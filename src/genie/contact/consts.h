@@ -14,8 +14,8 @@
 //#include <xtensor/xarray.hpp>
 #include <xtensor/xtensor.hpp>
 #include "genie/core/constants.h"
-#include "genie/core/record/contact/record.h"
-//#include "contact_parameters.h"
+#include "genie/core/record/contact_record/record.h"
+// #include "contact_parameters.h"
 //#include "subcontact_matrix_payload.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

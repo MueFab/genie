@@ -13,7 +13,7 @@
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xsort.hpp>
 #include "genie/contact/contact_coder.h"
-#include "genie/core/record/contact/record.h"
+#include "genie/core/record/contact_record/record.h"
 #include "genie/util/bit_reader.h"
 #include "helpers.h"
 //#include "genie/util/bitwriter.h"

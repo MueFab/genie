@@ -11,7 +11,7 @@
 #include "alignment_box.h"
 #include "alignment_shared_data.h"
 #include "genie/core/record/alignment_external/none.h"
-#include "genie/core/record/data_unit/record.h"
+#include "genie/core/record/data_unit_record/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"

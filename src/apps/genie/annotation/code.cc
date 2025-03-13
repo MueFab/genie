@@ -18,13 +18,12 @@
 #include "genie/util/runtime_exception.h"
 #include "genie/util/string_helpers.h"
 
-#include "genie/core/record/data_unit/record.h"
+#include "genie/core/record/data_unit_record/record.h"
 #include "genie/variantsite/accessunit_composer.h"
 #include "genie/variantsite/parameterset_composer.h"
 #include "genie/variantsite/variantsite_parser.h"
 
-#include "genie/core/record/variant_genotype/record.h"
-#include "genie/genotype/parameterset_composer.h"
+#include "genie/core/variant_genotype_record/record.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/likelihood/likelihood_coder.h"

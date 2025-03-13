@@ -13,7 +13,7 @@
 //#include <xtensor/xview.hpp>
 #include <codecs/include/mpegg-codecs.h>
 #include "genie/core/constants.h"
-#include "genie/core/record/variant_genotype/record.h"
+#include "genie/core/variant_genotype_record/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/runtime_exception.h"

@@ -24,7 +24,7 @@
 
 #include "genie/core/constants.h"
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
-#include "genie/core/record/variant_genotype/record.h"
+#include "genie/core/variant_genotype_record/record.h"
 #include "genie/likelihood/likelihood_parameters.h"
 #include "genotype_parameters.h"
 

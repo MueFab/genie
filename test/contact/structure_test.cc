@@ -437,7 +437,8 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
             }
         }
 
-        auto orig_obj = genie::contact::SubcontactMatrixParameters(ORIG_SCM_PARAM);
+        auto orig_obj = genie::contact::SubcontactMatrixParameters();
+        orig_obj = ORIG_SCM_PARAM;
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
@@ -524,9 +525,8 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
             }
         }
 
-        auto orig_obj = genie::contact::SubcontactMatrixParameters(
-            ORIG_SCM_PARAM
-        );
+        auto orig_obj = genie::contact::SubcontactMatrixParameters();
+        orig_obj = ORIG_SCM_PARAM;
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
