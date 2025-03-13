@@ -4,14 +4,10 @@
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
-
-#ifndef SRC_GENIE_CORE_META_REFBASE_H_
-#define SRC_GENIE_CORE_META_REFBASE_H_
+#ifndef SRC_GENIE_CORE_META_BLOCK_HEADER_H_
+#define SRC_GENIE_CORE_META_BLOCK_HEADER_H_
 
 // -----------------------------------------------------------------------------
-
-#include <memory>
-#include <string>
 
 #include "nlohmann/json.hpp"
 
@@ -20,29 +16,30 @@
 namespace genie::core::meta {
 
 /**
- * @brief Base class for reference information (internal and external)
+ * @brief Block header presence interface
  */
-class RefBase {
+class BlockHeader {
+public:
+ /**
+  * @brief Block header modes
+  */
+ enum class HeaderType : uint8_t { kDisabled = 0, kEnabled = 1 };
+
+private:
+ HeaderType type_;  //!< @brief Active type
+
 protected:
  /**
-  * @brief Do not allow construction of interface
+  * @brief Construct from type
+  * @param type Block header type
   */
- RefBase() = default;
+ explicit BlockHeader(HeaderType type);
 
 public:
  /**
-  * @brief Reference types supported by the standard
+  * @brief Virtual destructor for inheritance
   */
- enum class ReferenceType : uint8_t {
-  kMpeggRef = 0,
-  kRawRef = 1,
-  kFastaRef = 2
-};
-
- /**
-  * @brief Virtual destructor to allow inheritance
-  */
- virtual ~RefBase() = default;
+ virtual ~BlockHeader() = default;
 
  /**
   * @brief Convert to json
@@ -51,16 +48,10 @@ public:
  [[nodiscard]] virtual nlohmann::json ToJson() const = 0;
 
  /**
-  * @brief Get Json Key of this base (internal vs external ref)
-  * @return Json key
+  * @brief Return block header mode
+  * @return Block header mode
   */
- [[nodiscard]] virtual const std::string& GetKeyName() const = 0;
-
- /**
-  * @brief
-  * @return
-  */
- [[nodiscard]] virtual std::unique_ptr<RefBase> Clone() const = 0;
+ [[nodiscard]] HeaderType GetType() const;
 };
 
 // -----------------------------------------------------------------------------
@@ -69,7 +60,7 @@ public:
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_META_REFBASE_H_
+#endif  // SRC_GENIE_CORE_META_BLOCK_HEADER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

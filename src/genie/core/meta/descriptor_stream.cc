@@ -5,13 +5,10 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/core/meta/label.h"
+#include "genie/core/meta/descriptor_stream.h"
 
 #include <string>
 #include <utility>
-#include <vector>
-
-#include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
@@ -19,39 +16,39 @@ namespace genie::core::meta {
 
 // -----------------------------------------------------------------------------
 
-Label::Label(std::string id) : label_id_(std::move(id)) {}
+DescriptorStream::DescriptorStream(const size_t descriptor_id,
+                                   std::string ds_protection_value)
+    : descriptor_id_(descriptor_id),
+      ds_protection_value_(std::move(ds_protection_value)) {}
 
 // -----------------------------------------------------------------------------
 
-Label::Label(const nlohmann::json& json) : label_id_(json["label_ID"]) {
-  for (const auto& r : json["regions"]) {
-    regions_.emplace_back(r);
-  }
-  UTILS_DIE_IF(regions_.empty(), "Empty label region.");
-}
+DescriptorStream::DescriptorStream(const nlohmann::json& obj)
+    : descriptor_id_(obj["descriptor_ID"]),
+      ds_protection_value_(obj["DS_protection_value"]) {}
 
 // -----------------------------------------------------------------------------
 
-nlohmann::json Label::ToJson() const {
+size_t DescriptorStream::GetId() const { return descriptor_id_; }
+
+// -----------------------------------------------------------------------------
+
+nlohmann::json DescriptorStream::ToJson() const {
   nlohmann::json ret;
-  ret["label_ID"] = label_id_;
-  for (const auto& r : regions_) {
-    ret["regions"].push_back(r.ToJson());
-  }
+  ret["descriptor_ID"] = descriptor_id_;
+  ret["DS_protection_value"] = ds_protection_value_;
   return ret;
 }
 
 // -----------------------------------------------------------------------------
 
-void Label::AddRegion(Region r) { regions_.emplace_back(std::move(r)); }
+const std::string& DescriptorStream::GetProtection() const {
+  return ds_protection_value_;
+}
 
 // -----------------------------------------------------------------------------
 
-const std::string& Label::GetId() const { return label_id_; }
-
-// -----------------------------------------------------------------------------
-
-const std::vector<Region>& Label::GetRegions() const { return regions_; }
+std::string& DescriptorStream::GetProtection() { return ds_protection_value_; }
 
 // -----------------------------------------------------------------------------
 

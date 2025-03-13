@@ -13,10 +13,10 @@
 #include <string>
 #include <vector>
 #include "genie/core/constants.h"
-#include "genie/core/meta/external-ref/fasta.h"
-#include "genie/core/meta/external-ref/mpeg.h"
-#include "genie/core/meta/external-ref/raw.h"
-#include "genie/core/meta/internal-ref.h"
+#include "genie/core/meta/external_ref/fasta.h"
+#include "genie/core/meta/external_ref/mpeg.h"
+#include "genie/core/meta/external_ref/raw.h"
+#include "genie/core/meta/internal_ref.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"

@@ -14,9 +14,9 @@
 #include <vector>
 #include "boost/optional/optional.hpp"
 #include "genie/core/constants.h"
-#include "genie/core/meta/blockheader.h"
-#include "genie/core/meta/blockheader/disabled.h"
-#include "genie/core/meta/blockheader/enabled.h"
+#include "genie/core/meta/block_header.h"
+#include "genie/core/meta/block_header/disabled.h"
+#include "genie/core/meta/block_header/enabled.h"
 #include "genie/core/parameter/data_unit.h"
 #include "genie/core/record/class_type.h"
 #include "genie/format/mgg/dataset_header/block_header_off_options.h"

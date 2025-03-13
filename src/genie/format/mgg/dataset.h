@@ -13,8 +13,8 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "genie/core/meta/blockheader/disabled.h"
-#include "genie/core/meta/blockheader/enabled.h"
+#include "genie/core/meta/block_header/disabled.h"
+#include "genie/core/meta/block_header/enabled.h"
 #include "genie/core/meta/dataset.h"
 #include "genie/format/mgb/mgb_file.h"
 #include "genie/format/mgg/access_unit.h"
