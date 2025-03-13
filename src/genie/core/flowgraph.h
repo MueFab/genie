@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/core/meta/blockheader/enabled.h"
+#include "genie/core/meta/block_header/enabled.h"
 #include "genie/core/meta/dataset.h"
 #include "genie/core/stats/perf-stats.h"
 #include "genie/util/make_unique.h"

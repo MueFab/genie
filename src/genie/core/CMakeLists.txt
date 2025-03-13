@@ -89,19 +89,19 @@ set(source_files
         meta/sequence.cc
         meta/region.cc
         meta/reference.cc
-        meta/access-unit.cc
-        meta/blockheader.cc
+        meta/access_unit.cc
+        meta/block_header.cc
         meta/dataset.cc
-        meta/dataset-group.cc
-        meta/descriptor-stream.cc
+        meta/dataset_group.cc
+        meta/descriptor_stream.cc
         meta/label.cc
-        meta/external-ref.cc
-        meta/internal-ref.cc
-        meta/external-ref/fasta.cc
-        meta/external-ref/raw.cc
-        meta/external-ref/mpeg.cc
-        meta/blockheader/enabled.cc
-        meta/blockheader/disabled.cc
+        meta/external_ref.cc
+        meta/internal_ref.cc
+        meta/external_ref/fasta.cc
+        meta/external_ref/raw.cc
+        meta/external_ref/mpeg.cc
+        meta/block_header/enabled.cc
+        meta/block_header/disabled.cc
         api.cc
         c_api.cc
         payload.cc

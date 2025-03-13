@@ -11,7 +11,7 @@
 
 #include <memory>
 #include <vector>
-#include "genie/core/meta/internal-ref.h"
+#include "genie/core/meta/internal_ref.h"
 #include "genie/core/reference.h"
 #include "genie/core/reference_manager.h"
 
