@@ -16,9 +16,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+
+
+namespace genie::entropy::paramcabac {
 
 /**
  * @brief
@@ -69,31 +69,31 @@ class SupportValues {
      * @brief
      * @return
      */
-    uint8_t getOutputSymbolSize() const;
+    [[nodiscard]] uint8_t GetOutputSymbolSize() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getCodingSubsymSize() const;
+    [[nodiscard]] uint8_t GetCodingSubsymSize() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getCodingOrder() const;
+    [[nodiscard]] uint8_t GetCodingOrder() const;
 
     /**
      * @brief
      * @return
      */
-    bool getShareSubsymLutFlag() const;
+    [[nodiscard]] bool GetShareSubsymLutFlag() const;
 
     /**
      * @brief
      * @return
      */
-    bool getShareSubsymPrvFlag() const;
+    [[nodiscard]] bool GetShareSubsymPrvFlag() const;
 
     /**
      * @brief
@@ -114,21 +114,21 @@ class SupportValues {
      * @param transformIdSubsym
      * @return
      */
-    nlohmann::json toJson(TransformIdSubsym transformIdSubsym) const;
+    [[nodiscard]] nlohmann::json ToJson(TransformIdSubsym transformIdSubsym) const;
 
  private:
-    uint8_t output_symbol_size;  //!< @brief
-    uint8_t coding_subsym_size;  //!< @brief
-    uint8_t coding_order;        //!< @brief
-    bool share_subsym_lut_flag;  //!< @brief
-    bool share_subsym_prv_flag;  //!< @brief
+    uint8_t output_symbol_size_;  //!< @brief
+    uint8_t coding_subsym_size_;  //!< @brief
+    uint8_t coding_order_;        //!< @brief
+    bool share_subsym_lut_flag_;  //!< @brief
+    bool share_subsym_prv_flag_;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+} // namespace genie::entropy::paramcabac
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
