@@ -7,6 +7,8 @@
 #include "genie/annotation/geno_annotation.h"
 
 #include <codecs/include/mpegg-codecs.h>
+
+#include <iostream>
 #include <string>
 #include <tuple>
 
@@ -39,11 +41,35 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(
   likelihood_opt.block_size = static_cast<uint32_t>(defaultTileSizeHeight);
 
   std::vector<ParsBlocks> blocksWPars;
-  readBlocks(inputfile, defaultTileSizeHeight, blocksWPars);
+  auto numberofRows = readBlocks(inputfile, defaultTileSizeHeight, blocksWPars);
   GenoUnits dataunit;
   ParsBlocks combined;
-  {
     combined = blocksWPars.at(0);
+
+  {
+    std::ofstream workaroundFile;
+    workaroundFile.open("wofR" + std::to_string(numberofRows) + "_TS" +
+                        std::to_string(defaultTileSizeHeight) + ".txt");
+
+    for (auto i = 0; i < blocksWPars.size(); ++i) {
+      auto tile_index_1 =
+          blocksWPars.at(i).blocks.at(0).rowStart / defaultTileSizeHeight;
+      auto tile_index_2 =
+          blocksWPars.at(i).blocks.at(0).colStart / defaultTileSizeWidth;
+      auto max_ploidy =
+          blocksWPars.at(i).blocks.at(0).genotypeDatablock.max_ploidy;
+      std::string nr_flag =
+          blocksWPars.at(i).blocks.at(0).genotypeDatablock.dot_flag ? "true"
+                                                                    : "false";
+      std::string na_flag =
+          blocksWPars.at(i).blocks.at(0).genotypeDatablock.na_flag ? "true"
+                                                                   : "false";
+      workaroundFile << std::to_string(tile_index_1) << ", "
+                     << std::to_string(tile_index_2) << ", "
+                     << std::to_string(max_ploidy) << ", " << nr_flag << ", "
+                     << na_flag << std::endl;
+    }
+
     for (auto i = 1; i < blocksWPars.size(); ++i) {
       combined.blocks.push_back(blocksWPars.at(i).blocks.at(0));
     }

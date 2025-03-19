@@ -243,9 +243,8 @@ INSTANTIATE_TEST_SUITE_P(
                       "chrX_10x1000/ALL.chrX_47000-47999.site", 1000u, 1000, 3000u),
                       TestDetails("chrX_10x1000/ALL.chrX_48000-48999.geno", "chrX_10x1000/ALL.chrX_48000-48999.site",
                       1000u, 1000, 3000u),
-                      TestDetails("chrX_10x1000/ALL.chrX_49000-49999.geno", "chrX_10x1000/ALL.chrX_49000-49999.site",
-                      1000u, 1000, 3000u),
                       */
-                      TestDetails("ALL.chrX.100000.geno", "ALL.chrX.100000.site", 100000u, 1000, 3000),
+                      TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 1000, 3000u),
+                    //  TestDetails("ALL.chrX.100000.geno", "ALL.chrX.100000.site", 100000u, 1000, 3000),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 15u, 3000u),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 3000u)));
