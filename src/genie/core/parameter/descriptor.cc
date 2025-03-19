@@ -1,50 +1,51 @@
 /**
+* Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/core/parameter/descriptor.h"
+
+#include <memory>
+
 #include "genie/core/parameter/descriptor_present/descriptor_present.h"
-#include "genie/util/make_unique.h"
 #include "genie/util/runtime_exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
+namespace genie::core::parameter {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool Descriptor::equals(const Descriptor *desc) const { return dec_cfg_preset == desc->dec_cfg_preset; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Descriptor::write(util::BitWriter &writer) const { writer.WriteBits(uint8_t(dec_cfg_preset), 8); }
-std::unique_ptr<Descriptor> Descriptor::factory(GenDesc desc, util::BitReader &reader) {
-    auto preset = reader.Read<uint8_t>();
-    switch (preset) {
-        case 0:  // TODO(Fabian): move factory
-            return util::make_unique<desc_pres::DescriptorPresent>(desc, reader);
-        default:
-            UTILS_DIE("Invalid DecCfgPreset");
-    }
+bool Descriptor::Equals(const Descriptor* desc) const {
+  return dec_cfg_preset_ == desc->dec_cfg_preset_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint8_t Descriptor::getPreset() const { return dec_cfg_preset; }
+void Descriptor::Write(util::BitWriter& writer) const {
+  writer.WriteBits(dec_cfg_preset_, 8);
+}
+std::unique_ptr<Descriptor> Descriptor::Factory(GenDesc desc,
+                                                util::BitReader& reader) {
+  const auto preset = reader.Read<uint8_t>();
+  UTILS_DIE_IF(preset != 0, "Invalid DecCfgPreset");
+  return std::make_unique<desc_pres::DescriptorPresent>(desc, reader);
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Descriptor::Descriptor(uint8_t _dec_cfg_preset) : dec_cfg_preset(_dec_cfg_preset) {}
+uint8_t Descriptor::GetPreset() const { return dec_cfg_preset_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+Descriptor::Descriptor(const uint8_t dec_cfg_preset)
+    : dec_cfg_preset_(dec_cfg_preset) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+}  // namespace genie::core::parameter
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

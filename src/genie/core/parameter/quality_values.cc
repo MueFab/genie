@@ -5,7 +5,7 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/core/parameter/data_unit.h"
+#include "genie/core/parameter/quality_values.h"
 
 // -----------------------------------------------------------------------------
 
@@ -13,36 +13,19 @@ namespace genie::core::parameter {
 
 // -----------------------------------------------------------------------------
 
-DataUnit::DataUnit(const DataUnitType& t) : data_unit_type_(t) {}
+uint8_t QualityValues::GetMode() const { return qv_coding_mode_; }
 
 // -----------------------------------------------------------------------------
 
-void DataUnit::Write(util::BitWriter& writer) const {
-  writer.WriteBits(static_cast<uint64_t>(data_unit_type_), 8);
-}
+QualityValues::QualityValues(const uint8_t qv_coding_mode,
+                             const bool qv_reverse_flag)
+    : qv_coding_mode_(qv_coding_mode), qv_reverse_flag_(qv_reverse_flag) {}
 
 // -----------------------------------------------------------------------------
 
-DataUnit::DataUnitType DataUnit::GetDataUnitType() const {
-  return data_unit_type_;
-}
-
-// -----------------------------------------------------------------------------
-
-void DataUnit::PrintDebug(std::ostream& output, uint8_t, uint8_t) const {
-  output << "* Data Unit: ";
-  switch (data_unit_type_) {
-    case DataUnitType::kRawReference:
-      output << "raw reference";
-    break;
-    case DataUnitType::kParameterSet:
-      output << "parameter set";
-    break;
-    case DataUnitType::kAccessUnit:
-      output << "access unit";
-    break;
-  }
-  output << std::endl;
+bool QualityValues::Equals(const QualityValues* qv) const {
+  return qv_coding_mode_ == qv->qv_coding_mode_ &&
+         qv_reverse_flag_ == qv->qv_reverse_flag_;
 }
 
 // -----------------------------------------------------------------------------

@@ -5,12 +5,12 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_PARAMETER_COMPUTED_REF_EXTENDED_H_
-#define SRC_GENIE_CORE_PARAMETER_COMPUTED_REF_EXTENDED_H_
+#ifndef SRC_GENIE_CORE_PARAMETER_QUALITY_VALUES_H_
+#define SRC_GENIE_CORE_PARAMETER_QUALITY_VALUES_H_
 
 // -----------------------------------------------------------------------------
 
-#include <cstdint>
+#include <memory>
 
 #include "genie/util/bit_writer.h"
 
@@ -21,41 +21,54 @@ namespace genie::core::parameter {
 /**
  * @brief
  */
-class ComputedRefExtended final {
- uint8_t cr_pad_size_;       //!< @brief
- uint32_t cr_buf_max_size_;  //!< @brief
-
+class QualityValues {
 public:
- /**
-  * @brief
-  * @param ext
-  * @return
-  */
- bool operator==(const ComputedRefExtended& ext) const;
-
- /**
-  * @brief
-  * @param cr_pad_size
-  * @param cr_buf_max_size
-  */
- ComputedRefExtended(uint8_t cr_pad_size, uint32_t cr_buf_max_size);
-
- /**
-  * @brief
-  */
- ~ComputedRefExtended() = default;
-
- /**
-  * @brief
-  * @return
-  */
- [[nodiscard]] uint32_t GetBufMaxSize() const;
-
  /**
   * @brief
   * @param writer
   */
- void Write(util::BitWriter& writer) const;
+ virtual void Write(util::BitWriter& writer) const = 0;
+
+ /**
+  * @brief
+  */
+ virtual ~QualityValues() = default;
+
+ /**
+  * @brief
+  * @param qv_coding_mode
+  * @param qv_reverse_flag
+  */
+ QualityValues(uint8_t qv_coding_mode, bool qv_reverse_flag);
+
+ /**
+  * @brief
+  * @return
+  */
+ [[nodiscard]] virtual std::unique_ptr<QualityValues> Clone() const = 0;
+
+ /**
+  * @brief
+  * @return
+  */
+ [[nodiscard]] uint8_t GetMode() const;
+
+ /**
+  * @brief
+  * @return
+  */
+ [[nodiscard]] virtual size_t GetNumSubsequences() const = 0;
+
+ /**
+  * @brief
+  * @param qv
+  * @return
+  */
+ virtual bool Equals(const QualityValues* qv) const;
+
+protected:
+ uint8_t qv_coding_mode_;  //!< @brief
+ bool qv_reverse_flag_;    //!< @brief
 };
 
 // -----------------------------------------------------------------------------
@@ -64,7 +77,7 @@ public:
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_PARAMETER_COMPUTED_REF_EXTENDED_H_
+#endif  // SRC_GENIE_CORE_PARAMETER_QUALITY_VALUES_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
