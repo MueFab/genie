@@ -5,12 +5,7 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/entropy/gabac/run.h"
-
-#include <cstdint>
-
-#include "genie/entropy/gabac/decode_desc_sub_seq.h"
-#include "genie/entropy/gabac/encode_desc_sub_seq.h"
+#include "genie/entropy/gabac/context_model.h"
 
 // -----------------------------------------------------------------------------
 
@@ -18,12 +13,9 @@ namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
 
-uint64_t Run(const IoConfiguration& conf, const EncodingConfiguration& en_conf,
-             const bool decode) {
-  if (decode) {
-    return DecodeDescSubsequence(conf, en_conf);
-  }
-  return EncodeDescSubsequence(conf, en_conf);
+ContextModel::ContextModel(const unsigned char init_state) {
+  const unsigned char val_mps = init_state >= 64;
+  state_ = ((val_mps ? init_state - 64 : 63 - init_state) << 1) + val_mps;
 }
 
 // -----------------------------------------------------------------------------

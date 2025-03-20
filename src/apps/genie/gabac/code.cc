@@ -68,9 +68,9 @@ void code(const std::string &inputFilePath, const std::string &outputFilePath, c
         logstream = &nullstream;
     }
 
-    genie::entropy::gabac::IOConfiguration ioconf = {
+    genie::entropy::gabac::IoConfiguration ioconf = {
         istream, 1,         dstream,   ostream,
-        1,       blocksize, logstream, genie::entropy::gabac::IOConfiguration::LogLevel::LOG_INFO};
+        1,       blocksize, logstream, genie::entropy::gabac::IoConfiguration::LogLevel::LOG_INFO};
 
     genie::core::GenSubIndex genieSubseqID =
         (genie::core::GenSubIndex)std::pair<genie::core::GenDesc, uint8_t>((genie::core::GenDesc)descID, subseqID);
@@ -79,15 +79,15 @@ void code(const std::string &inputFilePath, const std::string &outputFilePath, c
 
     if (config_path.empty()) {
         config =
-            genie::entropy::gabac::EncodingConfiguration(genie::entropy::gabac::getEncoderConfigManual(genieSubseqID));
+            genie::entropy::gabac::EncodingConfiguration(genie::entropy::gabac::GetEncoderConfigManual(genieSubseqID));
             //  std::ofstream tmp("./cfg.json");
-            //  tmp << config.toJson().dump(4);
+            //  tmp << config.ToJson().dump(4);
     } else {
         std::ifstream t(config_path);
         std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
         config = genie::entropy::gabac::EncodingConfiguration(nlohmann::json::parse(str));
     }
-    genie::entropy::gabac::run(ioconf, config, decode);
+    genie::entropy::gabac::Run(ioconf, config, decode);
 
     /* GABACIFY_LOG_INFO << "Wrote buffer of size "
                       << outStream.bytesWritten()
