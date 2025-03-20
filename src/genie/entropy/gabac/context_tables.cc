@@ -5,30 +5,23 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/entropy/gabac/run.h"
+#include "genie/entropy/gabac/context_tables.h"
 
-#include <cstdint>
-
-#include "genie/entropy/gabac/decode_desc_sub_seq.h"
-#include "genie/entropy/gabac/encode_desc_sub_seq.h"
+#include <vector>
 
 // -----------------------------------------------------------------------------
 
-namespace genie::entropy::gabac {
+namespace genie::entropy::gabac::contexttables {
 
 // -----------------------------------------------------------------------------
 
-uint64_t Run(const IoConfiguration& conf, const EncodingConfiguration& en_conf,
-             const bool decode) {
-  if (decode) {
-    return DecodeDescSubsequence(conf, en_conf);
-  }
-  return EncodeDescSubsequence(conf, en_conf);
+std::vector<ContextModel> BuildContextTable(const uint64_t num_contexts) {
+  return std::vector<ContextModel>(num_contexts);
 }
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::entropy::gabac
+}  // namespace genie::entropy::gabac::contexttables
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

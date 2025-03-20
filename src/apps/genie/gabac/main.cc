@@ -39,11 +39,11 @@ int main(int argc, char* argv[]) {
                  programOptions.blocksize, programOptions.descID, programOptions.subseqID, true,
                  programOptions.dependencyFilePath);
         } else if (programOptions.task == "writeconfigs") {
-            for (const auto& d : genie::core::getDescriptors()) {
-                for (const auto& s : d.subseqs) {
+            for (const auto& d : genie::core::GetDescriptors()) {
+                for (const auto& s : d.sub_seqs) {
                     auto conf = genie::entropy::gabac::EncodingConfiguration(
-                                    genie::entropy::gabac::getEncoderConfigManual(s.id))
-                                    .toJson()
+                                    genie::entropy::gabac::GetEncoderConfigManual(s.id))
+                                    .ToJson()
                                     .dump(4);
                     std::ofstream outstream("gabacconf_" + std::to_string(static_cast<uint8_t>(s.id.first)) + "_" +
                                             std::to_string(s.id.second) + ".json");
@@ -55,12 +55,12 @@ int main(int argc, char* argv[]) {
             if (programOptions.fastBenchmark) {
                 timeweight = 1.0f;
             }
-            auto result = genie::entropy::gabac::benchmark_full(
+            auto result = genie::entropy::gabac::BenchmarkFull(
                 programOptions.inputFilePath,
                 genie::core::GenSubIndex(
                     std::make_pair(genie::core::GenDesc(programOptions.descID), programOptions.subseqID)),
                 timeweight);
-            auto json = result.config.toJoson().dump(4);
+            auto json = result.config.ToJson().dump(4);
             std::ofstream output_stream(programOptions.outputFilePath);
             output_stream.write(json.c_str(), json.length());
 
