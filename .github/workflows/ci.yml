@@ -227,7 +227,6 @@ jobs:
       - name: Make Release Binaries Executable
         run: chmod +x cmake-build-release/bin/*
 
-
       - name: Run Conformance Tests
         run: MPEGG_REF_DECODER=$PWD/ref-decoder/bin/decoder/mpegg-decoder-p2 ci/conformance_test.sh
 
@@ -239,6 +238,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+
+      - name: Set up QEMU (for ARM builds)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx (for multi-platform builds)
+        uses: docker/setup-buildx-action@v3
 
       - name: Docker Login
         uses: docker/login-action@v2
@@ -253,7 +258,18 @@ jobs:
           context: .
           file: 'Dockerfile'
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: muefab/genie:develop
+
+      - name: Build and Push Docker Image (ci_test branch)
+        if: github.ref == 'refs/heads/ci_test'
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: 'Dockerfile'
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: muefab/genie:ci_test
 
       - name: Build and Push Docker Image (main branch)
         if: github.ref == 'refs/heads/main'
@@ -262,6 +278,7 @@ jobs:
           context: .
           file: 'Dockerfile'
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: muefab/genie:latest
 
       - name: Build and Push Docker Image (Git tag)
@@ -271,4 +288,6 @@ jobs:
           context: .
           file: 'Dockerfile'
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: muefab/genie:${{ github.ref_name }}
+
