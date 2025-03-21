@@ -49,7 +49,7 @@
 #include "genie/read/spring/decoder.h"
 #include "genie/read/spring/encoder.h"
 
-#define USE_ZSTD 1
+#define USE_ZSTD 0
 
 // -----------------------------------------------------------------------------
 
