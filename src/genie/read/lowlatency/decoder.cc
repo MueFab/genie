@@ -65,12 +65,12 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) const {
     }
 
     for (size_t j = 0; j < num_segments; ++j) {
-      size_t length = data.GetParameters().GetReadLength();
-      e_cigars.emplace_back(length, '+');
       positions.emplace_back(std::numeric_limits<uint64_t>::max());
+      size_t length = data.GetParameters().GetReadLength();
       if (!length) {
         length = data.Pull(core::gen_sub::kReadLength) + 1;
       }
+      e_cigars.emplace_back(length, '+');
       std::string seq(length, '\0');
       for (auto& c : seq) {
         c = GetAlphabetProperties(core::AlphabetId::kAcgtn)

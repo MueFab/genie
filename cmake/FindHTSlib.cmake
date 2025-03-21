@@ -38,6 +38,9 @@ find_library(HTSlib_LIBRARY
         HINTS ENV HTSLIB_ROOT
         )
 
+set(ZLIB_LIBRARY, "/usr/local/lib/libz-ng.so")
+set(HTSlib_LIBRARY, "/usr/local/lib/libz-ng.so")
+
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this lib depends on.
 set(HTSlib_PROCESS_INCLUDES HTSlib_INCLUDE_DIR ZLIB_INCLUDE_DIR)

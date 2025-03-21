@@ -11,8 +11,7 @@
 
 #include <zlib.h>
 
-#include <cstdint>
-#include <optional>
+#include <array>
 #include <streambuf>
 #include <string>
 
@@ -21,31 +20,19 @@
 namespace genie::entropy::zlib {
 
 /**
- *
+ * Stream buffer for zlib compression
  */
 class ZlibStreamBuffer final : public std::streambuf {
  public:
   /**
-   *
+   * Constructor.
+   * @param file_path Path to the file.
+   * @param write_mode True for write mode, false for read mode.
+   * @param compression_level Compression level for writing (1-9, -1 for
+   * default).
    */
-  gzFile file_;
-
-  /**
-   *
-   */
-  std::optional<char> buffer_;
-
-  /**
-   *
-   */
-  bool writeMode_;
-
-  /**
-   *
-   * @param file_path
-   * @param mode
-   */
-  explicit ZlibStreamBuffer(const std::string& file_path, bool mode);
+  explicit ZlibStreamBuffer(const std::string& file_path, bool write_mode,
+                            int compression_level = -1);
 
   /**
    *
@@ -54,10 +41,15 @@ class ZlibStreamBuffer final : public std::streambuf {
 
  protected:
   /**
+   * @return
+   */
+  int underflow() override;
+
+  /**
    *
    * @return
    */
-  std::streamsize showmanyc() override;
+  int uflow() override;
 
   /**
    *
@@ -71,19 +63,6 @@ class ZlibStreamBuffer final : public std::streambuf {
    *
    * @return
    */
-  int underflow() override;
-
-  /**
-   *
-   * @return
-   */
-  int uflow() override;
-
-  /**
-   *
-   * @param c
-   * @return
-   */
   int overflow(int c) override;
 
   /**
@@ -93,6 +72,33 @@ class ZlibStreamBuffer final : public std::streambuf {
    * @return
    */
   std::streamsize xsputn(const char* s, std::streamsize n) override;
+
+  /**
+   *
+   * @return
+   */
+  int sync() override;
+
+ private:
+  /**
+   *
+   */
+  gzFile file_;
+
+  /**
+   *
+   */
+  bool write_mode_;
+
+  /**
+   *
+   */
+  static constexpr size_t buffer_size_ = 4096;
+
+  /**
+   *
+   */
+  std::array<char, buffer_size_> buffer_;
 };
 
 // -----------------------------------------------------------------------------
@@ -102,6 +108,3 @@ class ZlibStreamBuffer final : public std::streambuf {
 // -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_ENTROPY_ZLIB_ZLIBSTREAMBUFFER_H_
-
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
