@@ -100,11 +100,11 @@ void UpdateRefCount(std::bitset<BitsetSize>& cur, std::bitset<BitsetSize>& ref,
     return (a & 0x06) >> 1;
   };  // inverse of above
   char s[kMaxReadLen + 1], *current;
+  char s1[kMaxReadLen + 1];
   BitsetToString<BitsetSize>(cur, s, cur_read_len, rg);
   if (!rev) {
     current = s;
   } else {
-    char s1[kMaxReadLen + 1];
     ReverseComplement(s, s1, cur_read_len);
     current = s1;
   }
