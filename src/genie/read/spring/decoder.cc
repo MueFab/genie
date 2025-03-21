@@ -363,6 +363,8 @@ void Decoder::FlowIn(core::AccessUnit&& t, const util::Section& id) {
   DecodeStreams(au, cp_.paired_end, combine_pairs_, matched_records,
                 unmatched_records, std::get<0>(names), std::get<0>(qvs));
 
+  size_t chunk_size = cp_.paired_end ? matched_records[0].size() * 2
+                                     : matched_records[0].size();
   for (size_t i = 0; i < matched_records[0].size(); ++i) {
     chunk.GetData().emplace_back(
         cp_.paired_end ? static_cast<uint8_t>(2) : static_cast<uint8_t>(1),
@@ -383,6 +385,7 @@ void Decoder::FlowIn(core::AccessUnit&& t, const util::Section& id) {
   }
   // now put unmatched reads to chunks if combine_pairs is false
   if (!combine_pairs_) {
+    chunk_size += unmatched_records[0].size();
     for (auto& [name, seq, qv] : unmatched_records[0]) {
       chunk.GetData().emplace_back(
           cp_.paired_end ? static_cast<uint8_t>(2) : static_cast<uint8_t>(1),
@@ -396,6 +399,7 @@ void Decoder::FlowIn(core::AccessUnit&& t, const util::Section& id) {
       chunk.GetData().back().AddSegment(std::move(seg));
     }
     for (auto& [name, seq, qv] : unmatched_records[1]) {
+      chunk_size += unmatched_records[1].size();
       chunk.GetData().emplace_back(
           cp_.paired_end ? static_cast<uint8_t>(2) : static_cast<uint8_t>(1),
           core::record::ClassType::kClassU, std::move(name), "",
@@ -426,11 +430,6 @@ void Decoder::FlowIn(core::AccessUnit&& t, const util::Section& id) {
         }
       }
     }
-  }
-
-  size_t chunk_size = chunk.GetData().size();
-  if (cp_.paired_end) {
-    chunk_size *= 2;
   }
   chunk.SetStats(std::move(au.GetStats()));
   chunk.GetStats().AddDouble("time-spring-decoder", watch.Check());

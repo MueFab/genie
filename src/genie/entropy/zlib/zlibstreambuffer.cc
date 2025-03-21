@@ -1,132 +1,182 @@
-/**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/muefab/genie for more details.
- */
-
 #include "genie/entropy/zlib/zlibstreambuffer.h"
-
 #include <zlib.h>
-
-#include <iostream>
-#include <string>
-
-// -----------------------------------------------------------------------------
+#include <cstring>
+#include <stdexcept>
 
 namespace genie::entropy::zlib {
 
-// -----------------------------------------------------------------------------
+ZlibStreamBuffer::ZlibStreamBuffer(const std::string& file_path, bool writeMode,
+                                   std::size_t bufferSize, int compressionLevel)
+    : writeMode_(writeMode), internalBufferSize_(bufferSize) {
+  // Allocate internal buffer dynamically.
+  buffer_ = new char[internalBufferSize_];
 
-ZlibStreamBuffer::ZlibStreamBuffer(const std::string& file_path,
-                                   const bool mode)
-    : writeMode_(mode) {
-  if (mode) {
-    file_ = gzopen(file_path.c_str(), "wb");
+  // Build the mode string.
+  std::string mode;
+  if (writeMode_) {
+    mode = "wb";
+    // Append a compression level if specified.
+    if (compressionLevel >= 1 && compressionLevel <= 9) {
+      mode.push_back('0' + compressionLevel);
+    }
   } else {
-    file_ = gzopen(file_path.c_str(), "rb");
-    char c;
-    gzread(file_, &c, 1);
-    this->buffer_ = c;
+    mode = "rb";
   }
+
+  file_ = gzopen(file_path.c_str(), mode.c_str());
   if (!file_) {
+    delete[] buffer_;
     throw std::runtime_error("Failed to open file: " + file_path);
+  }
+
+  // Increase zlib's internal buffer size.
+  if (gzbuffer(file_, static_cast<unsigned>(bufferSize)) != 0) {
+    // gzbuffer returns 0 on success; you may log or handle errors here if desired.
+  }
+
+  if (writeMode_) {
+    // Set up the output area (reserve one byte for overflow handling).
+    setp(buffer_, buffer_ + internalBufferSize_ - 1);
+  } else {
+    // For reading, initially set the get area empty.
+    setg(buffer_, buffer_ + internalBufferSize_, buffer_ + internalBufferSize_);
   }
 }
 
-// -----------------------------------------------------------------------------
+ZlibStreamBuffer::~ZlibStreamBuffer() {
+  sync();         // Flush any buffered output.
+  gzclose(file_);
+  delete[] buffer_;
+}
 
-ZlibStreamBuffer::~ZlibStreamBuffer() { gzclose(file_); }
+int ZlibStreamBuffer::underflow() {
+  if (writeMode_) {
+    return traits_type::eof();
+  }
+  // If characters remain in the get area, return the current one.
+  if (gptr() < egptr()) {
+    return traits_type::to_int_type(*gptr());
+  }
+  // Fill the buffer with up to internalBufferSize_ bytes.
+  int bytesRead = gzread(file_, buffer_, static_cast<unsigned>(internalBufferSize_));
+  if (bytesRead <= 0) {
+    return traits_type::eof();
+  }
+  // Reset get area pointers.
+  setg(buffer_, buffer_, buffer_ + bytesRead);
+  return traits_type::to_int_type(*gptr());
+}
 
-// -----------------------------------------------------------------------------
+int ZlibStreamBuffer::uflow() {
+  int ch = underflow();
+  if (ch != traits_type::eof()) {
+    gbump(1);
+  }
+  return ch;
+}
 
-std::streamsize ZlibStreamBuffer::showmanyc() { return file_->have; }
+std::streamsize ZlibStreamBuffer::xsgetn(char* s, std::streamsize n) {
+  std::streamsize total = 0;
+  while (n > 0) {
+    int available = egptr() - gptr();
+    if (available <= 0) {
+      if (underflow() == traits_type::eof()) break;
+      available = egptr() - gptr();
+    }
+    int toCopy = (available < n) ? available : n;
+    std::memcpy(s, gptr(), toCopy);
+    gbump(toCopy);
+    s += toCopy;
+    total += toCopy;
+    n -= toCopy;
+  }
+  return total;
+}
 
-// -----------------------------------------------------------------------------
+int ZlibStreamBuffer::overflow(int c) {
+  if (!writeMode_) {
+    return traits_type::eof();
+  }
+  // Flush the current contents of the buffer.
+  int num = pptr() - pbase();
+  if (num > 0) {
+    int written = gzwrite(file_, pbase(), num);
+    if (written != num) {
+      return traits_type::eof();
+    }
+  }
+  // Reset the put area.
+  setp(buffer_, buffer_ + internalBufferSize_ - 1);
+  // If c is not EOF, add it to the buffer.
+  if (c != traits_type::eof()) {
+    *pptr() = traits_type::to_char_type(c);
+    pbump(1);
+  }
+  // Return a non-EOF value to indicate success.
+  return traits_type::not_eof(c);
+}
 
-std::streamsize ZlibStreamBuffer::xsgetn(char* s, const std::streamsize n) {
-  if (this->buffer_.has_value()) {
-    *s = this->buffer_.value();
-    s++;
-    int read_chars = 1;
-    for (int i = 0; i < n; i++) {
-      const int err = gzread(file_, s, 1);
-      read_chars += err;
-      if (gzeof(file_)) {
+
+std::streamsize ZlibStreamBuffer::xsputn(const char* s, std::streamsize n) {
+  // Optimized path for a single character.
+  if (n == 1) {
+    if (pptr() < epptr()) {
+      *pptr() = s[0];
+      pbump(1);
+      return 1;
+    } else {
+      if (overflow(s[0]) == traits_type::eof()) {
+        return 0;
+      }
+      return 1;
+    }
+  }
+
+  std::streamsize total = 0;
+  // If n is larger than the internal buffer, flush the current buffer and write the data directly.
+  if (n >= static_cast<std::streamsize>(internalBufferSize_)) {
+    // Flush any data already buffered.
+    if (pptr() > pbase()) {
+      if (overflow(traits_type::eof()) == traits_type::eof()) {
+        return total;
+      }
+    }
+    int written = gzwrite(file_, s, static_cast<unsigned>(n));
+    if (written <= 0) {
+      return total;
+    }
+    total += written;
+    return total;
+  }
+
+  // Otherwise, use the internal buffer as before.
+  while (n > 0) {
+    int space = epptr() - pptr();
+    if (space == 0) {
+      if (overflow(traits_type::eof()) == traits_type::eof()) {
         break;
       }
-      s++;
+      space = epptr() - pptr();
     }
-    gzread(file_, &this->buffer_.value(), 1);
-    return read_chars;
+    int toCopy = (space < n) ? space : n;
+    std::memcpy(pptr(), s, toCopy);
+    pbump(toCopy);
+    s += toCopy;
+    total += toCopy;
+    n -= toCopy;
+  }
+  return total;
+}
+
+
+
+int ZlibStreamBuffer::sync() {
+  if (writeMode_) {
+    if (overflow(traits_type::eof()) == traits_type::eof()) {
+      return -1;
+    }
   }
   return 0;
 }
 
-// -----------------------------------------------------------------------------
-
-std::streamsize ZlibStreamBuffer::xsputn(const char* s,
-                                         const std::streamsize n) {
-  if (this->buffer_.has_value()) {
-    int write_chars = gzwrite(file_, &this->buffer_.value(), 1);
-    for (int i = 0; i < n; i++) {
-      write_chars += gzwrite(file_, s, 1);
-      s++;
-      if (gzeof(file_)) {
-        return write_chars;
-      }
-    }
-    this->buffer_.value() = *s;
-    return write_chars;
-  }
-
-  int write_chars = 0;
-  for (int i = 0; i < n; i++) {
-    write_chars += gzwrite(file_, s, 1);
-    s++;
-    if (gzeof(file_)) {
-      return write_chars;
-    }
-  }
-  return write_chars;
-}
-
-// -----------------------------------------------------------------------------
-
-int ZlibStreamBuffer::overflow(const int c) {
-  if (c == EOF) {
-    this->buffer_ = std::nullopt;
-    return EOF;
-  }
-  this->buffer_.value() = c;
-  return c;
-}
-
-// -----------------------------------------------------------------------------
-
-int ZlibStreamBuffer::underflow() {
-  if (this->buffer_.has_value()) {
-    return this->buffer_.value();
-  }
-  return EOF;
-}
-
-// -----------------------------------------------------------------------------
-
-int ZlibStreamBuffer::uflow() {
-  if (this->buffer_.has_value()) {
-    const char local_buffer = this->buffer_.value();
-    gzread(file_, &this->buffer_, 1);
-    if (gzeof(file_)) {
-      this->buffer_ = std::nullopt;
-    }
-    return local_buffer;
-  }
-  return EOF;
-}
-
-// -----------------------------------------------------------------------------
-
 }  // namespace genie::entropy::zlib
-
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------

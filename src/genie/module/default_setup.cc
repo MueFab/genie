@@ -49,6 +49,8 @@
 #include "genie/read/spring/decoder.h"
 #include "genie/read/spring/encoder.h"
 
+#define USE_ZSTD 1
+
 // -----------------------------------------------------------------------------
 
 namespace genie::module {
@@ -101,7 +103,13 @@ std::unique_ptr<core::FlowGraphEncode> BuildDefaultEncoder(
 
   ret->AddNameCoder(std::make_unique<name::tokenizer::Encoder>());
   ret->AddNameCoder(std::make_unique<name::write_out::Encoder>());
-  ret->SetNameSelector([](const core::record::Chunk&) -> size_t { return 0; });
+  ret->SetNameSelector([](const core::record::Chunk&) -> size_t {
+#if USE_ZSTD
+    return 1;
+#else
+    return 0;
+#endif
+  });
 
   ret->AddEntropyCoder(
       std::make_unique<entropy::gabac::Encoder>(write_raw_streams));
@@ -112,7 +120,13 @@ std::unique_ptr<core::FlowGraphEncode> BuildDefaultEncoder(
   ret->AddEntropyCoder(
       std::make_unique<entropy::bsc::Encoder>(write_raw_streams));
   ret->SetEntropyCoderSelector(
-      [](const core::AccessUnit::Descriptor&) -> size_t { return 0; });
+      [](const core::AccessUnit::Descriptor&) -> size_t {
+#if USE_ZSTD
+        return 2;
+#else
+        return 0;
+#endif
+      });
 
   ret->SetExporterSelector([](const core::AccessUnit&) -> size_t { return 0; });
 
