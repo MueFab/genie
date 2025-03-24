@@ -17,9 +17,9 @@
 #include <utility>
 #include <vector>
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
+#include "genie/core/writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
