@@ -1,112 +1,158 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @brief Header file defining the `FileHeader` class, which represents the file
+ * header of an MPEG-G format file.
+ * @details This file provides the class definition for `FileHeader`, which
+ * encapsulates information about the file header, including the major brand,
+ * minor version, and compatible brands of the MPEG-G file. The `FileHeader`
+ * class inherits from `GenInfo` and includes methods for reading, writing, and
+ * comparing file header elements.
+ * @copyright This file is part of Genie.
+ *            See LICENSE and/or https://github.com/MueFab/genie for more
+ * details.
  */
 
 #ifndef SRC_GENIE_FORMAT_MGG_FILE_HEADER_H_
 #define SRC_GENIE_FORMAT_MGG_FILE_HEADER_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <string>
 #include <vector>
+
 #include "genie/core/constants.h"
 #include "genie/format/mgg/gen_info.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
- * @brief
+ * @brief Class representing the file header for an MPEG-G file.
+ * @details The `FileHeader` class stores metadata related to the file format,
+ * such as the major brand identifier, the minor version number, and a list of
+ * compatible brands that this file conforms to. It extends `GenInfo` to provide
+ *          specialized serialization and deserialization for file header
+ * metadata boxes.
  */
-class FileHeader : public GenInfo {
+class FileHeader final : public GenInfo {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    const std::string& getKey() const override;
+  /**
+   * @brief Retrieve the unique key identifier for the file header element.
+   * @details The key identifier is used to differentiate this type of
+   * metadata box from other types. For `FileHeader`, this typically
+   * corresponds to a string identifier.
+   * @return A constant reference to the string representing the key.
+   */
+  [[nodiscard]] const std::string& GetKey() const override;
 
-    /**
-     * @brief
-     */
-    FileHeader();
+  /**
+   * @brief Default constructor for the `FileHeader` class.
+   * @details Initializes the file header with empty or default values.
+   */
+  FileHeader();
 
-    /**
-     * @brief
-     */
-    explicit FileHeader(core::MPEGMinorVersion _minor_version);
+  /**
+   * @brief Construct a new `FileHeader` object with a specified minor
+   * version.
+   * @details This constructor sets the minor version to the given parameter
+   * and leaves other fields empty.
+   * @param minor_version The minor version to set for the file header.
+   */
+  explicit FileHeader(core::MpegMinorVersion minor_version);
 
-    /**
-     * @brief
-     */
-    explicit FileHeader(genie::util::BitReader& bitreader);
+  /**
+   * @brief Construct a new `FileHeader` object by reading from a `BitReader`.
+   * @details Initializes the file header by parsing its fields from the given
+   * bitstream reader.
+   * @param bit_reader The `BitReader` to extract the file header information
+   * from.
+   */
+  explicit FileHeader(util::BitReader& bit_reader);
 
-    /**
-     * @brief
-     * @param brand
-     */
-    void addCompatibleBrand(std::string brand);
+  /**
+   * @brief Add a compatible brand to the list of brands supported by this
+   * file.
+   * @details Compatible brands are used to specify other formats or versions
+   * that the file is compatible with.
+   * @param brand A string representing the compatible brand to add.
+   */
+  void AddCompatibleBrand(std::string brand);
 
-    /**
-     * @brief
-     * @return
-     */
-    const std::string& getMajorBrand() const;
+  /**
+   * @brief Retrieve the major brand identifier of the file header.
+   * @details The major brand indicates the primary format or specification
+   * this file conforms to.
+   * @return A constant reference to the string representing the major brand.
+   */
+  [[nodiscard]] const std::string& GetMajorBrand() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    core::MPEGMinorVersion getMinorVersion() const;
+  /**
+   * @brief Retrieve the minor version number of the file header.
+   * @details The minor version is used to indicate the specific version of
+   * the major brand.
+   * @return An enum representing the minor version of the file header.
+   */
+  [[nodiscard]] core::MpegMinorVersion GetMinorVersion() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    const std::vector<std::string>& getCompatibleBrands() const;
+  /**
+   * @brief Retrieve the list of compatible brands for the file.
+   * @details The compatible brands provide additional information on which
+   * other formats or versions are supported by this file.
+   * @return A constant reference to a vector containing the compatible brand
+   * strings.
+   */
+  [[nodiscard]] const std::vector<std::string>& GetCompatibleBrands() const;
 
-    /**
-     * @brief
-     * @param bitWriter
-     */
-    void box_write(genie::util::BitWriter& bitWriter) const override;
+  /**
+   * @brief Write the content of the `FileHeader` object to a `BitWriter`.
+   * @details This method serializes the file header data, including the major
+   * brand, minor version, and compatible brands, into the specified
+   * `BitWriter` object.
+   * @param bit_writer The `BitWriter` to serialize the data into.
+   */
+  void BoxWrite(util::BitWriter& bit_writer) const override;
 
-    /**
-     * @brief
-     * @param info
-     * @return
-     */
-    bool operator==(const GenInfo& info) const override;
+  /**
+   * @brief Compare this `FileHeader` object with another for equality.
+   * @details The equality check considers the major brand, minor version, and
+   * compatible brands to determine if two file headers are equivalent.
+   * @param info The other `GenInfo` object to compare against.
+   * @return True if the two file headers are equal, false otherwise.
+   */
+  bool operator==(const GenInfo& info) const override;
 
-    /**
-     * @brief
-     * @param output
-     * @param depth
-     * @param max_depth
-     */
-    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override;
+  /**
+   * @brief Print the content of the `FileHeader` object for debugging.
+   * @details This method outputs the internal state of the file header,
+   * including the major brand, minor version, and compatible brands, to the
+   * specified output stream.
+   * @param output The stream to print the debug information to.
+   * @param depth The current level of indentation for nested structures.
+   * @param max_depth The maximum depth for nested structures to be printed.
+   */
+  void PrintDebug(std::ostream& output, uint8_t depth,
+                   uint8_t max_depth) const override;
 
  private:
-    std::string major_brand;                     //!< @brief
-    core::MPEGMinorVersion minor_version;        //!< @brief
-    std::vector<std::string> compatible_brands;  //!< @brief
+  std::string major_brand_;  //!< @brief The major brand identifier for the
+                             //!< file format.
+  core::MpegMinorVersion
+      minor_version_;  //!< @brief The minor version of the file format.
+  std::vector<std::string>
+      compatible_brands_;  //!< @brief A list of compatible brands supported by
+                           //!< the file.
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_FORMAT_MGG_FILE_HEADER_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

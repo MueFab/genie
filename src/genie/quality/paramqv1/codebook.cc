@@ -1,66 +1,74 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * Copyright 2018-2024 The Genie Authors.
+ * @file codebook.cc
+ *
+ * @brief Implementation of the Codebook class for quality value (QV)
+ * representation in the Genie framework.
+ *
+ * This file contains the implementation of the `Codebook` class within the
+ * `paramqv1` namespace. The class provides functionality for managing quality
+ * value reconstruction entries and their serialization.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/quality/paramqv1/codebook.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/runtime-exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include <vector>
 
-namespace genie {
-namespace quality {
-namespace paramqv1 {
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/runtime_exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool Codebook::operator==(const Codebook& ps) const { return qv_recon == ps.qv_recon; }
+namespace genie::quality::paramqv1 {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+bool Codebook::operator==(const Codebook& ps) const {
+  return qv_recon_ == ps.qv_recon_;
+}
+
+// -----------------------------------------------------------------------------
 
 Codebook::Codebook(util::BitReader& reader) {
-    qv_recon.resize(reader.read<uint8_t>());
-    for (auto& v : qv_recon) {
-        v = reader.read<uint8_t>();
-    }
+  qv_recon_.resize(reader.Read<uint8_t>());
+  for (auto& v : qv_recon_) {
+    v = reader.Read<uint8_t>();
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Codebook::addEntry(uint8_t entry) {
-    constexpr size_t BOOK_MAX_SIZE = 94;
-    UTILS_DIE_IF(qv_recon.size() == BOOK_MAX_SIZE, "Maximum codebook size exceeded");
-    qv_recon.emplace_back(entry);
+void Codebook::AddEntry(uint8_t entry) {
+  constexpr size_t book_max_size = 94;
+  UTILS_DIE_IF(qv_recon_.size() == book_max_size,
+               "Maximum codebook Size exceeded");
+  qv_recon_.emplace_back(entry);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void Codebook::write(util::BitWriter& writer) const {
-    writer.write(qv_recon.size(), 8);
-    for (const auto& v : qv_recon) {
-        writer.write(v, 8);
-    }
+  writer.WriteBits(qv_recon_.size(), 8);
+  for (const auto& v : qv_recon_) {
+    writer.WriteBits(v, 8);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Codebook::Codebook(uint8_t v1, uint8_t v2) {
-    qv_recon.push_back(v1);
-    qv_recon.push_back(v2);
+Codebook::Codebook(const uint8_t v1, const uint8_t v2) {
+  qv_recon_.push_back(v1);
+  qv_recon_.push_back(v2);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const std::vector<uint8_t>& Codebook::getEntries() const { return qv_recon; }
+const std::vector<uint8_t>& Codebook::GetEntries() const { return qv_recon_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace paramqv1
-}  // namespace quality
-}  // namespace genie
-
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+}  // namespace genie::quality::paramqv1

@@ -1,103 +1,115 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/dataset_metadata.h"
+
+#include <string>
 #include <utility>
-#include "genie/util/runtime-exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/util/runtime_exception.h"
 
-namespace genie {
-namespace format {
-namespace mgg {
+// -----------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------------------------------------------
+namespace genie::format::mgg {
 
-const std::string& DatasetMetadata::getKey() const {
-    static const std::string key = "dtmd";
-    return key;
+// -----------------------------------------------------------------------------
+
+const std::string& DatasetMetadata::GetKey() const {
+  static const std::string key = "dtmd";
+  return key;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-DatasetMetadata::DatasetMetadata(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version)
-    : version(_version) {
-    auto start_pos = bitreader.getPos() - 4;
-    auto length = bitreader.readBypassBE<uint64_t>();
-    auto metadata_length = length - GenInfo::getHeaderLength();
-    if (version != genie::core::MPEGMinorVersion::V1900) {
-        dataset_group_id = bitreader.readBypassBE<uint8_t>();
-        dataset_id = bitreader.readBypassBE<uint16_t>();
-        metadata_length -= sizeof(uint8_t);
-        metadata_length -= sizeof(uint16_t);
-    }
-    dg_metatdata_value.resize(metadata_length);
-    bitreader.readBypass(dg_metatdata_value);
-    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getPos()), "Invalid length");
-    UTILS_DIE_IF(!bitreader.isGood(), "Invalid length");
+DatasetMetadata::DatasetMetadata(util::BitReader& bitreader,
+                                 const core::MpegMinorVersion version)
+    : version_(version) {
+  const auto start_pos = bitreader.GetStreamPosition() - 4;
+  const auto length = bitreader.ReadAlignedInt<uint64_t>();
+  auto metadata_length = length - GetHeaderLength();
+  if (version_ != core::MpegMinorVersion::kV1900) {
+    dataset_group_id_ = bitreader.ReadAlignedInt<uint8_t>();
+    dataset_id_ = bitreader.ReadAlignedInt<uint16_t>();
+    metadata_length -= sizeof(uint8_t);
+    metadata_length -= sizeof(uint16_t);
+  }
+  dg_metatdata_value_.resize(metadata_length);
+  bitreader.ReadAlignedBytes(dg_metatdata_value_.data(),
+                             dg_metatdata_value_.length());
+  UTILS_DIE_IF(start_pos + length != bitreader.GetStreamPosition(),
+               "Invalid length");
+  UTILS_DIE_IF(!bitreader.IsStreamGood(), "Invalid length");
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-DatasetMetadata::DatasetMetadata(uint8_t _dataset_group_id, uint16_t _dataset_id, std::string _dg_metatdata_value,
-                                 genie::core::MPEGMinorVersion _version)
-    : version(_version),
-      dataset_group_id(_dataset_group_id),
-      dataset_id(_dataset_id),
-      dg_metatdata_value(std::move(_dg_metatdata_value)) {}
+DatasetMetadata::DatasetMetadata(const uint8_t dataset_group_id,
+                                 const uint16_t dataset_id,
+                                 std::string dg_metatdata_value,
+                                 const core::MpegMinorVersion version)
+    : version_(version),
+      dataset_group_id_(dataset_group_id),
+      dataset_id_(dataset_id),
+      dg_metatdata_value_(std::move(dg_metatdata_value)) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void DatasetMetadata::box_write(genie::util::BitWriter& bitWriter) const {
-    if (version != genie::core::MPEGMinorVersion::V1900) {
-        bitWriter.writeBypassBE(dataset_group_id);
-        bitWriter.writeBypassBE(dataset_id);
-    }
-    bitWriter.writeBypass(dg_metatdata_value.data(), dg_metatdata_value.length());
+void DatasetMetadata::BoxWrite(util::BitWriter& bit_writer) const {
+  if (version_ != core::MpegMinorVersion::kV1900) {
+    bit_writer.WriteAlignedInt(dataset_group_id_);
+    bit_writer.WriteAlignedInt(dataset_id_);
+  }
+  bit_writer.WriteAlignedBytes(dg_metatdata_value_.data(),
+                              dg_metatdata_value_.length());
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint8_t DatasetMetadata::getDatasetGroupID() const { return dataset_group_id; }
+uint8_t DatasetMetadata::GetDatasetGroupId() const { return dataset_group_id_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint16_t DatasetMetadata::getDatasetID() const { return dataset_id; }
+uint16_t DatasetMetadata::GetDatasetId() const { return dataset_id_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const std::string& DatasetMetadata::getMetadata() const { return dg_metatdata_value; }
+const std::string& DatasetMetadata::GetMetadata() const {
+  return dg_metatdata_value_;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 bool DatasetMetadata::operator==(const GenInfo& info) const {
-    if (!GenInfo::operator==(info)) {
-        return false;
-    }
-    const auto& other = dynamic_cast<const DatasetMetadata&>(info);
-    return version == other.version && dataset_group_id == other.dataset_group_id && dataset_id == other.dataset_id &&
-           dg_metatdata_value == other.dg_metatdata_value;
+  if (!GenInfo::operator==(info)) {
+    return false;
+  }
+  const auto& other = dynamic_cast<const DatasetMetadata&>(info);
+  return version_ == other.version_ &&
+         dataset_group_id_ == other.dataset_group_id_ &&
+         dataset_id_ == other.dataset_id_ &&
+         dg_metatdata_value_ == other.dg_metatdata_value_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::string DatasetMetadata::decapsulate() { return std::move(dg_metatdata_value); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetMetadata::patchID(uint8_t _groupID, uint16_t _setID) {
-    dataset_group_id = _groupID;
-    dataset_id = _setID;
+std::string DatasetMetadata::decapsulate() {
+  return std::move(dg_metatdata_value_);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+void DatasetMetadata::PatchId(const uint8_t group_id, const uint16_t set_id) {
+  dataset_group_id_ = group_id;
+  dataset_id_ = set_id;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+}  // namespace genie::format::mgg
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

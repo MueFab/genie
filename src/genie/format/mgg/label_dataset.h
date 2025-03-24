@@ -1,102 +1,115 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @brief Defines the LabelDataset class for managing label regions within a
+ * dataset in MPEG-G files.
+ * @details This file provides the implementation of the `LabelDataset` class,
+ * which is used to store and manage label regions associated with a specific
+ * dataset. It includes methods for serializing, deserializing, and extracting
+ * metadata from these regions. The LabelDataset class supports operations for
+ * manipulating and retrieving label-related data for a given dataset.
+ * @copyright This file is part of Genie.
+ *            See LICENSE and/or https://github.com/MueFab/genie for more
+ * details.
  */
 
 #ifndef SRC_GENIE_FORMAT_MGG_LABEL_DATASET_H_
 #define SRC_GENIE_FORMAT_MGG_LABEL_DATASET_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <vector>
+
 #include "genie/core/meta/label.h"
 #include "genie/format/mgg/label_region.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
- * @brief
+ * @brief Class representing a dataset of labels within an MPEG-G file.
+ * @details The LabelDataset class encapsulates a collection of label regions
+ * associated with a specific dataset ID. Each label region is defined using the
+ * `LabelRegion` class. This class provides functionality for managing label
+ * regions, serializing and deserializing label data, and extracting metadata.
  */
 class LabelDataset {
- private:
-    uint16_t dataset_ID;  //!< @brief
-
-    std::vector<LabelRegion> dataset_regions;  //!< @brief
+  uint16_t dataset_id_;  //!< @brief Identifier for the dataset associated with
+                        //!< this label dataset.
+  std::vector<LabelRegion>
+      dataset_regions_;  //!< @brief List of label regions within the dataset.
 
  public:
-    /**
-     * @brief
-     * @param dataset
-     * @return
-     */
-    std::vector<genie::core::meta::Region> decapsulate(uint16_t dataset);
+  /**
+   * @brief Extract label regions as core metadata regions.
+   * @param dataset Dataset ID to associate with the metadata.
+   * @return A vector of `core::meta::Region` objects representing the label
+   * regions.
+   */
+  std::vector<core::meta::Region> Decapsulate(uint16_t dataset);
 
-    /**
-     * @brief
-     * @param other
-     * @return
-     */
-    bool operator==(const LabelDataset& other) const;
+  /**
+   * @brief Compare this LabelDataset with another for equality.
+   * @param other The other LabelDataset object to compare.
+   * @return True if both datasets are equivalent, false otherwise.
+   */
+  bool operator==(const LabelDataset& other) const;
 
-    /**
-     * @brief
-     * @param _ds_ID
-     */
-    explicit LabelDataset(uint16_t _ds_ID);
-    /**
-     * @brief
-     * @param reader
-     */
-    explicit LabelDataset(util::BitReader& reader);
+  /**
+   * @brief Construct a new LabelDataset object with a specified dataset ID.
+   * @param ds_id Dataset ID to associate with this LabelDataset.
+   */
+  explicit LabelDataset(uint16_t ds_id);
 
-    /**
-     * @brief
-     * @param _dataset_ID
-     * @param labels
-     */
-    LabelDataset(uint16_t _dataset_ID, genie::core::meta::Label& labels);
+  /**
+   * @brief Construct a new LabelDataset object from a BitReader.
+   * @param reader The BitReader to extract the label dataset data from.
+   */
+  explicit LabelDataset(util::BitReader& reader);
 
-    /**
-     * @brief
-     * @param _ds_region
-     */
-    void addDatasetRegion(LabelRegion _ds_region);
+  /**
+   * @brief Construct a new LabelDataset object using metadata labels.
+   * @param dataset_id Dataset ID to associate with this LabelDataset.
+   * @param labels Reference to a metadata Label object containing the label
+   * data.
+   */
+  LabelDataset(uint16_t dataset_id, const core::meta::Label& labels);
 
-    /**
-     * @brief
-     * @return
-     */
-    uint16_t getDatasetID() const;
+  /**
+   * @brief Add a label region to the dataset.
+   * @param ds_region The LabelRegion object to be added.
+   */
+  void AddDatasetRegion(LabelRegion ds_region);
 
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getBitLength() const;
+  /**
+   * @brief Retrieve the dataset ID associated with this LabelDataset.
+   * @return Dataset ID.
+   */
+  [[nodiscard]] uint16_t GetDatasetId() const;
 
-    /**
-     * @brief
-     * @param bit_writer
-     */
-    void write(genie::util::BitWriter& bit_writer) const;
+  /**
+   * @brief Retrieve the total bit length required to represent the dataset.
+   * @return Length of the dataset in bits.
+   */
+  [[nodiscard]] uint64_t GetBitLength() const;
+
+  /**
+   * @brief Serialize the LabelDataset to a BitWriter.
+   * @param bit_writer The BitWriter to serialize the data to.
+   */
+  void Write(util::BitWriter& bit_writer) const;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_FORMAT_MGG_LABEL_DATASET_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

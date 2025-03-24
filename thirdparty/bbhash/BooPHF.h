@@ -397,7 +397,8 @@ template <typename Item, class SingleHasher_t> class XorshiftHashFunctors
         const uint64_t s0 = s[ 1 ];
         s[ 0 ] = s0;
         s1 ^= s1 << 23; // a
-        return ( s[ 1 ] = ( s1 ^ s0 ^ ( s1 >> 17 ) ^ ( s0 >> 26 ) ) ) + s0; // b, c
+        s[ 1 ] = ( s1 ^ s0 ^ ( s1 >> 17 ) ^ ( s0 >> 26 ) );
+        return s[ 1 ] + s0; // b, c
     }
 
     //this one returns all the  hashes
@@ -842,7 +843,7 @@ class mphf {
         uint64_t non_minimal_hp,minimal_hp;
 
 
-        hash_pair_t bbhash;  int level;
+        hash_pair_t bbhash = {0, 0};  int level;
         uint64_t level_hash = getLevel(bbhash,elem,&level);
 
         if( level == (_nb_levels-1))
@@ -935,7 +936,7 @@ class mphf {
                 //printf("processing %llu  level %i\n",val, i);
 
                 //auto hashes = _hasher(val);
-                hash_pair_t bbhash;  int level;
+                hash_pair_t bbhash = {0, 0};  int level;
                 uint64_t level_hash;
                 if(_writeEachLevel)
                     getLevel(bbhash,val,&level, i,i-1);

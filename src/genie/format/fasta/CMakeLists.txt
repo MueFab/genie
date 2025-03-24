@@ -2,12 +2,13 @@ project("genie-fasta")
 
 set(source_files
         exporter.cc
-        fai-file.cc
-        fasta-source.cc
+        fai_file.cc
+        fasta_source.cc
         manager.cc
         reader.cc
         reference.cc
-        sha256File.cc)
+        sha256File.cc
+        ../sam/sam_sorter.h)
 
 add_library(genie-fasta ${source_files})
 

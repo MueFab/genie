@@ -1,7 +1,7 @@
 project("quality-tests")
 
 set(source_files
-       calq-test.cpp
+        calq-test.cpp
 )
 
 add_executable(quality-tests ${source_files})

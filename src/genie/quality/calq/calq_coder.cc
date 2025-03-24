@@ -1,97 +1,104 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * Copyright 2018-2024 The Genie Authors.
+ * @file calq_coder.cc
+ *
+ * @brief Implements the core encoding and decoding functions for genomic
+ * quality values in Calq.
+ *
+ * This file is part of the Genie project, designed to compress and reconstruct
+ * quality values associated with genomic sequences. The `calq_coder.cpp` file
+ * provides essential functionality for both encoding and decoding workflows,
+ * supporting multiple quantization techniques.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/quality/calq/calq_coder.h"
 
-// -----------------------------------------------------------------------------
-
 #include <map>
 #include <utility>
 
-// -----------------------------------------------------------------------------
-
-#include "genie/quality/calq/error_exception_reporter.h"
-#include "genie/quality/calq/lloyd_max_quantizer.h"
-#include "genie/quality/calq/qual_decoder.h"
-#include "genie/quality/calq/qual_encoder.h"
-#include "genie/quality/calq/uniform_min_max_quantizer.h"
-
-// -----------------------------------------------------------------------------
-namespace genie {
-namespace quality {
-namespace calq {
+#include "genie/quality/calq/quality_decoder.h"
+#include "genie/quality/calq/quality_encoder.h"
+#include "genie/util/lloyd_max_quantizer.h"
+#include "genie/util/runtime_exception.h"
+#include "genie/util/uniform_min_max_quantizer.h"
 
 // -----------------------------------------------------------------------------
 
-void encode(const EncodingOptions& opt, const SideInformation& sideInformation, const EncodingBlock& input,
-            DecodingBlock* output) {
-    ProbabilityDistribution pdf(opt.qualityValueMin, opt.qualityValueMax);
+namespace genie::quality::calq {
 
-    // Check quality value range
-    for (auto const& samRecord : input.qvalues) {
-        for (auto const& read : samRecord) {
-            for (auto const& q : read) {
-                if ((static_cast<int>(q) - opt.qualityValueOffset) < opt.qualityValueMin) {
-                    throwErrorException("Quality value too small");
-                }
-                if ((static_cast<int>(q) - opt.qualityValueOffset) > opt.qualityValueMax) {
-                    throwErrorException("Quality value too large");
-                }
-                pdf.addToPdf((static_cast<size_t>(q) - opt.qualityValueOffset));
-            }
-        }
+// -----------------------------------------------------------------------------
+
+void encode(const EncodingOptions& opt, const SideInformation& side_information,
+            const EncodingBlock& input, DecodingBlock* output) {
+  util::ProbabilityDistribution pdf(opt.quality_value_min,
+                                    opt.quality_value_max);
+
+  // Check quality value range
+  for (const auto& sam_record : input.quality_values) {
+    for (const auto& read : sam_record) {
+      for (const auto& q : read) {
+        UTILS_DIE_IF(q < opt.quality_value_min || q > opt.quality_value_max,
+                     "Quality value out of range");
+        pdf.AddToPdf(static_cast<size_t>(q) - opt.quality_value_offset);
+      }
     }
+  }
 
-    std::map<int, Quantizer> quantizers;
+  std::map<int, util::Quantizer> quantizers;
 
-    for (auto i = static_cast<int>(opt.quantizationMin); i <= static_cast<int>(opt.quantizationMax); ++i) {
-        if (opt.quantizerType == QuantizerType::UNIFORM) {
-            UniformMinMaxQuantizer quantizer(static_cast<const int&>(opt.qualityValueMin),
-                                             static_cast<const int&>(opt.qualityValueMax), i);
-            quantizers.insert(std::pair<int, Quantizer>(static_cast<const int&>(i - opt.quantizationMin), quantizer));
-        } else if (opt.quantizerType == QuantizerType::LLOYD_MAX) {
-            LloydMaxQuantizer quantizer(static_cast<size_t>(i));
-            quantizer.build(pdf);
-            quantizers.insert(std::pair<int, Quantizer>(static_cast<const int&>(i - opt.quantizationMin), quantizer));
-        } else {
-            throwErrorException("Quantization Type not supported");
-        }
+  for (auto i = static_cast<int>(opt.quantization_min);
+       i <= static_cast<int>(opt.quantization_max); ++i) {
+    if (opt.quantizer_type == QuantizerType::UNIFORM) {
+      util::UniformMinMaxQuantizer quantizer(
+          static_cast<const int&>(opt.quality_value_min),
+          static_cast<const int&>(opt.quality_value_max), i);
+      quantizers.insert(std::pair<int, util::Quantizer>(
+          static_cast<const int&>(i - opt.quantization_min), quantizer));
+    } else if (opt.quantizer_type == QuantizerType::LLOYD_MAX) {
+      util::LloydMaxQuantizer quantizer(static_cast<size_t>(i));
+      quantizer.build(pdf);
+      quantizers.insert(std::pair<int, util::Quantizer>(
+          static_cast<const int&>(i - opt.quantization_min), quantizer));
+    } else {
+      UTILS_DIE("Quantization Type not supported");
     }
+  }
 
-    // Encode the quality values
-    QualEncoder qualEncoder(opt, quantizers, output);
+  // Encode the quality values
+  QualityEncoder quality_encoder(opt, quantizers, output);
 
-    for (size_t i = 0; i < sideInformation.positions.size(); ++i) {
-        EncodingRecord record = {input.qvalues[i], sideInformation.sequences[i], sideInformation.cigars[i],
-                                 sideInformation.positions[i]};
-        qualEncoder.addMappedRecordToBlock(record);
-    }
+  for (size_t i = 0; i < side_information.positions.size(); ++i) {
+    EncodingRecord record = {
+        input.quality_values[i], side_information.sequences[i],
+        side_information.cigars[i], side_information.positions[i]};
+    quality_encoder.AddMappedRecordToBlock(record);
+  }
 
-    qualEncoder.finishBlock();
+  quality_encoder.FinishBlock();
 }
 
 // -----------------------------------------------------------------------------
 
-void decode(const DecodingOptions&, const SideInformation& sideInformation, const DecodingBlock& input,
-            EncodingBlock* output) {
-    // Decode the quality values
-    QualDecoder qualDecoder(input, sideInformation.positions[0][0], sideInformation.qualOffset, output);
-    output->qvalues.clear();
-    output->qvalues.emplace_back();
-    for (size_t i = 0; i < sideInformation.positions[0].size(); ++i) {
-        DecodingRead r = {sideInformation.positions[0][i], sideInformation.cigars[0][i]};
-        qualDecoder.decodeMappedRecordFromBlock(r);
-    }
+void decode(const DecodingOptions&, const SideInformation& side_information,
+            const DecodingBlock& input, EncodingBlock* output) {
+  // Decode the quality values
+  QualityDecoder quality_decoder(input, side_information.positions[0][0],
+                                 side_information.quality_offset, output);
+  output->quality_values.clear();
+  output->quality_values.emplace_back();
+  for (size_t i = 0; i < side_information.positions[0].size(); ++i) {
+    DecodingRead r = {side_information.positions[0][i],
+                      side_information.cigars[0][i]};
+    quality_decoder.DecodeMappedRecordFromBlock(r);
+  }
 }
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

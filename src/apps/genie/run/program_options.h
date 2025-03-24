@@ -1,0 +1,75 @@
+/**
+ * Copyright 2018-2024 The Genie Authors.
+ * @file
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
+ */
+
+#ifndef SRC_APPS_GENIE_RUN_PROGRAM_OPTIONS_H_
+#define SRC_APPS_GENIE_RUN_PROGRAM_OPTIONS_H_
+
+// -----------------------------------------------------------------------------
+
+#include <string>
+
+// -----------------------------------------------------------------------------
+
+namespace genie_app::run {
+
+/**
+ * @brief
+ */
+class ProgramOptions {
+ public:
+  /**
+   * @brief
+   * @param argc
+   * @param argv
+   */
+  ProgramOptions(int argc, char* argv[]);
+
+ public:
+  std::string inputFile;     //!< @brief
+  std::string inputSupFile;  //!< @brief
+  std::string inputRefFile;  //!< @brief
+
+  std::string outputFile;     //!< @brief
+  std::string outputSupFile;  //!< @brief
+
+  std::string workingDirectory;  //!< @brief
+
+  std::string paramsetPath;  //!< @brief
+
+  std::string qvMode;        //!< @brief
+  std::string readNameMode;  //!< @brief
+
+  bool forceOverwrite;  //!< @brief
+
+  bool combinePairsFlag;  //!< @brief
+
+  bool lowLatency;      //!< @brief
+  std::string refMode;  //!< @brief
+
+  size_t numberOfThreads;  //!< @brief
+  bool rawReference;       //!< @brief
+  bool rawStreams;         //!< @brief
+
+  bool help;  //!< @brief
+
+ private:
+  /**
+   * @brief
+   */
+  void validate();
+};
+
+// -----------------------------------------------------------------------------
+
+}  // namespace genie_app::run
+
+// -----------------------------------------------------------------------------
+
+#endif  // SRC_APPS_GENIE_RUN_PROGRAM_OPTIONS_H_
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

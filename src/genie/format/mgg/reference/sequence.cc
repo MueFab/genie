@@ -1,77 +1,82 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/reference/sequence.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include <string>
+#include <utility>
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace reference {
+// -----------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------------------------------------------
+namespace genie::format::mgg::reference {
+
+// -----------------------------------------------------------------------------
 
 bool Sequence::operator==(const Sequence& other) const {
-    return name == other.name && sequence_length == other.sequence_length && sequence_id == other.sequence_id &&
-           version == other.version;
+  return name_ == other.name_ && sequence_length_ == other.sequence_length_ &&
+         sequence_id_ == other.sequence_id_ && version_ == other.version_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Sequence::Sequence(std::string _name, uint32_t length, uint16_t id, genie::core::MPEGMinorVersion _version)
-    : name(std::move(_name)), sequence_length(length), sequence_id(id), version(_version) {}
+Sequence::Sequence(std::string name, const uint32_t length, const uint16_t id,
+                   const core::MpegMinorVersion version)
+    : name_(std::move(name)),
+      sequence_length_(length),
+      sequence_id_(id),
+      version_(version) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const std::string& Sequence::getName() const { return name; }
+const std::string& Sequence::GetName() const { return name_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint32_t Sequence::getLength() const { return sequence_length; }
+uint32_t Sequence::GetLength() const { return sequence_length_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint16_t Sequence::getID() const { return sequence_id; }
+uint16_t Sequence::GetId() const { return sequence_id_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Sequence::Sequence(genie::util::BitReader& reader, genie::core::MPEGMinorVersion _version) : version(_version) {
-    reader.readBypass_null_terminated(name);
-    if (version != genie::core::MPEGMinorVersion::V1900) {
-        sequence_length = reader.readBypassBE<uint32_t>();
-        sequence_id = reader.readBypassBE<uint16_t>();
-    }
+Sequence::Sequence(util::BitReader& reader,
+                   const core::MpegMinorVersion version)
+    : version_(version) {
+  name_ = reader.ReadAlignedStringTerminated();
+  if (version_ != core::MpegMinorVersion::kV1900) {
+    sequence_length_ = reader.ReadAlignedInt<uint32_t>();
+    sequence_id_ = reader.ReadAlignedInt<uint16_t>();
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Sequence::write(genie::util::BitWriter& writer) const {
-    writer.writeBypass(name.data(), name.length());
-    writer.writeBypassBE<uint8_t>('\0');
-    if (version != genie::core::MPEGMinorVersion::V1900) {
-        writer.writeBypassBE(sequence_length);
-        writer.writeBypassBE(sequence_id);
-    }
+void Sequence::Write(util::BitWriter& writer) const {
+  writer.WriteAlignedBytes(name_.data(), name_.length());
+  writer.WriteAlignedInt<uint8_t>('\0');
+  if (version_ != core::MpegMinorVersion::kV1900) {
+    writer.WriteAlignedInt(sequence_length_);
+    writer.WriteAlignedInt(sequence_id_);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Sequence::Sequence(genie::core::meta::Sequence s, genie::core::MPEGMinorVersion _version)
-    : name(std::move(s.getName())),
-      sequence_length(static_cast<uint32_t>(s.getLength())),
-      sequence_id(s.getID()),
-      version(_version) {}
+Sequence::Sequence(core::meta::Sequence s,
+                   const core::MpegMinorVersion version)
+    : name_(std::move(s.GetName())),
+      sequence_length_(static_cast<uint32_t>(s.GetLength())),
+      sequence_id_(s.GetId()),
+      version_(version) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace reference
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::reference
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

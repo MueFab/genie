@@ -1,114 +1,95 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * Copyright 2018-2024 The Genie Authors.
+ * @file params.h
+ * @copyright This file is part of Genie
+ * See LICENSE and/or visit https://github.com/MueFab/genie for more details.
+ * @brief Header file defining constants and utility functions for the Spring
+ * module.
+ *
+ * This file provides constants and utility functions used across the Spring
+ * module in Genie It includes parameters for read lengths, dictionary sizes,
+ * and other settings relevant to the encoding and reordering processes.
+ *
+ * This file is part of the Spring module within the GENIE project.
  */
 
 #ifndef SRC_GENIE_READ_SPRING_PARAMS_H_
 #define SRC_GENIE_READ_SPRING_PARAMS_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-#include <string>
+namespace genie::read::spring {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-#ifdef GENIE_USE_OPENMP
-#include <omp.h>
-#endif
+// Constants for Spring module configuration
 
-// ---------------------------------------------------------------------------------------------------------------------
+/// Maximum supported read length.
+constexpr uint16_t kMaxReadLen = 511;
 
-namespace genie {
-namespace read {
-namespace spring {
+/// Maximum read length for unaligned reads. May not be supported in MPEG-G.
+constexpr uint32_t kMaxReadLenUnalignedReads = 4294967290;
 
-// ---------------------------------------------------------------------------------------------------------------------
+/// Maximum number of reads supported.
+constexpr uint32_t kMaxNumReads = 4294967290;
 
-const uint16_t MAX_READ_LEN = 511;                //!< @brief
-const uint32_t MAX_READ_LEN_UREADS = 4294967290;  //!< @brief @note NOT SURE IF THIS LENGTH IS SUPPORTED IN MPEG-G
-const uint32_t MAX_NUM_READS = 4294967290;        //!< @brief
-const int NUM_DICT_REORDER = 2;                   //!< @brief
-const int MAX_SEARCH_REORDER = 1000;              //!< @brief
-const int THRESH_REORDER = 4;                     //!< @brief
-const float STOP_CRITERIA_REORDER =
-    0.5;                         //!< @brief fraction of unmatched reads in last 1M for thread to give up on searching
-const int NUM_DICT_ENCODER = 2;  //!< @brief
-const int MAX_SEARCH_ENCODER = 1000;     //!< @brief
-const int THRESH_ENCODER = 24;           //!< @brief
-const int NUM_READS_PER_BLOCK = 256000;  //!< @brief
-const int NUM_READS_PER_BLOCK_UREADS =
-    256000;  //!< @brief might want NUM_READS_PER_BLOCK_UREADS to be a bit smaller since it can have longer reads
-const uint32_t MAX_NUM_TOKENS_ID = 1024;           //!< @brief
-const uint32_t BIN_SIZE_COMBINE_PAIRS = 30000000;  //!< @brief number of records put in memory at a time when
-                                                   //!< @brief decompressing with combine_pairs on. Higher value
-                                                   //!< @brief uses more memory but is slightly faster.
+/// Number of dictionaries used for reordering.
+constexpr int kNumDictReorder = 2;
 
-// ---------------------------------------------------------------------------------------------------------------------
+/// Maximum search iterations during reordering.
+constexpr int kMaxSearchReorder = 1000;
 
-#ifdef GENIE_USE_OPENMP
+/// Threshold for reordering.
+constexpr int kThreshReorder = 4;
 
-// ---------------------------------------------------------------------------------------------------------------------
+/// Stop criterion for reordering (fraction of unmatched reads).
+constexpr float kStopCriteriaReorder = 0.5;
 
-const int NUM_LOCKS_REORDER = 0x10000;  //!< @brief # of locks (power of 2)
-const int LOCKS_REORDER_MASK = 0xffff;  //!< @brief
+/// Number of dictionaries used for encoding.
+constexpr int kNumDictEncoder = 2;
+
+/// Maximum search iterations during encoding.
+constexpr int kMaxSearchEncoder = 1000;
+
+/// Threshold for encoding.
+constexpr int kThreshEncoder = 24;
+
+/// Number of reads per block during compression.
+constexpr int kNumReadsPerBlock = 256000;
+
+/// Number of reads per block for unaligned reads (longer reads).
+constexpr int kNumReadsPerBlockUnalignedReads = 256000;
+
+/// Maximum number of tokens for read IDs.
+constexpr uint32_t kMaxNumTokensId = 1024;
+
+/// Size of bins when combining paired reads in memory.
+constexpr uint32_t kBinSizeCombinePairs = 30000000;
+
+// -----------------------------------------------------------------------------
+
+/// Number of locks (must be a power of 2).
+constexpr int kNumLocksReorder = 0x10000;
+
+/// Mask used for lock indexing.
+constexpr int kLocksReorderMask = 0xffff;
 
 /**
- * @brief
- * @param hval
- * @return
+ * @brief Computes the lock index for a given hash value.
+ * @param hash_value Hash value.
+ * @return Index of the lock to use.
  */
-inline uint64_t reorder_lock_idx(uint64_t hval) { return hval & LOCKS_REORDER_MASK; }
+inline uint64_t ReorderLockIdx(const uint64_t hash_value) {
+  return hash_value & kLocksReorderMask;
+}
 
-/**
- *@brief  Add a C++ wrapper around the OpenMP locks.
- * In the future, we will extend the interface with debugging aids.
- */
-class omp_lock {
- private:
-    omp_lock_t lck;  //!< @brief
+// -----------------------------------------------------------------------------
 
- public:
-    /**
-     * @brief
-     */
-    omp_lock() { omp_init_lock(&lck); }
+}  // namespace genie::read::spring
 
-    /**
-     * @brief
-     */
-    ~omp_lock() { omp_destroy_lock(&lck); }
-
-    /**
-     * @brief
-     */
-    void set(void) { omp_set_lock(&lck); }
-
-    /**
-     * @brief
-     */
-    void unset(void) { omp_unset_lock(&lck); }
-
-    /**
-     * @brief
-     * @return
-     */
-    int test(void) { return omp_test_lock(&lck); }
-};
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#endif /* GENIE_USE_OPENMP */
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
-
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_READ_SPRING_PARAMS_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

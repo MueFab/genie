@@ -1,104 +1,119 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @brief This file defines the `DatasetGroupMetadata` class, representing
+ * metadata for a dataset group in the MPEG-G format.
+ * @details The `DatasetGroupMetadata` class provides functionality for storing,
+ * serializing, and managing metadata related to a dataset group. It allows for
+ * reading and writing metadata values, updating the group ID, and extracting
+ * the metadata as a string. The class extends the `GenInfo` base class to
+ * integrate with the overall Genie file structure.
+ * @copyright This file is part of Genie.
+ *            See LICENSE and/or https://github.com/MueFab/genie for more
+ * details.
  */
 
 #ifndef SRC_GENIE_FORMAT_MGG_DATASET_GROUP_METADATA_H_
 #define SRC_GENIE_FORMAT_MGG_DATASET_GROUP_METADATA_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <string>
+
 #include "genie/core/constants.h"
 #include "genie/format/mgg/gen_info.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
- * @brief
+ * @brief Class representing metadata for a dataset group in MPEG-G.
+ * @details The `DatasetGroupMetadata` class encapsulates metadata for a dataset
+ * group, allowing for easy management and manipulation of these metadata
+ * values. The metadata can be serialized, deserialized, and modified as
+ * necessary.
  */
-class DatasetGroupMetadata : public GenInfo {
+class DatasetGroupMetadata final : public GenInfo {
  public:
-    /**
-     * @brief
-     * @param info
-     * @return
-     */
-    bool operator==(const GenInfo& info) const override;
+  /**
+   * @brief Compares the current object with another `GenInfo` object for
+   * equality.
+   * @param info The other `GenInfo` object to compare with.
+   * @return True if both objects are equal; otherwise, false.
+   */
+  bool operator==(const GenInfo& info) const override;
 
-    /**
-     * @brief
-     * @return
-     */
-    const std::string& getKey() const override;
+  /**
+   * @brief Retrieves the unique key representing this metadata information.
+   * @return The key string for this metadata information.
+   */
+  [[nodiscard]] const std::string& GetKey() const override;
 
-    /**
-     * @brief
-     * @param bitreader
-     * @param _version
-     */
-    explicit DatasetGroupMetadata(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version);
+  /**
+   * @brief Constructs a `DatasetGroupMetadata` object by reading from a
+   * `BitReader` stream.
+   * @param bitreader The input bit reader to read metadata from.
+   * @param version The MPEG-G version of the metadata.
+   */
+  explicit DatasetGroupMetadata(util::BitReader& bitreader,
+                                core::MpegMinorVersion version);
 
-    /**
-     * @brief
-     * @param _dataset_group_id
-     * @param _dg_metatdata_value
-     * @param _version
-     */
-    DatasetGroupMetadata(uint8_t _dataset_group_id, std::string _dg_metatdata_value,
-                         genie::core::MPEGMinorVersion _version);
+  /**
+   * @brief Constructs a `DatasetGroupMetadata` object with specified values.
+   * @param dataset_group_id The ID of the dataset group.
+   * @param dg_metatdata_value The metadata value string.
+   * @param version The MPEG-G version of the metadata.
+   */
+  DatasetGroupMetadata(uint8_t dataset_group_id,
+                       std::string dg_metatdata_value,
+                       core::MpegMinorVersion version);
 
-    /**
-     * @brief
-     * @param bitWriter
-     */
-    void box_write(genie::util::BitWriter& bitWriter) const override;
+  /**
+   * @brief Serializes the metadata information into a `BitWriter`.
+   * @param bit_writer The output bit writer to write the metadata to.
+   */
+  void BoxWrite(util::BitWriter& bit_writer) const override;
 
-    /**
-     * @brief
-     * @return
-     */
-    uint8_t getDatasetGroupID() const;
+  /**
+   * @brief Retrieves the ID of the dataset group.
+   * @return The ID of the dataset group.
+   */
+  [[nodiscard]] uint8_t GetDatasetGroupId() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    const std::string& getMetadata() const;
+  /**
+   * @brief Retrieves the metadata value string.
+   * @return The metadata value string.
+   */
+  [[nodiscard]] const std::string& GetMetadata() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    std::string decapsulate();
+  /**
+   * @brief Extracts the metadata value from this object.
+   * @return The extracted metadata value string.
+   */
+  std::string decapsulate();
 
-    /**
-     * @brief
-     * @param groupID
-     */
-    void patchID(uint8_t groupID);
+  /**
+   * @brief Updates the dataset group ID.
+   * @param group_id The new group ID to set.
+   */
+  void PatchId(uint8_t group_id);
 
  private:
-    genie::core::MPEGMinorVersion version;  //!< @brief
-    uint8_t dataset_group_id;               //!< @brief
-    std::string dg_metatdata_value;         //!< @brief
+  core::MpegMinorVersion
+      version_;  //!< @brief The version of the MPEG-G standard used.
+  uint8_t dataset_group_id_;        //!< @brief The ID of the dataset group.
+  std::string dg_metadata_value_;  //!< @brief The metadata value string for
+                                   //!< the dataset group.
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_FORMAT_MGG_DATASET_GROUP_METADATA_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

@@ -1,192 +1,233 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/reference.h"
-#include <sstream>
+
+#include <memory>
+#include <string>
 #include <utility>
+#include <vector>
+
 #include "genie/format/mgg/reference/location/external.h"
 #include "genie/format/mgg/reference/location/internal.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 bool Reference::operator==(const GenInfo& info) const {
-    if (!GenInfo::operator==(info)) {
-        return false;
-    }
-    const auto& other = dynamic_cast<const Reference&>(info);
-    return reference_name == other.reference_name && ref_version == other.ref_version && sequences == other.sequences &&
-           reference_location == other.reference_location && version == other.version;
+  if (!GenInfo::operator==(info)) {
+    return false;
+  }
+  const auto& other = dynamic_cast<const Reference&>(info);
+  return reference_name_ == other.reference_name_ &&
+         ref_version_ == other.ref_version_ && sequences_ == other.sequences_ &&
+         reference_location_ == other.reference_location_ &&
+         version_ == other.version_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Reference::Reference(util::BitReader& reader, genie::core::MPEGMinorVersion _version) : ref_version(0, 0, 0) {
-    version = _version;
-    auto start_pos = reader.getPos() - 4;
-    auto length = reader.readBypassBE<uint64_t>();
-    dataset_group_ID = reader.readBypassBE<uint8_t>();
-    reference_ID = reader.readBypassBE<uint8_t>();
-    reader.readBypass_null_terminated(reference_name);
-    ref_version = reference::Version(reader);
-    auto seq_count = reader.readBypassBE<uint16_t>();
-    for (size_t i = 0; i < seq_count; ++i) {
-        sequences.emplace_back(reader, version);
-    }
+Reference::Reference(util::BitReader& reader,
+                     const core::MpegMinorVersion version)
+    : ref_version_(0, 0, 0) {
+  version_ = version;
+  const auto start_pos = reader.GetStreamPosition() - 4;
+  const auto length = reader.ReadAlignedInt<uint64_t>();
+  dataset_group_id_ = reader.ReadAlignedInt<uint8_t>();
+  reference_id_ = reader.ReadAlignedInt<uint8_t>();
+  reference_name_ = reader.ReadAlignedStringTerminated();
+  ref_version_ = reference::Version(reader);
+  const auto seq_count = reader.ReadAlignedInt<uint16_t>();
+  for (size_t i = 0; i < seq_count; ++i) {
+    sequences_.emplace_back(reader, version_);
+  }
 
-    reference_location = reference::Location::factory(reader, seq_count, _version);
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
+  reference_location_ =
+      reference::Location::factory(reader, seq_count, version);
+  UTILS_DIE_IF(start_pos + length != reader.GetStreamPosition(),
+               "Invalid length");
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Reference::Reference(uint8_t group_id, uint8_t ref_id, std::string ref_name, reference::Version _ref_version,
-                     std::unique_ptr<reference::Location> location, genie::core::MPEGMinorVersion _version)
-    : dataset_group_ID(group_id),
-      reference_ID(ref_id),
-      reference_name(std::move(ref_name)),
-      ref_version(_ref_version),
-      reference_location(std::move(location)),
-      version(_version) {}
+Reference::Reference(const uint8_t group_id, const uint8_t ref_id,
+                     std::string ref_name, const reference::Version ref_version,
+                     std::unique_ptr<reference::Location> location,
+                     const core::MpegMinorVersion version)
+    : dataset_group_id_(group_id),
+      reference_id_(ref_id),
+      reference_name_(std::move(ref_name)),
+      ref_version_(ref_version),
+      reference_location_(std::move(location)),
+      version_(version) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint8_t Reference::getDatasetGroupID() const { return dataset_group_ID; }
+uint8_t Reference::GetDatasetGroupId() const { return dataset_group_id_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint8_t Reference::getReferenceID() const { return reference_ID; }
+uint8_t Reference::GetReferenceId() const { return reference_id_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const std::string& Reference::getReferenceName() const { return reference_name; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const reference::Version& Reference::getRefVersion() const { return ref_version; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::vector<reference::Sequence>& Reference::getSequences() const { return sequences; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::string& Reference::getKey() const {
-    static const std::string key = "rfgn";
-    return key;
+const std::string& Reference::GetReferenceName() const {
+  return reference_name_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Reference::addSequence(reference::Sequence seq, std::string checksum) {
-    sequences.emplace_back(std::move(seq));
-    if (reference_location->isExternal()) {
-        dynamic_cast<reference::location::External&>(*reference_location).addChecksum(std::move(checksum));
-    }
+const reference::Version& Reference::GetRefVersion() const {
+  return ref_version_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const reference::Location& Reference::getLocation() const { return *reference_location; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Reference::box_write(genie::util::BitWriter& writer) const {
-    writer.writeBypassBE(dataset_group_ID);
-    writer.writeBypassBE(reference_ID);
-    writer.writeBypass(reference_name.data(), reference_name.length());
-    writer.writeBypassBE<uint8_t>(0);
-    ref_version.write(writer);
-    writer.writeBypassBE<uint16_t>(static_cast<uint16_t>(sequences.size()));
-    for (const auto& s : sequences) {
-        s.write(writer);
-    }
-    reference_location->write(writer);
+const std::vector<reference::Sequence>& Reference::GetSequences() const {
+  return sequences_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Reference::patchID(uint8_t groupID) { dataset_group_ID = groupID; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Reference::patchRefID(uint8_t _old, uint8_t _new) {
-    if (reference_ID == _old) {
-        reference_ID = _new;
-    }
+const std::string& Reference::GetKey() const {
+  static const std::string key = "rfgn";  // NOLINT
+  return key;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie::core::meta::Reference Reference::decapsulate(std::string meta) {
-    std::unique_ptr<genie::core::meta::RefBase> location = reference_location->decapsulate();
-    genie::core::meta::Reference ret(std::move(reference_name), ref_version.getMajor(), ref_version.getMinor(),
-                                     ref_version.getPatch(), std::move(location), std::move(meta));
-    for (auto& s : sequences) {
-        ret.addSequence(genie::core::meta::Sequence(s.getName(), s.getLength(), s.getID()));
-    }
-    return ret;
+void Reference::AddSequence(reference::Sequence seq, std::string checksum) {
+  sequences_.emplace_back(std::move(seq));
+  if (reference_location_->IsExternal()) {
+    dynamic_cast<reference::location::External&>(*reference_location_)
+        .AddChecksum(std::move(checksum));
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Reference::Reference(uint8_t _dataset_group_id, uint8_t _reference_ID, genie::core::meta::Reference ref,
-                     genie::core::MPEGMinorVersion _version)
-    : dataset_group_ID(_dataset_group_id),
-      reference_ID(_reference_ID),
-      reference_name(std::move(ref.getName())),
-      ref_version(static_cast<uint16_t>(ref.getMajorVersion()), static_cast<uint16_t>(ref.getMinorVersion()),
-                  static_cast<uint16_t>(ref.getPatchVersion())),
-      version(_version) {
-    for (auto& r : ref.getSequences()) {
-        sequences.emplace_back(std::move(r), version);
-    }
-    reference_location = reference::Location::referenceLocationFactory(ref.moveBase(), _version);
+const reference::Location& Reference::GetLocation() const {
+  return *reference_location_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Reference::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
-    print_offset(output, depth, max_depth, "* Reference");
-    print_offset(output, depth + 1, max_depth,
-                 "Dataset group ID: " + std::to_string(static_cast<int>(dataset_group_ID)));
-    print_offset(output, depth + 1, max_depth, "Reference ID: " + std::to_string(static_cast<int>(reference_ID)));
-    print_offset(output, depth + 1, max_depth, "Reference name: " + reference_name);
-    print_offset(output, depth + 1, max_depth, "Reference major version: " + std::to_string(ref_version.getMajor()));
-    print_offset(output, depth + 1, max_depth, "Reference minor version: " + std::to_string(ref_version.getMinor()));
-    print_offset(output, depth + 1, max_depth, "Reference patch version: " + std::to_string(ref_version.getPatch()));
-    for (const auto& r : sequences) {
-        std::string s = "Reference sequence: " + r.getName();
-        if (version != core::MPEGMinorVersion::V1900) {
-            s += " (ID: " + std::to_string(r.getID()) + "; length: " + std::to_string(r.getLength()) + ")";
-        }
-        print_offset(output, depth + 1, max_depth, s);
-    }
-    std::string location;
-    if (reference_location->isExternal()) {
-        location = "External at " + dynamic_cast<const reference::location::External&>(*reference_location).getURI();
-    } else {
-        const auto& i = dynamic_cast<const reference::location::Internal&>(*reference_location);
-        location = "Internal at (Dataset Group " + std::to_string(static_cast<int>(i.getDatasetGroupID())) +
-                   ", Dataset " + std::to_string(static_cast<int>(i.getDatasetID())) + ")";
-    }
-    print_offset(output, depth + 1, max_depth, "Reference location: " + location);
+void Reference::BoxWrite(util::BitWriter& writer) const {
+  writer.WriteAlignedInt(dataset_group_id_);
+  writer.WriteAlignedInt(reference_id_);
+  writer.WriteAlignedBytes(reference_name_.data(), reference_name_.length());
+  writer.WriteAlignedInt<uint8_t>(0);
+  ref_version_.Write(writer);
+  writer.WriteAlignedInt<uint16_t>(static_cast<uint16_t>(sequences_.size()));
+  for (const auto& s : sequences_) {
+    s.Write(writer);
+  }
+  reference_location_->Write(writer);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+void Reference::PatchId(const uint8_t group_id) {
+  dataset_group_id_ = group_id;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+void Reference::PatchRefId(const uint8_t old, const uint8_t _new) {
+  if (reference_id_ == old) {
+    reference_id_ = _new;
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+core::meta::Reference Reference::decapsulate(std::string meta) {
+  std::unique_ptr<core::meta::RefBase> location =
+      reference_location_->decapsulate();
+  core::meta::Reference ret(std::move(reference_name_), ref_version_.GetMajor(),
+                            ref_version_.GetMinor(), ref_version_.GetPatch(),
+                            std::move(location), std::move(meta));
+  for (auto& s : sequences_) {
+    ret.AddSequence(
+        core::meta::Sequence(s.GetName(), s.GetLength(), s.GetId()));
+  }
+  return ret;
+}
+
+// -----------------------------------------------------------------------------
+
+Reference::Reference(const uint8_t dataset_group_id, const uint8_t reference_id,
+                     core::meta::Reference ref,
+                     const core::MpegMinorVersion version)
+    : dataset_group_id_(dataset_group_id),
+      reference_id_(reference_id),
+      reference_name_(std::move(ref.GetName())),
+      ref_version_(static_cast<uint16_t>(ref.GetMajorVersion()),
+                   static_cast<uint16_t>(ref.GetMinorVersion()),
+                   static_cast<uint16_t>(ref.GetPatchVersion())),
+      version_(version) {
+  for (auto& r : ref.GetSequences()) {
+    sequences_.emplace_back(std::move(r), version_);
+  }
+  reference_location_ =
+      reference::Location::ReferenceLocationFactory(ref.MoveBase(), version);
+}
+
+// -----------------------------------------------------------------------------
+
+void Reference::PrintDebug(std::ostream& output, const uint8_t depth,
+                            const uint8_t max_depth) const {
+  print_offset(output, depth, max_depth, "* Reference");
+  print_offset(output, depth + 1, max_depth,
+               "Dataset group ID: " + std::to_string(dataset_group_id_));
+  print_offset(output, depth + 1, max_depth,
+               "Reference ID: " + std::to_string(reference_id_));
+  print_offset(output, depth + 1, max_depth,
+               "Reference name: " + reference_name_);
+  print_offset(
+      output, depth + 1, max_depth,
+      "Reference major version: " + std::to_string(ref_version_.GetMajor()));
+  print_offset(
+      output, depth + 1, max_depth,
+      "Reference minor version: " + std::to_string(ref_version_.GetMinor()));
+  print_offset(
+      output, depth + 1, max_depth,
+      "Reference patch version: " + std::to_string(ref_version_.GetPatch()));
+  for (const auto& r : sequences_) {
+    std::string s = "Reference sequence: " + r.GetName();
+    if (version_ != core::MpegMinorVersion::kV1900) {
+      s += " (ID: " + std::to_string(r.GetId()) +
+           "; length: " + std::to_string(r.GetLength()) + ")";
+    }
+    print_offset(output, depth + 1, max_depth, s);
+  }
+  std::string location;
+  if (reference_location_->IsExternal()) {
+    location =
+        "External at " +
+        dynamic_cast<const reference::location::External&>(*reference_location_)
+            .GetUri();
+  } else {
+    const auto& i = dynamic_cast<const reference::location::Internal&>(
+        *reference_location_);
+    location = "Internal at (Dataset Group " +
+               std::to_string(i.GetDatasetGroupId()) + ", Dataset " +
+               std::to_string(i.GetDatasetId()) + ")";
+  }
+  print_offset(output, depth + 1, max_depth, "Reference location: " + location);
+}
+
+// -----------------------------------------------------------------------------
+
+}  // namespace genie::format::mgg
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

@@ -1,114 +1,135 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * Copyright 2018-2024 The Genie Authors.
+ * @file encoder.cc
+ * @brief Implementation of the Encoder class for the Spring module.
+ *
+ * This file contains the implementation of the Encoder class, which manages
+ * the encoding process for read sequences in the Spring module. It handles
+ * preprocessing, organizing records into chunks, and managing the multithreaded
+ * flow of data during the encoding process.
+ *
+ * @details The Encoder class utilizes the Preprocessor class to preprocess
+ * input records and generates the final encoded access units that can be stored
+ * or further processed. It includes functions for setting up file paths,
+ * processing read segments and records, and managing temporary files and
+ * directories.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/read/spring/encoder.h"
+
 #include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
-#include "genie/read/spring/call-template-functions.h"
-#include "genie/read/spring/encoder-source.h"
-#include "genie/read/spring/generate-read-streams.h"
-#include "genie/read/spring/reorder-compress-quality-id.h"
-#include "genie/util/thread-manager.h"
-#include "genie/util/watch.h"
+#include "genie/read/spring/call_template_functions.h"
+#include "genie/read/spring/encoder_source.h"
+#include "genie/read/spring/generate_read_streams.h"
+#include "genie/read/spring/reorder_compress_quality_id.h"
+#include "genie/util/log.h"
+#include "genie/util/stop_watch.h"
+#include "genie/util/thread_manager.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+constexpr auto kLogModuleName = "Spring";
 
-// ---------------------------------------------------------------------------------------------------------------------
+namespace genie::read::spring {
 
-void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
-    preprocessor.preprocess(std::move(t), id);
-    skipOut(id);
+// -----------------------------------------------------------------------------
+
+void Encoder::FlowIn(core::record::Chunk&& t, const util::Section& id) {
+  preprocessor_.Preprocess(std::move(t), id);
+  SkipOut(id);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Encoder::flushIn(uint64_t& pos) {
-    if (!preprocessor.used) {
-        flushOut(pos);
-        return;
-    }
-    preprocessor.finish(pos);
+void Encoder::FlushIn(uint64_t& pos) {
+  if (!preprocessor_.used) {
+    FlushOut(pos);
+    return;
+  }
+  preprocessor_.Finish(pos);
+  const std::string paired_end_str =
+      preprocessor_.cp.paired_end ? "(paired-end)" : "(single-end)";
+  UTILS_LOG(util::Logger::Severity::INFO,
+            "Preprocessing done " + paired_end_str);
+  std::vector<core::parameter::EncodingSet> params;
+  auto loc_cp = preprocessor_.cp;
+  util::Watch watch;
+  core::stats::PerfStats stats = preprocessor_.stats;
 
-    std::vector<core::parameter::EncodingSet> params;
-    auto loc_cp = preprocessor.cp;
-    util::Watch watch;
-    core::stats::PerfStats stats = preprocessor.getStats();
-#ifndef GENIE_USE_OPENMP
-    loc_cp.num_thr = 1;
-#endif
+  watch.Reset();
+  UTILS_LOG(util::Logger::Severity::INFO, "Reordering");
+  CallReorder(preprocessor_.temp_dir, loc_cp);
+  stats.AddDouble("time-spring-reorder", watch.Check());
 
-    watch.reset();
-    std::cerr << "Reordering ...\n";
-    call_reorder(preprocessor.temp_dir, loc_cp);
-    std::cerr << "Reordering done!\n";
-    stats.addDouble("time-spring-reorder", watch.check());
+  watch.Reset();
+  UTILS_LOG(util::Logger::Severity::INFO, "Encoding");
+  CallEncoder(preprocessor_.temp_dir, loc_cp);
+  stats.AddDouble("time-spring-encoding", watch.Check());
 
-    watch.reset();
-    std::cerr << "Encoding ...\n";
-    call_encoder(preprocessor.temp_dir, loc_cp);
-    std::cerr << "Encoding done!\n";
-    stats.addDouble("time-spring-encoding", watch.check());
+  watch.Reset();
+  UTILS_LOG(util::Logger::Severity::INFO, "Generating read streams");
+  GenerateReadStreams(preprocessor_.temp_dir, loc_cp, entropycoder_, params,
+                      stats, write_out_streams_);
+  stats.AddDouble("time-spring-gen-reads", watch.Check());
 
-    watch.reset();
-    std::cerr << "Generating read streams ...\n";
-    generate_read_streams(preprocessor.temp_dir, loc_cp, entropycoder, params, stats, writeOutStreams);
-    std::cerr << "Generating read streams done!\n";
-    stats.addDouble("time-spring-gen-reads", watch.check());
+  if (preprocessor_.cp.preserve_quality || preprocessor_.cp.preserve_id) {
+    watch.Reset();
 
-    if (preprocessor.cp.preserve_quality || preprocessor.cp.preserve_id) {
-        watch.reset();
-        std::cerr << "Reordering and compressing quality and/or ids ...\n";
-        reorder_compress_quality_id(preprocessor.temp_dir, loc_cp, qvcoder, namecoder, entropycoder, params, stats,
-                                    writeOutStreams);
-        std::cerr << "Reordering and compressing quality and/or ids done!\n";
-        stats.addDouble("time-spring-qual-name", watch.check());
-    }
+    ReorderCompressQualityId(preprocessor_.temp_dir, loc_cp, qvcoder_,
+                             namecoder_, entropycoder_, params, stats,
+                             write_out_streams_);
+    stats.AddDouble("time-spring-quality-name", watch.Check());
+  }
 
-    SpringSource src(this->preprocessor.temp_dir, this->preprocessor.cp, params, stats);
-    src.setDrain(this->drain);
-    std::vector<util::OriginalSource*> srcVec = {&src};
-    util::ThreadManager mgr(preprocessor.cp.num_thr, pos);
-    mgr.setSource(srcVec);
-    mgr.run();
+  UTILS_LOG(util::Logger::Severity::INFO, "Writing encoded data to output");
+  SpringSource src(this->preprocessor_.temp_dir, this->preprocessor_.cp, params,
+                   stats);
+  src.SetDrain(this->drain_);
+  std::vector<util::OriginalSource*> src_vec = {&src};
+  util::ThreadManager mgr(preprocessor_.cp.num_thr, pos);
+  mgr.SetSource(src_vec);
+  mgr.Run();
 
-    ghc::filesystem::remove(preprocessor.temp_dir + "/blocks_id.bin");
-    ghc::filesystem::remove(preprocessor.temp_dir + "/read_order.bin");
-    ghc::filesystem::remove_all(preprocessor.temp_dir);
+  std::filesystem::remove(preprocessor_.temp_dir + "/blocks_id.bin");
+  std::filesystem::remove(preprocessor_.temp_dir + "/read_order.bin");
+  std::filesystem::remove_all(preprocessor_.temp_dir);
 
-    preprocessor.setup(preprocessor.working_dir, preprocessor.cp.num_thr, preprocessor.cp.paired_end);
+  preprocessor_.Setup(preprocessor_.working_dir, preprocessor_.cp.num_thr,
+                      preprocessor_.cp.paired_end);
 
-    flushOut(pos);
+  UTILS_LOG(util::Logger::Severity::INFO, "Finished!");
+  FlushOut(pos);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Encoder::Encoder(const std::string& working_dir, size_t num_thr, bool paired_end, bool _write_raw)
-    : ReadEncoder(_write_raw) {
-    preprocessor.setup(working_dir, num_thr, paired_end);
+Encoder::Encoder(const std::string& working_dir, const size_t num_thr,
+                 const bool paired_end, const bool write_raw)
+    : ReadEncoder(write_raw), preprocess_progress_printed_(0) {
+  preprocessor_.Setup(working_dir, num_thr, paired_end);
+  const std::string paired_end_str = paired_end ? "paired-end" : "single-end";
+  UTILS_LOG(util::Logger::Severity::INFO,
+            "Preprocessing (" + paired_end_str + ")");
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Encoder::skipIn(const util::Section& id) {
-    preprocessor.skip(id);
-    skipOut(id);
+void Encoder::SkipIn(const util::Section& id) {
+  preprocessor_.Skip(id);
+  SkipOut(id);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

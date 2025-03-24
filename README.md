@@ -1,59 +1,113 @@
-# Genie
+<p align="center">
+<img src="https://raw.githubusercontent.com/MueFab/genie/develop/data/Genie_Logo.png" style="display:block; width: 70%; margin-left:auto; margin-right:auto" />
+</p>
 
-Open Source MPEG-G Codec
+<div align="center">
+   
+[![Build Status](https://github.com/muefab/genie/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/MueFab/genie/actions?query=branch%3Adevelop)
+[![Static Badge](https://img.shields.io/badge/License-BSD%203%E2%80%93Clause-blue?style=flat&link=https%3A%2F%2Fgithub.com%2FMueFab%2Fgenie%2Fblob%2Fmain%2FLICENSE)](https://github.com/MueFab/genie/blob/develop/LICENSE)
+[![Static Badge](https://img.shields.io/badge/Paper-Communications%20Biology-orange?style=flat&link=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs42003-024-06249-8)](https://www.nature.com/articles/s42003-024-06249-8)
+[![Static Badge](https://img.shields.io/badge/Docker%20Hub-Images-purple?style=flat&logo=docker)](https://hub.docker.com/r/muefab/genie)
 
-[![Build Status](https://dev.azure.com/fabianmuentefering/fabianmuentefering/_apis/build/status/muefab.genie?branchName=develop)](https://dev.azure.com/fabianmuentefering/fabianmuentefering/_build?definitionId=4&view=branches)
+</div>
+
+<h1 align="center"> Open Source MPEG-G Codec </h1>
 
 ---
 
-## Usage Policy
+## Motivation
 
-The open source MPEG-G codec Genie is made available before scientific publication.
+With the rapid advancements in DNA sequencing technology, the amount of genomic data has been growing exponentially. Handling this data efficiently has become a major challenge due to the diverse formats and statistical properties involved in its processing. From raw nucleotide sequences stored in FASTQ files to aligned data in BAM format, specialized data compression algorithms have emerged to address the storage requirements through optimized encoding.
 
-This pre-publication software is preliminary and may contain errors.
-The software is provided in good faith, but without any express or implied warranties.
-We refer the reader to our [license](LICENSE).
+However, existing compression solutions often lack interoperability, limiting their broader adoption. Inspired by the success of video and audio coding standards, the Moving Picture Experts Group (MPEG) introduced MPEG-G (ISO/IEC 23092), the first international standard for genomic information representation. While MPEG-G defines a framework for decoding genomic data, no open-source implementations of its encoding processes have been available until now.
 
-The goal of our policy is that early release should enable the progress of science.
-We kindly ask to refrain from publishing analyses that were conducted using this software while its development is in progress.
+Genie is the first open-source tool that produces MPEG-G compliant bitstreams. By integrating existing compression technologies like SPRING and GABAC, along with new encoding processes defined by the MPEG-G standard, Genie enables efficient compression of both unaligned and aligned genomic data. This framework facilitates interoperability while providing room for further innovation in genomic data compression.
 
-## Mandatory Dependencies
+Explore Genie and contribute to the future of genomic data storage and processing with the power of MPEG-G!
 
-* [OpenMP](https://en.wikipedia.org/wiki/OpenMP) for multithreading (ubuntu: libomp-dev / fedora: libomp-devel)
-* [CMake](https://cmake.org) 3.1 or greater (ubuntu: cmake / fedora: cmake)
-* [make](https://www.gnu.org/software/make/) (ubuntu: build-essential / fedora: make)
-* A compiler compliant to C++11  (ubuntu: build-essential / fedora: gcc)
+## Installing Genie
 
-## Optional Dependencies
+### 1. Using Genie as a Docker Container (Recommended)
 
-* [Doxygen](https://www.doxygen.nl) for building the HTML documentation
-* [HTSlib](https://github.com/samtools/htslib) for SAM/BAM file support (ubuntu: libhts-dev / fedora: htslib-devel)
-    * GNU [autoconf](https://www.gnu.org/software/autoconf/) (ubuntu: autoconf / fedora: autoconf)
-    * GNU [automake](https://www.gnu.org/software/automake/) (ubuntu: automake / fedora: automake)
-    * [zlib](https://www.zlib.net/) development files (ubuntu: zlib1g-dev / fedora: zlib-devel)
-    * [libbz2](https://gitlab.com/bzip2/bzip2) development files (ubuntu: libbz2-dev / fedora: bzip2-devel)
-    * [liblzma](https://tukaani.org/xz/) development files (ubuntu: liblzma-dev / fedora: xz-devel)
-    * [libcurl](https://curl.se/) development files  (ubuntu: libcurl4-{gnutls,nss,openssl}-dev / fedora: libcurl-devel)
-    * [libcrypto](https://www.openssl.org/docs/man3.0/man7/crypto.html) development files (ubuntu: lib{gnutls,nss3,ssl}-dev / fedora: openssl-devel)
+Genie is available on Docker Hub, and running it through Docker is the simplest and recommended way to get started.
 
-## Quickstart
+#### Installation and Usage
 
-### Getting and Building Genie
+To use Genie via Docker, run the following command:
 
-We provide the script `get_genie.sh` to quickly build Genie.
-It will automatically clone the Genie repository, build HTSlib as a dependency for SAM file support, and download a few small example files for testing purposes. The script needs git and all dependencies for genie and htslib installed (listed above).
+```bash
+docker run --rm -v <dir>:/work muefab/genie:latest <cmd>
+```
 
+- `<dir>`: The directory on your computer containing the files you want to process with Genie.
+- `<cmd>`: The Genie command you want to execute.
+- `muefab/genie:latest`: Refers to the latest stable version of Genie. If you want to try out the current preview version, use `muefab/genie:develop`.
+
+#### Example
+
+```bash
+docker run --rm -v /path/to/files:/work muefab/genie:latest run -i global_assembly.mgb -o global_assembly.mgrec
+```
+
+This command will run Genie in a container and process the files located in `/path/to/files`.
+
+### 2. Building Genie on Bare Metal
+
+If you prefer building Genie directly on your machine, follow the steps below. This approach gives you more control over the environment but requires additional setup.
+
+#### Mandatory Dependencies
+
+Ensure the following dependencies are installed on your system:
+
+- **OpenMP** for multithreading: 
+  - Ubuntu: `libomp-dev`
+  - Fedora: `libomp-devel`
+- **CMake** 3.8 or greater: 
+  - Ubuntu: `cmake`
+  - Fedora: `cmake`
+- **make**:
+  - Ubuntu: `build-essential`
+  - Fedora: `make`
+- **A C++17-compliant compiler**:
+  - Ubuntu: `build-essential`
+  - Fedora: `gcc`
+- **HTSlib** for SAM/BAM file support:
+  - Ubuntu: `libhts-dev`
+  - Fedora: `htslib-devel`
+- **liblzma** for LZMA encoding
+  - Ubuntu: `liblzma-dev`
+  - Fedora: ?
+- **libzstd** for ZSTD encoding
+  - Ubuntu: `libzstd-dev`
+  - Fedora: ?
+- **libbsc** for BSC encoding
+  - Available at [https://github.com/IlyaGrebnov/libbsc]
+
+#### Quickstart: Buildscript
+
+You can use the `get_genie.sh` script to quickly build Genie along with its dependencies.
+
+1. Create a build directory and navigate to it:
+
+    ```bash
     mkdir genie_buildspace
     cd genie_buildspace
+    ```
+
+2. Download and execute the `get_genie.sh` script:
+
+    ```bash
     wget https://raw.githubusercontent.com/MueFab/genie/main/util/get_genie.sh
     bash ./get_genie.sh
+    ```
 
-The script will work only in the `genie_buildspace` directory.
-It will not modify any user or system directories.
+This script will automatically clone the Genie repository, build HTSlib, and download example files for testing. It only works within the `genie_buildspace` directory and does not modify any system directories.
 
-Alternatively, you can manually build HTSlib and Genie using CMake.
+#### Manual Build
 
-### Verifying
+If you prefer to build HTSlib and Genie manually, you can do so using CMake following the dependencies outlined above.
+
+## Verifying
 
 To check that Genie is working correctly, you can execute the following commands.
 
@@ -108,3 +162,10 @@ Fabian Müntefering <[muenteferi@tnt.uni-hannover.de](mailto:muenteferi@tnt.uni-
 Mikel Hernaez <[mhernaez@unav.es](mailto:mhernaez@unav.es)>
 
 Jan Voges <[voges@tnt.uni-hannover.de](mailto:voges@tnt.uni-hannover.de)>
+
+## Supporting Genie
+
+Don't forget to cite Genie in your work if you want to support the further development of this tool:
+
+> Müntefering, F., Adhisantoso, Y.G., Chandak, S. et al. Genie: the first open-source ISO/IEC encoder for genomic data. Commun Biol 7, 553 (2024). https://doi.org/10.1038/s42003-024-06249-8
+

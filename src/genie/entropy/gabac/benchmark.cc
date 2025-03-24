@@ -1,616 +1,746 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
-#define NOMINMAX
+#define NOMINMAX  // NOLINT
 #include "genie/entropy/gabac/benchmark.h"
+
 #include <algorithm>
+#include <filesystem>  // NOLINT
 #include <fstream>
 #include <iostream>
-#include <limits>
-#include "filesystem/filesystem.hpp"
-#include "genie/entropy/gabac/encode-desc-subseq.h"
-#include "genie/entropy/gabac/encode-transformed-subseq.h"
-#include "genie/entropy/gabac/stream-handler.h"
-#include "genie/util/watch.h"
+#include <string>
+#include <utility>
+#include <vector>
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/entropy/gabac/encode_desc_sub_seq.h"
+#include "genie/entropy/gabac/encode_transformed_sub_seq.h"
+#include "genie/entropy/gabac/stream_handler.h"
+#include "genie/util/log.h"
+#include "genie/util/stop_watch.h"
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+// -----------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------------------------------------------
+constexpr auto kLogModuleName = "App/Gabac";
 
-paramcabac::Binarization ConfigSearchBinarization::getBinarization(bool bypass, uint8_t outputbits,
-                                                                   uint8_t subsymsize) const {
-    return paramcabac::Binarization(
-        lut[binarization_search_idx], bypass,
-        paramcabac::BinarizationParameters(
-            lut[binarization_search_idx],
-            {binarizationParameters[binarization_search_idx].getIndex(binarization_parameter_search_idx)}),
-        paramcabac::Context(true, outputbits, subsymsize, true));
+namespace genie::entropy::gabac {
+
+// -----------------------------------------------------------------------------
+
+paramcabac::Binarization ConfigSearchBinarization::GetBinarization(
+    const bool bypass, const uint8_t output_bits,
+    const uint8_t sub_symbol_size) const {
+  return paramcabac::Binarization(
+      lut_[binarization_search_idx_], bypass,
+      paramcabac::BinarizationParameters(
+          lut_[binarization_search_idx_],
+          {binarization_parameters_[binarization_search_idx_].GetIndex(
+              binarization_parameter_search_idx_)}),
+      paramcabac::Context(true, output_bits, sub_symbol_size, true));
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-ConfigSearchBinarization::ConfigSearchBinarization(const std::pair<int64_t, int64_t>& range, uint8_t split_size)
-    : binarization_search_idx(0), binarization_parameter_search_idx(0) {
-    auto bits = static_cast<uint8_t>(std::ceil(std::log2(std::max(std::abs(range.first), std::abs(range.second)))));
-    if (range.first < 0) {
-        bits++;
+ConfigSearchBinarization::ConfigSearchBinarization(
+    const std::pair<int64_t, int64_t>& range, uint8_t split_size)
+    : binarization_search_idx_(0), binarization_parameter_search_idx_(0) {
+  auto bits = static_cast<uint8_t>(std::ceil(
+      std::log2(std::max(std::abs(range.first), std::abs(range.second)))));
+  if (range.first < 0) {
+    bits++;
+  }
+  {
+    if (split_size == 0) {
+      lut_.emplace_back(paramcabac::BinarizationParameters::BinarizationId::BI);
+      binarization_parameters_.emplace_back(bits, bits,
+                                            static_cast<uint8_t>(1));
     }
-    {
-        if (split_size == 0) {
-            lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::BI);
-            binarizationParameters.emplace_back(bits, bits, uint8_t(1));
-        }
-    }
-    if (range.first >= 0) {
-        if (split_size != 0 && split_size != bits) {
-            lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::SUTU);
-            binarizationParameters.emplace_back(split_size, split_size, uint8_t(1));
-        } else {
-            if (range.second < 256) {
-                lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::TU);
-                binarizationParameters.emplace_back(static_cast<uint8_t>(range.second),
-                                                    static_cast<uint8_t>(range.second), uint8_t(1));
-            }
-            lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::EG);
-            binarizationParameters.emplace_back(uint8_t(0), uint8_t(0), uint8_t(1));
-        }
-
-        //      lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::TEG);
-        //      auto max_param = (std::min(int64_t(64), range.second) / 4) * 4 + 1;
-
-        //      binarizationParameters.emplace_back(1, max_param, std::max(int64_t(1), (max_param - 1) / 4));
+  }
+  if (range.first >= 0) {
+    if (split_size != 0 && split_size != bits) {
+      lut_.emplace_back(
+          paramcabac::BinarizationParameters::BinarizationId::SUTU);
+      binarization_parameters_.emplace_back(split_size, split_size,
+                                            static_cast<uint8_t>(1));
     } else {
-        if (split_size != 0 && split_size != bits) {
-            lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::SSUTU);
-            binarizationParameters.emplace_back(split_size, split_size, uint8_t(1));
-        } else {
-            lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::SEG);
-            binarizationParameters.emplace_back(uint8_t(0), uint8_t(0), uint8_t(1));
-        }
-
-        //    lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::STEG);
-        //     auto max_value = std::max(std::abs(range.first), std::abs(range.second));
-        //    auto max_param = (std::min(int64_t(64), max_value) / 4) * 4;
-
-        //     binarizationParameters.emplace_back(0, max_param, std::max(int64_t(1), max_param / 4));
+      if (range.second < 256) {
+        lut_.emplace_back(
+            paramcabac::BinarizationParameters::BinarizationId::TU);
+        binarization_parameters_.emplace_back(
+            static_cast<uint8_t>(range.second),
+            static_cast<uint8_t>(range.second), static_cast<uint8_t>(1));
+      }
+      lut_.emplace_back(paramcabac::BinarizationParameters::BinarizationId::EG);
+      binarization_parameters_.emplace_back(static_cast<uint8_t>(0),
+                                            static_cast<uint8_t>(0),
+                                            static_cast<uint8_t>(1));
     }
-    binarization = SearchSpace<uint8_t>(uint8_t(0), static_cast<uint8_t>(lut.size()) - 1, uint8_t(1));
+  } else {
+    if (split_size != 0 && split_size != bits) {
+      lut_.emplace_back(
+          paramcabac::BinarizationParameters::BinarizationId::SSUTU);
+      binarization_parameters_.emplace_back(split_size, split_size,
+                                            static_cast<uint8_t>(1));
+    } else {
+      lut_.emplace_back(
+          paramcabac::BinarizationParameters::BinarizationId::SEG);
+      binarization_parameters_.emplace_back(static_cast<uint8_t>(0),
+                                            static_cast<uint8_t>(0),
+                                            static_cast<uint8_t>(1));
+    }
+  }
+  binarization_ =
+      SearchSpace<uint8_t>(0, static_cast<uint8_t>(lut_.size()) - 1, 1);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool ConfigSearchBinarization::increment() {
-    binarization_parameter_search_idx++;
-    if (binarization_parameter_search_idx == binarizationParameters[binarization_search_idx].size()) {
-        binarization_parameter_search_idx = 0;
-        binarization_search_idx++;
-    }
-    if (binarization_search_idx == binarization.size()) {
-        binarization_search_idx = 0;
-        return false;
-    }
+bool ConfigSearchBinarization::Increment() {
+  binarization_parameter_search_idx_++;
+  if (binarization_parameter_search_idx_ ==
+      binarization_parameters_[binarization_search_idx_].Size()) {
+    binarization_parameter_search_idx_ = 0;
+    binarization_search_idx_++;
+  }
+  if (binarization_search_idx_ == binarization_.Size()) {
+    binarization_search_idx_ = 0;
+    return false;
+  }
+  return true;
+}
+
+// -----------------------------------------------------------------------------
+
+void ConfigSearchBinarization::Mutate(std::mt19937& rd,
+                                      std::normal_distribution<>& d) {
+  binarization_search_idx_ =
+      binarization_.Mutate(binarization_search_idx_, static_cast<float>(d(rd)));
+  binarization_parameter_search_idx_ =
+      binarization_parameters_[binarization_search_idx_].Mutate(
+          binarization_parameter_search_idx_, static_cast<float>(d(rd)));
+}
+
+// -----------------------------------------------------------------------------
+
+bool ConfigSearchTransformedSeq::LutValid() const {
+  return output_bits_ / GetSplitRatio() <= 8 &&
+         coding_order_.GetIndex(coding_order_search_idx_) > 0;
+}
+
+// -----------------------------------------------------------------------------
+
+int8_t ConfigSearchTransformedSeq::GetSubSymbolTransId() const {
+  if (subsymbol_transform_enabled_.GetIndex(subsymbol_transform_search_idx_) ==
+      0) {
+    return 0;
+  }
+  if (coding_order_.GetIndex(coding_order_search_idx_) == 0) {
+    return 0;
+  }
+  return 2;
+}
+
+// -----------------------------------------------------------------------------
+
+bool ConfigSearchTransformedSeq::IncrementTransform() {
+  subsymbol_transform_search_idx_++;
+  if (subsymbol_transform_search_idx_ == subsymbol_transform_enabled_.Size() ||
+      (GetSubSymbolTransId() == 2 && !LutValid())) {
+    subsymbol_transform_search_idx_ = 0;
+    return false;
+  }
+  return true;
+}
+
+// -----------------------------------------------------------------------------
+
+uint8_t ConfigSearchTransformedSeq::GetSplitRatio() const {
+  return 1 << split_size_.GetIndex(split_size_idx_);
+}
+
+// -----------------------------------------------------------------------------
+
+paramcabac::TransformedSubSeq ConfigSearchTransformedSeq::CreateConfig(
+    const core::GenSubIndex& descriptor_subsequence,
+    const bool original) const {
+  int lut[] = {0, 2, 1};
+  const auto sub_symbol_trans =
+      static_cast<paramcabac::SupportValues::TransformIdSubsym>(
+          lut[GetSubSymbolTransId()]);
+
+  auto symbol_size = output_bits_;
+  if (!split_in_binarization_.GetIndex(split_in_binarization_idx_)) {
+    symbol_size = output_bits_ / GetSplitRatio();
+  }
+
+  paramcabac::TransformedSubSeq ret(
+      sub_symbol_trans,
+      paramcabac::SupportValues(
+          output_bits_, symbol_size,
+          coding_order_.GetIndex(coding_order_search_idx_)),
+      binarizations_[split_size_.GetIndex(split_size_idx_)]
+                    [split_in_binarization_.GetIndex(
+                        split_in_binarization_idx_)][GetSubSymbolTransId()]
+                        .GetBinarization(bypass_.GetIndex(bypass_search_idx_),
+                                         output_bits_, symbol_size),
+      descriptor_subsequence, original);
+  return ret;
+}
+
+// -----------------------------------------------------------------------------
+
+bool ConfigSearchTransformedSeq::Increment() {  // NOLINT
+  // Increment binarization for current split and transformation
+  if (binarizations_[split_size_.GetIndex(split_size_idx_)]
+                    [split_in_binarization_.GetIndex(
+                        split_in_binarization_idx_)][GetSubSymbolTransId()]
+                        .Increment()) {
     return true;
-}
+  }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void ConfigSearchBinarization::mutate(std::mt19937& rd, std::normal_distribution<>& d) {
-    binarization_search_idx = binarization.mutate(binarization_search_idx, static_cast<float>(d(rd)));
-    binarization_parameter_search_idx = binarizationParameters[binarization_search_idx].mutate(
-        binarization_parameter_search_idx, static_cast<float>(d(rd)));
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool ConfigSearchTranformedSeq::lutValid() const {
-    return (output_bits / getSplitRatio()) <= 8 && coding_order.getIndex(coding_order_search_idx) > 0;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-int8_t ConfigSearchTranformedSeq::getSubsymbolTransID() {
-    if (subsymbol_transform_enabled.getIndex(subsymbol_transform_search_idx) == 0) {
-        return 0;
-    }
-    if (coding_order.getIndex(coding_order_search_idx) == 0) {
-        return 0;
-    }
-    return 2;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool ConfigSearchTranformedSeq::incrementTransform() {
-    subsymbol_transform_search_idx++;
-    if (subsymbol_transform_search_idx == subsymbol_transform_enabled.size() ||
-        (getSubsymbolTransID() == 2 && !lutValid())) {
-        subsymbol_transform_search_idx = 0;
-        return false;
-    }
+  // Increment sub symbol transformation
+  if (IncrementTransform()) {
     return true;
+  }
+
+  split_in_binarization_idx_++;
+  if (split_in_binarization_idx_ == split_in_binarization_.Size()) {
+    split_in_binarization_idx_ = 0;
+    split_size_idx_++;
+  }
+
+  if (split_size_idx_ == split_size_.Size()) {
+    split_size_idx_ = 0;
+    bypass_search_idx_++;
+  }
+
+  // Increment bypass setting
+  if (bypass_search_idx_ == bypass_.Size()) {
+    bypass_search_idx_ = 0;
+    coding_order_search_idx_++;
+  }
+
+  // If coding order cannot be incremented, all settings have been explored
+  if (coding_order_search_idx_ == coding_order_.Size()) {
+    coding_order_search_idx_ = 0;
+    return false;
+  }
+
+  // Skip split binarizations for coding order > 0
+  while ((coding_order_.GetIndex(coding_order_search_idx_) > 0 &&
+          split_in_binarization_.GetIndex(split_in_binarization_idx_)) ||
+         output_bits_ % GetSplitRatio() ||
+         ((coding_order_.GetIndex(coding_order_search_idx_) == 2 &&
+           output_bits_ / GetSplitRatio() > 8) ||
+          (coding_order_.GetIndex(coding_order_search_idx_) == 1 &&
+           output_bits_ / GetSplitRatio() > 16))) {
+    if (!Increment()) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint8_t ConfigSearchTranformedSeq::getSplitRatio() const { return 1 << split_size.getIndex(split_size_idx); }
+ConfigSearchTransformedSeq::ConfigSearchTransformedSeq(
+    const std::pair<int64_t, int64_t>& range)
+    : split_size_(0, 3, 1),
+      split_size_idx_(0),
+      split_in_binarization_(0, 0, 1),
+      split_in_binarization_idx_(0),
+      coding_order_(0, 2, 1),
+      coding_order_search_idx_(0),
+      bypass_(0, 0, 1),
+      bypass_search_idx_(0),
+      subsymbol_transform_enabled_(0, 1, 1),
+      subsymbol_transform_search_idx_(0) {
+  // Necessary bits
+  output_bits_ = static_cast<uint8_t>(std::ceil(log2(static_cast<double>(
+      std::max(std::abs(range.first) + 1, std::abs(range.second) + 1)))));
+  if (range.first < 0) {
+    output_bits_++;
+  }
+  // Split sizes 2^0 to 2^4
+  for (int i = 0; i < 4; ++i) {
+    binarizations_.emplace_back();
+    // Split at binarization level (1) or as sub symbol (0)
+    for (int j = 0; j < 2; ++j) {
+      binarizations_.back().emplace_back();
 
-// ---------------------------------------------------------------------------------------------------------------------
+      const uint8_t split_size = static_cast<uint8_t>(1) << i;
+      uint8_t coding_size = output_bits_ / split_size;
 
-paramcabac::TransformedSubSeq ConfigSearchTranformedSeq::createConfig(
-    const genie::core::GenSubIndex& descriptor_subsequence, bool original) {
-    int lut[] = {0, 2, 1};
-    auto subsymbol_trans = paramcabac::SupportValues::TransformIdSubsym(lut[getSubsymbolTransID()]);
-
-    auto symbol_size = output_bits;
-    if (!split_in_binarization.getIndex(split_in_binarization_idx)) {
-        symbol_size = output_bits / getSplitRatio();
+      if (j == 0) {
+        coding_size = 0;
+      }
+      binarizations_.back().back().emplace_back(range,
+                                                coding_size);  // No-Transform
+      binarizations_.back().back().emplace_back(
+          std::make_pair(-(range.second - range.first),
+                         range.second - range.first),
+          coding_size);  // DIFF
+      binarizations_.back().back().emplace_back(
+          std::make_pair(0, range.second - range.first),
+          coding_size);  // LUT
     }
-
-    paramcabac::TransformedSubSeq ret(
-        subsymbol_trans,
-        paramcabac::SupportValues(output_bits, symbol_size, coding_order.getIndex(coding_order_search_idx)),
-        binarizations[split_size.getIndex(split_size_idx)][split_in_binarization.getIndex(split_in_binarization_idx)]
-                     [getSubsymbolTransID()]
-                         .getBinarization(bypass.getIndex(bypass_search_idx), output_bits, symbol_size),
-        descriptor_subsequence, original);
-    return ret;
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool ConfigSearchTranformedSeq::increment() {
-    // Increment binarization for current split and transformation
-    if (binarizations[split_size.getIndex(split_size_idx)][split_in_binarization.getIndex(split_in_binarization_idx)]
-                     [getSubsymbolTransID()]
-                         .increment()) {
-        return true;
-    }
-
-    // Increment subsymbol tranformation
-    if (incrementTransform()) {
-        return true;
-    }
-
-    split_in_binarization_idx++;
-    if (split_in_binarization_idx == split_in_binarization.size()) {
-        split_in_binarization_idx = 0;
-        split_size_idx++;
-    }
-
-    if (split_size_idx == split_size.size()) {
-        split_size_idx = 0;
-        bypass_search_idx++;
-    }
-
-    // Increment bypass setting
-    if (bypass_search_idx == bypass.size()) {
-        bypass_search_idx = 0;
-        coding_order_search_idx++;
-    }
-
-    // If coding order cannot be incremented, all settings have been explored
-    if (coding_order_search_idx == coding_order.size()) {
-        coding_order_search_idx = 0;
-        return false;
-    }
-
-    // Skip split binarizations for coding order > 0
-    while ((coding_order.getIndex(coding_order_search_idx) > 0 &&
-            split_in_binarization.getIndex(split_in_binarization_idx)) ||
-           (output_bits % getSplitRatio()) ||
-           ((coding_order.getIndex(coding_order_search_idx) == 2 && output_bits / getSplitRatio() > 8) ||
-            (coding_order.getIndex(coding_order_search_idx) == 1 && output_bits / getSplitRatio() > 16))) {
-        if (!increment()) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-ConfigSearchTranformedSeq::ConfigSearchTranformedSeq(const std::pair<int64_t, int64_t>& range)
-    : split_size(0, 3, 1),
-      split_size_idx(0),
-      split_in_binarization(0, 0, 1),
-      split_in_binarization_idx(0),
-      coding_order(0, 2, 1),
-      coding_order_search_idx(0),
-      bypass(0, 0, 1),
-      bypass_search_idx(0),
-      subsymbol_transform_enabled(0, 1, 1),
-      subsymbol_transform_search_idx(0) {
-    // Necessary bits
-    output_bits =
-        static_cast<uint8_t>(std::ceil(log2(std::max(std::abs(range.first) + 1, std::abs(range.second) + 1))));
-    if (range.first < 0) {
-        output_bits++;
-    }
-    // Split sizes 2^0 to 2^4
-    for (int i = 0; i < 4; ++i) {
-        binarizations.emplace_back();
-        // Split at binarization level (1) or as subsymbol (0)
-        for (int j = 0; j < 2; ++j) {
-            binarizations.back().emplace_back();
-
-            uint8_t splitsize = uint8_t(1) << i;
-            uint8_t codingsize = output_bits / splitsize;
-
-            if (j == 0) {
-                codingsize = 0;
-            }
-            binarizations.back().back().emplace_back(range, codingsize);  // No-Transform
-            binarizations.back().back().emplace_back(
-                std::make_pair(-(range.second - range.first), range.second - range.first),
-                codingsize);  // DIFF
-            binarizations.back().back().emplace_back(std::make_pair(0, range.second - range.first),
-                                                     codingsize);  // LUT
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void ConfigSearchTranformedSeq::mutate(std::mt19937& rd, std::normal_distribution<>& d) {
-    coding_order_search_idx = coding_order.mutate(coding_order_search_idx, static_cast<float>(d(rd)));
-    split_size_idx = split_size.mutate(split_size_idx, static_cast<float>(d(rd)));
-    subsymbol_transform_search_idx =
-        subsymbol_transform_enabled.mutate(subsymbol_transform_search_idx, static_cast<float>(d(rd)));
-    bypass_search_idx = bypass.mutate(bypass_search_idx, static_cast<float>(d(rd)));
-    if (getSubsymbolTransID() == 2 && !lutValid()) {
-        subsymbol_transform_search_idx = 0;
-    }
-    binarizations[split_size.getIndex(split_size_idx)][split_in_binarization.getIndex(split_in_binarization_idx)]
-                 [getSubsymbolTransID()]
-                     .mutate(rd, d);
+void ConfigSearchTransformedSeq::Mutate(std::mt19937& rd,
+                                        std::normal_distribution<>& d) {
+  coding_order_search_idx_ =
+      static_cast<size_t>(static_cast<unsigned char>(coding_order_.Mutate(
+          coding_order_search_idx_, static_cast<float>(d(rd)))));
+  split_size_idx_ = static_cast<size_t>(static_cast<unsigned char>(
+      split_size_.Mutate(split_size_idx_, static_cast<float>(d(rd)))));
+  subsymbol_transform_search_idx_ = static_cast<size_t>(
+      static_cast<unsigned char>(subsymbol_transform_enabled_.Mutate(
+          subsymbol_transform_search_idx_, static_cast<float>(d(rd)))));
+  bypass_search_idx_ = static_cast<size_t>(static_cast<unsigned char>(
+      bypass_.Mutate(bypass_search_idx_, static_cast<float>(d(rd)))));
+  if (GetSubSymbolTransId() == 2 && !LutValid()) {
+    subsymbol_transform_search_idx_ = 0;
+  }
+  binarizations_[split_size_.GetIndex(split_size_idx_)]
+                [split_in_binarization_.GetIndex(split_in_binarization_idx_)]
+                [GetSubSymbolTransId()]
+                    .Mutate(rd, d);
 }
 
 /**
  * @brief
  * @return
  */
-std::string ResultTransformed::toCSV(const std::string& filename, size_t transform, size_t parameter,
-                                     size_t seq_id) const {
-    std::string ret;
-    ret += filename + ";" + std::to_string(size) + ";" + std::to_string(milliseconds) + ";" +
-           std::to_string(transform) + ";" + std::to_string(parameter) + ";" + std::to_string(seq_id) + ";";
-    ret += std::to_string(config.getSupportValues().getCodingOrder()) + ";" +
-           std::to_string(config.getSupportValues().getOutputSymbolSize()) + ";" +
-           std::to_string(config.getSupportValues().getCodingSubsymSize()) + ";" +
-           std::to_string(size_t(config.getTransformIDSubsym())) + ";" +
-           std::to_string(size_t(config.getBinarization().getBinarizationID())) + ";";
-    if (config.getBinarization().getBinarizationID() == paramcabac::BinarizationParameters::BinarizationId::TU) {
-        ret += std::to_string(size_t(config.getBinarization().getCabacBinarizationParameters().getCMax())) + ";";
-    } else if (config.getBinarization().getBinarizationID() ==
+std::string ResultTransformed::ToCsv(const std::string& filename,
+                                     const size_t transform,
+                                     const size_t parameter,
+                                     const size_t seq_id) const {
+  std::string ret;
+  ret += filename + ";" + std::to_string(size) + ";" +
+         std::to_string(milliseconds) + ";" + std::to_string(transform) + ";" +
+         std::to_string(parameter) + ";" + std::to_string(seq_id) + ";";
+  ret +=
+      std::to_string(config.GetSupportValues().GetCodingOrder()) + ";" +
+      std::to_string(config.GetSupportValues().GetOutputSymbolSize()) + ";" +
+      std::to_string(config.GetSupportValues().GetCodingSubsymSize()) + ";" +
+      std::to_string(static_cast<size_t>(config.GetTransformIdSubsym())) + ";" +
+      std::to_string(
+          static_cast<size_t>(config.GetBinarization().GetBinarizationId())) +
+      ";";
+  if (config.GetBinarization().GetBinarizationId() ==
+      paramcabac::BinarizationParameters::BinarizationId::TU) {
+    ret +=
+        std::to_string(static_cast<size_t>(config.GetBinarization()
+                                               .GetCabacBinarizationParameters()
+                                               .GetCMax())) +
+        ";";
+  } else if (config.GetBinarization().GetBinarizationId() ==
+             paramcabac::BinarizationParameters::BinarizationId::SUTU) {
+    ret +=
+        std::to_string(static_cast<size_t>(config.GetBinarization()
+                                               .GetCabacBinarizationParameters()
+                                               .GetSplitUnitSize())) +
+        ";";
+  } else {
+    ret += ";";
+  }
+  return ret;
+}
+
+/**
+ * @brief
+ * @return
+ */
+std::string ResultTransformed::GetCsvHeader() {
+  std::string desc;
+  desc +=
+      "File;Compressed Size;Compression "
+      "time;Transformation;TransformationParam;seqID;";
+  desc +=
+      "Coding order;Symbol size;Sub symbol Size;Sub symbol "
+      "transformation;Binarization;BinParam;";
+  return desc;
+}
+
+// -----------------------------------------------------------------------------
+
+std::string ResultFull::ToCsv(const std::string& filename) const {
+  std::string ret;
+  ret += std::to_string(size) + ";" + std::to_string(milliseconds) + ";" +
+         std::to_string(static_cast<size_t>(
+             config.GetTransformParameters().GetTransformIdSubseq())) +
+         ";" +
+         std::to_string(
+             static_cast<size_t>(config.GetTransformParameters().GetParam())) +
+         ";";
+  for (auto& cfg : config.GetTransformSubSeqConfigs()) {
+    ret += std::to_string(cfg.GetSupportValues().GetCodingOrder()) + ";" +
+           std::to_string(cfg.GetSupportValues().GetOutputSymbolSize()) + ";" +
+           std::to_string(cfg.GetSupportValues().GetCodingSubsymSize()) + ";" +
+           std::to_string(static_cast<size_t>(cfg.GetTransformIdSubsym())) +
+           ";" +
+           std::to_string(
+               static_cast<size_t>(cfg.GetBinarization().GetBinarizationId())) +
+           ";";
+    if (cfg.GetBinarization().GetBinarizationId() ==
+        paramcabac::BinarizationParameters::BinarizationId::TU) {
+      ret += std::to_string(
+                 static_cast<size_t>(cfg.GetBinarization()
+                                         .GetCabacBinarizationParameters()
+                                         .GetCMax())) +
+             ";";
+    } else if (cfg.GetBinarization().GetBinarizationId() ==
                paramcabac::BinarizationParameters::BinarizationId::SUTU) {
-        ret +=
-            std::to_string(size_t(config.getBinarization().getCabacBinarizationParameters().getSplitUnitSize())) + ";";
+      ret += std::to_string(
+                 static_cast<size_t>(cfg.GetBinarization()
+                                         .GetCabacBinarizationParameters()
+                                         .GetSplitUnitSize())) +
+             ";";
     } else {
-        ret += ";";
+      ret += ";";
     }
-    return ret;
+  }
+  for (int i = 0;
+       i < 3 - static_cast<int>(config.GetTransformSubSeqConfigs().size());
+       ++i) {
+    ret += ";;;;;;";
+  }
+  return filename + ";" + ret;
 }
 
-/**
- * @brief
- * @return
- */
-std::string ResultTransformed::getCSVHeader() {
-    std::string desc;
-    desc += "File;Compressed size;Compression time;Transformation;TransformationParam;seqID;";
-    desc += "Coding order;Symbol size;Subsymbol size;Subsymbol transformation;Binarization;BinParam;";
-    return desc;
+// -----------------------------------------------------------------------------
+
+std::string ResultFull::GetCsvHeader() const {
+  std::string desc;
+  desc +=
+      "File;Compressed Size;Compression "
+      "time;Transformation;TransformationParam;";
+  for (size_t i = 0; i < config.GetTransformSubSeqConfigs().size(); ++i) {
+    desc +=
+        "Coding order;Symbol size;Sub symbol Size;Sub symbol "
+        "transformation;Binarization;BinParam;";
+  }
+  for (int i = 0;
+       i < 3 - static_cast<int>(config.GetTransformSubSeqConfigs().size());
+       ++i) {
+    desc +=
+        "Coding order;Symbol size;Sub symbol Size;Sub symbol "
+        "transformation;Binarization;BinParam;";
+  }
+  return desc;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::string ResultFull::toCSV(const std::string& filename) const {
-    std::string ret;
-    ret += std::to_string(size) + ";" + std::to_string(milliseconds) + ";" +
-           std::to_string(size_t(config.getTransformParameters().getTransformIdSubseq())) + ";" +
-           std::to_string(size_t(config.getTransformParameters().getParam())) + ";";
-    for (auto& cfg : config.getTransformSubseqCfgs()) {
-        ret += std::to_string(cfg.getSupportValues().getCodingOrder()) + ";" +
-               std::to_string(cfg.getSupportValues().getOutputSymbolSize()) + ";" +
-               std::to_string(cfg.getSupportValues().getCodingSubsymSize()) + ";" +
-               std::to_string(size_t(cfg.getTransformIDSubsym())) + ";" +
-               std::to_string(size_t(cfg.getBinarization().getBinarizationID())) + ";";
-        if (cfg.getBinarization().getBinarizationID() == paramcabac::BinarizationParameters::BinarizationId::TU) {
-            ret += std::to_string(size_t(cfg.getBinarization().getCabacBinarizationParameters().getCMax())) + ";";
-        } else if (cfg.getBinarization().getBinarizationID() ==
-                   paramcabac::BinarizationParameters::BinarizationId::SUTU) {
-            ret +=
-                std::to_string(size_t(cfg.getBinarization().getCabacBinarizationParameters().getSplitUnitSize())) + ";";
-        } else {
-            ret += ";";
-        }
+ResultFull BenchmarkFull(const std::string& input_file,
+                         const core::GenSubIndex& desc, float time_weight) {
+  std::ifstream input_stream(input_file);
+  UTILS_DIE_IF(!input_stream, "Cannot open file to read: " + input_file);
+  util::DataBlock sequence(0, core::Range2Bytes(GetSubsequence(desc).range));
+  StreamHandler::ReadFull(input_stream, &sequence);
+
+  ResultFull best_result;
+  float best_score = INFINITY;
+  ConfigSearch config(GetSubsequence(desc).range);
+  bool new_file = !std::filesystem::exists("benchmark_total.csv");
+  std::ofstream results_file("benchmark_total.csv", std::ios_base::app);
+  do {
+    UTILS_LOG(
+        util::Logger::Severity::INFO,
+        "Optimizing transformation " + std::to_string(config.GetTransform()));
+    // Execute transformation
+    std::vector<util::DataBlock> transformed_sub_seqs;
+    transformed_sub_seqs.resize(1);
+    auto subsequence = sequence;
+    transformed_sub_seqs[0].Swap(&subsequence);
+    util::Watch timer;
+    timer.Reset();
+    auto cfg = config.CreateConfig(desc, GetDescriptor(desc.first).token_type);
+    DoSubsequenceTransform(cfg, &transformed_sub_seqs);
+    auto total_time = static_cast<size_t>(timer.Check() * 1000);
+    std::vector<ResultTransformed> trans_results;
+
+    // Optimize transformed sequences independently
+    for (size_t i = 0; i < transformed_sub_seqs.size(); ++i) {
+      UTILS_LOG(util::Logger::Severity::INFO,
+                "Optimizing subsequence " + std::to_string(i) + "...");
+      trans_results.emplace_back(OptimizeTransformedSequence(
+          config.GetTransformedSeqs()[i], desc, transformed_sub_seqs[i],
+          time_weight, i == transformed_sub_seqs.size() - 1,
+          config.GetTransform(), config.GetTransformParam(), i, input_file));
+      auto tmp = trans_results.back().config;
+      cfg.SetTransformSubSeqCfg(i, std::move(tmp));
     }
-    for (int i = 0; i < (3 - static_cast<int>(config.getTransformSubseqCfgs().size())); ++i) {
-        ret += ";;;;;;";
+
+    // Sum up compressed sizes and times
+    size_t total_size = 0;
+    for (const auto& r : trans_results) {
+      total_size += r.size;
+      total_time += r.milliseconds;  // Transformation time already added above
     }
-    return filename + ";" + ret;
+
+    // Calculate weighted score
+
+    // Found new best score
+    if (float score = time_weight * static_cast<float>(total_time) +
+                      (1 - time_weight) * static_cast<float>(total_size);
+        score < best_score) {
+      best_score = score;
+      best_result.milliseconds = total_time;
+      best_result.size = total_size;
+      best_result.config = cfg;
+    }
+
+    ResultFull result_current;
+    result_current.milliseconds = total_time;
+    result_current.size = total_size;
+    result_current.config = cfg;
+
+    if (new_file) {
+      results_file << result_current.GetCsvHeader() << std::endl;
+      new_file = false;
+    }
+    results_file << result_current.ToCsv(input_file) << std::endl;
+  } while (config.Increment());
+
+  std::cout << best_result.ToCsv(input_file) << std::endl;
+  return best_result;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::string ResultFull::getCSVHeader() {
-    std::string desc;
-    desc += "File;Compressed size;Compression time;Transformation;TransformationParam;";
-    for (size_t i = 0; i < config.getTransformSubseqCfgs().size(); ++i) {
-        desc += "Coding order;Symbol size;Subsymbol size;Subsymbol transformation;Binarization;BinParam;";
-    }
-    for (int i = 0; i < (3 - static_cast<int>(config.getTransformSubseqCfgs().size())); ++i) {
-        desc += "Coding order;Symbol size;Subsymbol size;Subsymbol transformation;Binarization;BinParam;";
-    }
-    return desc;
+int16_t ConfigSearchTransformation::GetParameter() const {
+  return parameter_.GetIndex(parameter_search_idx_);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-ResultFull benchmark_full(const std::string& input_file, const genie::core::GenSubIndex& desc, float timeweight) {
-    std::ifstream input_stream(input_file);
-    util::DataBlock sequence(0, core::range2bytes(core::getSubsequence(desc).range));
-    gabac::StreamHandler::readFull(input_stream, &sequence);
-
-    ResultFull best_result;
-    float best_score = INFINITY;
-    ConfigSearch config(genie::core::getSubsequence(desc).range);
-    bool new_file = !ghc::filesystem::exists("benchmark_total.csv");
-    std::ofstream results_file("benchmark_total.csv", std::ios_base::app);
-    do {
-        std::cerr << "Optimizing transformation " << static_cast<int>(config.getTransform()) << "..." << std::endl;
-        // Execute transformation
-        std::vector<util::DataBlock> transformedSubseqs;
-        transformedSubseqs.resize(1);
-        auto subsequence = sequence;
-        transformedSubseqs[0].swap(&subsequence);
-        util::Watch timer;
-        timer.reset();
-        auto cfg = config.createConfig(desc, core::getDescriptor(desc.first).tokentype);
-        gabac::doSubsequenceTransform(cfg, &transformedSubseqs);
-        size_t total_time = static_cast<size_t>(timer.check() * 1000);
-        std::vector<ResultTransformed> trans_results;
-
-        // Optimze transformed sequences independently
-        for (size_t i = 0; i < transformedSubseqs.size(); ++i) {
-            std::cerr << "Optimizing subsequence " << i << "..." << std::endl;
-            trans_results.emplace_back(optimizeTransformedSequence(
-                config.getTransformedSeqs()[i], desc, transformedSubseqs[i], timeweight,
-                i == transformedSubseqs.size() - 1, config.getTransform(), config.getTransformParam(), i, input_file));
-            auto tmp = trans_results.back().config;
-            cfg.setTransformSubseqCfg(i, std::move(tmp));
-        }
-
-        // Sum up compressed sizes and times
-        size_t total_size = 0;
-        for (const auto& r : trans_results) {
-            total_size += r.size;
-            total_time += r.milliseconds;  // Transformation time already added above
-        }
-
-        // Calculate weighted score
-        float score = timeweight * total_time + (1 - timeweight) * total_size;
-
-        // Found new best score
-        if (score < best_score) {
-            best_score = score;
-            best_result.milliseconds = total_time;
-            best_result.size = total_size;
-            best_result.config = cfg;
-        }
-
-        ResultFull result_current;
-        result_current.milliseconds = total_time;
-        result_current.size = total_size;
-        result_current.config = cfg;
-
-        if (new_file) {
-            results_file << result_current.getCSVHeader() << std::endl;
-            new_file = false;
-        }
-        results_file << result_current.toCSV(input_file) << std::endl;
-    } while (config.increment());
-
-    std::cout << best_result.toCSV(input_file) << std::endl;
-    return best_result;
+ConfigSearchTransformation::ConfigSearchTransformation(
+    const paramcabac::TransformedParameters::TransformIdSubseq trans_id,
+    const std::pair<int64_t, int64_t>& range)
+    : parameter_search_idx_(0) {
+  constexpr uint16_t match_coding_buffer_size = 255;
+  constexpr uint8_t rle_guard = 255;
+  switch (trans_id) {
+    case paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM:
+      parameter_ = SearchSpace<int16_t>(0, 0, 1);  // No param
+      transformed_seqs_.emplace_back(range);
+      break;
+    case paramcabac::TransformedParameters::TransformIdSubseq::EQUALITY_CODING:
+      parameter_ = SearchSpace<int16_t>(0, 0, 1);  // No param
+      transformed_seqs_.emplace_back(std::make_pair(0, 1));
+      transformed_seqs_.emplace_back(range);
+      break;
+    case paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING:
+      parameter_ = SearchSpace<int16_t>(match_coding_buffer_size,
+                                        match_coding_buffer_size, 1);
+      transformed_seqs_.emplace_back(
+          std::make_pair(0, match_coding_buffer_size));
+      transformed_seqs_.emplace_back(
+          std::make_pair(0, match_coding_buffer_size));
+      transformed_seqs_.emplace_back(range);
+      break;
+    case paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING:
+      parameter_ = SearchSpace<int16_t>(rle_guard, rle_guard, 1);
+      transformed_seqs_.emplace_back(std::make_pair(0, rle_guard));
+      transformed_seqs_.emplace_back(range);
+      break;
+    case paramcabac::TransformedParameters::TransformIdSubseq::MERGE_CODING:
+      UTILS_DIE("Merge coding unsupported");
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-int16_t ConfigSearchTransformation::getParameter() const { return parameter.getIndex(parameter_search_idx); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-ConfigSearchTransformation::ConfigSearchTransformation(paramcabac::TransformedParameters::TransformIdSubseq trans_id,
-                                                       const std::pair<int64_t, int64_t>& range)
-    : parameter_search_idx(0) {
-    const uint16_t MATCH_CODING_BUFFER_SIZE = 255;
-    const uint8_t RLE_GUARD = 255;
-    switch (trans_id) {
-        case paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM:
-            parameter = SearchSpace<int16_t>(0, 0, 1);  // No param
-            transformedSeqs.emplace_back(range);
-            break;
-        case paramcabac::TransformedParameters::TransformIdSubseq::EQUALITY_CODING:
-            parameter = SearchSpace<int16_t>(0, 0, 1);  // No param
-            transformedSeqs.emplace_back(std::make_pair(0, 1));
-            transformedSeqs.emplace_back(range);
-            break;
-        case paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING:
-            parameter = SearchSpace<int16_t>(MATCH_CODING_BUFFER_SIZE, MATCH_CODING_BUFFER_SIZE, 1);
-            transformedSeqs.emplace_back(std::make_pair(0, MATCH_CODING_BUFFER_SIZE));
-            transformedSeqs.emplace_back(std::make_pair(0, MATCH_CODING_BUFFER_SIZE));
-            transformedSeqs.emplace_back(range);
-            break;
-        case paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING:
-            parameter = SearchSpace<int16_t>(RLE_GUARD, RLE_GUARD, 1);
-            transformedSeqs.emplace_back(std::make_pair(0, RLE_GUARD));
-            transformedSeqs.emplace_back(range);
-            break;
-        case paramcabac::TransformedParameters::TransformIdSubseq::MERGE_CODING:
-            UTILS_DIE("Merge coding unsupported");
-            break;
-    }
+std::vector<ConfigSearchTransformedSeq>&
+ConfigSearchTransformation::GetTransformedSeqs() {
+  return transformed_seqs_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::vector<ConfigSearchTranformedSeq>& ConfigSearchTransformation::getTransformedSeqs() { return transformedSeqs; }
+bool ConfigSearchTransformation::Increment() {
+  // Try all parameters
+  parameter_search_idx_++;
+  if (parameter_search_idx_ == parameter_.Size()) {
+    // All parameters tried
+    parameter_search_idx_ = 0;
+    return false;
+  }
+  return true;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool ConfigSearchTransformation::increment() {
-    // Try all parameters
-    parameter_search_idx++;
-    if (parameter_search_idx == parameter.size()) {
-        // All parameters tried
-        parameter_search_idx = 0;
-        return false;
-    }
+void ConfigSearchTransformation::Mutate(std::mt19937& rd,
+                                        std::normal_distribution<>& d) {
+  parameter_search_idx_ =
+      parameter_.Mutate(parameter_search_idx_, static_cast<float>(d(rd)));
+
+  for (auto& ts : transformed_seqs_) {
+    ts.Mutate(rd, d);
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+uint8_t ConfigSearch::GetTransform() const {
+  return transformation_.GetIndex(transformation_search_idx_);
+}
+
+// -----------------------------------------------------------------------------
+
+uint32_t ConfigSearch::GetTransformParam() const {
+  return params_[transformation_.GetIndex(transformation_search_idx_)]
+      .GetParameter();
+}
+
+// -----------------------------------------------------------------------------
+
+std::vector<ConfigSearchTransformedSeq>& ConfigSearch::GetTransformedSeqs() {
+  return params_[transformation_.GetIndex(transformation_search_idx_)]
+      .GetTransformedSeqs();
+}
+
+// -----------------------------------------------------------------------------
+
+ConfigSearch::ConfigSearch(const std::pair<int64_t, int64_t>& range)
+    : transformation_search_idx_(0) {
+  params_.emplace_back(
+      paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM,
+      range);
+  params_.emplace_back(
+      paramcabac::TransformedParameters::TransformIdSubseq::EQUALITY_CODING,
+      range);
+  params_.emplace_back(
+      paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING,
+      range);
+  params_.emplace_back(
+      paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING, range);
+  transformation_ = SearchSpace<int8_t>(0, 3, 1);
+}
+
+// -----------------------------------------------------------------------------
+
+bool ConfigSearch::Increment() {
+  // Search current transformation
+  if (params_[transformation_.GetIndex(transformation_search_idx_)]
+          .Increment()) {
     return true;
+  }
+
+  // Current transformation completely searched, next transformation
+  transformation_search_idx_++;
+  if (transformation_search_idx_ == transformation_.Size()) {
+    transformation_search_idx_ = 0;
+    return false;
+  }
+
+  // All transformations searched
+  return true;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void ConfigSearchTransformation::mutate(std::mt19937& rd, std::normal_distribution<>& d) {
-    parameter_search_idx = parameter.mutate(parameter_search_idx, static_cast<float>(d(rd)));
+[[maybe_unused]] void ConfigSearch::Mutate(const float rate) {
+  std::random_device rd;
+  std::mt19937 gen{rd()};
+  std::normal_distribution<> d{0, rate};
 
-    for (auto& ts : transformedSeqs) {
-        ts.mutate(rd, d);
+  transformation_search_idx_ =
+      static_cast<size_t>(static_cast<unsigned char>(transformation_.Mutate(
+          transformation_search_idx_, static_cast<float>(d(gen)))));
+  params_[transformation_.GetIndex(transformation_search_idx_)].Mutate(gen, d);
+}
+
+// -----------------------------------------------------------------------------
+
+paramcabac::Subsequence ConfigSearch::CreateConfig(
+    const core::GenSubIndex& descriptor_subsequence, const bool token_type) {
+  // Generate top level transformation
+  auto t = paramcabac::TransformedParameters(
+      static_cast<paramcabac::TransformedParameters::TransformIdSubseq>(
+          transformation_.GetIndex(transformation_search_idx_)),
+      params_[transformation_.GetIndex(transformation_search_idx_)]
+          .GetParameter());
+
+  // Add config for transformed sequences
+  std::vector<paramcabac::TransformedSubSeq> tss;
+  for (auto& p : params_[transformation_.GetIndex(transformation_search_idx_)]
+                     .GetTransformedSeqs()) {
+    constexpr size_t i = 0;
+    tss.emplace_back(p.CreateConfig(
+        descriptor_subsequence,
+        i == params_[transformation_.GetIndex(transformation_search_idx_)]
+                     .GetTransformedSeqs()
+                     .size() -
+                 1));
+  }
+  paramcabac::Subsequence ret(std::move(t), descriptor_subsequence.second,
+                              token_type, std::move(tss));
+  return ret;
+}
+
+// -----------------------------------------------------------------------------
+
+ResultTransformed OptimizeTransformedSequence(
+    ConfigSearchTransformedSeq& seq, const core::GenSubIndex& sub_sequence,
+    util::DataBlock& data, float time_weight, bool original,
+    size_t transformation, size_t transformation_param, size_t sequence_id,
+    const std::string& filename) {
+  ResultTransformed ret;
+  float score = INFINITY;
+  bool new_file = !std::filesystem::exists(
+      "benchmark_trans_" + std::to_string(transformation) + ".csv");
+  std::ofstream results_file(
+      "benchmark_trans_" + std::to_string(transformation) + ".csv",
+      std::ios_base::app);
+  do {
+    auto cfg = seq.CreateConfig(sub_sequence, original);
+    auto input = data;
+
+    util::Watch watch;
+    watch.Reset();
+    EncodeTransformSubSeq(cfg, &input);
+    auto time = static_cast<size_t>(watch.Check() * 1000);  // Milliseconds
+    auto size = input.GetRawSize();
+
+    if (auto new_score =
+            static_cast<float>(time_weight * static_cast<float>(time) +
+                               (1.0 - time_weight) * static_cast<float>(size));
+        new_score < score) {
+      // Found new bets score
+      score = new_score;
+      ret.milliseconds = time;
+      ret.size = size;
+      ret.config = cfg;
     }
-}
+    ResultTransformed result_current;
+    result_current.milliseconds = time;
+    result_current.size = size;
+    result_current.config = cfg;
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t ConfigSearch::getTransform() const { return transformation.getIndex(transformation_search_idx); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint32_t ConfigSearch::getTransformParam() const {
-    return params[transformation.getIndex(transformation_search_idx)].getParameter();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::vector<ConfigSearchTranformedSeq>& ConfigSearch::getTransformedSeqs() {
-    return params[transformation.getIndex(transformation_search_idx)].getTransformedSeqs();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-ConfigSearch::ConfigSearch(const std::pair<int64_t, int64_t>& range) : transformation_search_idx(0) {
-    params.emplace_back(paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM, range);
-    params.emplace_back(paramcabac::TransformedParameters::TransformIdSubseq::EQUALITY_CODING, range);
-    params.emplace_back(paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING, range);
-    params.emplace_back(paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING, range);
-    transformation = SearchSpace<int8_t>(0, 3, 1);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool ConfigSearch::increment() {
-    // Search current transformation
-    if (params[transformation.getIndex(transformation_search_idx)].increment()) {
-        return true;
+    if (new_file) {
+      results_file << ResultTransformed::GetCsvHeader() << std::endl;
+      new_file = false;
     }
-
-    // Current transformation completely searched, next transformation
-    transformation_search_idx++;
-    if (transformation_search_idx == transformation.size()) {
-        transformation_search_idx = 0;
-        return false;
-    }
-
-    // All transformations searched
-    return true;
+    results_file << result_current.ToCsv(filename, transformation,
+                                         transformation_param, sequence_id)
+                 << std::endl;
+  } while (seq.Increment());
+  return ret;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void ConfigSearch::mutate(float rate) {
-    std::random_device rd;
-    std::mt19937 gen{rd()};
-    std::normal_distribution<> d{0, rate};
+}  // namespace genie::entropy::gabac
 
-    transformation_search_idx = transformation.mutate(transformation_search_idx, static_cast<float>(d(gen)));
-    params[transformation.getIndex(transformation_search_idx)].mutate(gen, d);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-paramcabac::Subsequence ConfigSearch::createConfig(genie::core::GenSubIndex descriptor_subsequence, bool tokentype) {
-    // Generate top level transformation
-    auto t = paramcabac::TransformedParameters(
-        paramcabac::TransformedParameters::TransformIdSubseq(transformation.getIndex(transformation_search_idx)),
-        params[transformation.getIndex(transformation_search_idx)].getParameter());
-
-    // Add config for transformed sequences
-    std::vector<paramcabac::TransformedSubSeq> tss;
-    size_t i = 0;
-    for (auto& p : params[transformation.getIndex(transformation_search_idx)].getTransformedSeqs()) {
-        tss.emplace_back(p.createConfig(
-            descriptor_subsequence,
-            i == params[transformation.getIndex(transformation_search_idx)].getTransformedSeqs().size() - 1));
-    }
-    paramcabac::Subsequence ret(std::move(t), descriptor_subsequence.second, tokentype, std::move(tss));
-    return ret;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, const genie::core::GenSubIndex& gensub,
-                                              util::DataBlock& data, float timeweight, bool original,
-                                              size_t transformation, size_t transformation_param, size_t sequence_id,
-                                              const std::string& filename) {
-    ResultTransformed ret;
-    float score = INFINITY;
-    bool new_file = !ghc::filesystem::exists("benchmark_trans_" + std::to_string(transformation) + ".csv");
-    std::ofstream results_file("benchmark_trans_" + std::to_string(transformation) + ".csv", std::ios_base::app);
-    do {
-        auto cfg = seq.createConfig(gensub, original);
-        auto input = data;
-
-        util::Watch watch;
-        watch.reset();
-        gabac::encodeTransformSubseq(cfg, &input);
-        auto time = size_t(watch.check() * 1000);  // Milliseconds
-        auto size = input.getRawSize();
-
-        float newscore = static_cast<float>(timeweight * time + (1.0 - timeweight) * size);
-        if (newscore < score) {
-            // Found new bets score
-            score = newscore;
-            ret.milliseconds = time;
-            ret.size = size;
-            ret.config = cfg;
-        }
-        ResultTransformed result_current;
-        result_current.milliseconds = time;
-        result_current.size = size;
-        result_current.config = cfg;
-
-        if (new_file) {
-            results_file << result_current.getCSVHeader() << std::endl;
-            new_file = false;
-        }
-        results_file << result_current.toCSV(filename, transformation, transformation_param, sequence_id) << std::endl;
-    } while (seq.increment());
-    return ret;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
-
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

@@ -1,41 +1,38 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/core/record/alignment_external/none.h"
+
 #include <memory>
-#include "genie/util/make-unique.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
-namespace alignment_external {
+namespace genie::core::record::alignment_external {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-None::None() : AlignmentExternal(AlignmentExternal::Type::NONE) {}
+None::None() : AlignmentExternal(Type::kNone) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void None::write(util::BitWriter &writer) const { AlignmentExternal::write(writer); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::unique_ptr<AlignmentExternal> None::clone() const {
-    auto ret = util::make_unique<None>();
-    return ret;
+void None::Write(util::BitWriter& writer) const {
+  AlignmentExternal::Write(writer);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace alignment_external
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+std::unique_ptr<AlignmentExternal> None::Clone() const {
+  auto ret = std::make_unique<None>();
+  return ret;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+}  // namespace genie::core::record::alignment_external
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

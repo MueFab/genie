@@ -1,122 +1,139 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * Copyright 2018-2024 The Genie Authors.
+ * @file decoder.cc
+ *
+ * @brief Implementation of the low-latency decoder for the Genie framework.
+ *
+ * This file contains the implementation of the Decoder class within the
+ * `lowlatency` namespace. The decoder processes sequencing data from Access
+ * Units (AUs) back into record chunks, supporting low-latency operations for
+ * unaligned reads.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/read/lowlatency/decoder.h"
+
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/core/global-cfg.h"
-#include "genie/core/name-decoder.h"
+
+#include "genie/core/global_cfg.h"
 #include "genie/read/basecoder/decoder.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop_watch.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace lowlatency {
+namespace genie::read::lowlatency {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
-    util::Watch watch;
-    core::record::Chunk ret;
-    core::AccessUnit data = std::move(t);
-    data = entropyCodeAU(std::move(data), true);
-    const auto& qvparam = data.getParameters().getQVConfig(data.getClassType());
-    auto qvStream = std::move(data.get(core::GenDesc::QV));
-    auto names = namecoder->process(data.get(core::GenDesc::RNAME));
-    data.getStats().addDouble("time-name", watch.check());
-    watch.reset();
-    std::vector<std::string> ecigars;
-    std::vector<uint64_t> positions;
-    // FIXME: loop condition is only correct if all records have the full number of reads
-    size_t i = 0;
-    size_t rec_i = 0;
-    while (i < data.getNumReads()) {
-        core::record::Record rec(uint8_t(data.getParameters().getNumberTemplateSegments()),
-                                 core::record::ClassType::CLASS_U,
-                                 std::get<0>(names).empty() ? "" : std::move(std::get<0>(names)[rec_i]), "", 0);
+core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) const {
+  util::Watch watch;
+  core::record::Chunk ret;
+  core::AccessUnit data = std::move(t);
+  data = EntropyCodeAu(std::move(data), true);
+  const auto& qv_param = data.GetParameters().GetQvConfig(data.GetClassType());
+  auto qv_stream = std::move(data.Get(core::GenDesc::kQv));
+  auto names = namecoder_->Process(data.Get(core::GenDesc::kReadName));
+  data.GetStats().AddDouble("time-name", watch.Check());
+  watch.Reset();
+  std::vector<std::string> e_cigars;
+  std::vector<uint64_t> positions;
+  // FIXME: loop condition is only correct if all records have the full number
+  // of reads
+  size_t i = 0;
+  size_t rec_i = 0;
+  while (i < data.GetNumReads()) {
+    core::record::Record rec(
+        static_cast<uint8_t>(data.GetParameters().GetNumberTemplateSegments()),
+        core::record::ClassType::kClassU,
+        std::get<0>(names).empty() ? "" : std::move(std::get<0>(names)[rec_i]),
+        "", 0);
 
-        size_t num_segments = 1;
-        if (data.getParameters().getNumberTemplateSegments() > 1) {
-            auto decoding_case = data.pull(core::GenSub::PAIR_DECODING_CASE);
-            if (decoding_case == core::GenConst::PAIR_SAME_RECORD) {
-                num_segments = 2;
-            } else if (decoding_case == core::GenConst::PAIR_R1_UNPAIRED) {
-                rec.setRead1First(true);
-            } else {
-                rec.setRead1First(false);
-            }
-        }
-
-        for (size_t j = 0; j < num_segments; ++j) {
-            size_t length = data.getParameters().getReadLength();
-            ecigars.emplace_back(length, '+');
-            positions.emplace_back(std::numeric_limits<uint64_t>::max());
-            if (!length) {
-                length = data.pull(core::GenSub::RLEN) + 1;
-            }
-            std::string seq(length, '\0');
-            for (auto& c : seq) {
-                c = core::getAlphabetProperties(core::AlphabetID::ACGTN).lut[data.pull(core::GenSub::UREADS)];
-            }
-
-            core::record::Segment seg(std::move(seq));
-            //     seg.addQualities(qvdecoder->process(data.getParameters().getQVConfig(core::record::ClassType::CLASS_U),
-            //                                        std::to_string(length) + "+", data.get(core::GenDesc::QV)));
-            rec.addSegment(std::move(seg));
-        }
-
-        ret.getData().push_back(std::move(rec));
-        i += num_segments;
-        rec_i++;
+    size_t num_segments = 1;
+    if (data.GetParameters().GetNumberTemplateSegments() > 1) {
+      if (auto decoding_case = data.Pull(core::gen_sub::kPairDecodingCase);
+          decoding_case == core::gen_const::kPairSameRecord) {
+        num_segments = 2;
+      } else if (decoding_case == core::gen_const::kPairR1Unpaired) {
+        rec.SetRead1First(true);
+      } else {
+        rec.SetRead1First(false);
+      }
     }
 
-    data.getStats().addDouble("time-lowlatency", watch.check());
-    watch.reset();
-    auto qvs = this->qvcoder->process(qvparam, ecigars, positions, qvStream);
-    size_t qvCounter = 0;
-    if (!std::get<0>(qvs).empty()) {
-        for (auto& r : ret.getData()) {
-            for (auto& s : r.getSegments()) {
-                if (!std::get<0>(qvs)[qvCounter].empty()) {
-                    s.addQualities(std::move(std::get<0>(qvs)[qvCounter]));
-                }
-                qvCounter++;
-            }
-            if (!r.getSegments().empty()) {
-                r.setQVDepth(static_cast<uint8_t>(r.getSegments().front().getQualities().size()));
-            }
-        }
+    for (size_t j = 0; j < num_segments; ++j) {
+      positions.emplace_back(std::numeric_limits<uint64_t>::max());
+      size_t length = data.GetParameters().GetReadLength();
+      if (!length) {
+        length = data.Pull(core::gen_sub::kReadLength) + 1;
+      }
+      e_cigars.emplace_back(length, '+');
+      std::string seq(length, '\0');
+      for (auto& c : seq) {
+        c = GetAlphabetProperties(core::AlphabetId::kAcgtn)
+                .lut[data.Pull(core::gen_sub::kUnalignedReads)];
+      }
+
+      core::record::Segment seg(std::move(seq));
+      rec.AddSegment(std::move(seg));
     }
 
-    data.getStats().addDouble("time-qv", watch.check());
-    watch.reset();
+    ret.GetData().push_back(std::move(rec));
+    i += num_segments;
+    rec_i++;
+  }
 
-    ret.setStats(std::move(data.getStats()));
-    data.clear();
-    return ret;
+  data.GetStats().AddDouble("time-lowlatency", watch.Check());
+  watch.Reset();
+  if (auto qvs =
+          this->qvcoder_->Process(qv_param, e_cigars, positions, qv_stream);
+      !std::get<0>(qvs).empty()) {
+    size_t qv_counter = 0;
+    for (auto& r : ret.GetData()) {
+      for (auto& s : r.GetSegments()) {
+        if (!std::get<0>(qvs)[qv_counter].empty()) {
+          s.AddQualities(std::move(std::get<0>(qvs)[qv_counter]));
+        }
+        qv_counter++;
+      }
+      if (!r.GetSegments().empty()) {
+        r.SetQvDepth(static_cast<uint8_t>(
+            r.GetSegments().front().GetQualities().size()));
+      }
+    }
+  }
+
+  data.GetStats().AddDouble("time-qv", watch.Check());
+  watch.Reset();
+
+  ret.SetStats(std::move(data.GetStats()));
+  data.Clear();
+  return ret;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) { flowOut(decode_common(std::move(t)), id); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::string Decoder::decode(core::AccessUnit&& t) {
-    return decode_common(std::move(t)).getData().front().getSegments().front().getSequence();
+void Decoder::FlowIn(core::AccessUnit&& t, const util::Section& id) {
+  FlowOut(decode_common(std::move(t)), id);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace lowlatency
-}  // namespace read
-}  // namespace genie
+std::string Decoder::Decode(core::AccessUnit&& t) {
+  return decode_common(std::move(t))
+      .GetData()
+      .front()
+      .GetSegments()
+      .front()
+      .GetSequence();
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+}  // namespace genie::read::lowlatency
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

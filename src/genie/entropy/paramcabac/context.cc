@@ -1,131 +1,139 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * Copyright 2018-2024 The Genie Authors.
+ * @file context.cc
+ * @brief Implementation of CABAC context handling for Genie.
+ *
+ * Manages adaptive mode, context initialization values, and serialization,
+ * with support for JSON conversion and shared sub-symbol context flags.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/entropy/paramcabac/context.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include <vector>
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+#include "genie/util/bit_writer.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+namespace genie::entropy::paramcabac {
+
+// -----------------------------------------------------------------------------
 
 Context::Context() : Context(true, 8, 8, false) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Context::Context(bool _adaptive_mode_flag, uint8_t _output_symbol_size, uint8_t _coding_subsym_size,
-                 bool _share_subsym_ctx_flag)
-    : adaptive_mode_flag(_adaptive_mode_flag),
-      num_contexts(0),
-      context_initialization_value(0),
-      share_subsym_ctx_flag() {
-    if (_coding_subsym_size < _output_symbol_size) {
-        share_subsym_ctx_flag = _share_subsym_ctx_flag;
-    }
+Context::Context(const bool adaptive_mode_flag,
+                 const uint8_t output_symbol_size,
+                 const uint8_t coding_subsym_size, bool share_subsym_ctx_flag)
+    : adaptive_mode_flag_(adaptive_mode_flag),
+      num_contexts_(0),
+      context_initialization_value_(0) {
+  if (coding_subsym_size < output_symbol_size) {
+    share_subsym_ctx_flag_ = share_subsym_ctx_flag;
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Context::Context(uint8_t output_symbol_size, uint8_t coding_subsym_size, util::BitReader& reader) {
-    adaptive_mode_flag = reader.read<bool>(1);
-    num_contexts = reader.read<uint16_t>();
-    for (size_t i = 0; i < num_contexts; ++i) {
-        context_initialization_value.emplace_back(reader.read<uint8_t>(7));
-    }
-    if (coding_subsym_size < output_symbol_size) {
-        share_subsym_ctx_flag = reader.read<bool>(1);
-    }
+Context::Context(const uint8_t output_symbol_size,
+                 const uint8_t coding_subsym_size, util::BitReader& reader) {
+  adaptive_mode_flag_ = reader.Read<bool>(1);
+  num_contexts_ = reader.Read<uint16_t>();
+  for (size_t i = 0; i < num_contexts_; ++i) {
+    context_initialization_value_.emplace_back(reader.Read<uint8_t>(7));
+  }
+  if (coding_subsym_size < output_symbol_size) {
+    share_subsym_ctx_flag_ = reader.Read<bool>(1);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Context::addContextInitializationValue(uint8_t _context_initialization_value) {
-    ++num_contexts;
-    this->context_initialization_value.push_back(_context_initialization_value);
+void Context::AddContextInitializationValue(
+    const uint8_t context_initialization_value) {
+  ++num_contexts_;
+  this->context_initialization_value_.push_back(context_initialization_value);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void Context::write(util::BitWriter& writer) const {
-    writer.write(adaptive_mode_flag, 1);
-    writer.write(num_contexts, 16);
-    for (auto& i : context_initialization_value) {
-        writer.write(i, 7);
-    }
-    if (share_subsym_ctx_flag) {
-        writer.write(*share_subsym_ctx_flag, 1);
-    }
+  writer.WriteBits(adaptive_mode_flag_, 1);
+  writer.WriteBits(num_contexts_, 16);
+  for (auto& i : context_initialization_value_) {
+    writer.WriteBits(i, 7);
+  }
+  if (share_subsym_ctx_flag_) {
+    writer.WriteBits(*share_subsym_ctx_flag_, 1);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool Context::getAdaptiveModeFlag() const { return adaptive_mode_flag; }
+bool Context::GetAdaptiveModeFlag() const { return adaptive_mode_flag_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint16_t Context::getNumContexts() const { return num_contexts; }
+uint16_t Context::GetNumContexts() const { return num_contexts_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool Context::getShareSubsymCtxFlag() const {
-    if (share_subsym_ctx_flag)
-        return *share_subsym_ctx_flag;
-    else
-        return false;  // default.
+bool Context::GetShareSubsymCtxFlag() const {
+  if (share_subsym_ctx_flag_) return *share_subsym_ctx_flag_;
+  return false;
+  // default.
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const std::vector<uint8_t>& Context::getContextInitializationValue() const { return context_initialization_value; }
+const std::vector<uint8_t>& Context::GetContextInitializationValue() const {
+  return context_initialization_value_;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 bool Context::operator==(const Context& ctx) const {
-    return adaptive_mode_flag == ctx.adaptive_mode_flag && num_contexts == ctx.num_contexts &&
-           context_initialization_value == ctx.context_initialization_value &&
-           share_subsym_ctx_flag == ctx.share_subsym_ctx_flag;
+  return adaptive_mode_flag_ == ctx.adaptive_mode_flag_ &&
+         num_contexts_ == ctx.num_contexts_ &&
+         context_initialization_value_ == ctx.context_initialization_value_ &&
+         share_subsym_ctx_flag_ == ctx.share_subsym_ctx_flag_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Context::Context(nlohmann::json j) : num_contexts(0) {
-    adaptive_mode_flag = static_cast<bool>(j["adaptive_mode_flag"]);
-    if (j.contains("context_initialization_value")) {
-        for (const auto& i : j["context_initialization_value"]) {
-            context_initialization_value.emplace_back(i);
-        }
+Context::Context(nlohmann::json j) : num_contexts_(0) {
+  adaptive_mode_flag_ = static_cast<bool>(j["adaptive_mode_flag"]);
+  if (j.contains("context_initialization_value")) {
+    for (const auto& i : j["context_initialization_value"]) {
+      context_initialization_value_.emplace_back(i);
     }
-    if (j.contains("share_subsym_ctx_flag")) {
-        share_subsym_ctx_flag = j["share_subsym_ctx_flag"];
-    }
+  }
+  if (j.contains("share_subsym_ctx_flag")) {
+    share_subsym_ctx_flag_ = j["share_subsym_ctx_flag"];
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-nlohmann::json Context::toJson() const {
-    nlohmann::json ret;
-    ret["adaptive_mode_flag"] = adaptive_mode_flag;
-    if (!context_initialization_value.empty()) {
-        ret["context_initialization_value"] = context_initialization_value;
-    }
-    if (share_subsym_ctx_flag != boost::none) {
-        ret["share_subsym_ctx_flag"] = *share_subsym_ctx_flag;
-    }
-    return ret;
+nlohmann::json Context::ToJson() const {
+  nlohmann::json ret;
+  ret["adaptive_mode_flag"] = adaptive_mode_flag_;
+  if (!context_initialization_value_.empty()) {
+    ret["context_initialization_value"] = context_initialization_value_;
+  }
+  if (share_subsym_ctx_flag_ != std::nullopt) {
+    ret["share_subsym_ctx_flag"] = *share_subsym_ctx_flag_;
+  }
+  return ret;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

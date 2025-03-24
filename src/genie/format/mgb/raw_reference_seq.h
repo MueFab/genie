@@ -1,116 +1,116 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_FORMAT_MGB_RAW_REFERENCE_SEQ_H_
 #define SRC_GENIE_FORMAT_MGB_RAW_REFERENCE_SEQ_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <memory>
 #include <string>
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/runtime-exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/runtime_exception.h"
 
-namespace genie {
-namespace format {
-namespace mgb {
+// -----------------------------------------------------------------------------
+
+namespace genie::format::mgb {
 
 /**
  * @brief
  */
-class RawReferenceSequence {
- private:
-    uint16_t sequence_ID;      //!< @brief
-    uint64_t seq_start;        //!< @brief
-    uint64_t seq_end;          //!< @brief
-    std::string ref_sequence;  //!< @brief
+class RawReferenceSequence final {
+  ///
+  uint16_t sequence_id_;
+
+  ///
+  uint64_t seq_start_;
+
+  ///
+  uint64_t seq_end_;
+
+  ///
+  std::string ref_sequence_;
 
  public:
-    /**
-     * @brief
-     * @return
-     */
-    uint16_t getSeqID() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint16_t GetSeqId() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getStart() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint64_t GetStart() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getEnd() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint64_t GetEnd() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    std::string& getSequence();
+  /**
+   * @brief
+   * @return
+   */
+  std::string& GetSequence();
 
-    /**
-     * @brief
-     * @return
-     */
-    const std::string& getSequence() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::string& GetSequence() const;
 
-    /**
-     * @brief
-     * @param _sequence_ID
-     * @param _seq_start
-     * @param _ref_sequence
-     */
-    RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::string&& _ref_sequence);
+  /**
+   * @brief
+   * @param sequence_id
+   * @param seq_start
+   * @param ref_sequence
+   */
+  RawReferenceSequence(uint16_t sequence_id, uint64_t seq_start,
+                       std::string&& ref_sequence);
 
-    /**
-     * @brief
-     * @param reader
-     * @param headerOnly
-     */
-    explicit RawReferenceSequence(util::BitReader& reader, bool headerOnly);
+  /**
+   * @brief
+   * @param reader
+   * @param header_only
+   */
+  explicit RawReferenceSequence(util::BitReader& reader, bool header_only);
 
-    /**
-     * @brief
-     */
-    virtual ~RawReferenceSequence() = default;
+  /**
+   * @brief
+   * @param s
+   * @return
+   */
+  [[nodiscard]] bool IsIdUnique(const RawReferenceSequence& s) const;
 
-    /**
-     * @brief
-     * @param s
-     * @return
-     */
-    bool isIdUnique(const RawReferenceSequence& s) const;
+  /**
+   * @brief
+   * @param writer
+   */
+  void Write(util::BitWriter& writer) const;
 
-    /**
-     * @brief
-     * @param writer
-     */
-    void write(util::BitWriter& writer) const;
-
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getTotalSize() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint64_t GetTotalSize() const;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace mgb
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgb
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_FORMAT_MGB_RAW_REFERENCE_SEQ_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

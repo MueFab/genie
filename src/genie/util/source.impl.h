@@ -1,57 +1,62 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * Copyright 2018-2024 The Genie Authors.
+ * @file source.impl.h
+ *
+ * @brief Implementation of the Source class template for data flow management.
+ *
+ * Defines methods for interacting with a Drain instance, including data
+ * transfer, flushing, skipping sections, and setting the Drain.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_UTIL_SOURCE_IMPL_H_
 #define SRC_GENIE_UTIL_SOURCE_IMPL_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <utility>
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-template <typename TYPE>
-void Source<TYPE>::flowOut(TYPE&& t, const Section& id) {
-    drain->flowIn(std::move(t), id);
+template <typename Type>
+void Source<Type>::FlowOut(Type&& t, const Section& id) {
+  drain_->FlowIn(std::move(t), id);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-template <typename TYPE>
-void Source<TYPE>::flushOut(uint64_t& pos) {
-    drain->flushIn(pos);
+template <typename Type>
+void Source<Type>::FlushOut(uint64_t& pos) {
+  drain_->FlushIn(pos);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-template <typename TYPE>
-void Source<TYPE>::skipOut(const Section& id) {
-    drain->skipIn(id);
+template <typename Type>
+void Source<Type>::SkipOut(const Section& id) {
+  drain_->SkipIn(id);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-template <typename TYPE>
-void Source<TYPE>::setDrain(Drain<TYPE>* d) {
-    drain = d;
+template <typename Type>
+void Source<Type>::SetDrain(Drain<Type>* d) {
+  drain_ = d;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace util
-}  // namespace genie
+}  // namespace genie::util
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_UTIL_SOURCE_IMPL_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

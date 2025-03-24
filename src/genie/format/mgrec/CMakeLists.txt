@@ -3,7 +3,7 @@ project("genie-mgrec")
 set(source_files
         exporter.cc
         importer.cc
-        )
+)
 
 add_library(genie-mgrec ${source_files})
 
