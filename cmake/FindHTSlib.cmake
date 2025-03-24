@@ -6,13 +6,15 @@
 #  htslib_INCLUDE_DIRS - the htslib include directories
 #  htslib_LIBRARIES - link these to use htslib
 
+# Set search directories
 set(HTSLIB_SEARCH_DIRS
-        ${HTSLIB_SEARCH_DIRS}
-        $ENV{HTLSIB_ROOT}
-        /gsc/pkg/bio/htslib
-        /usr
-        /usr/local
-        )
+    ${HTSLIB_SEARCH_DIRS}
+    $ENV{HTLSIB_ROOT}
+    $ENV{CONDA_PREFIX}
+    /gsc/pkg/bio/htslib
+    /usr
+    /usr/local
+)
 
 set(_htslib_ver_path "htslib-${htslib_FIND_VERSION}")
 include(LibFindMacros)
@@ -20,30 +22,35 @@ include(LibFindMacros)
 # Dependencies
 libfind_package(HTSlib ZLIB)
 
-# Include dir
-find_path(HTSlib_INCLUDE_DIR
-        NAMES ${HTSLIB_ADDITIONAL_HEADERS} sam.h
-        PATHS ${HTSLIB_SEARCH_DIRS}
-        PATH_SUFFIXES
-        include include/htslib htslib/${_htslib_ver_path}/htslib
-        HINTS ENV HTSLIB_ROOT
-        )
+# Find the include directory for HTSlib
+find_path(HTSLIB_INCLUDE_DIR
+    NAMES ${HTSLIB_ADDITIONAL_HEADERS} sam.h
+    PATHS ${HTSLIB_SEARCH_DIRS}
+    PATH_SUFFIXES include include/htslib htslib/${_htslib_ver_path}/htslib
+    HINTS ENV HTSLIB_ROOT
+)
 
-# Finally the library itself
+# If the found include directory ends with "htslib", use its parent instead.
+string(REGEX MATCH "/htslib$" _is_htslib_dir "${HTSLIB_INCLUDE_DIR}")
+if(_is_htslib_dir)
+    get_filename_component(HTSLIB_INCLUDE_DIR ${HTSLIB_INCLUDE_DIR} DIRECTORY)
+endif()
+
+# Find the library itself
 find_library(HTSlib_LIBRARY
-        NAMES hts libhts.a hts.a
-        PATHS ${HTSlib_INCLUDE_DIR} ${HTSLIB_SEARCH_DIRS}
-        NO_DEFAULT_PATH
-        PATH_SUFFIXES lib lib64 lib/x86_64-linux-gnu ${_htslib_ver_path}
-        HINTS ENV HTSLIB_ROOT
-        )
+    NAMES hts libhts.a hts.a
+    PATHS ${HTSLIB_INCLUDE_DIR} ${HTSLIB_SEARCH_DIRS}
+    NO_DEFAULT_PATH
+    PATH_SUFFIXES lib lib64 lib/x86_64-linux-gnu ${_htslib_ver_path}
+    HINTS ENV HTSLIB_ROOT
+)
 
-set(ZLIB_LIBRARY, "/usr/local/lib/libz-ng.so")
-set(HTSlib_LIBRARY, "/usr/local/lib/libz-ng.so")
+# Optional: set ZLIB_LIBRARY if needed
+#set(ZLIB_LIBRARY "/usr/local/lib/libz-ng.so")
+#set(HTSlib_LIBRARY "/usr/local/lib/libz-ng.so")
 
-# Set the include dir variables and the libraries and let libfind_process do the rest.
-# NOTE: Singular variables for this library, plural for libraries this lib depends on.
-set(HTSlib_PROCESS_INCLUDES HTSlib_INCLUDE_DIR ZLIB_INCLUDE_DIR)
+# Process the found include dirs and libraries.
+set(HTSlib_PROCESS_INCLUDES HTSLIB_INCLUDE_DIR ZLIB_INCLUDE_DIR)
 set(HTSlib_PROCESS_LIBS HTSlib_LIBRARY ZLIB_LIBRARIES)
 libfind_process(HTSlib)
 message(STATUS "   HTSlib include dirs: ${HTSlib_INCLUDE_DIRS}")

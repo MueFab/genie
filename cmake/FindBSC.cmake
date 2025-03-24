@@ -1,6 +1,17 @@
-# Look for the libbsc header and library
-find_path(BSC_INCLUDE_DIR libbsc.h)
-find_library(BSC_LIBRARY NAMES bsc libbsc)
+# Look for the libbsc header and library in the conda environment first
+find_path(BSC_INCLUDE_DIR
+    NAMES libbsc.h
+    HINTS
+        $ENV{CONDA_PREFIX}/include
+    PATH_SUFFIXES .
+)
+
+find_library(BSC_LIBRARY
+    NAMES bsc libbsc
+    HINTS
+        $ENV{CONDA_PREFIX}/lib
+    PATH_SUFFIXES .
+)
 
 # Check if the library and header were found
 if(BSC_INCLUDE_DIR AND BSC_LIBRARY)
