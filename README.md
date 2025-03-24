@@ -163,9 +163,48 @@ Mikel Hernaez <[mhernaez@unav.es](mailto:mhernaez@unav.es)>
 
 Jan Voges <[voges@tnt.uni-hannover.de](mailto:voges@tnt.uni-hannover.de)>
 
-## Supporting Genie
+## Cite Us
 
-Don't forget to cite Genie in your work if you want to support the further development of this tool:
+Please cite us if you are using Genie in your work.
+You are welcome to choose which resource is most representative of what aspect of Genie you called on in your work.
+
+### Genie
+
+Plain text:
 
 > Müntefering, F., Adhisantoso, Y.G., Chandak, S. et al. Genie: the first open-source ISO/IEC encoder for genomic data. Commun Biol 7, 553 (2024). https://doi.org/10.1038/s42003-024-06249-8
 
+BibTeX:
+
+```
+@article{muntefering_genie_2024,
+    title = {Genie: the first open-source {ISO}/{IEC} encoder for genomic data},
+    author = {Müntefering, Fabian and Adhisantoso, Yeremia Gunawan and Chandak, Shubham and Ostermann, Jörn and Hernaez, Mikel and Voges, Jan},
+    journal = {Communications Biology},
+    volume = {7},
+    number = {1},
+    pages = {1--10},
+    year = {2024},
+    doi = {10.1038/s42003-024-06249-8},
+}
+```
+
+### MPEG-G
+
+Plain text:
+> J. Voges, M. Hernaez, M. Mattavelli and J. Ostermann, "An Introduction to MPEG-G: The First Open ISO/IEC Standard for the Compression and Exchange of Genomic Sequencing Data," in Proceedings of the IEEE, vol. 109, no. 9, pp. 1607-1622, Sept. 2021, doi: 10.1109/JPROC.2021.3082027.
+
+BibTeX:
+
+```
+@article{voges_introduction_2021,
+    title={An Introduction to MPEG-G: The First Open ISO/IEC Standard for the Compression and Exchange of Genomic Sequencing Data},
+    author={Voges, Jan and Hernaez, Mikel and Mattavelli, Marco and Ostermann, Jörn},
+    journal={Proceedings of the IEEE},
+    volume={109},
+    number={9},
+    pages={1607-1622},
+    year={2021},
+    doi={10.1109/JPROC.2021.3082027}
+}
+```
