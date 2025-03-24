@@ -192,19 +192,20 @@ BibTeX:
 ### MPEG-G
 
 Plain text:
+
 > J. Voges, M. Hernaez, M. Mattavelli and J. Ostermann, "An Introduction to MPEG-G: The First Open ISO/IEC Standard for the Compression and Exchange of Genomic Sequencing Data," in Proceedings of the IEEE, vol. 109, no. 9, pp. 1607-1622, Sept. 2021, doi: 10.1109/JPROC.2021.3082027.
 
 BibTeX:
 
 ```
 @article{voges_introduction_2021,
-    title={An Introduction to MPEG-G: The First Open ISO/IEC Standard for the Compression and Exchange of Genomic Sequencing Data},
-    author={Voges, Jan and Hernaez, Mikel and Mattavelli, Marco and Ostermann, Jörn},
-    journal={Proceedings of the IEEE},
-    volume={109},
-    number={9},
-    pages={1607-1622},
-    year={2021},
-    doi={10.1109/JPROC.2021.3082027}
+    title = {An {Introduction} to {MPEG}-{G}: {The} {First} {Open} {ISO}/{IEC} {Standard} for the {Compression} and {Exchange} of {Genomic} {Sequencing} {Data}},
+    author = {Voges, Jan and Hernaez, Mikel and Mattavelli, Marco and Ostermann, Jörn},
+    journal = {Proceedings of the IEEE},
+    volume = {109},
+    number = {9},
+    pages = {1607--1622},
+    year = {2021},
+    doi = {10.1109/JPROC.2021.3082027}
 }
 ```
