@@ -52,7 +52,6 @@ struct TileParameter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//using ChrIDPair = std::pair<uint8_t, uint8_t>;
 using TileParameters = std::vector<std::vector<TileParameter>>;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -223,7 +222,7 @@ class SubcontactMatrixParameters {
     void SetNumTiles(
         size_t ntiles_in_row,
         size_t ntiles_in_col,
-        bool free_mem= true);
+        bool free_mem = true);
 
     /**
     * @brief Retrieves a tile parameter from the subcontact matrix parameters.
@@ -299,6 +298,11 @@ class SubcontactMatrixParameters {
      * @param writer The BitWriter to write to.
      */
     void Write(util::BitWriter& writer) const;
+
+    /**
+     *
+     * @param writer
+     */
     void Write(core::Writer& writer) const;
 };
 

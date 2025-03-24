@@ -1539,7 +1539,7 @@ void set_rle_information_from_mask(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//std::tuple<ContactMatrixParameters, EncodingBlock> encode_block(
+//std::tuple<ContactMatrixParameters, EncodingBlock> encode_genotype(
 //    const EncodingOptions& opt,
 //    std::vector<core::record::ContactRecord>& recs){
 //

@@ -7,13 +7,13 @@ find_package(xtl REQUIRED)
 find_package(xtensor REQUIRED)
 
 set(source_files
+        amax_payload.cc
+        bin_mat_payload.cc
         genotype_coder.cc
         genotype_parameters.cc
         genotype_payload.cc
         parameterset_composer.cc
-        bin_mat_payload.cc
         row_col_ids_payload.cc
-        amax_payload.cc
         sorted_bin_mat_payload.cc
 )
 
