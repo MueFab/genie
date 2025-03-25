@@ -52,6 +52,7 @@ compress_roundtrip () {
         -o $working_dir/output.mgb -f \
         -w $working_dir \
         $genie_encoder_parameters \
+        --entropy gabac \
         || { echo "Genie compress ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
     echo "-----------------Compressed:"

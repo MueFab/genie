@@ -49,18 +49,16 @@
 #include "genie/read/spring/decoder.h"
 #include "genie/read/spring/encoder.h"
 
-#define USE_ZSTD 0
-
 // -----------------------------------------------------------------------------
 
 namespace genie::module {
 
 // -----------------------------------------------------------------------------
 
-std::unique_ptr<core::FlowGraphEncode> BuildDefaultEncoder(
+std::unique_ptr<core::FlowGraphEncode> build_default_encoder(
     size_t threads, const std::string& working_dir, size_t block_size,
     core::ClassifierRegroup::RefMode external_ref, bool raw_ref,
-    bool write_raw_streams) {
+    bool write_raw_streams, const std::string& entropy_mode) {
   auto ret = std::make_unique<core::FlowGraphEncode>(threads);
 
   ret->SetClassifier(std::make_unique<core::ClassifierRegroup>(
@@ -103,12 +101,11 @@ std::unique_ptr<core::FlowGraphEncode> BuildDefaultEncoder(
 
   ret->AddNameCoder(std::make_unique<name::tokenizer::Encoder>());
   ret->AddNameCoder(std::make_unique<name::write_out::Encoder>());
-  ret->SetNameSelector([](const core::record::Chunk&) -> size_t {
-#if USE_ZSTD
+  ret->SetNameSelector([entropy_mode](const core::record::Chunk&) -> size_t {
+    if (entropy_mode == "gabac") {
+      return 0;
+    }
     return 1;
-#else
-    return 0;
-#endif
   });
 
   ret->AddEntropyCoder(
@@ -120,12 +117,20 @@ std::unique_ptr<core::FlowGraphEncode> BuildDefaultEncoder(
   ret->AddEntropyCoder(
       std::make_unique<entropy::bsc::Encoder>(write_raw_streams));
   ret->SetEntropyCoderSelector(
-      [](const core::AccessUnit::Descriptor&) -> size_t {
-#if USE_ZSTD
-        return 2;
-#else
-        return 0;
-#endif
+      [entropy_mode](const core::AccessUnit::Descriptor&) -> size_t {
+        if (entropy_mode == "gabac") {
+          return 0;
+        }
+        if (entropy_mode == "lzma") {
+          return 1;
+        }
+        if (entropy_mode == "zstd") {
+          return 2;
+        }
+        if (entropy_mode == "bsc") {
+          return 3;
+        }
+        UTILS_DIE("Unknown entropy mode: " + entropy_mode);
       });
 
   ret->SetExporterSelector([](const core::AccessUnit&) -> size_t { return 0; });

@@ -4,24 +4,24 @@
  * https://github.com/muefab/genie for more details.
  */
 
-#include "genie/entropy/zlib/zlibistream.h"
+#include "genie/util/zlib/ostream.h"
 
-#include <iostream>
 #include <utility>
 
 // -----------------------------------------------------------------------------
 
-namespace genie::entropy::zlib {
+namespace genie::util::zlib {
 
 // -----------------------------------------------------------------------------
 
-ZlibInputStream::ZlibInputStream(std::unique_ptr<ZlibStreamBuffer> buffer)
-    : std::istream(buffer.get()), buffer_(std::move(buffer)) {
+OutputStream::OutputStream(std::unique_ptr<StreamBuffer> buffer)
+    : buffer_(std::move(buffer)) {
+  std::ostream::init(buffer_.get());
 }
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::entropy::zlib
+}  // namespace genie::util::zlib
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

@@ -12,20 +12,11 @@ set(source_files
         string_helpers.cc
         thread_manager.cc
         stop_watch.cc
-        literal.h
-        log.h
         log.cc
-        circular_buffer.impl.h
         dynamic_scheduler.cc
-        merge_sort/chunk.h
-        merge_sort/chunk_file.h
-        merge_sort/chunk_memory.h
-        merge_sort/builder.h
-        merge_sort/merger.h
-        merge_sort/chunk_file.impl.h
-        merge_sort/chunk_memory.impl.h
-        merge_sort/builder.impl.h
-        merge_sort/merger.impl.h
+        zlib/streambuffer.cc
+        zlib/istream.cc
+        zlib/ostream.cc
 )
 
 add_library(genie-util ${source_files})

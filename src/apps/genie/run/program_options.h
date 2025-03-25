@@ -28,33 +28,34 @@ class ProgramOptions {
    */
   ProgramOptions(int argc, char* argv[]);
 
- public:
-  std::string inputFile;     //!< @brief
-  std::string inputSupFile;  //!< @brief
-  std::string inputRefFile;  //!< @brief
+  std::string input_file_;      //!< @brief
+  std::string input_sup_file_;  //!< @brief
+  std::string input_ref_file_;  //!< @brief
 
-  std::string outputFile;     //!< @brief
-  std::string outputSupFile;  //!< @brief
+  std::string output_file_;      //!< @brief
+  std::string output_sup_file_;  //!< @brief
 
-  std::string workingDirectory;  //!< @brief
+  std::string working_directory_;  //!< @brief
 
-  std::string paramsetPath;  //!< @brief
+  std::string paramset_path_;  //!< @brief
 
-  std::string qvMode;        //!< @brief
-  std::string readNameMode;  //!< @brief
+  std::string qv_mode_;         //!< @brief
+  std::string read_name_mode_;  //!< @brief
 
-  bool forceOverwrite;  //!< @brief
+  std::string entropy_mode_;  //!< @brief
 
-  bool combinePairsFlag;  //!< @brief
+  bool force_overwrite_;  //!< @brief
 
-  bool lowLatency;      //!< @brief
-  std::string refMode;  //!< @brief
+  bool combine_pairs_flag_;  //!< @brief
 
-  size_t numberOfThreads;  //!< @brief
-  bool rawReference;       //!< @brief
-  bool rawStreams;         //!< @brief
+  bool low_latency_;      //!< @brief
+  std::string ref_mode_;  //!< @brief
 
-  bool help;  //!< @brief
+  size_t number_of_threads_;  //!< @brief
+  bool raw_reference_;        //!< @brief
+  bool raw_streams_;          //!< @brief
+
+  bool help_;  //!< @brief
 
  private:
   /**
