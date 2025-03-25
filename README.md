@@ -53,32 +53,107 @@ This command will run Genie in a container and process the files located in `/pa
 
 ### 2. Building Genie on Bare Metal
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md).
+If you prefer building Genie directly on your machine, follow the steps below. This approach gives you more control over the environment but requires additional setup.
+
+#### Mandatory Dependencies
+
+Ensure the following dependencies are installed on your system:
+
+- **OpenMP** for multithreading: 
+  - Ubuntu: `libomp-dev`
+  - Fedora: `libomp-devel`
+- **CMake** 3.8 or greater: 
+  - Ubuntu: `cmake`
+  - Fedora: `cmake`
+- **make**:
+  - Ubuntu: `build-essential`
+  - Fedora: `make`
+- **A C++17-compliant compiler**:
+  - Ubuntu: `build-essential`
+  - Fedora: `gcc`
+- **HTSlib** for SAM/BAM file support:
+  - Ubuntu: `libhts-dev`
+  - Fedora: `htslib-devel`
+- **liblzma** for LZMA encoding
+  - Ubuntu: `liblzma-dev`
+  - Fedora: ?
+- **libzstd** for ZSTD encoding
+  - Ubuntu: `libzstd-dev`
+  - Fedora: ?
+- **libbsc** for BSC encoding
+  - Available at [https://github.com/IlyaGrebnov/libbsc]
+
+#### Quickstart: Buildscript
+
+You can use the `get_genie.sh` script to quickly build Genie along with its dependencies.
+
+1. Create a build directory and navigate to it:
+
+    ```bash
+    mkdir genie_buildspace
+    cd genie_buildspace
+    ```
+
+2. Download and execute the `get_genie.sh` script:
+
+    ```bash
+    wget https://raw.githubusercontent.com/MueFab/genie/main/util/get_genie.sh
+    bash ./get_genie.sh
+    ```
+
+This script will automatically clone the Genie repository, build HTSlib, and download example files for testing. It only works within the `genie_buildspace` directory and does not modify any system directories.
+
+#### Manual Build
+
+If you prefer to build HTSlib and Genie manually, you can do so using CMake following the dependencies outlined above.
 
 ## Verifying
 
 To check that Genie is working correctly, you can execute the following commands.
 
+Transcoding from FASTQ and SAM into MPEG-G records:
+
+    ./genie transcode-fastq -i ./data/example_1.fastq --input-suppl-file ./data/example_2.fastq -o ./data/transcoded_mgrec/unaligned.mgrec
+    ./genie transcode-sam -c -i ./data/example.sam -r ./data/example.fa -o ./data/transcoded_mgrec/aligned.mgrec
+
 Compression using the four encoding processes in Genie (Global Assembly Encoding, Low Latency Encoding, Local Assembly Encoding, Reference-Based Encoding):
 
     # Unaligned data without low latency flag -> Global Assembly Encoding
-    genie run -i ./data/transcoded_mgrec/unaligned.fastq -o ./data/encoded/global_assembly.mgb
+    ./genie run -i ./data/transcoded_mgrec/unaligned.mgrec -o ./data/encoded/global_assembly.mgb
     
     # Unaligned data with low latency flag -> Low Latency Encoding
-    genie run -i ./data/transcoded_mgrec/unaligned.fastq -o ./data/encoded/low_latency.mgb --low-latency
+    ./genie run -i ./data/transcoded_mgrec/unaligned.mgrec -o ./data/encoded/low_latency.mgb --low-latency
     
     # Aligned data without any reference specified -> Local Assembly Encoding
-    genie run -i ./data/transcoded_mgrec/aligned.bam -o ./data/encoded/local_assembly.mgb
+    ./genie run -i ./data/transcoded_mgrec/aligned.mgrec -o ./data/encoded/local_assembly.mgb
     
     # Aligned data with reference specified -> Reference Based Encoding
-    genie run -i ./data/transcoded_mgrec/aligned.bam -o ./data/encoded/reference_based.mgb -r ./data/example.fa 
+    ./genie run -i ./data/transcoded_mgrec/aligned.mgrec -o ./data/encoded/reference_based.mgb -r ./data/example.fa 
 
 Decompression:
 
-    ./genie run -i ./data/encoded/global_assembly.mgb -o ./data/decoded/global_assembly.fastq
-    ./genie run -i ./data/encoded/low_latency.mgb -o ./data/decoded/low_latency.fastq
-    ./genie run -i ./data/encoded/local_assembly.mgb -o ./data/decoded/local_assembly.sam
-    ./genie run -i ./data/encoded/reference_based.mgb -o ./data/decoded/reference_based.sam -r ./data/example.fa
+    ./genie run -i ./data/encoded/global_assembly.mgb -o ./data/decoded/global_assembly.mgrec
+    ./genie run -i ./data/encoded/low_latency.mgb -o ./data/decoded/low_latency.mgrec
+    ./genie run -i ./data/encoded/local_assembly.mgb -o ./data/decoded/local_assembly.mgrec
+    ./genie run -i ./data/encoded/reference_based.mgb -o ./data/decoded/reference_based.mgrec -r ./data/example.fa
+
+Transcoding from MPEG-G records back to FASTQ and SAM:
+
+    ./genie transcode-fastq -i ./data/decoded/global_assembly.mgrec -o ./data/transcoded_legacy/global_assembly_1.fastq --output-suppl-file ./data/transcoded_legacy/global_assembly_2.fastq
+    ./genie transcode-fastq -i ./data/decoded/low_latency.mgrec -o ./data/transcoded_legacy/low_latency_1.fastq --output-suppl-file ./data/transcoded_legacy/low_latency_2.fastq
+    ./genie transcode-sam -i ./data/decoded/local_assembly.mgrec -o ./data/transcoded_legacy/local_assembly.sam -r ./data/example.fa
+    ./genie transcode-sam -i ./data/decoded/reference_based.mgrec -o ./data/transcoded_legacy/reference_based.sam -r ./data/example.fa
+
+Compare decoded files to originals (record order might be different, thus they must be sorted before the comparison):
+    
+    diff <(sort ./data/example_1.fastq) <(sort ./data/transcoded_legacy/global_assembly_1.fastq)
+    diff <(sort ./data/example_2.fastq) <(sort ./data/transcoded_legacy/global_assembly_2.fastq)
+    diff <(sort ./data/example_1.fastq) <(sort ./data/transcoded_legacy/low_latency_1.fastq)
+    diff <(sort ./data/example_2.fastq) <(sort ./data/transcoded_legacy/low_latency_2.fastq)
+    
+    # First line is removed before comparison, as SAM files store the sorting of records in their header
+    diff <(tail -n +2 ./data/example.sam | sort) <(tail -n +2 ./data/transcoded_legacy/reference_based.sam | sort)
+    diff <(tail -n +2 ./data/example.sam | sort) <(tail -n +2 ./data/transcoded_legacy/local_assembly.sam | sort)
 
 ## Contact
 
@@ -88,49 +163,9 @@ Mikel Hernaez <[mhernaez@unav.es](mailto:mhernaez@unav.es)>
 
 Jan Voges <[voges@tnt.uni-hannover.de](mailto:voges@tnt.uni-hannover.de)>
 
-## Cite Us
+## Supporting Genie
 
-Please cite us if you are using Genie in your work.
-You are welcome to choose which resource is most representative of what aspect of Genie you called on in your work.
-
-### Genie
-
-Plain text:
+Don't forget to cite Genie in your work if you want to support the further development of this tool:
 
 > Müntefering, F., Adhisantoso, Y.G., Chandak, S. et al. Genie: the first open-source ISO/IEC encoder for genomic data. Commun Biol 7, 553 (2024). https://doi.org/10.1038/s42003-024-06249-8
 
-BibTeX:
-
-```
-@article{muntefering_genie_2024,
-    title = {Genie: the first open-source {ISO}/{IEC} encoder for genomic data},
-    author = {Müntefering, Fabian and Adhisantoso, Yeremia Gunawan and Chandak, Shubham and Ostermann, Jörn and Hernaez, Mikel and Voges, Jan},
-    journal = {Communications Biology},
-    volume = {7},
-    number = {1},
-    pages = {1--10},
-    year = {2024},
-    doi = {10.1038/s42003-024-06249-8},
-}
-```
-
-### MPEG-G
-
-Plain text:
-
-> J. Voges, M. Hernaez, M. Mattavelli and J. Ostermann, "An Introduction to MPEG-G: The First Open ISO/IEC Standard for the Compression and Exchange of Genomic Sequencing Data," in Proceedings of the IEEE, vol. 109, no. 9, pp. 1607-1622, Sept. 2021, doi: 10.1109/JPROC.2021.3082027.
-
-BibTeX:
-
-```
-@article{voges_introduction_2021,
-    title = {An {Introduction} to {MPEG}-{G}: {The} {First} {Open} {ISO}/{IEC} {Standard} for the {Compression} and {Exchange} of {Genomic} {Sequencing} {Data}},
-    author = {Voges, Jan and Hernaez, Mikel and Mattavelli, Marco and Ostermann, Jörn},
-    journal = {Proceedings of the IEEE},
-    volume = {109},
-    number = {9},
-    pages = {1607--1622},
-    year = {2021},
-    doi = {10.1109/JPROC.2021.3082027}
-}
-```
