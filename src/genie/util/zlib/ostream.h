@@ -4,44 +4,45 @@
  * https://github.com/muefab/genie for more details.
  */
 
-#ifndef SRC_GENIE_ENTROPY_ZLIB_ZLIBISTREAM_H_
-#define SRC_GENIE_ENTROPY_ZLIB_ZLIBISTREAM_H_
+#ifndef SRC_GENIE_UTIL_ZLIB_OSTREAM_H_
+#define SRC_GENIE_UTIL_ZLIB_OSTREAM_H_
 
 // -----------------------------------------------------------------------------
 
-#include <istream>
+#include <fstream>
 #include <memory>
+#include <utility>
 
-#include "genie/entropy/zlib/zlibstreambuffer.h"
+#include "genie/util/zlib/streambuffer.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::entropy::zlib {
+namespace genie::util::zlib {
 
 /**
  *
  */
-class ZlibInputStream final : public std::istream {
+class OutputStream final : public std::ostream {
   /**
    *
    */
-  std::unique_ptr<ZlibStreamBuffer> buffer_;
+  std::unique_ptr<StreamBuffer> buffer_;
 
  public:
   /**
    *
    * @param buffer
    */
-  explicit ZlibInputStream(std::unique_ptr<ZlibStreamBuffer> buffer);
+  explicit OutputStream(std::unique_ptr<StreamBuffer> buffer);
 };
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::entropy::zlib
+}  // namespace genie::util::zlib
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_ENTROPY_ZLIB_ZLIBISTREAM_H_
+#endif  // SRC_GENIE_UTIL_ZLIB_OSTREAM_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

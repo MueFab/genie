@@ -76,6 +76,7 @@ compress_roundtrip () {
         -o $working_dir/output.mgb -f \
         -w $working_dir \
         $genie_encoder_parameters \
+        --entropy gabac \
         || { echo "Genie compress ($primary_gz_file; $paired_gz_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
     echo "-----------------Compressed:"
@@ -148,13 +149,13 @@ compress_roundtrip () {
 }
 
 if [[ "$paired_fastq_file" == "" ]]; then
-    compress_roundtrip "--low-latency --qv none --read-ids none" "--broken_names --broken_qualities"
+#    compress_roundtrip "--low-latency --qv none --read-ids none" "--broken_names --broken_qualities"
     compress_roundtrip "--low-latency" ""
-    compress_roundtrip "--qv none --read-ids none" "--broken_names --broken_qualities --broken_order"
-    compress_roundtrip "" "--broken_order"
+#    compress_roundtrip "--qv none --read-ids none" "--broken_names --broken_qualities --broken_order"
+#    compress_roundtrip "" "--broken_order"
 else
-    compress_roundtrip "--low-latency --qv none --read-ids none" "--broken_names --broken_qualities"
+#    compress_roundtrip "--low-latency --qv none --read-ids none" "--broken_names --broken_qualities"
     compress_roundtrip "--low-latency" "--patched_names"
-    compress_roundtrip "--qv none --read-ids none" "--broken_names --broken_qualities --broken_order --broken_pairing"
-    compress_roundtrip "" "--broken_order --patched_names"
+#    compress_roundtrip "--qv none --read-ids none" "--broken_names --broken_qualities --broken_order --broken_pairing"
+#    compress_roundtrip "" "--broken_order --patched_names"
 fi

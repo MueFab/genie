@@ -4,8 +4,8 @@
  * https://github.com/muefab/genie for more details.
  */
 
-#ifndef SRC_GENIE_ENTROPY_ZLIB_ZLIBSTREAMBUFFER_H_
-#define SRC_GENIE_ENTROPY_ZLIB_ZLIBSTREAMBUFFER_H_
+#ifndef SRC_GENIE_UTIL_ZLIB_STREAMBUFFER_H_
+#define SRC_GENIE_UTIL_ZLIB_STREAMBUFFER_H_
 
 // -----------------------------------------------------------------------------
 
@@ -17,12 +17,12 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie::entropy::zlib {
+namespace genie::util::zlib {
 
 /**
  * Stream buffer for zlib compression
  */
-class ZlibStreamBuffer final : public std::streambuf {
+class StreamBuffer final : public std::streambuf {
  public:
   /**
    * Constructor.
@@ -31,13 +31,13 @@ class ZlibStreamBuffer final : public std::streambuf {
    * @param compression_level Compression level for writing (1-9, -1 for
    * default).
    */
-  explicit ZlibStreamBuffer(const std::string& file_path, bool write_mode,
+  explicit StreamBuffer(const std::string& file_path, bool write_mode,
                             int compression_level = -1);
 
   /**
    *
    */
-  ~ZlibStreamBuffer() override;
+  ~StreamBuffer() override;
 
  protected:
   /**
@@ -103,8 +103,11 @@ class ZlibStreamBuffer final : public std::streambuf {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::entropy::zlib
+}  // namespace genie::util::zlib
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_ENTROPY_ZLIB_ZLIBSTREAMBUFFER_H_
+#endif  // SRC_GENIE_UTIL_ZLIB_STREAMBUFFER_H_
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
