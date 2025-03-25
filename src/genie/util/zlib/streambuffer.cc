@@ -4,7 +4,7 @@
  * https://github.com/muefab/genie for more details.
  */
 
-#include "genie/entropy/zlib/zlibstreambuffer.h"
+#include "genie/util/zlib/streambuffer.h"
 
 #include <zlib.h>
 
@@ -14,11 +14,11 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie::entropy::zlib {
+namespace genie::util::zlib {
 
 // -----------------------------------------------------------------------------
 
-ZlibStreamBuffer::ZlibStreamBuffer(const std::string& file_path,
+StreamBuffer::StreamBuffer(const std::string& file_path,
                                    const bool write_mode,
                                    const int compression_level)
     : write_mode_(write_mode), buffer_() {
@@ -57,14 +57,14 @@ ZlibStreamBuffer::ZlibStreamBuffer(const std::string& file_path,
 
 // -----------------------------------------------------------------------------
 
-ZlibStreamBuffer::~ZlibStreamBuffer() {
+StreamBuffer::~StreamBuffer() {
   sync();  // Flush any buffered output.
   gzclose(file_);
 }
 
 // -----------------------------------------------------------------------------
 
-int ZlibStreamBuffer::underflow() {
+int StreamBuffer::underflow() {
   if (write_mode_) {
     return traits_type::eof();
   }
@@ -84,7 +84,7 @@ int ZlibStreamBuffer::underflow() {
 
 // -----------------------------------------------------------------------------
 
-int ZlibStreamBuffer::uflow() {
+int StreamBuffer::uflow() {
   const int ch = underflow();
   if (ch != traits_type::eof()) {
     gbump(1);
@@ -94,7 +94,7 @@ int ZlibStreamBuffer::uflow() {
 
 // -----------------------------------------------------------------------------
 
-std::streamsize ZlibStreamBuffer::xsgetn(char* s, std::streamsize n) {
+std::streamsize StreamBuffer::xsgetn(char* s, std::streamsize n) {
   std::streamsize total = 0;
   while (n > 0) {
     int available = egptr() - gptr();
@@ -114,7 +114,7 @@ std::streamsize ZlibStreamBuffer::xsgetn(char* s, std::streamsize n) {
 
 // -----------------------------------------------------------------------------
 
-int ZlibStreamBuffer::overflow(int c) {
+int StreamBuffer::overflow(int c) {
   if (!write_mode_) {
     return traits_type::eof();
   }
@@ -137,7 +137,7 @@ int ZlibStreamBuffer::overflow(int c) {
 
 // -----------------------------------------------------------------------------
 
-std::streamsize ZlibStreamBuffer::xsputn(const char* s, std::streamsize n) {
+std::streamsize StreamBuffer::xsputn(const char* s, std::streamsize n) {
   // Optimized path for a single character.
   if (n == 1) {
     if (pptr() < epptr()) {
@@ -190,7 +190,7 @@ std::streamsize ZlibStreamBuffer::xsputn(const char* s, std::streamsize n) {
 
 // -----------------------------------------------------------------------------
 
-int ZlibStreamBuffer::sync() {
+int StreamBuffer::sync() {
   if (write_mode_) {
     if (overflow(traits_type::eof()) == traits_type::eof()) {
       return -1;
@@ -201,7 +201,7 @@ int ZlibStreamBuffer::sync() {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::entropy::zlib
+}  // namespace genie::util::zlib
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

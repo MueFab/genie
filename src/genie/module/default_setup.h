@@ -50,12 +50,13 @@ namespace genie::module {
  * @param raw_ref Flag indicating if raw reference data should be used.
  * @param write_raw_streams Flag indicating if raw streams should be written to
  * output.
+ * @param entropy_mode Which entropy mode to use.
  * @return A unique pointer to the configured `FlowGraphEncode` object.
  */
-std::unique_ptr<core::FlowGraphEncode> BuildDefaultEncoder(
+std::unique_ptr<core::FlowGraphEncode> build_default_encoder(
     size_t threads, const std::string& working_dir, size_t block_size,
     core::ClassifierRegroup::RefMode external_ref, bool raw_ref,
-    bool write_raw_streams);
+    bool write_raw_streams, const std::string& entropy_mode);
 
 /**
  * @brief Constructs and configures the default decoder setup for Genie
