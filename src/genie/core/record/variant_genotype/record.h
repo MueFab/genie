@@ -69,44 +69,83 @@ class format_field {
  */
 class VariantGenotype {
  private:
-    uint64_t variant_index;      //!< @brief
-    uint32_t sample_index_from;  //!< @brief
-    uint32_t sample_count;       //!< @brief
+  uint64_t variant_index_;      //!< @brief Variant index
+  uint32_t sample_index_from_;  //!< @brief Starting sample index
+  uint32_t sample_count_;       //!< @brief Number of samples
 
-    std::vector<format_field> format;  //!< @brief
+  std::vector<format_field> format_;  //!< @brief Format fields
 
-    std::vector<std::vector<int8_t>> alleles;    //!< @brief
-    std::vector<std::vector<uint8_t>> phasings;  //!< @brief
+  std::vector<std::vector<int8_t>> alleles_;    //!< @brief Allele data
+  std::vector<std::vector<uint8_t>> phasings_;  //!< @brief Phasing data
+  std::vector<std::vector<uint32_t>> likelihoods_;  //!< @brief Likelihood data
 
-    std::vector<std::vector<uint32_t>> likelihoods;  //!< @brief
-
-    std::optional<LinkRecord> link_record;
+  std::optional<LinkRecord> link_record_;  //!< @brief Link record
 
  public:
-    explicit VariantGenotype(util::BitReader& bitreader);
-    VariantGenotype(uint64_t variant_index, uint32_t sample_index_from);
-    uint64_t getVariantIndex() const;
-    uint32_t getStartSampleIndex() const;
-    uint32_t getNumSamples() const;
+    // Default constructor
+    VariantGenotype();
 
-    uint8_t getFormatCount() const;
+    // Parameterized constructor
+    VariantGenotype(
+        uint64_t variant_index,
+        uint32_t sample_index_from,
+        uint32_t sample_count,
+        std::vector<format_field>&& format,
+        std::vector<std::vector<int8_t>>&& alleles,
+        std::vector<std::vector<uint8_t>>&& phasings,
+        std::vector<std::vector<uint32_t>>&& likelihoods,
+        const std::optional<LinkRecord>& link_record
+    );
 
-    bool isGenotypePresent() const;
-    bool isLikelihoodPresent() const;
-    uint8_t getNumberOfAllelesPerSample() const;
-    const std::vector<std::vector<int8_t>>& getAlleles() const;
-    const std::vector<std::vector<uint8_t>>& getPhasing() const;
-    uint8_t getNumberOfLikelihoods() const;
-    const std::vector<std::vector<uint32_t>>& getLikelihoods() const;
-    bool getLinkedRecord() const;
-    const LinkRecord& getLinkRecord() const;
-    const std::vector<format_field>& getFormats() const;
+    // Copy constructor
+    VariantGenotype(const VariantGenotype& other);
 
-    void setLikelihood(std::vector<std::vector<uint32_t>> _likelihoods) { likelihoods = _likelihoods; }
-    void setPhasings(std::vector<std::vector<uint8_t>> _phasings) { phasings = _phasings; };
-    void setAlleles(std::vector<std::vector<int8_t>> _alleles) { alleles = _alleles; }
-    void setNumberOfSamples(uint32_t sampleSize) { sample_count = sampleSize; };
-    void setFormats(std::vector<format_field> _formats) { format = _formats; }
+    // Move constructor
+    VariantGenotype(VariantGenotype&& other) noexcept;
+
+    // Copy assignment operator
+    VariantGenotype& operator=(const VariantGenotype& other);
+
+    // Move assignment operator
+    VariantGenotype& operator=(VariantGenotype&& other) noexcept;
+
+    // Constructor from BitReader
+    explicit VariantGenotype(util::BitReader& reader);
+
+    // Getters
+    uint64_t GetVariantIndex() const;
+    uint32_t GetSampleIndexFrom() const;
+    uint32_t GetSampleCount() const;
+    const std::vector<format_field>& GetFormat() const;
+    const std::vector<std::vector<int8_t>>& GetAlleles() const;
+    const std::vector<std::vector<uint8_t>>& GetPhasing() const;
+    const std::vector<std::vector<uint32_t>>& GetLikelihoods() const;
+    const std::optional<LinkRecord>& GetLinkRecord() const;
+
+    // Setters
+    void SetVariantIndex(uint64_t value);
+    void SetSampleIndexFrom(uint32_t value);
+    void SetSampleCount(uint32_t value);
+    void SetFormat(std::vector<format_field> value);
+    void SetFormat(std::vector<format_field>&& value);
+    void SetAlleles(std::vector<std::vector<int8_t>> value);
+    void SetAlleles(std::vector<std::vector<int8_t>>&& value);
+    void SetPhasings(std::vector<std::vector<uint8_t>> value);
+    void SetPhasings(std::vector<std::vector<uint8_t>>&& value);
+    void SetLikelihoods(std::vector<std::vector<uint32_t>> value);
+    void SetLikelihoods(std::vector<std::vector<uint32_t>>&& value);
+    void SetLinkRecord(const std::optional<LinkRecord>& value);
+
+    // Additional Getter
+    uint8_t GetFormatCount() const;
+    bool IsGenotypePresent() const;
+    uint8_t GetNumberOfAllelesPerSample() const;
+    bool IsLikelihoodPresent() const;
+    uint8_t GetNumberOfLikelihoods() const;
+    bool GetLinkedRecord() const;
+
+    // Size calculation
+    size_t GetSize() const;
 };
 
 }  // namespace record

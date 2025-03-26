@@ -1194,13 +1194,13 @@ void encode_scm(
     auto ntiles_in_col = cm_param.GetNumTiles(chr2_ID);
 
     cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
-    scm_payload.SetSampleId(rec.getSampleID());
+    scm_payload.SetSampleID(rec.getSampleID());
 
     scm_param.SetChr1ID(chr1_ID);
-    scm_payload.SetChr1Id(chr1_ID);
+    scm_payload.SetChr1ID(chr1_ID);
 
     scm_param.SetChr2ID(chr2_ID);
-    scm_payload.SetChr2Id(chr2_ID);
+    scm_payload.SetChr2ID(chr2_ID);
 
     auto is_intra_scm = scm_param.IsIntraSCM();
 
@@ -1539,7 +1539,7 @@ void set_rle_information_from_mask(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//std::tuple<ContactMatrixParameters, EncodingBlock> encode_block(
+//std::tuple<ContactMatrixParameters, EncodingBlock> encode_genotype(
 //    const EncodingOptions& opt,
 //    std::vector<core::record::ContactRecord>& recs){
 //

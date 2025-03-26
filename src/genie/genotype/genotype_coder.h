@@ -23,15 +23,15 @@
 #pragma GCC diagnostic pop
 
 #include "genie/core/constants.h"
-#include "genie/core/record/annotation_parameter_set/AttributeData.h"
+//#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/record/variant_genotype/record.h"
-#include "genie/likelihood/likelihood_parameters.h"
-#include "genotype_parameters.h"
+//#include "genie/likelihood/likelihood_parameters.h"
+#include "genie/genotype/genotype_parameters.h"
+#include "genie/genotype/genotype_payload.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace genotype {
+namespace genie::genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -67,61 +67,8 @@ struct EncodingOptions {
     genie::core::AlgoID codec_ID = genie::core::AlgoID::JBIG;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
 
-struct EncodingBlock {
-    uint8_t max_ploidy = 0;
-    bool dot_flag = false;
-    bool na_flag = false;
-
-    Int8MatDtype allele_mat;
-    BinMatDtype phasing_mat;
-
-    UIntVecDtype amax_vec;
-    uint8_t num_bit_planes;
-    std::vector<BinMatDtype> allele_bin_mat_vect;
-    std::vector<UIntVecDtype> allele_row_ids_vect;
-    std::vector<UIntVecDtype> allele_col_ids_vect;
-
-    UIntVecDtype phasing_row_ids;
-    UIntVecDtype phasing_col_ids;
-
-    std::map<std::string, core::record::annotation_parameter_set::AttributeData> attributeInfo;
-
-    // <block_size, num_samples, format_count/array_length, type>
-    std::map<std::string, std::vector<std::vector<std::vector<AttrType>>>> attributeData;
-
-    likelihood::LikelihoodParameters likelihoodParameters;
-    std::vector<uint32_t> likelihoodData;
-};
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-/**
- * @brief Generates genotype parameters from an encoding block and options.
- *
- * Creates genotype parameters based on the given encoding options and block.
- * It sets up the parameters for variants and phases payload_, including sorting and codec settings.
- *
- * @param opt The encoding options.
- * @param block The encoding block.
- * @return The generated genotype parameters.
- */
-GenotypeParameters generate_genotype_parameters(const EncodingOptions& opt, const EncodingBlock& block);
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-/**
- * @brief Gets the number of binary matrices in an encoding block.
- *
- * Returns the number of binary matrices stored in the encoding block.
- *
- * @param block The encoding block.
- * @return The number of binary matrices.
- */
-uint8_t getNumBinMats(const EncodingBlock& block);
-
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Decomposes records into an encoding block.
@@ -133,9 +80,18 @@ uint8_t getNumBinMats(const EncodingBlock& block);
  * @param recs The vector of variant genotype records to decompose.
  * @throws std::runtime_error If the number of records is empty or the number of samples is not constant within a block.
  */
-void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<core::record::VariantGenotype>& recs);
+void decompose(
+    // Input
+    std::vector<core::record::VariantGenotype>& recs,
+    // Output
+    uint8_t& max_ploidy,
+    Int8MatDtype& allele_mat,
+    BinMatDtype& phasing_mat,
+    // Options
+    size_t block_size
+);
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Transforms the maximum value in an allele matrix.
@@ -146,9 +102,13 @@ void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<cor
  * @param no_ref_flag Output flag indicating the presence of "no reference" values.
  * @param not_avail_flag Output flag indicating the presence of "not available" values.
  */
-void transform_max_value(Int8MatDtype& allele_mat, bool& no_ref_flag, bool& not_avail_flag);
+void transform_max_value(
+    Int8MatDtype& allele_mat,
+    bool& no_ref_flag,
+    bool& not_avail_flag
+);
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Inverse transforms the maximum value in an allele matrix.
@@ -161,7 +121,7 @@ void transform_max_value(Int8MatDtype& allele_mat, bool& no_ref_flag, bool& not_
  */
 void inverse_transform_max_val(Int8MatDtype& allele_mat, bool no_ref_flag, bool not_avail_flag);
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Binarizes an allele matrix into bit planes.
@@ -173,9 +133,17 @@ void inverse_transform_max_val(Int8MatDtype& allele_mat, bool no_ref_flag, bool 
  * @param bin_mats The output vector of binary matrices.
  * @param num_bit_planes The output number of bit planes.
  */
-void binarize_bit_plane(Int8MatDtype& allele_mat, ConcatAxis concat_axis, std::vector<BinMatDtype>& bin_mats, uint8_t& num_bit_planes);
+void binarize_bit_plane(
+    // Input
+    Int8MatDtype& allele_mat,
+    // Output
+    std::vector<BinMatDtype>& bin_mats,
+    uint8_t& num_bit_planes,
+    // Options
+    const ConcatAxis concat_axis
+);
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Debinarizes bit planes into an allele matrix.
@@ -187,9 +155,16 @@ void binarize_bit_plane(Int8MatDtype& allele_mat, ConcatAxis concat_axis, std::v
  * @param concat_axis The axis used for concatenation.
  * @param allele_mat The output allele matrix.
  */
-void debinarize_bit_plane(std::vector<BinMatDtype>& bin_mats, uint8_t num_bit_planes, ConcatAxis concat_axis,  Int8MatDtype& allele_mat);
+void debinarize_bit_plane(
+    // Input
+    std::vector<BinMatDtype>& bin_mats,
+    uint8_t num_bit_planes,
+    const ConcatAxis concat_axis,
+    // Output
+    Int8MatDtype& allele_mat
+);
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Binarizes an allele matrix into a binary matrix by row.
@@ -202,7 +177,7 @@ void debinarize_bit_plane(std::vector<BinMatDtype>& bin_mats, uint8_t num_bit_pl
  */
 void binarize_row_bin(Int8MatDtype& allele_mat, std::vector<BinMatDtype>& bin_mats, UIntVecDtype& amax_vec);
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Debinarizes a binary matrix into an allele matrix by row.
@@ -219,7 +194,7 @@ void debinarize_row_bin(
     Int8MatDtype& allele_mat
 );
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Binarizes an allele matrix based on the specified binarization ID.
@@ -235,15 +210,18 @@ void debinarize_row_bin(
  * @throws std::runtime_error If the binarization ID is invalid.
  */
 void binarize_allele_mat(
+    // Input
     Int8MatDtype& allele_mat,
-    BinarizationID binarization_ID,
-    ConcatAxis concat_axis,
+    // Output
     std::vector<BinMatDtype>& bin_mats,
+    uint8_t& num_bit_planes,
     UIntVecDtype& amax_vec,
-    uint8_t& num_bit_planes
+    // Options
+    BinarizationID binarization_ID,
+    ConcatAxis concat_axis
 );
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Sorts a binary matrix based on the given IDs and axis.
@@ -261,7 +239,7 @@ void sort_matrix(
     uint8_t axis
 );
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Randomly sorts a binary matrix along a specified axis.
@@ -279,7 +257,7 @@ void random_sort_bin_mat(
     uint8_t axis
 );
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Sorts a binary matrix based on the specified sorting algorithms.
@@ -301,7 +279,7 @@ void sort_bin_mat(
     SortingAlgoID sort_col_method
 );
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Inverts the sorting of a binary matrix.
@@ -318,7 +296,7 @@ void invert_sort_bin_mat(
     UIntVecDtype& col_ids
 );
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Sorts an encoding block based on the specified options.
@@ -328,12 +306,12 @@ void invert_sort_bin_mat(
  * @param opt The encoding options.
  * @param block The encoding block to sort.
  */
-void sort_block(
-    const EncodingOptions& opt,
-    EncodingBlock& block
-);
+//void sort_block(
+//    const EncodingOptions& opt,
+//    EncodingBlock& block
+//);
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Converts a binary matrix to a byte array.
@@ -352,7 +330,7 @@ void bin_mat_to_bytes(
     size_t& payload_len
 );
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * @brief Converts a byte array to a binary matrix.
@@ -376,20 +354,20 @@ void bin_mat_from_bytes(
     BinMatDtype& bin_mat
 );
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // TODO (Yeremia,Stefanie): Move and refactor this function to the parsing function
-void sort_format(
-    const std::vector<core::record::VariantGenotype>& recs,
-    size_t block_size,
-    std::map<std::string,
-    core::record::annotation_parameter_set::AttributeData>& info,
-    std::map<std::string, std::vector<std::vector<std::vector<AttrType>>>>& values
-);
+//[[maybe_unused]] void sort_format(
+//    const std::vector<core::record::VariantGenotype>& recs,
+//    size_t block_size,
+//    std::map<std::string,
+//    core::record::annotation_parameter_set::AttributeData>& info,
+//    std::map<std::string, std::vector<std::vector<std::vector<AttrType>>>>& values
+//);
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void entropy_encode_bin_mat(
+[[maybe_unused]] void entropy_encode_bin_mat(
     BinMatDtype& bin_mat,
     genie::core::AlgoID codec_ID,
     std::vector<uint8_t>& payload
@@ -397,15 +375,24 @@ void entropy_encode_bin_mat(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::tuple<GenotypeParameters, EncodingBlock> encode_block(
-    const EncodingOptions& opt,
-    std::vector<core::record::VariantGenotype>& recs
+void encode_genotype(
+    std::vector<core::record::VariantGenotype>& recs,
+    // Output
+    GenotypeParameters& params,
+    GenotypePayload& payload,
+    // Options
+    size_t block_size=512,
+    BinarizationID binarization_ID=BinarizationID::ROW_BIN,
+    ConcatAxis concat_axis=ConcatAxis::DO_NOT_CONCAT,
+    bool transpose_mat=false,
+    SortingAlgoID sort_row_method=SortingAlgoID::NO_SORTING,
+    SortingAlgoID sort_col_method=SortingAlgoID::NO_SORTING,
+    genie::core::AlgoID codec_ID=genie::core::AlgoID::JBIG
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genotype
-}  // namespace genie
+}  // namespace genie::genotype
 
 // -----------------------------------------------------------------------------
 
