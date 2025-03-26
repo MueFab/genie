@@ -1178,6 +1178,7 @@ void encode_scm(
     bool multiplicative_norm,
     core::AlgoID codec_ID
 ) {
+    // TODO (Yeremia): Weights as optional input?
 
     // Initialize variables
     BinVecDtype row_mask;
@@ -1418,30 +1419,31 @@ void encode_scm(
         }
     }
 
-    // Compression of balanced matrix can be done only for intra SCM
-    if (is_intra_scm){
-        // Weight computation
-        if (norm_as_weight){
-            // argwhere row_ids equal to col_ids
-            auto main_diag_positions = xt::argwhere(xt::equal(row_ids, col_ids));
-            int num_norms = rec.getNumNormCounts();
-            for (auto i_norm = 0u; i_norm < num_norms; i_norm++){
-                DoubleVecDtype norm_counts = xt::adapt(rec.getNormCounts()[i_norm], {num_entries});
-                auto norm_main_diag_counts = xt::view(norm_counts, main_diag_positions);
-                auto weights = xt::view(norm_counts, main_diag_positions) / xt::view(counts, main_diag_positions);
-
-                auto weights_shape = weights.shape();
-//                auto main_diag_positions_shape = main_diag_positions.shape();
-                if (multiplicative_norm){
-                    auto y = 10;
-                } else {
-                    UTILS_DIE("Not yet implemented!");
-                }
-            }
-        } else {
-            UTILS_DIE("Normalized matrix is not yet implemented!");
-        }
-    }
+    //TODO(yeremia): Separate this loop as another function
+//    // Compression of balanced matrix can be done only for intra SCM
+//    if (is_intra_scm){
+//        // Weight computation
+//        if (norm_as_weight){
+//            // argwhere row_ids equal to col_ids
+//            auto main_diag_positions = xt::argwhere(xt::equal(row_ids, col_ids));
+//            int num_norms = rec.getNumNormCounts();
+//            for (auto i_norm = 0u; i_norm < num_norms; i_norm++){
+//                DoubleVecDtype norm_counts = xt::adapt(rec.getNormCounts()[i_norm], {num_entries});
+//                auto norm_main_diag_counts = xt::view(norm_counts, main_diag_positions);
+//                auto weights = xt::view(norm_counts, main_diag_positions) / xt::view(counts, main_diag_positions);
+//
+//                auto weights_shape = weights.shape();
+////                auto main_diag_positions_shape = main_diag_positions.shape();
+//                if (multiplicative_norm){
+//                    auto y = 10;
+//                } else {
+//                    UTILS_DIE("Not yet implemented!");
+//                }
+//            }
+//        } else {
+//            UTILS_DIE("Normalized matrix is not yet implemented!");
+//        }
+//    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
