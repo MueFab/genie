@@ -403,7 +403,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
         uint8_t CHR1_ID = 0u;
         auto CHR1_NAME = std::string("CHR1");
         auto CHR1_LEN = 70u;
-        uint8_t CHR2_ID = 0u;
+        uint8_t CHR2_ID = CHR1_ID;
         auto CHR2_NAME = std::string(CHR1_NAME);
         auto CHR2_LEN = CHR1_LEN;
         uint32_t BIN_SIZE = 5u;

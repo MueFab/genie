@@ -21,7 +21,7 @@ void extract_likelihoods(const EncodingOptions& opt, EncodingBlock& block, std::
     UTILS_DIE_IF(recs.empty(), "No records found for the process!");
 
     auto block_size = opt.block_size < recs.size() ? opt.block_size : recs.size();
-    uint32_t num_samples = recs.front().GetNumSamples();
+    uint32_t num_samples = recs.front().GetSampleCount();
     uint8_t num_likelihoods = recs.front().GetNumberOfLikelihoods();
 
     auto& likelihood_mat = block.likelihood_mat;
@@ -32,7 +32,7 @@ void extract_likelihoods(const EncodingOptions& opt, EncodingBlock& block, std::
     for (uint32_t i_rec = 0; i_rec < block_size; i_rec++) {
         auto& rec = recs[i_rec];
 
-        UTILS_DIE_IF(num_samples != rec.GetNumSamples(), "Number of samples is not constant within a block!");
+        UTILS_DIE_IF(num_samples != rec.GetSampleCount(), "Number of samples is not constant within a block!");
         UTILS_DIE_IF(num_likelihoods != rec.GetNumberOfLikelihoods(), "Number of likelihoods is not constant within a block!");
 
         auto& rec_likelihoods = rec.GetLikelihoods();

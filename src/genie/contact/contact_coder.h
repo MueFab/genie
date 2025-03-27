@@ -577,7 +577,7 @@ void encode_scm(
  * @param recs A reference to the vector of contact records to be encoded.
  * @return A tuple containing the encoded contact parameters and the encoding block.
  */
-//std::tuple<ContactMatrixParameters, EncodingBlock> encode_block(
+//std::tuple<ContactMatrixParameters, EncodingBlock> encode_genotype(
 //    const EncodingOptions& opt,
 //    std::vector<core::record::ContactRecord>& recs
 //);

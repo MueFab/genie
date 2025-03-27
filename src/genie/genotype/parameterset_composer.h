@@ -74,7 +74,7 @@ class ParameterSetComposer {
 
     uint8_t parameter_set_ID;
     uint8_t AT_ID;
-    genie::core::AlphabetID AT_alphabet_ID;
+    genie::core::AlphabetId AT_alphabet_ID;
     uint8_t AT_coord_size;
     bool AT_pos_40_bits_flag;
     uint8_t n_aux_attribute_groups;

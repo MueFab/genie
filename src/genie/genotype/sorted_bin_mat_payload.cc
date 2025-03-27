@@ -6,6 +6,7 @@
 
 #include "sorted_bin_mat_payload.h"
 #include <optional>
+#include <genie/util/runtime_exception.h>
 
 // -----------------------------------------------------------------------------
 

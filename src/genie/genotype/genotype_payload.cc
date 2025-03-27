@@ -315,7 +315,7 @@ void GenotypePayload::Write(core::Writer& writer) const {
 //      auto nBitsPerElem = static_cast<uint32_t>(std::ceil(std::log2(nrows)));
 //
 //      std::vector<uint64_t> payloadVec(alleleRowIDs.begin(), alleleRowIDs.end());
-//      sort_variants_row_ids_payloads_.emplace_back(std::move(payloadVec));
+//      sort_variants_row_ids_payloads_.emplace_back(std::Move(payloadVec));
 //    }
 //
 //    // Initialize column IDs payloads
@@ -326,7 +326,7 @@ void GenotypePayload::Write(core::Writer& writer) const {
 //      auto nBitsPerElem = static_cast<uint32_t>(std::ceil(std::log2(ncols)));
 //
 //      std::vector<uint64_t> payloadVec(alleleColIDs.begin(), alleleColIDs.end());
-//      sort_variants_col_ids_payloads_.emplace_back(std::move(payloadVec));
+//      sort_variants_col_ids_payloads_.emplace_back(std::Move(payloadVec));
 //    }
 //
 //    // Initialize amax payload if binarization is ROW_BIN
@@ -336,7 +336,7 @@ void GenotypePayload::Write(core::Writer& writer) const {
 //        amax_elements.push_back(amax);
 //      }
 //
-//      variants_amax_payload_ = AmaxPayload(std::move(amax_elements));
+//      variants_amax_payload_ = AmaxPayload(std::Move(amax_elements));
 //    }
 //}
 

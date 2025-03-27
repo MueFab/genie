@@ -224,7 +224,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
         auto& info = attributesInfo[formatdata.first];
         std::vector<uint32_t> arrayDims;
         arrayDims.push_back(std::min(BLOCK_SIZE, static_cast<uint32_t>(recs.size())));
-        arrayDims.push_back(recs.at(0).GetNumSamples());
+        arrayDims.push_back(recs.at(0).GetSampleCount());
         arrayDims.push_back(recs.at(0).GetFormatCount());
         attributeTDStream[formatdata.first].set(info.getAttributeType(), static_cast<uint8_t>(arrayDims.size()),
                                                 arrayDims);
@@ -234,9 +234,9 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
     descriptorStream[genie::core::AnnotDesc::GENOTYPE];
     {
-        //genie::genotype::GenotypePayload genotypePayload(datablock, genotypeParameters);
+        genie::genotype::GenotypePayload genotypePayload(datablock, genotypeParameters);
         genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
-        //genotypePayload.Write(writer);
+        genotypePayload.Write(writer);
     }
 
     descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];

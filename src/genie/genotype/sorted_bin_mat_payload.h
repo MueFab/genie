@@ -16,14 +16,16 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 #include <optional>
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
-#include "genie/genotype/bin_mat_payload.h"
-#include "genie/genotype/row_col_ids_payload.h"
-#include "genie/util/data_block.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
+#include "genie/core/writer.h"
+
+#include "genie/genotype/bin_mat_payload.h"
+#include "genie/genotype/row_col_ids_payload.h"
+//#include "genie/util/data_block.h"
 
 // -----------------------------------------------------------------------------
 
