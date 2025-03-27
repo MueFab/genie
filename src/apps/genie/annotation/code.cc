@@ -26,6 +26,7 @@
 #include "genie/core/variant_genotype_record/record.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
+#include "genie/genotype/parameterset_composer.h"
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_parameters.h"
 #include "genie/likelihood/likelihood_payload.h"
@@ -233,9 +234,9 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
     descriptorStream[genie::core::AnnotDesc::GENOTYPE];
     {
-        genie::genotype::GenotypePayload genotypePayload(datablock, genotypeParameters);
+        //genie::genotype::GenotypePayload genotypePayload(datablock, genotypeParameters);
         genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
-        genotypePayload.Write(writer);
+        //genotypePayload.Write(writer);
     }
 
     descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
