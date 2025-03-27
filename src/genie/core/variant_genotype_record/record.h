@@ -125,7 +125,7 @@ class FormatField {
    * @brief Sets the number of samples
    * @param _sample_count The sample count to set
    */
-  void setSampleCount(uint32_t _sample_count) {
+  void SetSampleCount(uint32_t _sample_count) {
     sample_count_ = _sample_count;
   }
 
@@ -133,7 +133,7 @@ class FormatField {
    * @brief Sets the format field values
    * @param _value The values to set
    */
-  void setValue(std::vector<std::vector<std::vector<uint8_t>>> _value) {
+  void SetValue(std::vector<std::vector<std::vector<uint8_t>>> _value) {
     value_ = std::move(_value);
   }
 };
@@ -146,22 +146,64 @@ class FormatField {
  */
 class VariantGenotype {
  private:
-  uint64_t variant_index_;      //!< @brief
-  uint32_t sample_index_from_;  //!< @brief
-  uint32_t sample_count_;       //!< @brief
+  uint64_t variant_index_;      //!< @brief Variant index
+  uint32_t sample_index_from_;  //!< @brief Starting sample index
+  uint32_t sample_count_;       //!< @brief Number of samples
 
-  std::vector<FormatField> format_;  //!< @brief
+  std::vector<FormatField> format_;  //!< @brief Format fields
 
-  std::vector<std::vector<int8_t>> alleles_;    //!< @brief
-  std::vector<std::vector<uint8_t>> phasings_;  //!< @brief
+  std::vector<std::vector<int8_t>> alleles_;    //!< @brief Allele data
+  std::vector<std::vector<uint8_t>> phasings_;  //!< @brief Phasing data
+  std::vector<std::vector<uint32_t>> likelihoods_;  //!< @brief Likelihood data
 
-  std::vector<std::vector<uint32_t>> likelihoods_;  //!< @brief
-
-  std::optional<LinkRecord> link_record_;
+  std::optional<LinkRecord> link_record_; //!< @brief Link record
 
  public:
+ /**
+   * @brief Default constructor
+   */
+ VariantGenotype();
+
+ /**
+   * @brief Parametrized constructor
+   */
+ VariantGenotype(
+     uint64_t variant_index,
+     uint32_t sample_index_from,
+     uint32_t sample_count,
+     std::vector<FormatField>&& format,
+     std::vector<std::vector<int8_t>>&& alleles,
+     std::vector<std::vector<uint8_t>>&& phasings,
+     std::vector<std::vector<uint32_t>>&& likelihoods,
+     const std::optional<LinkRecord>& link_record
+ );
+
+ /**
+   * @brief Copy constructor
+   * @param other VariantGenotype
+   */
+ VariantGenotype(const VariantGenotype& other);
+
+ /**
+   * @brief Move constructor
+   * @param other VariantGenotype
+   */
+ VariantGenotype(VariantGenotype&& other) noexcept;
+
+ /**
+   * @brief Copy assignment operator
+   * @param other VariantGenotype
+   */
+ VariantGenotype& operator=(const VariantGenotype& other);
+
+ /**
+   * @brief Move assignment operator
+   * @param other VariantGenotype
+   */
+ VariantGenotype& operator=(VariantGenotype&& other) noexcept;
+
   /**
-   * @brief Constructs a variant genotype by reading from a bit stream
+   * @brief Constructs a variant genotype by reading using BitReader
    * @param bitreader The bit reader to read from
    */
   explicit VariantGenotype(util::BitReader& bitreader);
@@ -173,6 +215,9 @@ class VariantGenotype {
    */
   VariantGenotype(uint64_t variant_index, uint32_t sample_index_from);
 
+ // Getters
+
+
   /**
    * @brief Gets the variant index
    * @return The variant index
@@ -183,13 +228,19 @@ class VariantGenotype {
    * @brief Gets the starting sample index
    * @return The starting sample index
    */
-  [[nodiscard]] uint32_t GetStartSampleIndex() const;
+  [[nodiscard]] uint32_t GetSampleIndexFrom() const;
 
   /**
    * @brief Gets the number of samples
    * @return The sample count
    */
-  [[nodiscard]] uint32_t GetNumSamples() const;
+  [[nodiscard]] uint32_t GetSampleCount() const;
+
+ /**
+  * @brief Get the format
+  * @return Vector of FormatField
+  */
+ [[nodiscard]] const std::vector<FormatField>& GetFormat() const;
 
   /**
    * @brief Gets the number of format fields
@@ -296,6 +347,12 @@ class VariantGenotype {
   void SetFormats(std::vector<FormatField> formats) {
     format_ = std::move(formats);
   }
+
+ /**
+ * @brief Get size of the VariantGenotype
+ * @return size_t of VariantGenotype size
+ */
+  [[nodiscard]] size_t GetSize() const;
 };
 
 }  // namespace genie::core::record

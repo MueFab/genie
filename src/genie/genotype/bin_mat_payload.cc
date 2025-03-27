@@ -210,7 +210,7 @@ void BinMatPayload::Write(util::BitWriter writer) const {
 //TODO: Move to somewhere else
 //void BinMatPayload::WriteCompressed(core::Writer& writer) const {
 //  std::stringstream payloadStream;
-//  for (auto byte : payload_) payloadStream.write((char*)&byte, 1);
+//  for (auto byte : payload_) payloadStream.Write((char*)&byte, 1);
 //
 //  std::stringstream compressedStream;
 //  if (codec_ID_ != genie::core::AlgoID::JBIG) {

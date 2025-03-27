@@ -23,7 +23,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Buil
     std::vector<uint64_t> defaultTileSize) {
     parameter_set_ID = 1;
     AT_ID = _AT_ID;
-    AT_alphabet_ID = genie::core::AlphabetID::ACGTN;
+    AT_alphabet_ID = genie::core::AlphabetId::kAcgtn;
     AT_coord_size = 3;
     AT_pos_40_bits_flag = false;
     n_aux_attribute_groups = 0;

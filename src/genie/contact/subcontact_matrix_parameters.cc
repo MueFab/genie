@@ -44,10 +44,47 @@ SubcontactMatrixParameters::SubcontactMatrixParameters(
 
 // -----------------------------------------------------------------------------
 
-//SubcontactMatrixParameters::SubcontactMatrixParameters(const SubcontactMatrixParameters& other) noexcept = default;
+SubcontactMatrixParameters::SubcontactMatrixParameters(
+    const SubcontactMatrixParameters& other) noexcept
+    : parameter_set_ID_(other.parameter_set_ID_),
+      chr1_ID_(other.chr1_ID_),
+      chr2_ID_(other.chr2_ID_),
+      codec_ID_(other.codec_ID_),
+      tile_parameters_(other.tile_parameters_),
+      row_mask_exists_flag_(other.row_mask_exists_flag_),
+      col_mask_exists_flag_(other.col_mask_exists_flag_)
+{
+  SetNumTiles(
+      other.GetNTilesInRow(),
+      other.GetNTilesInCol()
+  );
+
+  // Deep copy for TileParameters if needed
+  for (size_t i = 0; i < other.GetNTilesInRow(); ++i) {
+    for (size_t j = 0; j < other.GetNTilesInCol(); ++j) {
+      tile_parameters_[i][j].diag_tranform_mode = other.tile_parameters_[i][j].diag_tranform_mode;
+      tile_parameters_[i][j].binarization_mode = other.tile_parameters_[i][j].binarization_mode;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+SubcontactMatrixParameters::SubcontactMatrixParameters(SubcontactMatrixParameters&& other) noexcept
+  : parameter_set_ID_(other.parameter_set_ID_),
+    chr1_ID_(other.chr1_ID_),
+    chr2_ID_(other.chr2_ID_),
+    codec_ID_(other.codec_ID_),
+    tile_parameters_(std::move(other.tile_parameters_)),
+    row_mask_exists_flag_(other.row_mask_exists_flag_),
+    col_mask_exists_flag_(other.col_mask_exists_flag_) {}
+
+// -----------------------------------------------------------------------------
+
 SubcontactMatrixParameters& SubcontactMatrixParameters::operator=(
     const SubcontactMatrixParameters& other) {
-  if (this == &other) return *this;
+  if (this == &other)
+    return *this;
   parameter_set_ID_ = other.parameter_set_ID_;
   chr1_ID_ = other.chr1_ID_;
   chr2_ID_ = other.chr2_ID_;
@@ -60,21 +97,11 @@ SubcontactMatrixParameters& SubcontactMatrixParameters::operator=(
 
 // -----------------------------------------------------------------------------
 
-SubcontactMatrixParameters::SubcontactMatrixParameters(SubcontactMatrixParameters&& other) noexcept
-    : parameter_set_ID_(other.parameter_set_ID_),
-      chr1_ID_(other.chr1_ID_),
-      chr2_ID_(other.chr2_ID_),
-      codec_ID_(other.codec_ID_),
-      tile_parameters_(std::move(other.tile_parameters_)),
-      row_mask_exists_flag_(other.row_mask_exists_flag_),
-      col_mask_exists_flag_(other.col_mask_exists_flag_) {}
-
-// -----------------------------------------------------------------------------
-
 // Move assignment operator
 SubcontactMatrixParameters& SubcontactMatrixParameters::operator=(
     SubcontactMatrixParameters&& other) noexcept {
-    if (this == &other) return *this;
+    if (this == &other)
+      return *this;
     parameter_set_ID_ = std::move(other.parameter_set_ID_);
     chr1_ID_ = std::move(other.chr1_ID_);
     chr2_ID_ = std::move(other.chr2_ID_);
@@ -87,18 +114,23 @@ SubcontactMatrixParameters& SubcontactMatrixParameters::operator=(
 
 // -----------------------------------------------------------------------------
 
-SubcontactMatrixParameters::SubcontactMatrixParameters(util::BitReader& reader, ContactMatrixParameters& cm_params)
-    : parameter_set_ID_(reader.ReadAlignedInt<uint8_t>()),
-      chr1_ID_(reader.ReadAlignedInt<uint8_t>()),
-      chr2_ID_(reader.ReadAlignedInt<uint8_t>()) {
+SubcontactMatrixParameters::SubcontactMatrixParameters(
+    util::BitReader& reader,
+    ContactMatrixParameters& cm_params
+): parameter_set_ID_(reader.ReadAlignedInt<uint8_t>()),
+   chr1_ID_(reader.ReadAlignedInt<uint8_t>()),
+   chr2_ID_(reader.ReadAlignedInt<uint8_t>()) {
+
+    auto flags = reader.ReadAlignedInt<uint8_t>();
+    codec_ID_ = static_cast<core::AlgoID>(flags & 0x1F);
+
     auto ntiles_in_row = cm_params.GetNumTiles(chr1_ID_, 1);
     tile_parameters_.resize(ntiles_in_row);
 
     auto ntiles_in_col = cm_params.GetNumTiles(chr2_ID_, 1);
-    for (auto& v : tile_parameters_) v.resize(ntiles_in_col);
 
-    auto flags = reader.ReadAlignedInt<uint8_t>();
-    codec_ID_ = static_cast<core::AlgoID>(flags & 0x1F);
+    for (auto& v : tile_parameters_)
+      v.resize(ntiles_in_col);
 
     for (size_t i = 0u; i < ntiles_in_row; ++i) {
         for (size_t j = 0u; j < ntiles_in_col; ++j) {
@@ -125,15 +157,16 @@ SubcontactMatrixParameters::SubcontactMatrixParameters(util::BitReader& reader, 
 
 bool SubcontactMatrixParameters::operator==(const SubcontactMatrixParameters& other) {
     bool ret = parameter_set_ID_ == other.parameter_set_ID_ &&
-             chr1_ID_ == other.chr1_ID_ && chr2_ID_ == other.chr2_ID_ &&
-             row_mask_exists_flag_ == other.row_mask_exists_flag_ &&
-             col_mask_exists_flag_ == other.col_mask_exists_flag_;
+               chr1_ID_ == other.chr1_ID_ &&
+               chr2_ID_ == other.chr2_ID_ &&
+               row_mask_exists_flag_ == other.row_mask_exists_flag_ &&
+               col_mask_exists_flag_ == other.col_mask_exists_flag_;
 
     auto ntiles_in_row = GetNTilesInRow();
     auto ntiles_in_col = GetNTilesInCol();
 
-    ret &= ntiles_in_row && other.GetNTilesInRow();
-    ret &= ntiles_in_col && other.GetNTilesInCol();
+    ret &= ntiles_in_row == other.GetNTilesInRow();
+    ret &= ntiles_in_col == other.GetNTilesInCol();
 
     if (ret) {
         for (size_t i = 0; i < ntiles_in_row; ++i) {
@@ -218,7 +251,7 @@ void SubcontactMatrixParameters::SetColMaskExistsFlag(bool flag) {
 
 void SubcontactMatrixParameters::SetNumTiles(size_t ntiles_in_row, size_t ntiles_in_col, bool free_mem) {
     if (free_mem) {
-      tile_parameters_.clear();
+        tile_parameters_.clear();
     }
 
     tile_parameters_.resize(ntiles_in_row);
@@ -244,12 +277,15 @@ void SubcontactMatrixParameters::SetTileParameter(size_t i_tile, size_t j_tile, 
     //    UTILS_DIE_IF(j_tile >= GetNTilesInCol(), "Invalid j_tile!");
     //    UTILS_DIE_IF(i_tile > j_tile && IsIntraSCM(), "Accessing lower triangle of intra SCM is not allowed!");
 
-    GetTileParameter(i_tile, j_tile) = tile_parameter;
+//    GetTileParameter(i_tile, j_tile) = tile_parameter;
+    tile_parameters_[i_tile][j_tile] = tile_parameter;
 }
 
 // -----------------------------------------------------------------------------
 
-size_t SubcontactMatrixParameters::GetNTilesInRow() const { return tile_parameters_.size(); }
+size_t SubcontactMatrixParameters::GetNTilesInRow() const {
+  return tile_parameters_.size();
+}
 
 // -----------------------------------------------------------------------------
 
@@ -303,9 +339,12 @@ void SubcontactMatrixParameters::Write(util::BitWriter& writer) const {
     flags |= (static_cast<uint8_t>(codec_ID_) & 0x1F);
     writer.WriteBypassBE(flags);
 
+    auto num_tiles_in_row = GetNTilesInRow();
+    auto num_tiles_in_col = GetNTilesInCol();
+
     // Write the tile_parameters_
-    for (size_t i = 0; i < GetNTilesInRow(); ++i) {
-        for (size_t j = 0; j < GetNTilesInCol(); ++j) {
+    for (size_t i = 0; i < num_tiles_in_row; ++i) {
+        for (size_t j = 0; j < num_tiles_in_col; ++j) {
             if (IsIntraSCM() && i > j) {
                 continue;
             }

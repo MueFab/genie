@@ -16,14 +16,14 @@
 #include <vector>
 
 #include "genie/core/constants.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 #include "genie/core/writer.h"
 #include "genie/genotype/amax_payload.h"
-#include "genie/genotype/genotype_coder.h"
-#include "genie/genotype/genotype_parameters.h"
 #include "genie/genotype/row_col_ids_payload.h"
+#include "genie/genotype/amax_payload.h"
 #include "genie/genotype/sorted_bin_mat_payload.h"
-#include "genie/util/bit_writer.h"
-#include "sorted_bin_mat_payload.h"
+#include "genie/genotype/genotype_parameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ class GenotypePayload {
   bool no_reference_flag_;
   bool not_available_flag_;
   bool phases_value_;
-  uint8_t num_bit_planes_; //? Only for bit plane binarization
+//  uint8_t num_bit_planes_; //? Only for bit plane binarization
 
   std::vector<SortedBinMatPayload> variants_payloads_;
   std::optional<AmaxPayload> variants_amax_payload_;
@@ -79,7 +79,7 @@ class GenotypePayload {
                            [[maybe_unused]] GenotypeParameters& parameters);
 
   // Getters
-  [[maybe_unused]] [[maybe_unused]] uint8_t GetMaxPloidy() const;
+  [[maybe_unused]] uint8_t GetMaxPloidy() const;
   bool GetNoReferenceFlag() const;
   bool GetNotAvailableFlag() const;
   bool GetPhasesValue() const;
@@ -100,7 +100,7 @@ class GenotypePayload {
   void SetPhasesPayload(std::optional<SortedBinMatPayload>&& phases_payload);
 
   // GetSize function
-  size_t GetSize() const;
+  [[nodiscard]] size_t GetSize() const;
 
   // Function to write to writer
   void Write(util::BitWriter& writer) const;
