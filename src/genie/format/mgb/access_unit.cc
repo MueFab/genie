@@ -97,7 +97,7 @@ AccessUnit::AccessUnit(const std::map<size_t, core::parameter::EncodingSet> &par
 
 AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
                        uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, bool signatureFlag,
-                       core::AlphabetID alphabet)
+                       core::AlphabetId alphabet)
     : DataUnit(DataUnitType::ACCESS_UNIT),
       header(_access_unit_ID, _parameter_set_ID, _au_type, _reads_count, dataset_type, posSize, signatureFlag,
              alphabet),
@@ -114,7 +114,7 @@ AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core
         header.setAuTypeCfg(AuTypeCfg(posSize));
     } else {
         if (signatureFlag) {
-            header.setSignatureCfg(SignatureCfg(core::getAlphabetProperties(alphabet).base_bits));
+            header.setSignatureCfg(SignatureCfg(core::GetAlphabetProperties(alphabet).base_bits));
         }
     }
 }

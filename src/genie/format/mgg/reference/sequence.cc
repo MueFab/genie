@@ -22,7 +22,7 @@ bool Sequence::operator==(const Sequence& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Sequence::Sequence(std::string _name, uint32_t length, uint16_t id, genie::core::MPEGMinorVersion _version)
+Sequence::Sequence(std::string _name, uint32_t length, uint16_t id, genie::core::MpegMinorVersion _version)
     : name(std::move(_name)), sequence_length(length), sequence_id(id), version(_version) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -39,9 +39,9 @@ uint16_t Sequence::getID() const { return sequence_id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Sequence::Sequence(genie::util::BitReader& reader, genie::core::MPEGMinorVersion _version) : version(_version) {
+Sequence::Sequence(genie::util::BitReader& reader, genie::core::MpegMinorVersion _version) : version(_version) {
     reader.readBypass_null_terminated(name);
-    if (version != genie::core::MPEGMinorVersion::V1900) {
+    if (version != genie::core::MpegMinorVersion::kV1900) {
         sequence_length = reader.readBypassBE<uint32_t>();
         sequence_id = reader.readBypassBE<uint16_t>();
     }
@@ -52,7 +52,7 @@ Sequence::Sequence(genie::util::BitReader& reader, genie::core::MPEGMinorVersion
 void Sequence::write(genie::util::BitWriter& writer) const {
     writer.writeBypass(name.data(), name.length());
     writer.writeBypassBE<uint8_t>('\0');
-    if (version != genie::core::MPEGMinorVersion::V1900) {
+    if (version != genie::core::MpegMinorVersion::kV1900) {
         writer.writeBypassBE(sequence_length);
         writer.writeBypassBE(sequence_id);
     }
@@ -60,7 +60,7 @@ void Sequence::write(genie::util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Sequence::Sequence(genie::core::meta::Sequence s, genie::core::MPEGMinorVersion _version)
+Sequence::Sequence(genie::core::meta::Sequence s, genie::core::MpegMinorVersion _version)
     : name(std::move(s.getName())),
       sequence_length(static_cast<uint32_t>(s.getLength())),
       sequence_id(s.getID()),

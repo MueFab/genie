@@ -31,7 +31,7 @@ class Sequence {
     std::string name;                       //!< @brief
     uint32_t sequence_length;               //!< @brief
     uint16_t sequence_id;                   //!< @brief
-    genie::core::MPEGMinorVersion version;  //!< @brief
+    genie::core::MpegMinorVersion version;  //!< @brief
 
  public:
     /**
@@ -48,14 +48,14 @@ class Sequence {
      * @param id
      * @param _version
      */
-    Sequence(std::string _name, uint32_t length, uint16_t id, genie::core::MPEGMinorVersion _version);
+    Sequence(std::string _name, uint32_t length, uint16_t id, genie::core::MpegMinorVersion _version);
 
     /**
      * @brief
      * @param s
      * @param _version
      */
-    Sequence(genie::core::meta::Sequence s, genie::core::MPEGMinorVersion _version);
+    Sequence(genie::core::meta::Sequence s, genie::core::MpegMinorVersion _version);
 
     /**
      * @brief
@@ -80,7 +80,7 @@ class Sequence {
      * @param reader
      * @param _version
      */
-    Sequence(genie::util::BitReader& reader, genie::core::MPEGMinorVersion _version);
+    Sequence(genie::util::BitReader& reader, genie::core::MpegMinorVersion _version);
 
     /**
      * @brief

@@ -2,17 +2,17 @@ project("genie-core")
 
 set(source_files
         parameter/descriptor_present/decoder.cc
-        parameter/descriptor_present/decoder-regular.cc
-        parameter/descriptor_present/decoder-tokentype.cc
+        parameter/descriptor_present/decoder_regular.cc
+        parameter/descriptor_present/decoder_token_type.cc
         parameter/descriptor_present/descriptor_present.cc
 
         parameter/computed_ref.cc
         parameter/computed_ref_extended.cc
         parameter/data_unit.cc
         parameter/descriptor.cc
-        parameter/descriptor_subseq_cfg.cc
+        parameter/descriptor_sub_sequence_cfg.cc
         parameter/parameter_set.cc
-        parameter/quality-values.cc
+        parameter/quality_values.cc
 
         record/alignment_external/none.cc
         record/alignment_external/other_rec.cc

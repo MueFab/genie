@@ -36,7 +36,7 @@ std::string RecordPileup::preprocess(const std::string &read, const std::string 
         if (cigar_pos == '(' || cigar_pos == '[') {
             continue;
         }
-        if (getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar_pos) && count == 0) {
+        if (GetAlphabetProperties(core::AlphabetId::kAcgtn).IsIncluded(cigar_pos) && count == 0) {
             result += read[read_pos++];
             continue;
         }

@@ -55,6 +55,7 @@ void DatasetMetadata::box_write(genie::util::BitWriter& bitWriter) const {
     if (version != genie::core::MPEGMinorVersion::V1900) {
         bitWriter.writeBypassBE(dataset_group_id);
         bitWriter.writeBypassBE(dataset_id);
+    if (version != genie::core::MpegMinorVersion::kV1900) {
     }
     bitWriter.writeBypass(dg_metatdata_value.data(), dg_metatdata_value.length());
 }

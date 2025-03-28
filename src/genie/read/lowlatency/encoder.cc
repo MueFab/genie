@@ -41,23 +41,23 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     for (auto& r : data.getData()) {
         for (auto& s : r.getSegments()) {
             num_reads++;
-            state.streams.push(core::GenSub::RLEN, s.getSequence().length() - 1);
+            state.streams.push(core::gen_sub::kReadLength, s.getSequence().length() - 1);
             if (state.readLength != s.getSequence().length()) {
                 state.readLength = 0;
             }
 
             for (auto c : s.getSequence()) {
-                state.streams.push(core::GenSub::UREADS,
-                                   core::getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[c]);
+                state.streams.push(core::gen_sub::kUnalignedReads,
+                                   core::GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut[c]);
             }
         }
         if (r.getSegments().size() > 1) {
-            state.streams.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_SAME_RECORD);
+            state.streams.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairSameRecord);
         } else if (r.getNumberOfTemplateSegments() > 1) {
             if (r.getRead1First()) {
-                state.streams.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_UNPAIRED);
+                state.streams.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairR1Unpaired);
             } else {
-                state.streams.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_UNPAIRED);
+                state.streams.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairR2Unpaired );
             }
         }
     }
@@ -69,11 +69,11 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     auto rawAU = pack(id, std::get<1>(qv).isEmpty() ? 0 : 1, std::move(std::get<0>(qv)), state);
 
     if (!data.isReferenceOnly()) {
-        rawAU.get(core::GenDesc::QV) = std::move(std::get<1>(qv));
-        rawAU.get(core::GenDesc::RNAME) = std::move(std::get<0>(rname));
+        rawAU.get(core::GenDesc::kQv) = std::move(std::get<1>(qv));
+        rawAU.get(core::GenDesc::kReadName) = std::move(std::get<0>(rname));
     }
     if (state.readLength != 0) {
-        rawAU.set(core::GenSub::RLEN, core::AccessUnit::Subsequence(core::GenSub::RLEN));
+        rawAU.set(core::gen_sub::kReadLength, core::AccessUnit::Subsequence(core::gen_sub::kReadLength));
     }
 
     rawAU.setStats(std::move(data.getStats()));
@@ -96,7 +96,7 @@ core::AccessUnit Encoder::pack(const util::Section& id, uint8_t qv_depth,
     core::parameter::DataUnit::DatasetType dataType = state.refOnly
                                                           ? core::parameter::DataUnit::DatasetType::REFERENCE
                                                           : core::parameter::DataUnit::DatasetType::NON_ALIGNED;
-    core::parameter::ParameterSet ret(uint8_t(id.start), uint8_t(id.start), dataType, core::AlphabetID::ACGTN,
+    core::parameter::ParameterSet ret(uint8_t(id.start), uint8_t(id.start), dataType, core::AlphabetId::kAcgtn,
                                       uint32_t(state.readLength), state.pairedEnd, false, qv_depth, 0, false, false);
     ret.getEncodingSet().addClass(core::record::ClassType::CLASS_U, std::move(qvparam));
 

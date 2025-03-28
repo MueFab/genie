@@ -29,7 +29,7 @@
 //#include "genie/read/lowlatency/encoder.h"
 #include "genie/util/stop_watch.h"
 
-// TODO(Fabian): For some reason, compilation on windows fails if we move this include further up. Investigate.
+// TODO(Fabian): For some reason, compilation on windows fails if we Move this include further up. Investigate.
 #include "filesystem/filesystem.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -126,9 +126,9 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //    }
 //    auto fai_file = genie::util::make_unique<std::ifstream>(fai);
 //    auto sha_file = genie::util::make_unique<std::ifstream>(sha);
-//    inputFiles.push_back(std::move(fasta_file));
-//    inputFiles.push_back(std::move(fai_file));
-//    inputFiles.push_back(std::move(sha_file));
+//    inputFiles.push_back(std::Move(fasta_file));
+//    inputFiles.push_back(std::Move(fai_file));
+//    inputFiles.push_back(std::Move(sha_file));
 //    flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
 //        **(inputFiles.rbegin() + 2), **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr(),
 //        fastaFile));
@@ -171,7 +171,7 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //    if (file_extension(pOpts.inputFile) == "fasta") {
 //        mode = genie::core::ClassifierRegroup::RefMode::FULL;
 //    }
-//    auto flow = genie::module::buildDefaultEncoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE, mode,
+//    auto flow = genie::module::BuildDefaultEncoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE, mode,
 //                                                   pOpts.rawReference, pOpts.rawStreams);
 //    if (file_extension(pOpts.inputFile) == "fasta") {
 //        addFasta(pOpts.inputFile, flow.get(), inputFiles);
@@ -211,15 +211,15 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //                                                     std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
 //                                                     std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
 //    constexpr size_t BLOCKSIZE = 128000;
-//    auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory,
+//    auto flow = genie::module::build_default_decoder(pOpts.numberOfThreads, pOpts.workingDirectory,
 //                                                   pOpts.combinePairsFlag, BLOCKSIZE);
 //
 //    std::string json_uri_path = pOpts.inputRefFile;
 //    if (ghc::filesystem::exists(pOpts.inputFile + ".json") && ghc::filesystem::file_size(pOpts.inputFile + ".json")) {
-//        genie::core::meta::Dataset data(nlohmann::json::parse(std::ifstream(pOpts.inputFile + ".json")));
-//        if (data.getReference()) {
+//        genie::core::meta::Dataset data_(nlohmann::json::parse(std::ifstream(pOpts.inputFile + ".json")));
+//        if (data_.getReference()) {
 //            std::string uri =
-//                dynamic_cast<const genie::core::meta::external_ref::Fasta&>(data.getReference()->getBase()).getURI();
+//                dynamic_cast<const genie::core::meta::external_ref::Fasta&>(data_.getReference()->getBase()).getURI();
 //            std::string scheme = "file://";
 //            UTILS_DIE_IF(uri.substr(0, scheme.length()) != scheme, "Unknown URI scheme: " + uri);
 //            std::string path = uri.substr(scheme.length());
@@ -251,9 +251,9 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //            }
 //            auto fai_file = genie::util::make_unique<std::ifstream>(fai);
 //            auto sha_file = genie::util::make_unique<std::ifstream>(sha);
-//            inputFiles.push_back(std::move(fasta_file));
-//            inputFiles.push_back(std::move(fai_file));
-//            inputFiles.push_back(std::move(sha_file));
+//            inputFiles.push_back(std::Move(fasta_file));
+//            inputFiles.push_back(std::Move(fai_file));
+//            inputFiles.push_back(std::Move(sha_file));
 //            flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
 //                **(inputFiles.rbegin() + 2), **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr(),
 //                json_uri_path));
@@ -306,8 +306,8 @@ int main(int argc, char* argv[]) {
 
 //    if (getOperation(pOpts.inputFile, pOpts.outputFile) == OperationCase::ENCODE) {
 //        std::ofstream jsonfile(pOpts.outputFile + ".json");
-//        auto jsonstring = flowGraph->getMeta().toJson().dump(4);
-//        jsonfile.write(jsonstring.data(), jsonstring.length());
+//        auto jsonstring = flowGraph->getMeta().ToJson().dump(4);
+//        jsonfile.Write(jsonstring.data_(), jsonstring.length());
 //    }
 
     // auto stats = flowGraph->getStats();

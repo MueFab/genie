@@ -12,15 +12,15 @@
 #include <memory>
 #include "boost/optional/optional.hpp"
 #include "genie/core/parameter/parameter_set.h"
-#include "genie/core/parameter/quality-values.h"
+#include "genie/core/parameter/quality_values.h"
 #include "genie/quality/paramqv1/parameter_set.h"
 #include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace paramqv1 {
+
+
+namespace genie::quality::paramqv1 {
 
 /**
  * @brief
@@ -58,13 +58,13 @@ class QualityValues1 : public core::parameter::QualityValues {
      * @brief
      * @param writer
      */
-    void write(util::BitWriter& writer) const override;
+    void Write(util::BitWriter& writer) const override;
 
     /**
      * @brief
      * @return
      */
-    std::unique_ptr<QualityValues> clone() const override;
+    [[nodiscard]] std::unique_ptr<QualityValues> Clone() const override;
 
     /**
      * @brief
@@ -92,27 +92,27 @@ class QualityValues1 : public core::parameter::QualityValues {
      * @brief
      * @return
      */
-    size_t getNumberCodeBooks() const;
+    [[nodiscard]] size_t getNumberCodeBooks() const;
 
     /**
      * @brief
      * @param id
      * @return
      */
-    const Codebook& getCodebook(size_t id) const;
+    [[nodiscard]] const Codebook& getCodebook(size_t id) const;
 
     /**
      * @brief
      * @return
      */
-    size_t getNumSubsequences() const override;
+    [[nodiscard]] size_t GetNumSubsequences() const override;
 
     /**
      * @brief
      * @param qv
      * @return
      */
-    bool equals(const QualityValues* qv) const override;
+    bool Equals(const QualityValues* qv) const override;
 
  private:
     boost::optional<ParameterSet> parameter_set_qvps;  //!< @brief
@@ -121,9 +121,9 @@ class QualityValues1 : public core::parameter::QualityValues {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramqv1
-}  // namespace quality
-}  // namespace genie
+} // namespace genie::quality::paramqv1
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 

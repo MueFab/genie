@@ -31,7 +31,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Comp
     core::record::annotation_parameter_set::AnnotationEncodingParameters& annotationEncodingpars) {
     const uint8_t ATCoordSize = 3;
     const bool AT_pos_40_bits_flag = false;
-    const core::AlphabetID AT_alphabet_ID = core::AlphabetID::ACGTN;
+    const core::AlphabetId AT_alphabet_ID = core::AlphabetId::kAcgtn;
     const uint8_t n_aux_attribute_groups = 0;
     const uint8_t parameter_set_ID = 1;
 

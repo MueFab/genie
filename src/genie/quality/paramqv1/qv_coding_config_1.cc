@@ -28,7 +28,7 @@ QualityValues1::QualityValues1(QvpsPresetId _qvps_preset_ID, bool _reverse_flag)
 
 QualityValues1::QualityValues1(genie::core::GenDesc desc, util::BitReader& reader) : QualityValues(MODE_QV1, false) {
     (void)desc;
-    assert(desc == genie::core::GenDesc::QV);
+    assert(desc == genie::core::GenDesc::kQv);
 
     auto qvps_flag = reader.read<bool>(1);
     if (qvps_flag) {
@@ -48,9 +48,9 @@ void QualityValues1::setQvps(ParameterSet&& _parameter_set_qvps) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void QualityValues1::write(util::BitWriter& writer) const {
-    writer.write(uint8_t(qv_coding_mode), 4);
-    writer.write(static_cast<bool>(parameter_set_qvps), 1);
+void QualityValues1::Write(util::BitWriter& writer) const {
+    writer.Write(uint8_t(qv_coding_mode), 4);
+    writer.Write(static_cast<bool>(parameter_set_qvps), 1);
     if (parameter_set_qvps) {
         parameter_set_qvps->write(writer);
     }

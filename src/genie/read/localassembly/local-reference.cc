@@ -11,7 +11,7 @@
 #include <limits>
 #include <map>
 #include "genie/core/constants.h"
-#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/core/record/alignment_split/same_rec.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ std::string LocalReference::preprocess(const std::string &read, const std::strin
         if (cigar_pos == '(' || cigar_pos == '[') {
             continue;
         }
-        if (getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar_pos) && count == 0) {
+        if (GetAlphabetProperties(core::AlphabetId::kAcgtn).IsIncluded(cigar_pos) && count == 0) {
             result += read[read_pos++];
             continue;
         }
@@ -103,25 +103,25 @@ void LocalReference::addSingleRead(const std::string &record, const std::string 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void LocalReference::addRead(const core::record::Record &s) {
-    const auto &seq1 = s.getSegments()[0].getSequence();
-    const auto &cigar1 = s.getAlignments().front().getAlignment().getECigar();
-    const auto pos1 = s.getAlignments().front().getPosition();
+    const auto &seq1 = s.GetSegments()[0].GetSequence();
+    const auto &cigar1 = s.GetAlignments().front().GetAlignment().GetECigar();
+    const auto pos1 = s.GetAlignments().front().GetPosition();
     addSingleRead(seq1, cigar1, pos1);
 
-    if (s.getSegments().size() == 1) {
+    if (s.GetSegments().size() == 1) {
         return;
     }
 
-    UTILS_DIE_IF(s.getAlignments().front().getAlignmentSplits().front()->getType() !=
-                     core::record::AlignmentSplit::Type::SAME_REC,
+    UTILS_DIE_IF(s.GetAlignments().front().GetAlignmentSplits().front()->GetType() !=
+                     core::record::AlignmentSplit::Type::kSameRec,
                  "Only same record split alignments supported");
 
-    const auto ptr = s.getAlignments().front().getAlignmentSplits().front().get();
+    const auto ptr = s.GetAlignments().front().GetAlignmentSplits().front().get();
     const auto &rec = dynamic_cast<const core::record::alignment_split::SameRec &>(*ptr);
 
-    const auto &seq2 = s.getSegments()[1].getSequence();
-    const auto &cigar2 = rec.getAlignment().getECigar();
-    const auto pos2 = s.getAlignments().front().getPosition() + rec.getDelta();
+    const auto &seq2 = s.GetSegments()[1].GetSequence();
+    const auto &cigar2 = rec.GetAlignment().GetECigar();
+    const auto pos2 = s.GetAlignments().front().GetPosition() + rec.getDelta();
     addSingleRead(seq2, cigar2, pos2);
 }
 
@@ -149,7 +149,7 @@ uint32_t LocalReference::lengthFromCigar(const std::string &cigar) {
         if (cigar_pos == '(' || cigar_pos == '[') {
             continue;
         }
-        if (getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar_pos) && count == 0) {
+        if (GetAlphabetProperties(core::AlphabetId::kAcgtn).IsIncluded(cigar_pos) && count == 0) {
             len += 1;
             continue;
         }
@@ -210,9 +210,9 @@ char LocalReference::majorityVote(uint32_t abs_position) {
             max_value = v.second;
             max = v.first;
         } else if (max_value == v.second) {
-            max = getAlphabetProperties(core::AlphabetID::ACGTN)
-                      .lut[std::min(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[max],
-                                    getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[v.first])];
+            max = GetAlphabetProperties(core::AlphabetId::kAcgtn)
+                      .lut[std::min(GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut[max],
+                                    GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut[v.first])];
         }
     }
 

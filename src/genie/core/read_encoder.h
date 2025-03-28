@@ -34,7 +34,7 @@ class ReadEncoder : public Module<record::Chunk, AccessUnit> {
     using NameSelector = util::SideSelector<NameEncoder, std::tuple<AccessUnit::Descriptor, core::stats::PerfStats>,
                                             const record::Chunk&>;  //!< @brief
     using EntropySelector =
-        util::SideSelector<EntropyEncoder, EntropyEncoder::EntropyCoded, AccessUnit::Descriptor&>;  //!< @brief
+        util::SideSelector<EntropyEncoder, EntropyEncoder::entropy_coded, AccessUnit::Descriptor&>;  //!< @brief
 
  protected:
     QvSelector* qvcoder{};            //!< @brief

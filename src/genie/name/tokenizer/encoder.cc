@@ -18,7 +18,7 @@ namespace tokenizer {
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Encoder::process(const core::record::Chunk& recs) {
     util::Watch watch;
     std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> ret =
-        std::make_tuple(core::AccessUnit::Descriptor(core::GenDesc::RNAME), core::stats::PerfStats());
+        std::make_tuple(core::AccessUnit::Descriptor(core::GenDesc::kReadName), core::stats::PerfStats());
     std::vector<SingleToken> old;
 
     for (const auto& r : recs.getData()) {

@@ -46,36 +46,36 @@ void Encoder::encodeFirstSegment(const core::record::Record &rec) {
         rec.getAlignments().front();  // TODO(Fabian): Multiple alignments. Currently only 1 supported
     const auto &RECORD = rec.getSegments()[0];  // First segment
 
-    container.push(core::GenSub::RTYPE, uint8_t(rec.getClassID()));
+    container.push(core::gen_sub::kRtype, uint8_t(rec.getClassID()));
 
     const auto POSITION = ALIGNMENT.getPosition() - pos;
     pos = ALIGNMENT.getPosition();
-    container.push(core::GenSub::POS_MAPPING_FIRST, POSITION);
+    container.push(core::gen_sub::kPositionFirst, POSITION);
 
     const auto LENGTH = RECORD.getSequence().length() - 1;
-    container.push(core::GenSub::RLEN, LENGTH);
+    container.push(core::gen_sub::kReadLength, LENGTH);
 
     const auto RCOMP = ALIGNMENT.getAlignment().getRComp();
-    container.push(core::GenSub::RCOMP, RCOMP);
+    container.push(core::gen_sub::kReverseComplement, RCOMP);
 
     const auto FLAG_PCR =
-        (rec.getFlags() & core::GenConst::FLAGS_PCR_DUPLICATE_MASK) >> core::GenConst::FLAGS_PCR_DUPLICATE_POS;
-    container.push(core::GenSub::FLAGS_PCR_DUPLICATE, FLAG_PCR);
+        (rec.getFlags() & core::gen_const::kFlagsPcrDuplicateMask) >> core::gen_const::kFlagsPcrDuplicatePos;
+    container.push(core::gen_sub::FlagsPcrDuplicate, FLAG_PCR);
     const auto FLAG_QUAL =
-        (rec.getFlags() & core::GenConst::FLAGS_QUALITY_FAIL_MASK) >> core::GenConst::FLAGS_QUALITY_FAIL_POS;
-    container.push(core::GenSub::FLAGS_QUALITY_FAIL, FLAG_QUAL);
+        (rec.getFlags() & core::gen_const::kFlagsQualityFailMask) >> core::gen_const::kFlagsQualityFailPos;
+    container.push(core::gen_sub::kFlagsQualityFail , FLAG_QUAL);
     const auto FLAG_PAIR =
-        (rec.getFlags() & core::GenConst::FLAGS_PROPER_PAIR_MASK) >> core::GenConst::FLAGS_PROPER_PAIR_POS;
-    container.push(core::GenSub::FLAGS_PROPER_PAIR, FLAG_PAIR);
+        (rec.getFlags() & core::gen_const::kFlagsProperPairMask) >> core::gen_const::kFlagsProperPairPos;
+    container.push(core::gen_sub::kFlagsProperPair , FLAG_PAIR);
 
     const auto MSCORE =
         ALIGNMENT.getAlignment().getMappingScores().empty()
             ? 255
             : ALIGNMENT.getAlignment().getMappingScores().front();  // TODO(Fabian): Multiple mapping scores
-    container.push(core::GenSub::MSCORE, MSCORE);
+    container.push(core::gen_sub::kMappingScore, MSCORE);
 
     // const auto RGROUP = 0;  // TODO(Fabian)
-    //  container.push(core::GenSub::RGROUP, RGROUP);
+    //  container.push(core::gen_sub::kReadGroup, RGROUP);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -94,20 +94,20 @@ const core::record::alignment_split::SameRec &Encoder::extractPairedAlignment(co
 
 void Encoder::encodeAdditionalSegment(size_t length, const core::record::alignment_split::SameRec &srec, bool first1) {
     const auto LENGTH = length - 1;
-    container.push(core::GenSub::RLEN, LENGTH);
+    container.push(core::gen_sub::kReadLength, LENGTH);
 
     const auto RCOMP = srec.getAlignment().getRComp();
-    container.push(core::GenSub::RCOMP, RCOMP);
+    container.push(core::gen_sub::kReverseComplement, RCOMP);
 
     // TODO(Fabian): MSCORE depth != 1
     const auto MSCORE = srec.getAlignment().getMappingScores().front();
-    container.push(core::GenSub::MSCORE, MSCORE);
+    container.push(core::gen_sub::kMappingScore, MSCORE);
 
-    container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_SAME_RECORD);
+    container.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairSameRecord);
 
     const auto DELTA = srec.getDelta();
     const auto SAME_REC_DATA = (DELTA << 1u) | uint32_t(!first1);  // FIRST1 is encoded in least significant bit
-    container.push(core::GenSub::PAIR_SAME_REC, SAME_REC_DATA);
+    container.push(core::gen_sub::kPairSameRec, SAME_REC_DATA);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -136,9 +136,9 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
         if (rec.getAlignments().front().getAlignmentSplits().front()->getType() ==
             core::record::AlignmentSplit::Type::UNPAIRED) {
             if (rec.isRead1First()) {
-                container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_UNPAIRED);
+                container.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairR1Unpaired);
             } else {
-                container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_UNPAIRED);
+                container.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairR2Unpaired );
             }
             // Other record
         } else {
@@ -146,21 +146,21 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
             auto split = *reinterpret_cast<const core::record::alignment_split::OtherRec *>(ALIGNMENT);
             if (rec.isRead1First()) {
                 if (split.getNextSeq() != rec.getAlignmentSharedData().getSeqID()) {
-                    container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_DIFF_REF);
-                    container.push(core::GenSub::PAIR_R2_DIFF_SEQ, split.getNextSeq());
-                    container.push(core::GenSub::PAIR_R2_DIFF_POS, split.getNextPos());
+                    container.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairR2DiffRef);
+                    container.push(core::gen_sub::kPairR2DiffSeq, split.getNextSeq());
+                    container.push(core::gen_sub::kPairR2DiffPos, split.getNextPos());
                 } else {
-                    container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_SPLIT);
-                    container.push(core::GenSub::PAIR_R2_SPLIT, split.getNextPos());
+                    container.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairR2Split);
+                    container.push(core::gen_sub::kPairR2Split, split.getNextPos());
                 }
             } else {
                 if (split.getNextSeq() != rec.getAlignmentSharedData().getSeqID()) {
-                    container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_DIFF_REF);
-                    container.push(core::GenSub::PAIR_R1_DIFF_SEQ, split.getNextSeq());
-                    container.push(core::GenSub::PAIR_R1_DIFF_POS, split.getNextPos());
+                    container.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairR1DiffRef);
+                    container.push(core::gen_sub::kPairR1DiffSeq, split.getNextSeq());
+                    container.push(core::gen_sub::kPairR1DiffPos, split.getNextPos());
                 } else {
-                    container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_SPLIT);
-                    container.push(core::GenSub::PAIR_R1_SPLIT, split.getNextPos());
+                    container.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairR1Split);
+                    container.push(core::gen_sub::kPairR1Split, split.getNextPos());
                 }
             }
         }
@@ -175,17 +175,17 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
 
 void Encoder::encodeInsertion(CodingState &state) {
     for (size_t i = 0; i < state.count; ++i) {
-        container.push(core::GenSub::MMPOS_TERMINATOR, core::GenConst::MMPOS_PERSIST);
+        container.push(core::gen_sub::kMismatchPosTerminator, core::gen_const::kMismatchPositionPersist);
 
         const auto POSITION = state.read_pos - state.lastMisMatch - state.clips.softClips[0].length();
         state.lastMisMatch = state.read_pos + 1 - state.clips.softClips[0].length();
-        container.push(core::GenSub::MMPOS_POSITION, POSITION);
+        container.push(core::gen_sub::kMismatchPosDelta, POSITION);
 
-        container.push(core::GenSub::MMTYPE_TYPE, core::GenConst::MMTYPE_INSERTION);
+        container.push(core::gen_sub::kMismatchType, core::gen_const::kMismatchTypeInsertion);
 
-        const auto SYMBOL = getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[state.read[state.read_pos]];
+        const auto SYMBOL = GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut[state.read[state.read_pos]];
         state.read_pos++;
-        container.push(core::GenSub::MMTYPE_INSERTION, SYMBOL);
+        container.push(core::gen_sub::kMismatchTypeInsert, SYMBOL);
     }
 }
 
@@ -193,12 +193,12 @@ void Encoder::encodeInsertion(CodingState &state) {
 
 void Encoder::encodeDeletion(CodingState &state) {
     for (size_t i = 0; i < state.count; ++i) {
-        container.push(core::GenSub::MMPOS_TERMINATOR, core::GenConst::MMPOS_PERSIST);
+        container.push(core::gen_sub::kMismatchPosTerminator, core::gen_const::kMismatchPositionPersist);
 
         const auto POSITION = state.read_pos - state.lastMisMatch - state.clips.softClips[0].length();
         state.lastMisMatch = state.read_pos - state.clips.softClips[0].length();
-        container.push(core::GenSub::MMPOS_POSITION, POSITION);
-        container.push(core::GenSub::MMTYPE_TYPE, core::GenConst::MMTYPE_DELETION);
+        container.push(core::gen_sub::kMismatchPosDelta, POSITION);
+        container.push(core::gen_sub::kMismatchType, core::gen_const::kMismatchTypeDeletion);
         state.ref_offset++;
     }
 }
@@ -215,7 +215,7 @@ void Encoder::encodeSoftClip(CodingState &state) {
             UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
         }
         state.clips.softClips[state.isRightClip] +=
-            getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[state.read[state.read_pos]];
+            GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut[state.read[state.read_pos]];
         state.read_pos++;
     }
 }
@@ -224,23 +224,23 @@ void Encoder::encodeSoftClip(CodingState &state) {
 
 void Encoder::encodeSubstitution(CodingState &state) {
     if (state.ref[state.ref_offset] == 0) {
-        const auto SYMBOL = getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[state.read[state.read_pos]];
-        container.push(core::GenSub::UREADS, SYMBOL);
+        const auto SYMBOL = GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut[state.read[state.read_pos]];
+        container.push(core::gen_sub::kUnalignedReads, SYMBOL);
         return;
     }
-    container.push(core::GenSub::MMPOS_TERMINATOR, core::GenConst::MMPOS_PERSIST);
+    container.push(core::gen_sub::kMismatchPosTerminator, core::gen_const::kMismatchPositionPersist);
 
     const auto POSITION = state.read_pos - state.lastMisMatch - state.clips.softClips[0].length();
     state.lastMisMatch = state.read_pos + 1 - state.clips.softClips[0].length();
-    container.push(core::GenSub::MMPOS_POSITION, POSITION);
+    container.push(core::gen_sub::kMismatchPosDelta, POSITION);
 
     if (state.type >= core::record::ClassType::CLASS_M) {
-        container.push(core::GenSub::MMTYPE_TYPE, core::GenConst::MMTYPE_SUBSTITUTION);
-        const auto SYMBOL = getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[state.read[state.read_pos]];
-        container.push(core::GenSub::MMTYPE_SUBSTITUTION, SYMBOL);
+        container.push(core::gen_sub::kMismatchType, core::gen_const::kMismatchTypeSubstitution);
+        const auto SYMBOL = GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut[state.read[state.read_pos]];
+        container.push(core::gen_sub::kMismatchTypeSubstBase, SYMBOL);
         container.pushDependency(
-            core::GenSub::MMTYPE_SUBSTITUTION,
-            getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[state.ref[state.ref_offset]]);
+            core::gen_sub::kMismatchTypeSubstBase,
+            GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut[state.ref[state.ref_offset]]);
     }
 }
 
@@ -275,7 +275,7 @@ bool Encoder::updateCount(char cigar_char, CodingState &state) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::encodeCigarToken(char cigar_char, CodingState &state) {
-    if (getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar_char)) {  // TODO(Fabian): other alphabets
+    if (GetAlphabetProperties(core::AlphabetId::kAcgtn).IsIncluded(cigar_char)) {  // TODO(Fabian): other alphabets
         const char AMBIGUOUS_CHAR = '-';  // Character used twice in ecigar (deletion + alphabet 2)
         if ((cigar_char == AMBIGUOUS_CHAR && state.count == 0) || cigar_char != AMBIGUOUS_CHAR) {
             state.count = std::max(state.count, size_t(1));
@@ -330,7 +330,7 @@ Encoder::ClipInformation Encoder::encodeCigar(const std::string &read, const std
     }
 
     if (type > core::record::ClassType::CLASS_P) {
-        container.push(core::GenSub::MMPOS_TERMINATOR, core::GenConst::MMPOS_TERMINATE);
+        container.push(core::gen_sub::kMismatchPosTerminator, core::gen_const::kMismatchPosTerminate);
     }
     return state.clips;
 }
@@ -356,17 +356,17 @@ bool Encoder::encodeSingleClip(const ClipInformation &inf, bool last) {
     for (size_t index = 0; index < inf.softClips.size(); ++index) {
         if (!inf.softClips[index].empty()) {
             const auto TYPE = (uint32_t(last) << 1u) | index;
-            container.push(core::GenSub::CLIPS_TYPE, TYPE);
+            container.push(core::gen_sub::kClipsType, TYPE);
             for (const auto &c : inf.softClips[index]) {
-                container.push(core::GenSub::CLIPS_SOFT_STRING, c);
+                container.push(core::gen_sub::kClipsSoftClip, c);
             }
             const auto TERMINATOR =
-                getAlphabetProperties(core::AlphabetID::ACGTN).lut.size();  // TODO(Fabian): other alphabets
-            container.push(core::GenSub::CLIPS_SOFT_STRING, TERMINATOR);
+                GetAlphabetProperties(core::AlphabetId::kAcgtn).lut.size();  // TODO(Fabian): other alphabets
+            container.push(core::gen_sub::kClipsSoftClip, TERMINATOR);
         } else if (inf.hardClips[index]) {
             const auto TYPE = 0x4u | (uint32_t(last) << 1u) | index;
-            container.push(core::GenSub::CLIPS_TYPE, TYPE);
-            container.push(core::GenSub::CLIPS_HARD_LENGTH, inf.hardClips[index]);
+            container.push(core::gen_sub::kClipsType, TYPE);
+            container.push(core::gen_sub::kClipsHardClip, inf.hardClips[index]);
         }
     }
 
@@ -380,8 +380,8 @@ void Encoder::encodeClips(const std::pair<ClipInformation, ClipInformation> &cli
     present = encodeSingleClip(clips.second, true) || present;
 
     if (present) {
-        container.push(core::GenSub::CLIPS_RECORD_ID, readCounter);
-        container.push(core::GenSub::CLIPS_TYPE, core::GenConst::CLIPS_RECORD_END);
+        container.push(core::gen_sub::kClipsRecordId, readCounter);
+        container.push(core::gen_sub::kClipsType, core::gen_const::kClipsRecordEnd);
     }
 
     readCounter += 1;  // TODO(Fabian): Check if this applies to unpaired situations

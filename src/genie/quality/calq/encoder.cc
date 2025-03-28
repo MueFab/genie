@@ -34,7 +34,7 @@ paramqv1::Codebook codebookFromVector(const std::vector<unsigned char>& vec) {
 
 core::GenSubIndex get_qv_steps(size_t i) {
     UTILS_DIE_IF(i > 7, "QV_STEPS index out of range");
-    return std::make_pair(core::GenDesc::QV, (uint16_t)i + 2);
+    return std::make_pair(core::GenDesc::kQv, (uint16_t)i + 2);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -123,10 +123,10 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
     param.setQvps(std::move(set));
 
     // setup descriptor and fill
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
+    desc.add(core::AccessUnit::Subsequence(1, core::gen_sub::kQvPresent));
 
     // QV_CODEBOOK
-    desc.add(core::AccessUnit::Subsequence(util::DataBlock(&output.quantizerIndices), core::GenSub::QV_CODEBOOK));
+    desc.add(core::AccessUnit::Subsequence(util::DataBlock(&output.quantizerIndices), core::gen_sub::kQvCodebook));
 
     // fill QV_STEPS_0-7
     for (size_t i = 0; i < output.stepindices.size(); ++i) {
@@ -166,9 +166,9 @@ void Encoder::encodeUnaligned(const core::record::Chunk& chunk, paramqv1::Qualit
     param.setQvps(std::move(set));
 
     // setup descriptor
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_CODEBOOK));
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_0));
+    desc.add(core::AccessUnit::Subsequence(1, core::gen_sub::kQvPresent));
+    desc.add(core::AccessUnit::Subsequence(1, core::gen_sub::kQvCodebook));
+    desc.add(core::AccessUnit::Subsequence(1, core::gen_sub::kQvSteps0));
 
     // encode values
     for (const auto& rec : chunk.getData()) {
@@ -183,7 +183,7 @@ void Encoder::encodeUnaligned(const core::record::Chunk& chunk, paramqv1::Qualit
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
     util::Watch watch;
     auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
-    core::AccessUnit::Descriptor desc(core::GenDesc::QV);
+    core::AccessUnit::Descriptor desc(core::GenDesc::kQv);
 
     const ClassType& classType = chunk.getData()[0].getClassID();
 

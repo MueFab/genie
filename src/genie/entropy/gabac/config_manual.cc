@@ -40,7 +40,7 @@ paramcabac::Subsequence GetEncoderConfigManual(const core::GenSubIndex& sub) {
   constexpr auto alpha_id = core::AlphabetId::kAcgtn;
   const uint64_t num_alpha_special =
       paramcabac::StateVars::GetNumAlphaSpecial(genie_subseq_id, alpha_id);
-  // const uint8_t symSize = (alphaID == core::AlphabetID::ACGTN) ? 3 : 5;
+  // const uint8_t symSize = (alphaID == core::AlphabetId::ACGTN) ? 3 : 5;
 
   auto trnsf_subseq_id =
       paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM;

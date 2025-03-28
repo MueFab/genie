@@ -39,9 +39,9 @@ Block::Block(size_t qv_count, util::BitReader &reader) : payload(core::AccessUni
            reader.read(8);
        } */
 
-    count = static_cast<uint8_t>(core::GenDesc(descriptor_ID) == core::GenDesc::QV
+    count = static_cast<uint8_t>(core::GenDesc(descriptor_ID) == core::GenDesc::kQv
                                      ? qv_count
-                                     : core::getDescriptor(core::GenDesc(descriptor_ID)).subseqs.size());
+                                     : core::GetDescriptor(core::GenDesc(descriptor_ID)).sub_seqs.size());
     // payload = core::AccessUnit::Descriptor(core::GenDesc(descriptor_ID), count, block_payload_size, reader);
     payload = core::Payload(reader, block_payload_size);
 

@@ -34,7 +34,7 @@ class DatasetParameterSet : public GenInfo {
     uint8_t parent_parameter_set_ID;                                 //!< @brief
     boost::optional<dataset_parameterset::UpdateInfo> param_update;  //!< @brief
     genie::core::parameter::EncodingSet params;                      //!< @brief
-    core::MPEGMinorVersion version;                                  //!< @brief
+    core::MpegMinorVersion version;                                  //!< @brief
 
  public:
     /**
@@ -59,7 +59,7 @@ class DatasetParameterSet : public GenInfo {
      * @param _version
      */
     DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _dataset_id, genie::core::parameter::ParameterSet set,
-                        core::MPEGMinorVersion _version);
+                        core::MpegMinorVersion _version);
 
     /**
      * @brief
@@ -78,7 +78,7 @@ class DatasetParameterSet : public GenInfo {
      */
     DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _dataset_id, uint8_t _parameter_set_ID,
                         uint8_t _parent_parameter_set_ID, genie::core::parameter::EncodingSet ps,
-                        core::MPEGMinorVersion _version);
+                        core::MpegMinorVersion _version);
 
     /**
      * @brief
@@ -86,7 +86,7 @@ class DatasetParameterSet : public GenInfo {
      * @param _version
      * @param parameters_update_flag
      */
-    DatasetParameterSet(genie::util::BitReader& reader, core::MPEGMinorVersion _version, bool parameters_update_flag);
+    DatasetParameterSet(genie::util::BitReader& reader, core::MpegMinorVersion _version, bool parameters_update_flag);
 
     /**
      * @brief

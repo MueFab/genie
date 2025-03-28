@@ -13,11 +13,11 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-util::IndustrialPark& GlobalCfg::getIndustrialPark() { return fpark; }
+util::IndustrialPark& GlobalCfg::GetIndustrialPark() { return fpark; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-GlobalCfg& GlobalCfg::getSingleton() {
+GlobalCfg& GlobalCfg::GetSingleton() {
     static GlobalCfg cfg;
     return cfg;
 }

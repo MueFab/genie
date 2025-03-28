@@ -29,7 +29,7 @@ bool DatasetParameterSet::operator==(const GenInfo& info) const {
 
 DatasetParameterSet::DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _dataset_id, uint8_t _parameter_set_ID,
                                          uint8_t _parent_parameter_set_ID, genie::core::parameter::EncodingSet ps,
-                                         core::MPEGMinorVersion _version)
+                                         core::MpegMinorVersion _version)
     : dataset_group_id(_dataset_group_id),
       dataset_id(_dataset_id),
       parameter_set_ID(_parameter_set_ID),
@@ -39,7 +39,7 @@ DatasetParameterSet::DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _da
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetParameterSet::DatasetParameterSet(genie::util::BitReader& reader, core::MPEGMinorVersion _version,
+DatasetParameterSet::DatasetParameterSet(genie::util::BitReader& reader, core::MpegMinorVersion _version,
                                          bool parameters_update_flag)
     : version(_version) {
     auto start_pos = reader.getPos() - 4;
@@ -48,7 +48,7 @@ DatasetParameterSet::DatasetParameterSet(genie::util::BitReader& reader, core::M
     dataset_id = reader.readBypassBE<uint16_t>();
     parameter_set_ID = reader.readBypassBE<uint8_t>();
     parent_parameter_set_ID = reader.readBypassBE<uint8_t>();
-    if (version != genie::core::MPEGMinorVersion::V1900 && parameters_update_flag) {
+    if (version != genie::core::MpegMinorVersion::kV1900 && parameters_update_flag) {
         param_update = dataset_parameterset::UpdateInfo(reader);
     }
     params = genie::core::parameter::EncodingSet(reader);
@@ -71,7 +71,7 @@ void DatasetParameterSet::box_write(genie::util::BitWriter& writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetParameterSet::addParameterUpdate(dataset_parameterset::UpdateInfo update) {
-    if (version != core::MPEGMinorVersion::V1900) {
+    if (version != core::MpegMinorVersion::kV1900) {
         param_update = std::move(update);
     }
 }
@@ -125,7 +125,7 @@ void DatasetParameterSet::patchID(uint8_t _groupID, uint16_t _setID) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetParameterSet::DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _dataset_id,
-                                         genie::core::parameter::ParameterSet set, core::MPEGMinorVersion _version)
+                                         genie::core::parameter::ParameterSet set, core::MpegMinorVersion _version)
     : DatasetParameterSet(_dataset_group_id, _dataset_id, set.getID(), set.getParentID(),
                           std::move(set.getEncodingSet()), _version) {}
 

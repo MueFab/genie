@@ -18,7 +18,7 @@ namespace qvwriteout {
 
 core::QVEncoder::QVCoded NoneEncoder::process(const core::record::Chunk&) {
     auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
-    core::AccessUnit::Descriptor desc(core::GenDesc::QV);
+    core::AccessUnit::Descriptor desc(core::GenDesc::kQv);
 
     return std::make_tuple(std::move(param), std::move(desc), core::stats::PerfStats());
 }

@@ -58,10 +58,10 @@ bool SpringSource::pump(uint64_t& id, std::mutex& lock) {
 
         for (auto& d : au) {
             std::string filename;
-            size_t count = core::getDescriptor(d.getID()).subseqs.size();
-            if (d.getID() == core::GenDesc::RNAME) {
+            size_t count = core::GetDescriptor(d.getID()).subseqs.size();
+            if (d.getID() == core::GenDesc::kReadName) {
                 filename = id_desc_prefix + std::to_string(auId);
-            } else if (d.getID() == core::GenDesc::QV) {
+            } else if (d.getID() == core::GenDesc::kQv) {
                 filename = quality_desc_prefix + std::to_string(auId);
                 count = au.getParameters().getQVConfig(core::record::ClassType::CLASS_U).getNumSubsequences();
             } else {

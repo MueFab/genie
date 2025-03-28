@@ -15,7 +15,7 @@
 #include "genie/util/runtime_exception.h"
 
 #include "genie/core/arrayType.h"
-#include "genie/core/record/variant_genotype/record.h"
+#include "genie/core/variant_genotype_record/record.h"
 
 // -----------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ VariantGenotype::VariantGenotype(
     uint64_t variant_index,
     uint32_t sample_index_from,
     uint32_t sample_count,
-    std::vector<format_field>&& format,
+    std::vector<FormatField>&& format,
     std::vector<std::vector<int8_t>>&& alleles,
     std::vector<std::vector<uint8_t>>&& phasings,
     std::vector<std::vector<uint32_t>>&& likelihoods,
@@ -199,7 +199,7 @@ uint32_t VariantGenotype::GetSampleCount() const { return sample_count_; }
 
 // -----------------------------------------------------------------------------
 
-const std::vector<format_field>& VariantGenotype::GetFormat() const { return format_; }
+const std::vector<FormatField>& VariantGenotype::GetFormat() const { return format_; }
 
 // -----------------------------------------------------------------------------
 
@@ -231,11 +231,11 @@ void VariantGenotype::SetSampleCount(uint32_t value) { sample_count_ = value; }
 
 // -----------------------------------------------------------------------------
 
-void VariantGenotype::SetFormat(std::vector<format_field> value) { format_ = std::move(value); }
+void VariantGenotype::SetFormat(std::vector<FormatField> value) { format_ = std::move(value); }
 
 // -----------------------------------------------------------------------------
 
-void VariantGenotype::SetFormat(std::vector<format_field>&& value) { format_ = std::move(value); }
+void VariantGenotype::SetFormat(std::vector<FormatField>&& value) { format_ = std::move(value); }
 
 // -----------------------------------------------------------------------------
 
@@ -306,13 +306,13 @@ bool VariantGenotype::GetLinkedRecord() const { return link_record_.has_value();
 // -----------------------------------------------------------------------------
 
 // Size calculation
-size_t VariantGenotype::GetSize() {
+size_t VariantGenotype::GetSize() const {
 //  size_t size = 0;
 //  size += sizeof(variant_index_);
 //  size += sizeof(sample_index_from_);
 //  size += sizeof(sample_count_);
 //
-//  size += format_.size() * sizeof(format_field);
+//  size += format_.size() * sizeof(FormatField);
 //
 //  for (const auto& allele_vector : alleles_) {
 //    size += allele_vector.size() * sizeof(int8_t);
@@ -337,17 +337,17 @@ size_t VariantGenotype::GetSize() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-format_field::format_field(util::BitReader& bitreader, uint32_t _sample_count) : sample_count(_sample_count) {
-    format.resize(bitreader.Read<uint8_t>());  // static_cast<uint8_t>(bitreader.ReadBits(8)));
-    for (char& c : format) c = static_cast<char>(bitreader.ReadBits(8));
-    type = static_cast<core::DataType>(bitreader.ReadBits(8));
+FormatField::FormatField(util::BitReader& bitreader, uint32_t _sample_count) : sample_count_(_sample_count) {
+    format_.resize(bitreader.Read<uint8_t>());  // static_cast<uint8_t>(bitreader.ReadBits(8)));
+    for (char& c : format_) c = static_cast<char>(bitreader.ReadBits(8));
+    type_ = static_cast<core::DataType>(bitreader.ReadBits(8));
     core::ArrayType arrayType;
 
-    arrayLength = bitreader.Read<uint8_t>();  // static_cast<uint8_t>(bitreader.ReadBits(8));
-    value.resize(sample_count, std::vector<std::vector<uint8_t>>(arrayLength, std::vector<uint8_t>(0)));
-    for (auto& formatArray : value) {
+    array_length_ = bitreader.Read<uint8_t>();  // static_cast<uint8_t>(bitreader.ReadBits(8));
+    value_.resize(sample_count_, std::vector<std::vector<uint8_t>>(array_length_, std::vector<uint8_t>(0)));
+    for (auto& formatArray : value_) {
         for (auto& oneValue : formatArray) {
-            oneValue = arrayType.toArray(type, bitreader);
+            oneValue = arrayType.toArray(type_, bitreader);
             //   oneValue = temp;
             //   for (auto i = temp.size(); i > 0; --i) oneValue.at(i - 1) = temp.at(temp.size() - i);
         }

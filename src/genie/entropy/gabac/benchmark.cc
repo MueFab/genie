@@ -443,7 +443,7 @@ ResultFull BenchmarkFull(const std::string& input_file,
                          const core::GenSubIndex& desc, float time_weight) {
   std::ifstream input_stream(input_file);
   UTILS_DIE_IF(!input_stream, "Cannot open file to read: " + input_file);
-  util::DataBlock sequence(0, core::Range2Bytes(GetSubsequence(desc).range));
+  util::DataBlock sequence(0, genie::core::Range2Bytes(GetSubsequence(desc).range));
   StreamHandler::ReadFull(input_stream, &sequence);
 
   ResultFull best_result;

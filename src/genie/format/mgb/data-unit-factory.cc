@@ -35,7 +35,7 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
     do {
         type = bitReader.read<core::parameter::DataUnit::DataUnitType>();
         size_t pos = bitReader.getPos();
-        if (!bitReader.isGood()) {
+        if (!bitReader.IsStreamGood()) {
             bitReader.clear();
             return boost::none;
         }

@@ -120,7 +120,7 @@ class TransformedSubSeq final {
 
   /**
    * @brief Retrieves the alphabet identifier used in the subsequence.
-   * @return The `core::AlphabetID` used in the subsequence.
+   * @return The `core::AlphabetId` used in the subsequence.
    */
   [[nodiscard]] core::AlphabetId GetAlphabetId() const;
 

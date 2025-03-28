@@ -34,7 +34,7 @@ namespace module {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir,
+std::unique_ptr<core::FlowGraphEncode> BuildDefaultEncoder(size_t threads, const std::string& working_dir,
                                                            size_t blocksize,
                                                            core::ClassifierRegroup::RefMode externalref, bool rawref,
                                                            bool writeRawStreams) {
@@ -89,7 +89,7 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const std::string& working_dir,
+std::unique_ptr<core::FlowGraphDecode> build_default_decoder(size_t threads, const std::string& working_dir,
                                                            bool combinePairsFlag, size_t) {
     std::unique_ptr<core::FlowGraphDecode> ret = genie::util::make_unique<core::FlowGraphDecode>(threads);
 
@@ -101,21 +101,21 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, combinePairsFlag, false));
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, combinePairsFlag, true));
     ret->setReadCoderSelector([](const genie::core::AccessUnit& au) -> size_t {
-        if (au.getParameters().isComputedReference()) {
-            switch (au.getParameters().getComputedRef().getAlgorithm()) {
-                case core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY:
-                    if (au.getParameters().getNumberTemplateSegments() >= 2) {
+        if (au.getParameters().IsComputedReference()) {
+            switch (au.getParameters().GetComputedRef().GetAlgorithm()) {
+                case core::parameter::ComputedRef::Algorithm::kGlobalAssembly:
+                    if (au.getParameters().GetNumberTemplateSegments() >= 2) {
                         return 4;
                     } else {
                         return 3;
                     }
                     break;
-                case core::parameter::ComputedRef::Algorithm::REF_TRANSFORM:
+                case core::parameter::ComputedRef::Algorithm::kRefTransform:
                     UTILS_DIE("Ref Transform decoding not supported");
                     break;
-                case core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY:
+                case core::parameter::ComputedRef::Algorithm::kLocalAssembly:
                     return 1;
-                case core::parameter::ComputedRef::Algorithm::PUSH_IN:
+                case core::parameter::ComputedRef::Algorithm::kPushIn:
                     UTILS_DIE("Push in decoding not supported");
                     break;
                 default:
@@ -134,7 +134,7 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
     ret->addQVCoder(genie::util::make_unique<genie::quality::calq::Decoder>());
     ret->setQVSelector([](const genie::core::parameter::QualityValues& param, const std::vector<std::string>&,
                           const std::vector<uint64_t>&, genie::core::AccessUnit::Descriptor&) -> size_t {
-        UTILS_DIE_IF(param.getMode() != 1, "Unsupported QV decoding mode");
+        UTILS_DIE_IF(param.GetMode() != 1, "Unsupported QV decoding mode");
         return 0;
     });
 
@@ -142,7 +142,7 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
     ret->setNameSelector([](const genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
 
     ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::Decoder>());
-    ret->setEntropyCoderSelector([](const genie::core::parameter::DescriptorSubseqCfg&,
+    ret->setEntropyCoderSelector([](const genie::core::parameter::DescriptorSubSequenceCfg&,
                                     genie::core::AccessUnit::Descriptor&, bool) -> size_t { return 0; });
 
     ret->setExporterSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
@@ -152,7 +152,7 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<core::FlowGraphConvert> buildDefaultConverter(size_t threads) {
+std::unique_ptr<core::FlowGraphConvert> build_default_converter(size_t threads) {
     std::unique_ptr<core::FlowGraphConvert> ret = genie::util::make_unique<core::FlowGraphConvert>(threads);
 
     ret->setExporterSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });

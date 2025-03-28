@@ -17,7 +17,7 @@ namespace encapsulator {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-EncapsulatedDataset::EncapsulatedDataset(const std::string& input_file, genie::core::MPEGMinorVersion version)
+EncapsulatedDataset::EncapsulatedDataset(const std::string& input_file, genie::core::MpegMinorVersion version)
     : reader(input_file), mgb_file(&reader) {
     if ((ghc::filesystem::exists(input_file + ".json") && ghc::filesystem::file_size(input_file + ".json"))) {
         std::ifstream in_file(input_file + ".json");
@@ -29,12 +29,12 @@ EncapsulatedDataset::EncapsulatedDataset(const std::string& input_file, genie::c
         for (uint8_t pos40 = 0; pos40 < 2; ++pos40) {
             for (uint8_t data_type = 0; data_type < uint8_t(genie::core::parameter::DataUnit::DatasetType::COUNT);
                  ++data_type) {
-                for (uint8_t alphabet_type = 0; alphabet_type < uint8_t(genie::core::AlphabetID::COUNT);
+                for (uint8_t alphabet_type = 0; alphabet_type < uint8_t(genie::core::AlphabetId::COUNT);
                      ++alphabet_type) {
                     auto param_ids =
                         mgb_file.collect_param_ids(static_cast<bool>(multiple_alignment), static_cast<bool>(pos40),
                                                    genie::core::parameter::DataUnit::DatasetType(data_type),
-                                                   genie::core::AlphabetID(alphabet_type));
+                                                   genie::core::AlphabetId(alphabet_type));
                     if (param_ids.empty()) {
                         continue;
                     }

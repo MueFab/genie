@@ -101,7 +101,7 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
     // annotation_parameter_set parameters
     uint8_t parameter_set_ID = 1;
     uint8_t AT_ID = 1;
-    genie::core::AlphabetID AT_alphabet_ID = genie::core::AlphabetID::ACGTN;
+    genie::core::AlphabetId AT_alphabet_ID = genie::core::AlphabetId::kAcgtn;
     uint8_t AT_coord_size = 3;
     bool AT_pos_40_bits_flag = false;
     uint8_t n_aux_attribute_groups = 0;

@@ -39,13 +39,13 @@ class GlobalCfg {
      * @brief Access the set of all active factories
      * @return Factories
      */
-    util::IndustrialPark& getIndustrialPark();
+    util::IndustrialPark& GetIndustrialPark();
 
     /**
      * @brief Access the global configuration
      * @return Global genie configuration
      */
-    static GlobalCfg& getSingleton();
+    static GlobalCfg& GetSingleton();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

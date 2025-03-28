@@ -316,7 +316,7 @@ uint64_t Record::GetLengthOfCigar(const std::string &cigar) {
       digits += c;
       continue;
     }
-    if (getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(c)) {
+    if (GetAlphabetProperties(core::AlphabetId::kAcgtn).IsIncluded(c)) {
       length++;
       digits.clear();
       continue;

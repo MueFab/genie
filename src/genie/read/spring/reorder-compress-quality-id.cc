@@ -206,7 +206,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
                     continue;
                 }
                 std::ofstream out_file_stream("rawstream_" + std::to_string(block_num) + "_" +
-                                              std::to_string(static_cast<uint8_t>(genie::core::GenDesc::RNAME)) + "_" +
+                                              std::to_string(static_cast<uint8_t>(genie::core::GenDesc::kReadName)) + "_" +
                                               std::to_string(static_cast<uint8_t>(i)));
                 out_file_stream.write(static_cast<char *>(std::get<0>(raw_desc).get(i).getData().getData()),
                                       std::get<0>(raw_desc).get(i).getData().getRawSize());
@@ -215,7 +215,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
         auto encoded = entropy->process(std::get<0>(raw_desc));
         stat_vec[block_num].add(std::get<2>(encoded));
         std::string name = file_name + "." + std::to_string(block_num);
-        params[block_num].setDescriptor(core::GenDesc::RNAME, std::move(std::get<0>(encoded)));
+        params[block_num].setDescriptor(core::GenDesc::kReadName, std::move(std::get<0>(encoded)));
         std::string file_to_save_streams = id_desc_prefix + std::to_string(block_num);
         std::ofstream outfile(file_to_save_streams, std::ios::binary);
         util::BitWriter bw(&outfile);
@@ -290,7 +290,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
                         continue;
                     }
                     std::ofstream out_file_stream("rawstream_" + std::to_string(block_num) + "_" +
-                                                  std::to_string(static_cast<uint8_t>(genie::core::GenDesc::QV)) + "_" +
+                                                  std::to_string(static_cast<uint8_t>(genie::core::GenDesc::kQv)) + "_" +
                                                   std::to_string(static_cast<uint8_t>(i)));
                     out_file_stream.write(static_cast<char *>(std::get<1>(raw_desc).get(i).getData().getData()),
                                           std::get<1>(raw_desc).get(i).getData().getRawSize());
@@ -300,7 +300,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
             auto encoded = entropy->process(std::get<1>(raw_desc));
             stat_vec[block_num - start_block_num].add(std::get<2>(encoded));
             params[block_num].addClass(core::record::ClassType::CLASS_U, std::move(std::get<0>(raw_desc)));
-            params[block_num].setDescriptor(core::GenDesc::QV, std::move(std::get<0>(encoded)));
+            params[block_num].setDescriptor(core::GenDesc::kQv, std::move(std::get<0>(encoded)));
             std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num);
             std::ofstream out(file_to_save_streams, std::ios::binary);
             util::BitWriter bw(&out);
@@ -396,7 +396,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                         }
                         std::ofstream out_file_stream(
                             "rawstream_" + std::to_string(block_num_offset + block_num) + "_" +
-                            std::to_string(static_cast<uint8_t>(genie::core::GenDesc::RNAME)) + "_" +
+                            std::to_string(static_cast<uint8_t>(genie::core::GenDesc::kReadName)) + "_" +
                             std::to_string(static_cast<uint8_t>(i)));
                         out_file_stream.write(static_cast<char *>(std::get<0>(name_raw).get(i).getData().getData()),
                                               std::get<0>(name_raw).get(i).getData().getRawSize());
@@ -405,7 +405,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
 
                 auto encoded = entropy->process(std::get<0>(name_raw));
                 stat_vec[block_num].add(std::get<2>(encoded));
-                params[block_num_offset + block_num].setDescriptor(core::GenDesc::RNAME,
+                params[block_num_offset + block_num].setDescriptor(core::GenDesc::kReadName,
                                                                    std::move(std::get<0>(encoded)));
                 std::string file_to_save_streams = id_desc_prefix + std::to_string(block_num_offset + block_num);
                 std::ofstream out(file_to_save_streams, std::ios::binary);
@@ -430,7 +430,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                         }
                         std::ofstream out_file_stream("rawstream_" + std::to_string(block_num_offset + block_num) +
                                                       "_" +
-                                                      std::to_string(static_cast<uint8_t>(genie::core::GenDesc::QV)) +
+                                                      std::to_string(static_cast<uint8_t>(genie::core::GenDesc::kQv)) +
                                                       "_" + std::to_string(static_cast<uint8_t>(i)));
                         out_file_stream.write(static_cast<char *>(std::get<1>(qv_str).get(i).getData().getData()),
                                               std::get<1>(qv_str).get(i).getData().getRawSize());
@@ -441,7 +441,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 stat_vec[block_num].add(std::get<2>(encoded));
                 params[block_num_offset + block_num].addClass(core::record::ClassType::CLASS_U,
                                                               std::move(std::get<0>(qv_str)));
-                params[block_num_offset + block_num].setDescriptor(core::GenDesc::QV, std::move(std::get<0>(encoded)));
+                params[block_num_offset + block_num].setDescriptor(core::GenDesc::kQv, std::move(std::get<0>(encoded)));
                 std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num_offset + block_num);
                 std::ofstream out(file_to_save_streams, std::ios::binary);
                 util::BitWriter bw(&out);
