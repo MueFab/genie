@@ -14,6 +14,7 @@ set(source_files
         stringview.cc
         thread_manager.cc
         stop_watch.cc
+        literal.h
         log.cc
         )
 

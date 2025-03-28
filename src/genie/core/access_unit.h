@@ -35,10 +35,10 @@ class AccessUnit {
      */
     class Subsequence {
      private:
-        util::DataBlock data;  //!< @brief
-        size_t position{};     //!< @brief
+        util::DataBlock data_;  //!< @brief
+        size_t position_{};     //!< @brief
 
-        GenSubIndex id;       //!< @brief
+        GenSubIndex id_;       //!< @brief
         size_t numSymbols{};  //!< @brief
 
         util::DataBlock dependency;                  //!< @brief
@@ -75,13 +75,13 @@ class AccessUnit {
          * @brief
          * @return
          */
-        util::DataBlock* getDependency();
+        util::DataBlock* GetDependency();
 
         /**
          * @brief
          * @param mm
          */
-        core::AccessUnit::Subsequence attachMismatchDecoder(std::unique_ptr<MismatchDecoder> mm);
+        core::AccessUnit::Subsequence AttachMismatchDecoder(std::unique_ptr<MismatchDecoder> mm);
 
         /**
          * @brief
@@ -135,13 +135,13 @@ class AccessUnit {
         /**
          * @brief
          */
-        util::DataBlock&& move();
+        util::DataBlock&& Move();
 
         /**
          * @brief
          * @return
          */
-        GenSubIndex getID() const;
+        GenSubIndex GetId() const;
 
         /**
          * @brief
@@ -153,31 +153,31 @@ class AccessUnit {
          * @brief
          * @return
          */
-        size_t getNumSymbols() const;
+        size_t GetNumSymbols() const;
 
         /**
          * @brief
          * @param num
          */
-        void annotateNumSymbols(size_t num);
+        void AnnotateNumSymbols(size_t num);
 
         /**
          * @brief
          * @return
          */
-        bool isEmpty() const;
+        bool IsEmpty() const;
 
         /**
          * @brief
          * @return
          */
-        size_t getRawSize() const;
+        size_t GetRawSize() const;
 
         /**
          * @brief
          * @param writer
          */
-        void write(util::BitWriter& writer) const;
+        void Write(util::BitWriter& writer) const;
 
         /**
          * @brief
@@ -204,7 +204,7 @@ class AccessUnit {
          * @brief
          * @param dat
          */
-        void set(util::DataBlock&& dat);
+        void Set(util::DataBlock&& dat);
 
         /**
          * @brief
@@ -233,14 +233,14 @@ class AccessUnit {
          * @param sub
          * @return
          */
-        Subsequence& get(uint16_t sub);
+        Subsequence& Get(uint16_t sub);
 
         /**
          * @brief
          * @param sub
          * @return
          */
-        const Subsequence& get(uint16_t sub) const;
+        const Subsequence& Get(uint16_t sub) const;
 
         /**
          * @brief
@@ -254,20 +254,20 @@ class AccessUnit {
          * @brief
          * @return
          */
-        GenDesc getID() const;
+        GenDesc GetId() const;
 
         /**
          * @brief
          * @param sub
          */
-        void add(Subsequence&& sub);
+        void Add(Subsequence&& sub);
 
         /**
          * @brief
          * @param _id
          * @param sub
          */
-        void set(uint16_t _id, Subsequence&& sub);
+        void Set(uint16_t _id, Subsequence&& sub);
 
         /**
          * @brief
@@ -303,7 +303,7 @@ class AccessUnit {
          * @brief
          * @return
          */
-        size_t getSize() const;
+        size_t GetSize() const;
 
         /**
          * @brief
@@ -371,14 +371,14 @@ class AccessUnit {
      * @param sub
      * @param data
      */
-    void set(GenSubIndex sub, Subsequence&& data);
+    void Set(GenSubIndex sub, Subsequence&& data);
 
     /**
      * @brief
      * @param sub
      * @param data
      */
-    void set(GenDesc sub, Descriptor&& data);
+    void Set(GenDesc sub, Descriptor&& data);
 
     /**
      * @brief
