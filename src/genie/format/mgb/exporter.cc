@@ -71,7 +71,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
                                                      : core::parameter::DataUnit::DatasetType::NON_ALIGNED);
 
     mgb::AccessUnit au((uint32_t)id_ctr, parameter_id, data.getClassType(), (uint32_t)data.getNumReads(), datasetType,
-                       32, false, core::AlphabetID::ACGTN);
+                       32, false, core::AlphabetId::kAcgtn);
     if (data.isReferenceOnly()) {
         au.getHeader().setRefCfg(RefCfg(data.getReference(), data.getReferenceExcerpt().getGlobalStart(),
                                         data.getReferenceExcerpt().getGlobalEnd() - 1, 32));

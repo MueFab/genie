@@ -34,14 +34,14 @@ const std::vector<uint64_t>& UnalignedAUIndex::getBlockOffsets() const { return 
 UnalignedAUIndex::UnalignedAUIndex(util::BitReader& reader, uint8_t _byte_offset_size, uint8_t _position_size,
                                    core::parameter::DataUnit::DatasetType dataset_type, bool signature_flag,
                                    bool signature_const_flag, uint8_t _signature_size, bool block_header_flag,
-                                   const std::vector<genie::core::GenDesc>& descriptors, core::AlphabetID alphabet)
+                                   const std::vector<genie::core::GenDesc>& descriptors, core::AlphabetId alphabet)
     : byte_offset_size(_byte_offset_size), position_size(_position_size), signature_size(_signature_size) {
     au_byte_offset = reader.read<uint64_t>(byte_offset_size);
     if (dataset_type == core::parameter::DataUnit::DatasetType::REFERENCE) {
         ref_cfg = genie::format::mgb::RefCfg(position_size, reader);
     } else if (signature_flag) {
         sig_cfg = genie::format::mgb::SignatureCfg(reader, signature_const_flag ? signature_size : 0,
-                                                   core::getAlphabetProperties(alphabet).base_bits);
+                                                   core::GetAlphabetProperties(alphabet).base_bits);
         reader.flush();
     }
     if (!block_header_flag) {

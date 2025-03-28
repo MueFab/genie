@@ -27,8 +27,8 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
     core::AccessUnit data = std::move(t);
     data = entropyCodeAU(std::move(data), true);
     const auto& qvparam = data.getParameters().getQVConfig(data.getClassType());
-    auto qvStream = std::move(data.get(core::GenDesc::QV));
-    auto names = namecoder->process(data.get(core::GenDesc::RNAME));
+    auto qvStream = std::move(data.get(core::GenDesc::kQv));
+    auto names = namecoder->process(data.get(core::GenDesc::kReadName));
     data.getStats().addDouble("time-name", watch.check());
     watch.reset();
     std::vector<std::string> ecigars;
@@ -43,13 +43,13 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
 
         size_t num_segments = 1;
         if (data.getParameters().getNumberTemplateSegments() > 1) {
-            auto decoding_case = data.pull(core::GenSub::PAIR_DECODING_CASE);
-            if (decoding_case == core::GenConst::PAIR_SAME_RECORD) {
+            auto decoding_case = data.pull(core::gen_sub::kPairDecodingCase);
+            if (decoding_case == core::gen_const::kPairSameRecord) {
                 num_segments = 2;
-            } else if (decoding_case == core::GenConst::PAIR_R1_UNPAIRED) {
-                rec.setRead1First(true);
+            } else if (decoding_case == core::gen_const::kPairR1Unpaired) {
+                rec.SetRead1First(true);
             } else {
-                rec.setRead1First(false);
+                rec.SetRead1First(false);
             }
         }
 
@@ -58,16 +58,16 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
             ecigars.emplace_back(length, '+');
             positions.emplace_back(std::numeric_limits<uint64_t>::max());
             if (!length) {
-                length = data.pull(core::GenSub::RLEN) + 1;
+                length = data.pull(core::gen_sub::kReadLength) + 1;
             }
             std::string seq(length, '\0');
             for (auto& c : seq) {
-                c = core::getAlphabetProperties(core::AlphabetID::ACGTN).lut[data.pull(core::GenSub::UREADS)];
+                c = core::GetAlphabetProperties(core::AlphabetId::kAcgtn).lut[data.pull(core::gen_sub::kUnalignedReads)];
             }
 
             core::record::Segment seg(std::move(seq));
             //     seg.addQualities(qvdecoder->process(data.getParameters().getQVConfig(core::record::ClassType::CLASS_U),
-            //                                        std::to_string(length) + "+", data.get(core::GenDesc::QV)));
+            //                                        std::to_string(length) + "+", data.get(core::GenDesc::kQv)));
             rec.addSegment(std::move(seg));
         }
 

@@ -39,7 +39,7 @@ class ReadDecoder : public Module<AccessUnit, record::Chunk> {
                                             AccessUnit::Descriptor&>;  //!< @brief
     using EntropySelector =
         util::SideSelector<EntropyDecoder, std::tuple<AccessUnit::Descriptor, core::stats::PerfStats>,
-                           const parameter::DescriptorSubseqCfg&, AccessUnit::Descriptor&, bool>;  //!< @brief
+                           const parameter::DescriptorSubSequenceCfg&, AccessUnit::Descriptor&, bool>;  //!< @brief
 
  protected:
     QvSelector* qvcoder{};            //!< @brief

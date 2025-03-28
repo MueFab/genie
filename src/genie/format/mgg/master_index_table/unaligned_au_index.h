@@ -67,7 +67,7 @@ class UnalignedAUIndex {
     explicit UnalignedAUIndex(util::BitReader& reader, uint8_t _byte_offset_size, uint8_t _position_size,
                               core::parameter::DataUnit::DatasetType dataset_type, bool signature_flag,
                               bool signature_const_flag, uint8_t _signature_size, bool block_header_flag,
-                              const std::vector<genie::core::GenDesc>& descriptors, core::AlphabetID alphabet);
+                              const std::vector<genie::core::GenDesc>& descriptors, core::AlphabetId alphabet);
 
     /**
      * @brief

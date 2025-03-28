@@ -49,13 +49,13 @@ struct EncapsulatedDatasetGroup {
      * @brief
      * @param version
      */
-    void mergeMetadata(genie::core::MPEGMinorVersion version);
+    void mergeMetadata(genie::core::MpegMinorVersion version);
 
     /**
      * @brief
      * @param version
      */
-    void mergeReferences(genie::core::MPEGMinorVersion version);
+    void mergeReferences(genie::core::MpegMinorVersion version);
 
     /**
      * @brief
@@ -67,14 +67,14 @@ struct EncapsulatedDatasetGroup {
      * @param input_files
      * @param version
      */
-    EncapsulatedDatasetGroup(const std::vector<std::string>& input_files, genie::core::MPEGMinorVersion version);
+    EncapsulatedDatasetGroup(const std::vector<std::string>& input_files, genie::core::MpegMinorVersion version);
 
     /**
      * @brief
      * @param version
      * @return
      */
-    genie::format::mgg::DatasetGroup assemble(genie::core::MPEGMinorVersion version);
+    genie::format::mgg::DatasetGroup assemble(genie::core::MpegMinorVersion version);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -27,7 +27,7 @@ class UpdateInfo {
  private:
     bool multiple_alignment_flag;             //!< @brief
     bool pos_40_bits_flag;                    //!< @brief
-    core::AlphabetID alphabetId;              //!< @brief
+    core::AlphabetId alphabetId;              //!< @brief
     boost::optional<USignature> u_signature;  //!< @brief
 
  public:
@@ -44,7 +44,7 @@ class UpdateInfo {
      * @param _pos_40_bits_flag
      * @param _alphabetId
      */
-    UpdateInfo(bool _multiple_alignment_flag, bool _pos_40_bits_flag, core::AlphabetID _alphabetId);
+    UpdateInfo(bool _multiple_alignment_flag, bool _pos_40_bits_flag, core::AlphabetId _alphabetId);
 
     /**
      * @brief
@@ -80,7 +80,7 @@ class UpdateInfo {
      * @brief
      * @return
      */
-    core::AlphabetID getAlphabetID() const;
+    core::AlphabetId getAlphabetID() const;
 
     /**
      * @brief

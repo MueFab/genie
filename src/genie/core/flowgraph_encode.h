@@ -47,7 +47,7 @@ class FlowGraphEncode : public FlowGraph {
     genie::core::ReadEncoder::NameSelector nameSelector;                //!< @brief
 
     std::vector<std::unique_ptr<genie::core::EntropyEncoder>> entropyCoders;  //!< @brief
-    genie::util::SideSelector<genie::core::EntropyEncoder, genie::core::EntropyEncoder::EntropyCoded,
+    genie::util::SideSelector<genie::core::EntropyEncoder, genie::core::EntropyEncoder::entropy_coded,
                               genie::core::AccessUnit::Descriptor&>
         entropySelector;  //!< @brief
 

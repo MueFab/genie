@@ -59,7 +59,7 @@ class RawReference : public core::parameter::DataUnit {
      * @brief
      * @param writer
      */
-    void write(util::BitWriter& writer) const override;
+    void Write(util::BitWriter& writer) const override;
 
     /**
      * @brief

@@ -40,14 +40,14 @@ struct EncapsulatedFile {
      * @param input_files
      * @param version
      */
-    EncapsulatedFile(const std::vector<std::string>& input_files, genie::core::MPEGMinorVersion version);
+    EncapsulatedFile(const std::vector<std::string>& input_files, genie::core::MpegMinorVersion version);
 
     /**
      * @brief
      * @param version
      * @return
      */
-    genie::format::mgg::MggFile assemble(genie::core::MPEGMinorVersion version);
+    genie::format::mgg::MggFile assemble(genie::core::MpegMinorVersion version);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

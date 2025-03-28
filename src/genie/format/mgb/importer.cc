@@ -50,7 +50,7 @@ bool Importer::Pump(uint64_t& id, std::mutex&) {
 
 std::string Importer::getRef(bool raw, size_t f_pos, size_t start, size_t end) {
     AccessUnit au(0, 0, core::record::ClassType::NONE, 0, core::parameter::DataUnit::DatasetType::REFERENCE, 0, false,
-                  core::AlphabetID::ACGTN);
+                  core::AlphabetId::kAcgtn);
     std::string ret;
     {
         std::lock_guard<std::mutex> f_lock(this->lock);

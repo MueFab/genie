@@ -22,7 +22,7 @@ bool UpdateInfo::operator==(const UpdateInfo& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-UpdateInfo::UpdateInfo(bool _multiple_alignment_flag, bool _pos_40_bits_flag, core::AlphabetID _alphabetId)
+UpdateInfo::UpdateInfo(bool _multiple_alignment_flag, bool _pos_40_bits_flag, core::AlphabetId _alphabetId)
     : multiple_alignment_flag(_multiple_alignment_flag), pos_40_bits_flag(_pos_40_bits_flag), alphabetId(_alphabetId) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ UpdateInfo::UpdateInfo(bool _multiple_alignment_flag, bool _pos_40_bits_flag, co
 UpdateInfo::UpdateInfo(genie::util::BitReader& reader) {
     multiple_alignment_flag = reader.read<bool>(1);
     pos_40_bits_flag = reader.read<bool>(1);
-    alphabetId = reader.read<core::AlphabetID>(8);
+    alphabetId = reader.read<core::AlphabetId>(8);
     if (reader.read<bool>(1)) {
         u_signature = USignature(reader);
     }
@@ -64,7 +64,7 @@ bool UpdateInfo::getPos40BitsFlag() const { return pos_40_bits_flag; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AlphabetID UpdateInfo::getAlphabetID() const { return alphabetId; }
+core::AlphabetId UpdateInfo::getAlphabetID() const { return alphabetId; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -55,7 +55,7 @@ class AccessUnit : public core::parameter::DataUnit {
      * @brief
      * @param writer
      */
-    void write(util::BitWriter &writer) const override;
+    void Write(util::BitWriter &writer) const override;
 
     /**
      * @brief
@@ -70,7 +70,7 @@ class AccessUnit : public core::parameter::DataUnit {
      */
     AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
                uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, bool signatureFlag,
-               core::AlphabetID alphabet);
+               core::AlphabetId alphabet);
 
     /**
      * @brief
@@ -100,7 +100,7 @@ class AccessUnit : public core::parameter::DataUnit {
      * @brief
      * @param output
      */
-    void print_debug(std::ostream &output, uint8_t, uint8_t) const override;
+    void PrintDebug(std::ostream &output, uint8_t, uint8_t) const override;
 
     /**
      * @brief

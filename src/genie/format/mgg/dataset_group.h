@@ -41,7 +41,7 @@ class DatasetGroup : public GenInfo {
     boost::optional<DatasetGroupProtection> protection;  //!< @brief
     std::vector<Dataset> dataset;                        //!< @brief
 
-    core::MPEGMinorVersion version;  //!< @brief
+    core::MpegMinorVersion version;  //!< @brief
 
  public:
     /**
@@ -99,7 +99,7 @@ class DatasetGroup : public GenInfo {
      * @param reader
      * @param _version
      */
-    explicit DatasetGroup(util::BitReader& reader, core::MPEGMinorVersion _version);
+    explicit DatasetGroup(util::BitReader& reader, core::MpegMinorVersion _version);
 
     /**
      * @brief
@@ -107,7 +107,7 @@ class DatasetGroup : public GenInfo {
      * @param _version
      * @param _mpeg_version
      */
-    DatasetGroup(uint8_t _ID, uint8_t _version, core::MPEGMinorVersion _mpeg_version);
+    DatasetGroup(uint8_t _ID, uint8_t _version, core::MpegMinorVersion _mpeg_version);
 
     /**
      * @brief

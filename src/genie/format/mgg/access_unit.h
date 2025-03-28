@@ -37,7 +37,7 @@ class AccessUnit : public GenInfo {
     boost::optional<AUProtection> au_protection;    //!< @brief
     std::vector<Block> blocks;                      //!< @brief
 
-    core::MPEGMinorVersion version;  //!< @brief
+    core::MpegMinorVersion version;  //!< @brief
 
  public:
     /**
@@ -72,7 +72,7 @@ class AccessUnit : public GenInfo {
      * @param mit
      * @param _version
      */
-    AccessUnit(format::mgb::AccessUnit au, bool mit, core::MPEGMinorVersion _version);
+    AccessUnit(format::mgb::AccessUnit au, bool mit, core::MpegMinorVersion _version);
 
     /**
      * @brief
@@ -86,7 +86,7 @@ class AccessUnit : public GenInfo {
      * @param h
      * @param version
      */
-    explicit AccessUnit(AccessUnitHeader h, core::MPEGMinorVersion version);
+    explicit AccessUnit(AccessUnitHeader h, core::MpegMinorVersion version);
 
     /**
      * @brief
@@ -97,7 +97,7 @@ class AccessUnit : public GenInfo {
      * @param version
      */
     AccessUnit(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet>& parameterSets, bool mit,
-               bool block_header, core::MPEGMinorVersion version);
+               bool block_header, core::MpegMinorVersion version);
 
     /**
      * @brief

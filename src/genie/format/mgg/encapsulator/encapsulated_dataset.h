@@ -38,7 +38,7 @@ struct EncapsulatedDataset {
      * @param input_file
      * @param version
      */
-    explicit EncapsulatedDataset(const std::string& input_file, genie::core::MPEGMinorVersion version);
+    explicit EncapsulatedDataset(const std::string& input_file, genie::core::MpegMinorVersion version);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

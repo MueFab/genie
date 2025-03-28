@@ -25,7 +25,7 @@ namespace reference {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<Location> Location::factory(genie::util::BitReader& reader, size_t seq_count,
-                                            genie::core::MPEGMinorVersion _version) {
+                                            genie::core::MpegMinorVersion _version) {
     auto _reserved = reader.read<uint8_t>(7);
     bool _external_ref_flag = reader.read<bool>(1);
     if (!_external_ref_flag) {
@@ -38,7 +38,7 @@ std::unique_ptr<Location> Location::factory(genie::util::BitReader& reader, size
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<Location> Location::referenceLocationFactory(std::unique_ptr<genie::core::meta::RefBase> base,
-                                                             genie::core::MPEGMinorVersion _version) {
+                                                             genie::core::MpegMinorVersion _version) {
     if (dynamic_cast<genie::core::meta::external_ref::MPEG*>(base.get()) != nullptr) {
         auto ref = dynamic_cast<genie::core::meta::external_ref::MPEG*>(base.get());
         auto ret = genie::util::make_unique<location::external::MPEG>(

@@ -28,7 +28,7 @@ bool DatasetGroup::operator==(const GenInfo& info) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroup::DatasetGroup(util::BitReader& reader, core::MPEGMinorVersion _version) : version(_version) {
+DatasetGroup::DatasetGroup(util::BitReader& reader, core::MpegMinorVersion _version) : version(_version) {
     auto start_pos = reader.getPos() - 4;
     auto length = reader.readBypassBE<uint64_t>();
     auto end_pos = start_pos + static_cast<int64_t>(length);
@@ -43,7 +43,7 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, core::MPEGMinorVersion _vers
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroup::DatasetGroup(uint8_t _ID, uint8_t _version, core::MPEGMinorVersion _mpeg_version)
+DatasetGroup::DatasetGroup(uint8_t _ID, uint8_t _version, core::MpegMinorVersion _mpeg_version)
     : header(DatasetGroupHeader(_ID, _version)), version(_mpeg_version) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

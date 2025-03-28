@@ -25,12 +25,12 @@ void Encoder::setUpParameters(const core::record::Chunk& rec, paramqv1::QualityV
     auto codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
     set.addCodeBook(std::move(codebook));
 
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_CODEBOOK));
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_0));
+    desc.add(core::AccessUnit::Subsequence(1, core::gen_sub::kQvPresent));
+    desc.add(core::AccessUnit::Subsequence(1, core::gen_sub::kQvCodebook));
+    desc.add(core::AccessUnit::Subsequence(1, core::gen_sub::kQvSteps0));
     if (rec.getData().front().getClassID() == core::record::ClassType::CLASS_I ||
         rec.getData().front().getClassID() == core::record::ClassType::CLASS_HM) {
-        desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_1));
+        desc.add(core::AccessUnit::Subsequence(1, core::gen_sub::kQvSteps1));
 
         codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
         set.addCodeBook(std::move(codebook));
@@ -49,7 +49,7 @@ void Encoder::encodeAlignedSegment(const core::record::Segment& s, const std::st
             [&desc, &q](uint8_t cigar, const util::StringView& bs, const util::StringView&) -> bool {
                 auto qvs = bs.deploy(q.data());
                 uint8_t codebook = core::getECigarInfo().lut_step_ref[cigar] ||
-                                           core::getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)
+                                           core::GetAlphabetProperties(core::AlphabetId::kAcgtn).IsIncluded(cigar)
                                        ? 2
                                        : (uint8_t)desc.getSize() - 1;
                 for (const auto& c : qvs) {
@@ -77,7 +77,7 @@ void Encoder::encodeUnalignedSegment(const core::record::Segment& s, core::Acces
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
     util::Watch watch;
     auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
-    core::AccessUnit::Descriptor desc(core::GenDesc::QV);
+    core::AccessUnit::Descriptor desc(core::GenDesc::kQv);
 
     setUpParameters(rec, *param, desc);
 

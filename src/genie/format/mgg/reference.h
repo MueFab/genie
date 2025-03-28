@@ -43,7 +43,7 @@ class Reference : public GenInfo {
 
     std::unique_ptr<reference::Location> reference_location;  //!< @brief
 
-    genie::core::MPEGMinorVersion version;  //!< @brief
+    genie::core::MpegMinorVersion version;  //!< @brief
 
  public:
     /**
@@ -72,7 +72,7 @@ class Reference : public GenInfo {
      * @param _version
      */
     Reference(uint8_t _dataset_group_id, uint8_t _reference_ID, genie::core::meta::Reference ref,
-              genie::core::MPEGMinorVersion _version);
+              genie::core::MpegMinorVersion _version);
 
     /**
      * @brief
@@ -86,7 +86,7 @@ class Reference : public GenInfo {
      * @param reader
      * @param _version
      */
-    explicit Reference(util::BitReader& reader, genie::core::MPEGMinorVersion _version);
+    explicit Reference(util::BitReader& reader, genie::core::MpegMinorVersion _version);
 
     /**
      * @brief
@@ -98,7 +98,7 @@ class Reference : public GenInfo {
      * @param _version
      */
     Reference(uint8_t group_id, uint8_t ref_id, std::string ref_name, reference::Version _ref_version,
-              std::unique_ptr<reference::Location> location, genie::core::MPEGMinorVersion _version);
+              std::unique_ptr<reference::Location> location, genie::core::MpegMinorVersion _version);
 
     /**
      * @brief

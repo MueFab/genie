@@ -24,14 +24,14 @@ namespace annotation_parameter_set {
 Record::Record()
     : parameter_set_ID(0),
       AT_ID(0),
-      AT_alphabet_ID(core::AlphabetID::ACGTN),
+      AT_alphabet_ID(core::AlphabetId::kAcgtn),
       AT_coord_size(3),
       AT_pos_40_bits_flag(false),
       n_aux_attribute_groups(0),
       tile_configuration{},
       annotation_encoding_parameters{} {}
 
-Record::Record(uint8_t parameter_set_ID, uint8_t AT_ID, core::AlphabetID AT_alphabet_ID, uint8_t AT_coord_size,
+Record::Record(uint8_t parameter_set_ID, uint8_t AT_ID, core::AlphabetId AT_alphabet_ID, uint8_t AT_coord_size,
                bool AT_pos_40_bits_flag, uint8_t n_aux_attribute_groups,
                std::vector<TileConfiguration> tile_configuration,
                AnnotationEncodingParameters annotation_encoding_parameters)
@@ -47,7 +47,7 @@ Record::Record(uint8_t parameter_set_ID, uint8_t AT_ID, core::AlphabetID AT_alph
 void Record::read(util::BitReader& reader) {
     parameter_set_ID = static_cast<uint8_t>(reader.ReadBits(8));
     AT_ID = static_cast<uint8_t>(reader.ReadBits(8));
-    AT_alphabet_ID = static_cast<core::AlphabetID>(reader.ReadBits(8));
+    AT_alphabet_ID = static_cast<core::AlphabetId>(reader.ReadBits(8));
     reader.ReadBits(2);
     AT_coord_size = static_cast<uint8_t>(reader.ReadBits(2));
     AT_pos_40_bits_flag = static_cast<bool>(reader.ReadBits(1));

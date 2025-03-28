@@ -17,7 +17,7 @@ namespace mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Dataset::Dataset(util::BitReader& reader, core::MPEGMinorVersion _version) : version(_version) {
+Dataset::Dataset(util::BitReader& reader, core::MpegMinorVersion _version) : version(_version) {
     auto start_pos = reader.getPos() - 4;
     auto length = reader.readBypassBE<uint64_t>();
     auto end_pos = start_pos + static_cast<int64_t>(length);
@@ -97,7 +97,7 @@ std::vector<DatasetParameterSet>& Dataset::getParameterSets() { return parameter
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Dataset::Dataset(format::mgb::MgbFile& file, core::meta::Dataset& meta, core::MPEGMinorVersion _version,
+Dataset::Dataset(format::mgb::MgbFile& file, core::meta::Dataset& meta, core::MpegMinorVersion _version,
                  const std::vector<uint8_t>& param_ids)
     : version(_version) {
     bool mitFlag = false;
@@ -116,7 +116,7 @@ Dataset::Dataset(format::mgb::MgbFile& file, core::meta::Dataset& meta, core::MP
             file.sort_by_position();
         }
         for (size_t c = 0; c < size_t(core::record::ClassType::COUNT); ++c) {
-            for (size_t d = 0; d < size_t(core::GenDesc::COUNT); ++d) {
+            for (size_t d = 0; d < size_t(core::GenDesc::kCount); ++d) {
                 auto blocks = file.extractDescriptor(core::record::ClassType(c), core::GenDesc(d), param_ids);
                 auto desc = DescriptorStream(core::GenDesc(d), core::record::ClassType(c), blocks);
                 if (!desc.isEmpty()) {

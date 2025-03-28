@@ -41,7 +41,7 @@ class DatasetHeader : public GenInfo {
  private:
     uint8_t group_ID;                       //!< @brief
     uint16_t ID;                            //!< @brief
-    genie::core::MPEGMinorVersion version;  //!< @brief
+    genie::core::MpegMinorVersion version;  //!< @brief
     bool multiple_alignment_flag;           //!< @brief
     bool byte_offset_size_flag;             //!< @brief
     bool non_overlapping_AU_range_flag;     //!< @brief
@@ -56,7 +56,7 @@ class DatasetHeader : public GenInfo {
 
     std::vector<dataset_header::MITClassConfig> mit_configs;  //!< @brief
     bool parameters_update_flag;                              //!< @brief
-    core::AlphabetID alphabet_id;                             //!< @brief
+    core::AlphabetId alphabet_id;                             //!< @brief
 
     uint32_t num_U_access_units;                          //!< @brief
     boost::optional<dataset_header::UOptions> u_options;  //!< @brief
@@ -115,7 +115,7 @@ class DatasetHeader : public GenInfo {
      * @brief
      * @return
      */
-    genie::core::MPEGMinorVersion getVersion() const;
+    genie::core::MpegMinorVersion getVersion() const;
 
     /**
      * @brief
@@ -193,7 +193,7 @@ class DatasetHeader : public GenInfo {
      * @brief
      * @return
      */
-    core::AlphabetID getAlphabetID() const;
+    core::AlphabetId getAlphabetID() const;
 
     /**
      * @brief
@@ -237,10 +237,10 @@ class DatasetHeader : public GenInfo {
      * @param _parameters_update_flag
      * @param _alphabet_id
      */
-    DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, genie::core::MPEGMinorVersion _version,
+    DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, genie::core::MpegMinorVersion _version,
                   bool _multiple_alignments_flags, bool _byte_offset_size_flags, bool _non_overlapping_AU_range_flag,
                   bool _pos_40_bits_flag, core::parameter::DataUnit::DatasetType _dataset_type,
-                  bool _parameters_update_flag, core::AlphabetID _alphabet_id);
+                  bool _parameters_update_flag, core::AlphabetId _alphabet_id);
 
     /**
      * @brief

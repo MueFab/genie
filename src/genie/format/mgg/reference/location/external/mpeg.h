@@ -28,7 +28,7 @@ namespace external {
  */
 class MPEG : public External {
  private:
-    genie::core::MPEGMinorVersion version;   //!< @brief
+    genie::core::MpegMinorVersion version;   //!< @brief
     uint8_t external_dataset_group_id;       //!< @brief
     uint16_t external_dataset_id;            //!< @brief
     std::string ref_checksum;                //!< @brief
@@ -52,7 +52,7 @@ class MPEG : public External {
      * @param _version
      */
     MPEG(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, uint8_t _group_id, uint16_t _dataset_id,
-         std::string _ref_checksum, genie::core::MPEGMinorVersion _version);
+         std::string _ref_checksum, genie::core::MpegMinorVersion _version);
 
     /**
      * @brief
@@ -60,7 +60,7 @@ class MPEG : public External {
      * @param seq_count
      * @param _version
      */
-    explicit MPEG(genie::util::BitReader& reader, size_t seq_count, genie::core::MPEGMinorVersion _version);
+    explicit MPEG(genie::util::BitReader& reader, size_t seq_count, genie::core::MpegMinorVersion _version);
 
     /**
      * @brief
@@ -72,7 +72,7 @@ class MPEG : public External {
      * @param _version
      */
     explicit MPEG(genie::util::BitReader& reader, uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo,
-                  size_t seq_count, genie::core::MPEGMinorVersion _version);
+                  size_t seq_count, genie::core::MpegMinorVersion _version);
 
     /**
      * @brief

@@ -69,7 +69,7 @@ class Location {
      * @return
      */
     static std::unique_ptr<Location> factory(genie::util::BitReader& reader, size_t seq_count,
-                                             genie::core::MPEGMinorVersion _version);
+                                             genie::core::MpegMinorVersion _version);
 
     /**
      * @brief
@@ -78,7 +78,7 @@ class Location {
      * @return
      */
     static std::unique_ptr<Location> referenceLocationFactory(std::unique_ptr<genie::core::meta::RefBase> base,
-                                                              genie::core::MPEGMinorVersion _version);
+                                                              genie::core::MpegMinorVersion _version);
 
     /**
      * @brief

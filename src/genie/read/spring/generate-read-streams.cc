@@ -80,63 +80,63 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
     }
     if (seq_start != seq_end) {
         // not all unaligned
-        raw_au.get(core::GenSub::RLEN).push(seq_end - seq_start - 1);  // rlen
-        raw_au.get(core::GenSub::RTYPE).push(5);                       // rtype
+        raw_au.get(core::gen_sub::kReadLength).push(seq_end - seq_start - 1);  // rlen
+        raw_au.get(core::gen_sub::kRtype).push(5);                       // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-            raw_au.get(core::GenSub::UREADS)
-                .push(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[data.seq[i]]);  // ureads
+            raw_au.get(core::gen_sub::kUnalignedReads)
+                .push(GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut[data.seq[i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
     for (uint64_t i = start_read_num; i < end_read_num; i++) {
         if (data.flag_arr[i] == true) {
-            raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[i] - 1);          // rlen
-            raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
+            raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[i] - 1);          // rlen
+            raw_au.get(core::gen_sub::kReverseComplement).push(rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
             if (i == start_read_num) {
                 // Note: In order non-preserving mode, if the first read of
                 // the block is a singleton, then the rest are too.
-                raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(0);  // pos
+                raw_au.get(core::gen_sub::kPositionFirst).push(0);  // pos
                 prevpos = data.pos_arr[i];
             } else {
                 diffpos = data.pos_arr[i] - prevpos;
-                raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(diffpos);  // pos
+                raw_au.get(core::gen_sub::kPositionFirst).push(diffpos);  // pos
                 prevpos = data.pos_arr[i];
             }
             if (data.noise_len_arr[i] == 0) {
-                raw_au.get(core::GenSub::RTYPE).push(1);  // rtype = P
+                raw_au.get(core::gen_sub::kRtype).push(1);  // rtype = P
             } else {
-                raw_au.get(core::GenSub::RTYPE).push(3);  // rtype = M
+                raw_au.get(core::gen_sub::kRtype).push(3);  // rtype = M
                 uint16_t curr_noise_pos = 0;
                 for (uint16_t j = 0; j < data.noise_len_arr[i]; j++) {
                     curr_noise_pos += data.noisepos_arr[data.pos_in_noise_arr[i] + j];
-                    raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(0);  // mmpos
+                    raw_au.get(core::gen_sub::kMismatchPosTerminator).push(0);  // mmpos
                     if (j == 0)
-                        raw_au.get(core::GenSub::MMPOS_POSITION).push(data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
+                        raw_au.get(core::gen_sub::kMismatchPosDelta).push(data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
                     else
-                        raw_au.get(core::GenSub::MMPOS_POSITION)
+                        raw_au.get(core::gen_sub::kMismatchPosDelta)
                             .push(data.noisepos_arr[data.pos_in_noise_arr[i] + j] - 1);  // decoder adds +1
-                    raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);                       // mmtype = Substitution
-                    raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION)
-                        .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                    raw_au.get(core::gen_sub::kMismatchType).push(0);                       // mmtype = Substitution
+                    raw_au.get(core::gen_sub::kMismatchTypeSubstBase)
+                        .push(GetAlphabetProperties(core::AlphabetId::kAcgtn)
                                   .inverseLut[data.noise_arr[data.pos_in_noise_arr[i] + j]]);
-                    raw_au.pushDependency(core::GenSub::MMTYPE_SUBSTITUTION,
-                                          getAlphabetProperties(core::AlphabetID::ACGTN)
+                    raw_au.pushDependency(core::gen_sub::kMismatchTypeSubstBase,
+                                          GetAlphabetProperties(core::AlphabetId::kAcgtn)
                                               .inverseLut[data.seq[data.pos_arr[i] + curr_noise_pos]]);
                 }
-                raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);
+                raw_au.get(core::gen_sub::kMismatchPosTerminator).push(1);
             }
         } else {
-            raw_au.get(core::GenSub::RTYPE).push(5);                           // rtype
-            raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[i] - 1);  // rlen
+            raw_au.get(core::gen_sub::kRtype).push(5);                           // rtype
+            raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[i] - 1);  // rlen
             for (uint64_t j = 0; j < data.read_length_arr[i]; j++) {
-                raw_au.get(core::GenSub::UREADS)
-                    .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                raw_au.get(core::gen_sub::kUnalignedReads)
+                    .push(GetAlphabetProperties(core::AlphabetId::kAcgtn)
                               .inverseLut[data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
             }
-            raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(seq_end - prevpos);  // pos
-            raw_au.get(core::GenSub::RCOMP).push(0);                              // rcomp
-            raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[i] - 1);     // rlen
-            raw_au.get(core::GenSub::RTYPE).push(1);                              // rtype = P
+            raw_au.get(core::gen_sub::kPositionFirst).push(seq_end - prevpos);  // pos
+            raw_au.get(core::gen_sub::kReverseComplement).push(0);                              // rcomp
+            raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[i] - 1);     // rlen
+            raw_au.get(core::gen_sub::kRtype).push(1);                              // rtype = P
             prevpos = seq_end;
             seq_end = prevpos + data.read_length_arr[i];
         }
@@ -162,13 +162,13 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
 #endif
     for (int64_t block_num = 0; block_num < static_cast<int64_t>(blocks); block_num++) {
         params[block_num] = core::parameter::EncodingSet(core::parameter::ParameterSet::DatasetType::NON_ALIGNED,
-                                                         core::AlphabetID::ACGTN, 0, false, false, 1, 0, false, false);
+                                                         core::AlphabetId::kAcgtn, 0, false, false, 1, 0, false, false);
         params[block_num].setComputedRef(
             core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY));
         core::AccessUnit au(std::move(params[block_num]), 0);
 
         generate_subseqs(data, block_num, au);
-        num_reads_per_block[block_num] = (uint32_t)au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
+        num_reads_per_block[block_num] = (uint32_t)au.get(core::gen_sub::kReverseComplement).getNumSymbols();  // rcomp
 
         au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au), write_raw);
         stat_vec[block_num].add(au.getStats());
@@ -653,11 +653,11 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
     uint64_t seq_start = bdata.block_seq_start[cur_block_num], seq_end = bdata.block_seq_end[cur_block_num];
     if (seq_start != seq_end) {
         // not all unaligned
-        raw_au.get(core::GenSub::RLEN).push(seq_end - seq_start - 1);  // rlen
-        raw_au.get(core::GenSub::RTYPE).push(5);                       // rtype
+        raw_au.get(core::gen_sub::kReadLength).push(seq_end - seq_start - 1);  // rlen
+        raw_au.get(core::gen_sub::kRtype).push(5);                       // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-            raw_au.get(core::GenSub::UREADS)
-                .push(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[data.seq[i]]);  // ureads
+            raw_au.get(core::gen_sub::kUnalignedReads)
+                .push(GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut[data.seq[i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
@@ -670,11 +670,11 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
             if (i == bdata.block_start[cur_block_num]) {
                 // Note: In order non-preserving mode, if the first read of
                 // the block is a singleton, then the rest are too.
-                raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(0);  // pos
+                raw_au.get(core::gen_sub::kPositionFirst).push(0);  // pos
                 prevpos = data.pos_arr[current];
             } else {
                 diffpos = data.pos_arr[current] - prevpos;
-                raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(diffpos);  // pos
+                raw_au.get(core::gen_sub::kPositionFirst).push(diffpos);  // pos
                 prevpos = data.pos_arr[current];
             }
         }
@@ -683,111 +683,111 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
             // both reads in same record
             if (data.flag_arr[current] == false) {
                 // Case 1: both unaligned
-                raw_au.get(core::GenSub::RTYPE).push(5);  // rtype
-                raw_au.get(core::GenSub::RLEN)
+                raw_au.get(core::gen_sub::kRtype).push(5);  // rtype
+                raw_au.get(core::gen_sub::kReadLength)
                     .push(data.read_length_arr[current] + data.read_length_arr[pair] - 1);  // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
-                    raw_au.get(core::GenSub::UREADS)
-                        .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                    raw_au.get(core::gen_sub::kUnalignedReads)
+                        .push(GetAlphabetProperties(core::AlphabetId::kAcgtn)
                                   .inverseLut[data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
                 }
                 for (uint64_t j = 0; j < data.read_length_arr[pair]; j++) {
-                    raw_au.get(core::GenSub::UREADS)
-                        .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                    raw_au.get(core::gen_sub::kUnalignedReads)
+                        .push(GetAlphabetProperties(core::AlphabetId::kAcgtn)
                                   .inverseLut[data.unaligned_arr[data.pos_arr[pair] + j]]);  // ureads
                 }
-                raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(seq_end - prevpos);     // pos
-                raw_au.get(core::GenSub::RCOMP).push(0);                                 // rcomp
-                raw_au.get(core::GenSub::RCOMP).push(0);                                 // rcomp
-                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);  // rlen
-                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[pair] - 1);     // rlen
-                raw_au.get(core::GenSub::RTYPE).push(1);                                 // rtype = P
-                raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(0);                    // pair decoding case same_rec
+                raw_au.get(core::gen_sub::kPositionFirst).push(seq_end - prevpos);     // pos
+                raw_au.get(core::gen_sub::kReverseComplement).push(0);                                 // rcomp
+                raw_au.get(core::gen_sub::kReverseComplement).push(0);                                 // rcomp
+                raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[current] - 1);  // rlen
+                raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[pair] - 1);     // rlen
+                raw_au.get(core::gen_sub::kRtype).push(1);                                 // rtype = P
+                raw_au.get(core::gen_sub::kPairDecodingCase).push(0);                    // pair decoding case same_rec
                 bool read_1_first = true;
                 uint16_t delta = data.read_length_arr[current];
-                raw_au.get(core::GenSub::PAIR_SAME_REC).push(!(read_1_first) + 2 * delta);  // pair
+                raw_au.get(core::gen_sub::kPairSameRec).push(!(read_1_first) + 2 * delta);  // pair
                 prevpos = seq_end;
                 seq_end = prevpos + data.read_length_arr[current] + data.read_length_arr[pair];
             } else {
                 // Case 2: both aligned
-                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);          // rlen
-                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[pair] - 1);             // rlen
-                raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
-                raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[pair]]);     // rcomp
+                raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[current] - 1);          // rlen
+                raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[pair] - 1);             // rlen
+                raw_au.get(core::gen_sub::kReverseComplement).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
+                raw_au.get(core::gen_sub::kReverseComplement).push(rc_to_int[(uint8_t)data.RC_arr[pair]]);     // rcomp
                 if (data.noise_len_arr[current] == 0 && data.noise_len_arr[pair] == 0) {
-                    raw_au.get(core::GenSub::RTYPE).push(1);  // rtype = P
+                    raw_au.get(core::gen_sub::kRtype).push(1);  // rtype = P
                 } else {
-                    raw_au.get(core::GenSub::RTYPE).push(3);  // rtype = M
+                    raw_au.get(core::gen_sub::kRtype).push(3);  // rtype = M
                     for (int k = 0; k < 2; k++) {
                         uint32_t index = k ? pair : current;
                         uint16_t curr_noise_pos = 0;
                         for (uint16_t j = 0; j < data.noise_len_arr[index]; j++) {
                             curr_noise_pos += data.noisepos_arr[data.pos_in_noise_arr[index] + j];
-                            raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(0);  // mmpos
+                            raw_au.get(core::gen_sub::kMismatchPosTerminator).push(0);  // mmpos
                             if (j == 0)
-                                raw_au.get(core::GenSub::MMPOS_POSITION)
+                                raw_au.get(core::gen_sub::kMismatchPosDelta)
                                     .push(data.noisepos_arr[data.pos_in_noise_arr[index] + j]);  // mmpos
                             else
-                                raw_au.get(core::GenSub::MMPOS_POSITION)
+                                raw_au.get(core::gen_sub::kMismatchPosDelta)
                                     .push(data.noisepos_arr[data.pos_in_noise_arr[index] + j] - 1);  // mmpos
-                            raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);  // mmtype = Substitution
-                            raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION)
-                                .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                            raw_au.get(core::gen_sub::kMismatchType).push(0);  // mmtype = Substitution
+                            raw_au.get(core::gen_sub::kMismatchTypeSubstBase)
+                                .push(GetAlphabetProperties(core::AlphabetId::kAcgtn)
                                           .inverseLut[data.noise_arr[data.pos_in_noise_arr[index] + j]]);
-                            raw_au.pushDependency(core::GenSub::MMTYPE_SUBSTITUTION,
-                                                  getAlphabetProperties(core::AlphabetID::ACGTN)
+                            raw_au.pushDependency(core::gen_sub::kMismatchTypeSubstBase,
+                                                  GetAlphabetProperties(core::AlphabetId::kAcgtn)
                                                       .inverseLut[data.seq[data.pos_arr[index] + curr_noise_pos]]);
                         }
-                        raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);  // mmpos
+                        raw_au.get(core::gen_sub::kMismatchPosTerminator).push(1);  // mmpos
                     }
                 }
                 bool read_1_first = (current < pair);
                 auto delta = (uint16_t)(data.pos_arr[pair] - data.pos_arr[current]);
-                raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(0);  // pair decoding case same_rec
-                raw_au.get(core::GenSub::PAIR_SAME_REC).push(!(read_1_first) + 2 * delta);  // pair
+                raw_au.get(core::gen_sub::kPairDecodingCase).push(0);  // pair decoding case same_rec
+                raw_au.get(core::gen_sub::kPairSameRec).push(!(read_1_first) + 2 * delta);  // pair
                 pest->count_same_rec[cur_thread_num]++;
             }
         } else {
             // only one read in genomic record
             if (data.flag_arr[current] == true) {
-                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);          // rlen
-                raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
+                raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[current] - 1);          // rlen
+                raw_au.get(core::gen_sub::kReverseComplement).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
                 if (data.noise_len_arr[current] == 0) {
-                    raw_au.get(core::GenSub::RTYPE).push(1);  // rtype = P
+                    raw_au.get(core::gen_sub::kRtype).push(1);  // rtype = P
                 } else {
-                    raw_au.get(core::GenSub::RTYPE).push(3);  // rtype = M
+                    raw_au.get(core::gen_sub::kRtype).push(3);  // rtype = M
                     uint16_t curr_noise_pos = 0;
                     for (uint16_t j = 0; j < data.noise_len_arr[current]; j++) {
                         curr_noise_pos += data.noisepos_arr[data.pos_in_noise_arr[current] + j];
-                        raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(0);  // mmpos
+                        raw_au.get(core::gen_sub::kMismatchPosTerminator).push(0);  // mmpos
                         if (j == 0)
-                            raw_au.get(core::GenSub::MMPOS_POSITION)
+                            raw_au.get(core::gen_sub::kMismatchPosDelta)
                                 .push(data.noisepos_arr[data.pos_in_noise_arr[current] + j]);  // mmpos
                         else
-                            raw_au.get(core::GenSub::MMPOS_POSITION)
+                            raw_au.get(core::gen_sub::kMismatchPosDelta)
                                 .push(data.noisepos_arr[data.pos_in_noise_arr[current] + j] - 1);  // mmpos
-                        raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);  // mmtype = Substitution
-                        raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION)
-                            .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                        raw_au.get(core::gen_sub::kMismatchType).push(0);  // mmtype = Substitution
+                        raw_au.get(core::gen_sub::kMismatchTypeSubstBase)
+                            .push(GetAlphabetProperties(core::AlphabetId::kAcgtn)
                                       .inverseLut[data.noise_arr[data.pos_in_noise_arr[current] + j]]);
-                        raw_au.pushDependency(core::GenSub::MMTYPE_SUBSTITUTION,
-                                              getAlphabetProperties(core::AlphabetID::ACGTN)
+                        raw_au.pushDependency(core::gen_sub::kMismatchTypeSubstBase,
+                                              GetAlphabetProperties(core::AlphabetId::kAcgtn)
                                                   .inverseLut[data.seq[data.pos_arr[current] + curr_noise_pos]]);
                     }
-                    raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);
+                    raw_au.get(core::gen_sub::kMismatchPosTerminator).push(1);
                 }
             } else {
-                raw_au.get(core::GenSub::RTYPE).push(5);                                 // rtype
-                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);  // rlen
+                raw_au.get(core::gen_sub::kRtype).push(5);                                 // rtype
+                raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[current] - 1);  // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
-                    raw_au.get(core::GenSub::UREADS)
-                        .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                    raw_au.get(core::gen_sub::kUnalignedReads)
+                        .push(GetAlphabetProperties(core::AlphabetId::kAcgtn)
                                   .inverseLut[data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
                 }
-                raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(seq_end - prevpos);     // pos
-                raw_au.get(core::GenSub::RCOMP).push(0);                                 // rcomp
-                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);  // rlen
-                raw_au.get(core::GenSub::RTYPE).push(1);                                 // rtype = P
+                raw_au.get(core::gen_sub::kPositionFirst).push(seq_end - prevpos);     // pos
+                raw_au.get(core::gen_sub::kReverseComplement).push(0);                                 // rcomp
+                raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[current] - 1);  // rlen
+                raw_au.get(core::gen_sub::kRtype).push(1);                                 // rtype = P
                 prevpos = seq_end;
                 seq_end = prevpos + data.read_length_arr[current];
             }
@@ -801,19 +801,19 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
 
             bool read_1_first = (current < pair);
             if (same_block && !read_1_first) {
-                raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(1);  // R1_split
-                raw_au.get(core::GenSub::PAIR_R1_SPLIT).push(bdata.genomic_record_index[pair]);
+                raw_au.get(core::gen_sub::kPairDecodingCase).push(1);  // R1_split
+                raw_au.get(core::gen_sub::kPairR1Split).push(bdata.genomic_record_index[pair]);
             } else if (same_block && read_1_first) {
-                raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(2);  // R2_split
-                raw_au.get(core::GenSub::PAIR_R2_SPLIT).push(bdata.genomic_record_index[pair]);
+                raw_au.get(core::gen_sub::kPairDecodingCase).push(2);  // R2_split
+                raw_au.get(core::gen_sub::kPairR2Split).push(bdata.genomic_record_index[pair]);
             } else if (!same_block && !read_1_first) {
-                raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(3);  // R1_diff_ref_seq
-                raw_au.get(core::GenSub::PAIR_R1_DIFF_SEQ).push(bdata.block_num[pair]);
-                raw_au.get(core::GenSub::PAIR_R1_DIFF_POS).push(bdata.genomic_record_index[pair]);
+                raw_au.get(core::gen_sub::kPairDecodingCase).push(3);  // R1_diff_ref_seq
+                raw_au.get(core::gen_sub::kPairR1DiffSeq).push(bdata.block_num[pair]);
+                raw_au.get(core::gen_sub::kPairR1DiffPos).push(bdata.genomic_record_index[pair]);
             } else {
-                raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(4);  // R2_diff_ref_seq
-                raw_au.get(core::GenSub::PAIR_R2_DIFF_SEQ).push(bdata.block_num[pair]);
-                raw_au.get(core::GenSub::PAIR_R2_DIFF_POS).push(bdata.genomic_record_index[pair]);
+                raw_au.get(core::gen_sub::kPairDecodingCase).push(4);  // R2_diff_ref_seq
+                raw_au.get(core::gen_sub::kPairR2DiffSeq).push(bdata.block_num[pair]);
+                raw_au.get(core::gen_sub::kPairR2DiffPos).push(bdata.genomic_record_index[pair]);
             }
         }
     }
@@ -864,13 +864,13 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
     for (int64_t cur_block_num = 0; cur_block_num < static_cast<int64_t>(bdata.block_start.size()); cur_block_num++) {
         params[cur_block_num] =
             core::parameter::EncodingSet(core::parameter::ParameterSet::DatasetType::NON_ALIGNED,
-                                         core::AlphabetID::ACGTN, 0, true, false, 1, 0, false, false);
+                                         core::AlphabetId::kAcgtn, 0, true, false, 1, 0, false, false);
         params[cur_block_num].setComputedRef(
             core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY));
         core::AccessUnit au(std::move(params[cur_block_num]), 0);
 
         generate_streams_pe(data, bdata, cur_block_num, &pest, au);
-        num_reads_per_block[cur_block_num] = (uint32_t)au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
+        num_reads_per_block[cur_block_num] = (uint32_t)au.get(core::gen_sub::kReverseComplement).getNumSymbols();  // rcomp
         num_records_per_block[cur_block_num] =
             bdata.block_end[cur_block_num] - bdata.block_start[cur_block_num];  // used later for ids
         au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au), write_raw);

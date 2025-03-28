@@ -359,7 +359,7 @@ genie::core::record::annotation_parameter_set::Record
 RandomAnnotationEncodingParameters::randomAnnotationParameterSet() {
     uint8_t parameter_set_ID = randomU8();
     uint8_t AT_ID = randomU8();
-    genie::core::AlphabetID AT_alphabet_ID = static_cast <genie::core::AlphabetID>(randomU8());
+    genie::core::AlphabetId AT_alphabet_ID = static_cast <genie::core::AlphabetId>(randomU8());
     uint8_t AT_coord_size = randomU2();
     bool AT_pos_40_bits_flag = randomBool();
     uint8_t n_aux_attribute_groups = randomU3();

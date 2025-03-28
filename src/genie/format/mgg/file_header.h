@@ -40,7 +40,7 @@ class FileHeader : public GenInfo {
     /**
      * @brief
      */
-    explicit FileHeader(core::MPEGMinorVersion _minor_version);
+    explicit FileHeader(core::MpegMinorVersion _minor_version);
 
     /**
      * @brief
@@ -63,7 +63,7 @@ class FileHeader : public GenInfo {
      * @brief
      * @return
      */
-    core::MPEGMinorVersion getMinorVersion() const;
+    core::MpegMinorVersion getMinorVersion() const;
 
     /**
      * @brief
@@ -94,7 +94,7 @@ class FileHeader : public GenInfo {
 
  private:
     std::string major_brand;                     //!< @brief
-    core::MPEGMinorVersion minor_version;        //!< @brief
+    core::MpegMinorVersion minor_version;        //!< @brief
     std::vector<std::string> compatible_brands;  //!< @brief
 };
 

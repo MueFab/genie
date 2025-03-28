@@ -33,8 +33,8 @@ class EntropyEncoderAnnotation {
  */
 class EntropyEncoder {
  public:
-    using EntropyCoded =
-        std::tuple<parameter::DescriptorSubseqCfg, AccessUnit::Descriptor, core::stats::PerfStats>;  //!< @brief
+    using entropy_coded =
+        std::tuple<parameter::DescriptorSubSequenceCfg, AccessUnit::Descriptor, core::stats::PerfStats>;  //!< @brief
 
     /**
      * @brief
@@ -46,7 +46,7 @@ class EntropyEncoder {
      * @param desc
      * @return
      */
-    virtual EntropyCoded Process(core::AccessUnit::Descriptor& desc) = 0;
+    virtual entropy_coded Process(core::AccessUnit::Descriptor& desc) = 0;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

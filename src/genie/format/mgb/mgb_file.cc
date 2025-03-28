@@ -309,7 +309,7 @@ std::vector<std::unique_ptr<format::mgb::AccessUnit>> MgbFile::extractAUs(const 
 
 std::vector<uint8_t> MgbFile::collect_param_ids(bool multipleAlignments, bool pos40,
                                                 genie::core::parameter::DataUnit::DatasetType dataset_type,
-                                                genie::core::AlphabetID alphabet) {
+                                                genie::core::AlphabetId alphabet) {
     std::vector<uint8_t> ret;
     for (auto& parameterSet : parameterSets) {
         if (parameterSet.second.hasMultipleAlignments() == multipleAlignments &&

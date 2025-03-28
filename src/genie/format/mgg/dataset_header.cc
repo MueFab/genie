@@ -97,7 +97,7 @@ bool DatasetHeader::getParameterUpdateFlag() const { return parameters_update_fl
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AlphabetID DatasetHeader::getAlphabetID() const { return alphabet_id; }
+core::AlphabetId DatasetHeader::getAlphabetID() const { return alphabet_id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -121,8 +121,8 @@ const std::string& DatasetHeader::getKey() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetHeader::DatasetHeader()
-    : DatasetHeader(0, 0, genie::core::MPEGMinorVersion::V2000, false, false, false, false,
-                    core::parameter::DataUnit::DatasetType::ALIGNED, false, core::AlphabetID::ACGTN) {}
+    : DatasetHeader(0, 0, genie::core::MpegMinorVersion::kV2000, false, false, false, false,
+                    core::parameter::DataUnit::DatasetType::ALIGNED, false, core::AlphabetId::kAcgtn) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -130,7 +130,7 @@ DatasetHeader::DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, ge
                              bool _multiple_alignments_flags, bool _byte_offset_size_flags,
                              bool _non_overlapping_AU_range_flag, bool _pos_40_bits_flag,
                              core::parameter::DataUnit::DatasetType _dataset_type, bool _parameters_update_flag,
-                             core::AlphabetID _alphabet_id)
+                             core::AlphabetId _alphabet_id)
     : group_ID(_dataset_group_id),
       ID(_dataset_id),
       version(_version),

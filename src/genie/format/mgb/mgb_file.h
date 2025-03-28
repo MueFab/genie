@@ -159,7 +159,7 @@ class MgbFile {
      */
     std::vector<uint8_t> collect_param_ids(bool multipleAlignments, bool pos40,
                                            genie::core::parameter::DataUnit::DatasetType dataset_type,
-                                           genie::core::AlphabetID alphabet);
+                                           genie::core::AlphabetId alphabet);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

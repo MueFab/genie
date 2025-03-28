@@ -23,12 +23,12 @@ const std::string& DatasetProtection::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetProtection::DatasetProtection(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version)
+DatasetProtection::DatasetProtection(genie::util::BitReader& bitreader, genie::core::MpegMinorVersion _version)
     : version(_version) {
     auto start_pos = bitreader.getPos();
     auto length = bitreader.readBypassBE<uint64_t>();
     auto protection_length = length - GenInfo::getHeaderLength();
-    if (version != genie::core::MPEGMinorVersion::V1900) {
+    if (version != genie::core::MpegMinorVersion::kV1900) {
         dataset_group_id = bitreader.readBypassBE<uint8_t>();
         dataset_id = bitreader.readBypassBE<uint16_t>();
         protection_length -= sizeof(uint8_t);
@@ -42,7 +42,7 @@ DatasetProtection::DatasetProtection(genie::util::BitReader& bitreader, genie::c
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetProtection::DatasetProtection(uint8_t _dataset_group_id, uint16_t _dataset_id, std::string _dg_protection_value,
-                                     genie::core::MPEGMinorVersion _version)
+                                     genie::core::MpegMinorVersion _version)
     : version(_version),
       dataset_group_id(_dataset_group_id),
       dataset_id(_dataset_id),
@@ -51,7 +51,7 @@ DatasetProtection::DatasetProtection(uint8_t _dataset_group_id, uint16_t _datase
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetProtection::box_write(genie::util::BitWriter& bitWriter) const {
-    if (version != genie::core::MPEGMinorVersion::V1900) {
+    if (version != genie::core::MpegMinorVersion::kV1900) {
         bitWriter.writeBypassBE(dataset_group_id);
         bitWriter.writeBypassBE(dataset_id);
     }
