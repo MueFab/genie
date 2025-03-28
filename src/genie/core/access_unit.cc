@@ -17,21 +17,21 @@ namespace core {
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence &AccessUnit::Subsequence::operator=(const Subsequence &sub) {
-    data = sub.data;
-    position = sub.position;
-    id = sub.id;
+    data_ = sub.data_;
+    position_ = sub.position_;
+    id_ = sub.id_;
     numSymbols = sub.numSymbols;
     dependency = sub.dependency;
-    if (sub.mmDecoder != nullptr) mmDecoder = sub.mmDecoder->copy();
+    if (sub.mmDecoder != nullptr) mmDecoder = sub.mmDecoder->Copy();
     return *this;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence &AccessUnit::Subsequence::operator=(AccessUnit::Subsequence &&sub) noexcept {
-    data = std::move(sub.data);
-    position = sub.position;
-    id = sub.id;
+    data_ = std::move(sub.data_);
+    position_ = sub.position_;
+    id_ = sub.id_;
     numSymbols = sub.numSymbols;
     dependency = sub.dependency;
     mmDecoder = std::move(sub.mmDecoder);
@@ -48,8 +48,8 @@ AccessUnit::Subsequence::Subsequence(Subsequence &&sub) noexcept { *this = std::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-util::DataBlock *AccessUnit::Subsequence::getDependency() {
-    if (id == GenSub::MMTYPE_SUBSTITUTION || id == GenSub::RFTT)
+util::DataBlock *AccessUnit::Subsequence::GetDependency() {
+    if (id_ == gen_sub::kMismatchTypeSubstBase || id_ == gen_sub::kRefTransTransform)
         return &dependency;
     else
         return nullptr;
@@ -57,7 +57,7 @@ util::DataBlock *AccessUnit::Subsequence::getDependency() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnit::Subsequence AccessUnit::Subsequence::attachMismatchDecoder(std::unique_ptr<MismatchDecoder> mm) {
+core::AccessUnit::Subsequence AccessUnit::Subsequence::AttachMismatchDecoder(std::unique_ptr<MismatchDecoder> mm) {
     mmDecoder = std::move(mm);
     return *this;
 }
@@ -69,16 +69,16 @@ MismatchDecoder *AccessUnit::Subsequence::getMismatchDecoder() const { return mm
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(uint8_t wordSize, GenSubIndex _id)
-    : data(0, wordSize), position(0), id(std::move(_id)), dependency(0, wordSize) {}
+    : data_(0, wordSize), position_(0), id_(std::move(_id)), dependency(0, wordSize) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(util::DataBlock d, GenSubIndex _id)
-    : data(std::move(d)), position(0), id(std::move(_id)), dependency(0, (uint8_t)d.GetWordSize()) {}
+    : data_(std::move(d)), position_(0), id_(std::move(_id)), dependency(0, (uint8_t)d.GetWordSize()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Subsequence::push(uint64_t val) { data.PushBack(val); }
+void AccessUnit::Subsequence::push(uint64_t val) { data_.PushBack(val); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -86,27 +86,27 @@ void AccessUnit::Subsequence::pushDependency(uint64_t val) { dependency.PushBack
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Subsequence::inc() { position++; }
+void AccessUnit::Subsequence::inc() { position_++; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t AccessUnit::Subsequence::get(size_t lookahead) const { return data.Get(position + lookahead); }
+uint64_t AccessUnit::Subsequence::get(size_t lookahead) const { return data_.Get(position_ + lookahead); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool AccessUnit::Subsequence::end() const { return data.Size() <= position; }
+bool AccessUnit::Subsequence::end() const { return data_.Size() <= position_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-util::DataBlock &&AccessUnit::Subsequence::move() { return std::move(data); }
+util::DataBlock &&AccessUnit::Subsequence::Move() { return std::move(data_); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-GenSubIndex AccessUnit::Subsequence::getID() const { return id; }
+GenSubIndex AccessUnit::Subsequence::GetId() const { return id_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t AccessUnit::Subsequence::getNumSymbols() const { return data.Size(); }
+size_t AccessUnit::Subsequence::GetNumSymbols() const { return data_.Size(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -114,38 +114,38 @@ uint64_t AccessUnit::Subsequence::pull() {
     if (end()) {
         UTILS_DIE("Tried to read descriptor that has already ended");
     }
-    return data.Get(position++);
+    return data_.Get(position_++);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence &AccessUnit::Descriptor::get(uint16_t sub) { return subdesc[sub]; }
+AccessUnit::Subsequence &AccessUnit::Descriptor::Get(uint16_t sub) { return subdesc[sub]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const AccessUnit::Subsequence &AccessUnit::Descriptor::get(uint16_t sub) const { return subdesc[sub]; }
+const AccessUnit::Subsequence &AccessUnit::Descriptor::Get(uint16_t sub) const { return subdesc[sub]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence &AccessUnit::Descriptor::getTokenType(uint16_t pos, uint8_t _type) {
     uint16_t s_id = ((pos << 4u) | (_type & 0xfu));
     while (subdesc.size() <= s_id) {
-        subdesc.emplace_back((uint8_t)4, GenSubIndex(getID(), uint16_t(subdesc.size())));
+        subdesc.emplace_back((uint8_t)4, GenSubIndex(GetId(), uint16_t(subdesc.size())));
     }
-    return get(s_id);
+    return Get(s_id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-GenDesc AccessUnit::Descriptor::getID() const { return id; }
+GenDesc AccessUnit::Descriptor::GetId() const { return id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Descriptor::add(Subsequence &&sub) { subdesc.push_back(std::move(sub)); }
+void AccessUnit::Descriptor::Add(Subsequence &&sub) { subdesc.push_back(std::move(sub)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Descriptor::set(uint16_t _id, Subsequence &&sub) { subdesc[uint16_t(_id)] = std::move(sub); }
+void AccessUnit::Descriptor::Set(uint16_t _id, Subsequence &&sub) { subdesc[uint16_t(_id)] = std::move(sub); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -169,11 +169,11 @@ const AccessUnit::Subsequence *AccessUnit::Descriptor::end() const { return &sub
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t AccessUnit::Descriptor::getSize() const { return subdesc.size(); }
+size_t AccessUnit::Descriptor::GetSize() const { return subdesc.size(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence &AccessUnit::get(GenSubIndex sub) { return descriptors[uint8_t(sub.first)].get(sub.second); }
+AccessUnit::Subsequence &AccessUnit::get(GenSubIndex sub) { return descriptors[uint8_t(sub.first)].Get(sub.second); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -186,18 +186,18 @@ const AccessUnit::Descriptor &AccessUnit::get(GenDesc desc) const { return descr
 // ---------------------------------------------------------------------------------------------------------------------
 
 const AccessUnit::Subsequence &AccessUnit::get(GenSubIndex sub) const {
-    return descriptors[uint8_t(sub.first)].get(sub.second);
+    return descriptors[uint8_t(sub.first)].Get(sub.second);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::set(GenSubIndex sub, Subsequence &&data) {
-    descriptors[uint8_t(sub.first)].set(sub.second, std::move(data));
+void AccessUnit::Set(GenSubIndex sub, Subsequence &&data) {
+    descriptors[uint8_t(sub.first)].Set(sub.second, std::move(data));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::set(GenDesc sub, Descriptor &&data) { descriptors[uint8_t(sub)] = std::move(data); }
+void AccessUnit::Set(GenDesc sub, Descriptor &&data) { descriptors[uint8_t(sub)] = std::move(data); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -221,80 +221,80 @@ uint64_t AccessUnit::pull(GenSubIndex sub) { return get(sub).pull(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Subsequence::annotateNumSymbols(size_t num) { numSymbols = num; }
+void AccessUnit::Subsequence::AnnotateNumSymbols(size_t num) { numSymbols = num; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool AccessUnit::Subsequence::isEmpty() const { return !getNumSymbols(); }
+bool AccessUnit::Subsequence::IsEmpty() const { return !GetNumSymbols(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t AccessUnit::Subsequence::getRawSize() const { return data.GetRawSize(); }
+size_t AccessUnit::Subsequence::GetRawSize() const { return data_.GetRawSize(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Subsequence::write(util::BitWriter &writer) const {
-    writer.WriteAlignedBytes(data.GetData(), data.GetRawSize());
+void AccessUnit::Subsequence::Write(util::BitWriter &writer) const {
+    writer.WriteAlignedBytes(data_.GetData(), data_.GetRawSize());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitReader &reader)
-    : data(0, 1), id(std::move(_id)), numSymbols(0), dependency(0, 1) {
-    data.Resize(size);
+    : data_(0, 1), id_(std::move(_id)), numSymbols(0), dependency(0, 1) {
+    data_.Resize(size);
     // no need to resize 'dependency' as it's not used on decoder side
-    reader.ReadAlignedBytes(reinterpret_cast<char *>(data.GetData()), size);
+    reader.ReadAlignedBytes(reinterpret_cast<char *>(data_.GetData()), size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence::Subsequence(GenSubIndex _id) : data(0, 1), id(_id), numSymbols(0), dependency(0, 1) {}
+AccessUnit::Subsequence::Subsequence(GenSubIndex _id) : data_(0, 1), id_(_id), numSymbols(0), dependency(0, 1) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(GenSubIndex _id, util::DataBlock &&dat)
-    : data(std::move(dat)), id(std::move(_id)), numSymbols(0), dependency(0, (uint8_t)data.GetWordSize()) {}
+    : data_(std::move(dat)), id_(std::move(_id)), numSymbols(0), dependency(0, (uint8_t)data_.GetWordSize()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Subsequence::set(util::DataBlock &&dat) { data = std::move(dat); }
+void AccessUnit::Subsequence::Set(util::DataBlock &&dat) { data_ = std::move(dat); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Subsequence::setPosition(size_t pos) { position = pos; }
+void AccessUnit::Subsequence::setPosition(size_t pos) { position_ = pos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-util::DataBlock &AccessUnit::Subsequence::getData() { return data; }
+util::DataBlock &AccessUnit::Subsequence::getData() { return data_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t AccessUnit::Descriptor::getWrittenSize() const {
-    size_t overhead = getDescriptor(getID()).tokentype ? 0 : (subdesc.size() - 1) * sizeof(uint32_t);
+    size_t overhead = GetDescriptor(GetId()).token_type ? 0 : (subdesc.size() - 1) * sizeof(uint32_t);
     return std::accumulate(subdesc.begin(), subdesc.end(), overhead, [](size_t sum, const Subsequence &payload) {
-        return payload.isEmpty() ? sum : sum + payload.getRawSize();
+        return payload.IsEmpty() ? sum : sum + payload.GetRawSize();
     });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::Descriptor::write(util::BitWriter &writer) const {
-    if (this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
-        subdesc.front().write(writer);
+    if (this->id == GenDesc::kReadName || this->id == GenDesc::kMultiSegmentAlignment) {
+        subdesc.front().Write(writer);
         return;
     }
     for (size_t i = 0; i < subdesc.size(); ++i) {
         if (i < (subdesc.size() - 1)) {
-            writer.WriteBits(subdesc[i].getRawSize(), 32);
+            writer.WriteBits(subdesc[i].GetRawSize(), 32);
         }
-        subdesc[i].write(writer);
+        subdesc[i].Write(writer);
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Descriptor::Descriptor(GenDesc _id, size_t count, size_t remainingSize, util::BitReader &reader) : id(_id) {
-    if (this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
+    if (this->id == GenDesc::kReadName || this->id == GenDesc::kMultiSegmentAlignment) {
         subdesc.emplace_back(GenSubIndex{_id, (uint16_t)0}, remainingSize, reader);
         return;
     }
@@ -318,7 +318,7 @@ AccessUnit::Descriptor::Descriptor(GenDesc _id, size_t count, size_t remainingSi
 
 bool AccessUnit::Descriptor::isEmpty() const {
     for (const auto &d : subdesc) {
-        if (!d.isEmpty()) {
+        if (!d.IsEmpty()) {
             return false;
         }
     }
@@ -333,11 +333,11 @@ AccessUnit::Descriptor::Descriptor() : id(GenDesc(0)) {}
 
 AccessUnit::AccessUnit(parameter::EncodingSet &&set, size_t _numRecords)
     : descriptors(), parameters(std::move(set)), numReads(_numRecords), minPos(0), maxPos(0), referenceSequence(0) {
-    for (const auto &desc : getDescriptors()) {
+    for (const auto &desc : GetDescriptors()) {
         Descriptor desc_data(desc.id);
-        for (const auto &subdesc : desc.subseqs) {
-            auto bytes = range2bytes(core::getSubsequence(subdesc.id).range);
-            desc_data.add(Subsequence(bytes, subdesc.id));
+        for (const auto &subdesc : desc.sub_seqs) {
+            auto bytes = Range2Bytes(core::GetSubsequence(subdesc.id).range);
+            desc_data.Add(Subsequence(bytes, subdesc.id));
         }
         descriptors.push_back(std::move(desc_data));
     }

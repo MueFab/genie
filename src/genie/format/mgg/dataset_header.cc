@@ -43,7 +43,7 @@ uint16_t DatasetHeader::getDatasetID() const { return ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::MPEGMinorVersion DatasetHeader::getVersion() const { return version; }
+genie::core::MpegMinorVersion DatasetHeader::getVersion() const { return version; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -126,7 +126,7 @@ DatasetHeader::DatasetHeader()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetHeader::DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, genie::core::MPEGMinorVersion _version,
+DatasetHeader::DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, genie::core::MpegMinorVersion _version,
                              bool _multiple_alignments_flags, bool _byte_offset_size_flags,
                              bool _non_overlapping_AU_range_flag, bool _pos_40_bits_flag,
                              core::parameter::DataUnit::DatasetType _dataset_type, bool _parameters_update_flag,
@@ -155,7 +155,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
     std::string versionString(4, '\0');
     reader.readBypass(versionString);
     version = core::getMPEGVersion(versionString);
-    UTILS_DIE_IF(version == core::MPEGMinorVersion::UNKNOWN, "Unknown MPEG version");
+    UTILS_DIE_IF(version == core::MpegMinorVersion::kUnknown, "Unknown MPEG version");
 
     multiple_alignment_flag = reader.read<bool>(1);
     byte_offset_size_flag = reader.read<bool>(1);
@@ -176,7 +176,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
         }
     }
     parameters_update_flag = reader.read<bool>(1);
-    alphabet_id = reader.read<genie::core::AlphabetID>(7);
+    alphabet_id = reader.read<genie::core::AlphabetId>(7);
     num_U_access_units = reader.read<uint32_t>(32);
     if (num_U_access_units) {
         u_options = dataset_header::UOptions(reader);
