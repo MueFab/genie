@@ -32,19 +32,19 @@ class MismatchDecoder {
      * @param ref
      * @return
      */
-    virtual uint64_t decodeMismatch(uint64_t ref) = 0;
+    virtual uint64_t DecodeMismatch(uint64_t ref) = 0;
 
     /**
      * @brief
      * @return
      */
-    virtual bool dataLeft() const = 0;
+    virtual bool DataLeft() const = 0;
 
     /**
      * @brief
      * @return
      */
-    virtual std::unique_ptr<MismatchDecoder> copy() const = 0;
+    virtual std::unique_ptr<MismatchDecoder> Copy() const = 0;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

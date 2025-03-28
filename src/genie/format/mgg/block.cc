@@ -63,7 +63,7 @@ genie::core::GenDesc Block::getDescID() const { return header.getDescriptorID();
 void Block::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
     print_offset(output, depth, max_depth, "* Block");
     print_offset(output, depth + 1, max_depth,
-                 "Block descriptor ID: " + genie::core::getDescriptor(header.getDescriptorID()).name);
+                 "Block descriptor ID: " + genie::core::GetDescriptor(header.getDescriptorID()).name);
     print_offset(output, depth + 1, max_depth, "Block payload size: " + std::to_string(header.getPayloadSize()));
 }
 
