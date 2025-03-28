@@ -94,8 +94,10 @@ struct EncodingBlock {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void extract_likelihoods(const EncodingOptions& opt, EncodingBlock& block,
-                         std::vector<core::record::VariantGenotype>& recs);
+void extract_likelihoods(
+    const EncodingOptions& opt,
+    EncodingBlock& block,
+    std::vector<core::record::VariantGenotype>& recs);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

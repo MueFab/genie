@@ -244,7 +244,10 @@ size_t GenotypeParameters::GetSize() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void GenotypeParameters::Write(util::BitWriter& writer) const{
+void GenotypeParameters::Write(util::BitWriter& writer) const {
+
+  UTILS_DIE_IF(!writer.IsByteAligned(), "Not byte aligned!");
+
   writer.WriteBits(0u, 3); // reserved(3)
   writer.WriteBits(static_cast<uint64_t>(binarization_ID_), 3);
   writer.WriteBits(static_cast<uint64_t>(concat_axis_), 2);
@@ -257,12 +260,10 @@ void GenotypeParameters::Write(util::BitWriter& writer) const{
 
   writer.WriteBits(0u, 1); // reserved(1)
   writer.WriteBits(GetEncodePhasesDataFlag(), 1);
-  writer.WriteBits(GetTransposeAllelesMatFlag(), 1);
-  writer.WriteBits(GetSortAllelesRowsFlag(), 1);
-  writer.WriteBits(GetSortAllelesColsFlag(), 1);
+  writer.WriteBits(GetTransposePhasesMatFlag(), 1);
+  writer.WriteBits(GetSortPhasesRowsFlag(), 1);
+  writer.WriteBits(GetSortPhasesColsFlag(), 1);
   writer.WriteBits(static_cast<uint64_t>(GetAllelesCodecID()), 3);
-
-  writer.FlushBits();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -280,10 +281,10 @@ void GenotypeParameters::Write(core::Writer& writer) const {
 
   writer.Write(0u, 1); // reserved(1)
   writer.Write(GetEncodePhasesDataFlag(), 1);
-  writer.Write(GetTransposeAllelesMatFlag(), 1);
-  writer.Write(GetSortAllelesRowsFlag(), 1);
-  writer.Write(GetSortAllelesColsFlag(), 1);
-  writer.Write(static_cast<uint64_t>(GetAllelesCodecID()), 3);
+  writer.Write(GetTransposePhasesMatFlag(), 1);
+  writer.Write(GetSortPhasesRowsFlag(), 1);
+  writer.Write(GetSortPhasesColsFlag(), 1);
+  writer.Write(static_cast<uint64_t>(GetPhasesCodecID()), 3);
   writer.Flush();
 }
 

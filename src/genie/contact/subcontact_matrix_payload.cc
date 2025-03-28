@@ -69,27 +69,36 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
     chr1_ID_ = reader.ReadAlignedInt<uint8_t>();
     chr2_ID_ = reader.ReadAlignedInt<uint8_t>();
 
-    UTILS_DIE_IF(parameter_set_ID_ != scm_param.GetParameterSetID(),
+    UTILS_DIE_IF(
+        parameter_set_ID_ != scm_param.GetParameterSetID(),
         "parameter_set_ID_ differs"
     );
-    UTILS_DIE_IF(chr1_ID_ != scm_param.GetChr1ID(),
+    UTILS_DIE_IF(
+        chr1_ID_ != scm_param.GetChr1ID(),
         "chr1_ID_ differs"
     );
-    UTILS_DIE_IF(chr2_ID_ != scm_param.GetChr2ID(),
+    UTILS_DIE_IF(
+        chr2_ID_ != scm_param.GetChr2ID(),
         "chr2_ID_ differs"
     );
 
     auto ntiles_in_row = cm_param.GetNumTiles(chr1_ID_, MULT);
     auto ntiles_in_col = cm_param.GetNumTiles(chr2_ID_, MULT);
 
-    UTILS_DIE_IF(ntiles_in_row != scm_param.GetNTilesInRow(), "chr1_ID_ differs");
-    UTILS_DIE_IF(ntiles_in_col != scm_param.GetNTilesInCol(), "chr2_ID_ differs");
+    UTILS_DIE_IF(
+      ntiles_in_row != scm_param.GetNTilesInRow(),
+      "chr1_ID_ differs"
+    );
+    UTILS_DIE_IF(
+      ntiles_in_col != scm_param.GetNTilesInCol(),
+      "chr2_ID_ differs"
+    );
 
     SetNumTiles(ntiles_in_row, ntiles_in_col);
 
     for (auto i = 0u; i< GetNTilesInRow(); i++){
         for (auto j = 0u; j< GetNTilesInCol(); j++){
-            if (!IsIntraScm() || i<=j){
+            if (!IsIntraScm() || i <= j){
 
                 auto tile_payload_size = reader.ReadAlignedInt<uint32_t>();
                 auto tile_payload = ContactMatrixTilePayload(reader, tile_payload_size);
