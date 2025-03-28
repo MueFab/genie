@@ -300,7 +300,7 @@ class VariantGenotype {
    * @brief Gets the linked record
    * @return Constant reference to the link record
    */
-  [[nodiscard]] const LinkRecord& GetLinkRecord() const;
+  [[nodiscard]] const std::optional<LinkRecord>& GetLinkRecord() const;
 
   /**
    * @brief Gets the format fields
@@ -309,50 +309,81 @@ class VariantGenotype {
   [[nodiscard]] const std::vector<FormatField>& GetFormats() const;
 
   /**
-   * @brief Sets the likelihood values
-   * @param likelihoods The likelihood values to set
+   * @brief Get the variant index
+   * @param value to set the variant index
    */
-  void SetLikelihood(std::vector<std::vector<uint32_t>> likelihoods) {
-    likelihoods_ = std::move(likelihoods);
-  }
+  void SetVariantIndex(uint64_t value);
+
+ /**
+    * @brief Set the variant index
+    */
+ void SetSampleIndexFrom(uint32_t value);
+
+ /**
+    * @brief Set the number of sample count
+    */
+ void SetSampleCount(uint32_t value);
+
+ /**
+    * @brief Set the format value
+    */
+ void SetFormat(std::vector<FormatField> value);
+
+ /**
+    * @brief Set the format value
+    */
+ void SetFormat(std::vector<FormatField>&& value);
+
+ /**
+   * @brief Set the likelihood information
+   */
+  void SetLikelihoods(std::vector<std::vector<uint32_t>> value);
+
+ /**
+   * @brief Set the likelihood information
+   */
+ void SetLikelihoods(std::vector<std::vector<uint32_t>>&& value);
+
+ /**
+   * @brief Set the link record information
+   */
+ void SetLinkRecord(const std::optional<LinkRecord>& value);
+
+  /**
+   * @brief Sets the phasing information
+   * @param value the phasing values to set
+   */
+ void SetPhasings(std::vector<std::vector<uint8_t>> value);
 
   /**
    * @brief Sets the phasing information
    * @param phasings The phasing values to set
    */
-  void SetPhasings(std::vector<std::vector<uint8_t>> phasings) {
-    phasings_ = std::move(phasings);
-  };
+ void SetPhasings(std::vector<std::vector<uint8_t>>&& value);
 
   /**
    * @brief Sets the allele information
    * @param alleles The allele values to set
    */
-  void SetAlleles(std::vector<std::vector<int8_t>> alleles) {
-    alleles_ = std::move(alleles);
-  }
+ void SetAlleles(std::vector<std::vector<int8_t>> value);
+
+ /**
+   * @brief Sets the allele information
+   * @param alleles The allele values to set
+   */
+ void SetAlleles(std::vector<std::vector<int8_t>>&& value);
 
   /**
    * @brief Sets the number of samples
    * @param sampleSize The sample count to set
    */
-  void SetNumberOfSamples(uint32_t sampleSize) {
-    sample_count_ = sampleSize;
-  };
-
-  /**
-   * @brief Sets the format fields
-   * @param formats The format fields to set
-   */
-  void SetFormats(std::vector<FormatField> formats) {
-    format_ = std::move(formats);
-  }
+  void SetNumberOfSamples(uint32_t sampleSize);
 
  /**
  * @brief Get size of the VariantGenotype
  * @return size_t of VariantGenotype size
  */
-  [[nodiscard]] size_t GetSize() const;
+  size_t GetSize() const;
 };
 
 }  // namespace genie::core::record
