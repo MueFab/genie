@@ -262,6 +262,7 @@ size_t GenotypePayload::GetSize() const {
 
 void GenotypePayload::Write(util::BitWriter& writer) const {
   UTILS_DIE_IF(!writer.IsByteAligned(), "Not byte aligned!");
+
   writer.WriteBypassBE(GetMaxPloidy());
 
   uint8_t flag = 0;

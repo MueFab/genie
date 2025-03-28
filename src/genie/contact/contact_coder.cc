@@ -967,10 +967,13 @@ void sort_sparse_mat_inplace(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void decode_scm(
+    // Inputs
     ContactMatrixParameters& cm_param,
     SubcontactMatrixParameters& scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
+    // Outputs
     core::record::ContactRecord& rec,
+    // Options
     uint32_t bin_size_mult
 ){
     // (not part of specification) Initialize variables
@@ -1178,246 +1181,251 @@ void encode_scm(
     bool multiplicative_norm,
     core::AlgoID codec_ID
 ) {
-    // TODO (Yeremia): Weights as optional input?
 
-    // Initialize variables
-    BinVecDtype row_mask;
-    BinVecDtype col_mask;
+  // TODO (Yeremia): Weights as optional input?
+  // TODO (Yeremia): By design, we always binarize the contact matrix. Change?
+  UTILS_DIE_IF(!ena_binarization, "Binarization must be activated!");
 
-    auto interval = cm_param.GetBinSize();
-    auto tile_size = cm_param.GetTileSize();
-    auto num_entries = rec.getNumEntries();
-    auto chr1_ID = rec.getChr1ID();
-    auto chr1_num_bin_entries = cm_param.GetNumBinEntries(chr1_ID);
-    auto ntiles_in_row = cm_param.GetNumTiles(chr1_ID);
-    auto chr2_ID = rec.getChr2ID();
-    auto chr2_num_bin_entries = cm_param.GetNumBinEntries(chr2_ID);
-    auto ntiles_in_col = cm_param.GetNumTiles(chr2_ID);
+  // Initialize variables
+  BinVecDtype row_mask;
+  BinVecDtype col_mask;
 
-    cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
-    scm_payload.SetSampleID(rec.getSampleID());
+  auto interval = cm_param.GetBinSize();
+  auto tile_size = cm_param.GetTileSize();
+  auto num_entries = rec.getNumEntries();
+  auto chr1_ID = rec.getChr1ID();
+  auto chr1_num_bin_entries = cm_param.GetNumBinEntries(chr1_ID);
+  auto ntiles_in_row = cm_param.GetNumTiles(chr1_ID);
+  auto chr2_ID = rec.getChr2ID();
+  auto chr2_num_bin_entries = cm_param.GetNumBinEntries(chr2_ID);
+  auto ntiles_in_col = cm_param.GetNumTiles(chr2_ID);
 
-    scm_param.SetChr1ID(chr1_ID);
-    scm_payload.SetChr1ID(chr1_ID);
+  cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+  scm_payload.SetSampleID(rec.getSampleID());
 
-    scm_param.SetChr2ID(chr2_ID);
-    scm_payload.SetChr2ID(chr2_ID);
+  scm_param.SetChr1ID(chr1_ID);
+  scm_payload.SetChr1ID(chr1_ID);
 
-    auto is_intra_scm = scm_param.IsIntraSCM();
+  scm_param.SetChr2ID(chr2_ID);
+  scm_payload.SetChr2ID(chr2_ID);
 
-    scm_param.SetCodecID(codec_ID);
+  auto is_intra_scm = scm_param.IsIntraSCM();
 
-    scm_param.SetNumTiles(ntiles_in_row, ntiles_in_col);
-    scm_payload.SetNumTiles(ntiles_in_row, ntiles_in_col);
+  scm_param.SetCodecID(codec_ID);
 
-    UInt64VecDtype row_ids = xt::adapt(rec.getStartPos1(), {num_entries});
-    row_ids /= interval;
+  scm_param.SetNumTiles(ntiles_in_row, ntiles_in_col);
+  scm_payload.SetNumTiles(ntiles_in_row, ntiles_in_col);
 
-    UInt64VecDtype col_ids = xt::adapt(rec.getStartPos2(), {num_entries});
-    col_ids /= interval;
+  UInt64VecDtype row_ids = xt::adapt(rec.getStartPos1(), {num_entries});
+  row_ids /= interval;
 
-    UIntVecDtype counts = xt::adapt(rec.getCounts(), {num_entries});
+  UInt64VecDtype col_ids = xt::adapt(rec.getStartPos2(), {num_entries});
+  col_ids /= interval;
 
-    if (remove_unaligned_region){
-        // Compute mask for
-        compute_masks(
-            row_ids,
-            col_ids,
-            chr1_num_bin_entries,
-            chr2_num_bin_entries,
-            is_intra_scm,
-            row_mask,
-            col_mask
-        );
+  UIntVecDtype counts = xt::adapt(rec.getCounts(), {num_entries});
 
-        if (transform_mask){
-            // TODO(irvan): implement 6.4.4.3.4.5
-            {
-                if(!is_intra_scm) {
-                    RunLengthEncodingData rowRLEData;
-                    RunLengthEncodingData colRLEData;
+  if (remove_unaligned_region){
+      // Compute mask for
+      compute_masks(
+          row_ids,
+          col_ids,
+          chr1_num_bin_entries,
+          chr2_num_bin_entries,
+          is_intra_scm,
+          row_mask,
+          col_mask
+      );
 
-                    set_rle_information_from_mask(rowRLEData, row_mask);
-                    set_rle_information_from_mask(colRLEData, col_mask);
+      if (transform_mask){
+          // TODO(irvan): implement 6.4.4.3.4.5
+          {
+              if(!is_intra_scm) {
+                  RunLengthEncodingData rowRLEData;
+                  RunLengthEncodingData colRLEData;
 
-                    auto row_mask_payload = SubcontactMatrixMaskPayload(
-                        rowRLEData.transformID,
-                        rowRLEData.firstVal,
-                        rowRLEData.rl_entries
-                        );
+                  set_rle_information_from_mask(rowRLEData, row_mask);
+                  set_rle_information_from_mask(colRLEData, col_mask);
 
-                    auto col_mask_payload = SubcontactMatrixMaskPayload(
-                        colRLEData.transformID,
-                        colRLEData.firstVal,
-                        colRLEData.rl_entries
-                        );
+                  auto row_mask_payload = SubcontactMatrixMaskPayload(
+                      rowRLEData.transformID,
+                      rowRLEData.firstVal,
+                      rowRLEData.rl_entries
+                      );
 
-                    // set row and mask to scm_payload
-                    scm_payload.SetRowMaskPayload(std::move(row_mask_payload));
-                    scm_param.SetRowMaskESetRowMaskExistsFlag(true);
+                  auto col_mask_payload = SubcontactMatrixMaskPayload(
+                      colRLEData.transformID,
+                      colRLEData.firstVal,
+                      colRLEData.rl_entries
+                      );
 
-                    scm_payload.SetColMaskPayload(std::move(col_mask_payload));
-                    scm_param.SetColMaskExistsFlag(true);
-                }
-                else { // if is_intra_scm is true
-                    RunLengthEncodingData symmetricalRLEData;
+                  // set row and mask to scm_payload
+                  scm_payload.SetRowMaskPayload(std::move(row_mask_payload));
+                  scm_param.SetRowMaskESetRowMaskExistsFlag(true);
 
-                    set_rle_information_from_mask(symmetricalRLEData, row_mask);
+                  scm_payload.SetColMaskPayload(std::move(col_mask_payload));
+                  scm_param.SetColMaskExistsFlag(true);
+              }
+              else { // if is_intra_scm is true
+                  RunLengthEncodingData symmetricalRLEData;
 
-                    auto symmetrical_mask_payload = SubcontactMatrixMaskPayload(
-                        symmetricalRLEData.transformID,
-                        symmetricalRLEData.firstVal,
-                        symmetricalRLEData.rl_entries
-                        );
+                  set_rle_information_from_mask(symmetricalRLEData, row_mask);
 
-                    // set row and mask to scm_payload
-                    scm_payload.SetRowMaskPayload(
-                        std::move(symmetrical_mask_payload));
-                    scm_param.SetRowMaskESetRowMaskExistsFlag(true);
-                }
-            }
-        } else {
-            auto row_mask_payload = SubcontactMatrixMaskPayload(
-                std::move(row_mask)
-            );
+                  auto symmetrical_mask_payload = SubcontactMatrixMaskPayload(
+                      symmetricalRLEData.transformID,
+                      symmetricalRLEData.firstVal,
+                      symmetricalRLEData.rl_entries
+                      );
 
-            scm_payload.SetRowMaskPayload(std::move(row_mask_payload));
-            scm_param.SetRowMaskESetRowMaskExistsFlag(true);
+                  // set row and mask to scm_payload
+                  scm_payload.SetRowMaskPayload(
+                      std::move(symmetrical_mask_payload));
+                  scm_param.SetRowMaskESetRowMaskExistsFlag(true);
+              }
+          }
+      } else {
+          auto row_mask_payload = SubcontactMatrixMaskPayload(
+              std::move(row_mask)
+          );
 
-            auto col_mask_payload = SubcontactMatrixMaskPayload(
-                std::move(col_mask)
-            );
+          scm_payload.SetRowMaskPayload(std::move(row_mask_payload));
+          scm_param.SetRowMaskESetRowMaskExistsFlag(true);
 
-            scm_payload.SetColMaskPayload(std::move(col_mask_payload));
-            scm_param.SetColMaskExistsFlag(true);
-        }
-    }
+          auto col_mask_payload = SubcontactMatrixMaskPayload(
+              std::move(col_mask)
+          );
 
-    for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++){
+          scm_payload.SetColMaskPayload(std::move(col_mask_payload));
+          scm_param.SetColMaskExistsFlag(true);
+      }
+  }
 
-        auto min_row_id = i_tile*tile_size;
-        auto max_row_id = std::min(min_row_id+tile_size, chr1_num_bin_entries);
+  for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++){
 
-        for (size_t j_tile = 0u; j_tile< ntiles_in_col; j_tile++){
+      auto min_row_id = i_tile*tile_size;
+      auto max_row_id = std::min(min_row_id+tile_size, chr1_num_bin_entries);
 
-            if (i_tile > j_tile && is_intra_scm){
-                continue;
-            }
+      for (size_t j_tile = 0u; j_tile < ntiles_in_col; j_tile++){
 
-            uint32_t tile_nrows, tile_ncols;
+          if (i_tile > j_tile && is_intra_scm){
+              continue;
+          }
 
-            // Assign
-            auto& tile_param = scm_param.GetTileParameter(i_tile, j_tile);
-            auto& diag_transform_mode = tile_param.diag_tranform_mode;
-            auto& binarization_mode = tile_param.binarization_mode;
-            bool is_intra_tile = is_intra_scm && (i_tile == j_tile);
+          uint32_t tile_nrows, tile_ncols;
 
-            // Mode selection for encoding
-            if (ena_diag_transform){
-                if (i_tile == j_tile){
-                    if (is_intra_scm){
-                        diag_transform_mode = DiagonalTransformMode::MODE_0;
-                    } else
-                        diag_transform_mode = DiagonalTransformMode::MODE_1;
-                } else if (i_tile < j_tile){
-                    diag_transform_mode = DiagonalTransformMode::MODE_2;
-                } else if (i_tile > j_tile) {
-                    diag_transform_mode = DiagonalTransformMode::MODE_3;
-                } else {
-                    UTILS_DIE("This should never be reached!");
-                }
+          // Assign
+          auto& tile_param = scm_param.GetTileParameter(i_tile, j_tile);
+          auto& diag_transform_mode = tile_param.diag_tranform_mode;
+          auto& binarization_mode = tile_param.binarization_mode;
+          bool is_intra_tile = is_intra_scm && (i_tile == j_tile);
 
-            } else {
-                diag_transform_mode = DiagonalTransformMode::NONE;
-            }
+          // Mode selection for encoding
+          if (ena_diag_transform){
+              if (i_tile == j_tile){
+                  if (is_intra_scm) {
+                      diag_transform_mode = DiagonalTransformMode::MODE_0;
+                  } else {
+                      diag_transform_mode = DiagonalTransformMode::MODE_1;
+                  }
+              } else if (i_tile < j_tile){
+                  diag_transform_mode = DiagonalTransformMode::MODE_2;
+              } else if (i_tile > j_tile) {
+                  diag_transform_mode = DiagonalTransformMode::MODE_3;
+              } else {
+                  UTILS_DIE("This should never be reached!");
+              }
 
-            if (ena_binarization){
-                binarization_mode = BinarizationMode::ROW_BINARIZATION;
-            } else {
-                binarization_mode = BinarizationMode::NONE;
-            }
+          } else {
+              diag_transform_mode = DiagonalTransformMode::NONE;
+          }
 
-            auto min_col_id = j_tile*tile_size;
-            auto max_col_id = std::min(min_col_id+tile_size, chr2_num_bin_entries);
+          if (ena_binarization){
+              binarization_mode = BinarizationMode::ROW_BINARIZATION;
+          } else {
+              binarization_mode = BinarizationMode::NONE;
+          }
 
-            // Compute tile shape
-            tile_nrows = static_cast<uint32_t>(std::min(max_row_id, chr1_num_bin_entries) - min_row_id);
-            tile_ncols = static_cast<uint32_t>(std::min(max_col_id, chr2_num_bin_entries) - min_col_id);
+          auto min_col_id = j_tile*tile_size;
+          auto max_col_id = std::min(min_col_id+tile_size, chr2_num_bin_entries);
 
-            // Filter entries that belongs to the current tile
-            BinVecDtype mask1 = (row_ids >= min_row_id) && (row_ids < max_row_id);
-            BinVecDtype mask2 = (col_ids >= min_col_id) && (col_ids < max_col_id);
-            BinVecDtype mask = mask1 && mask2;
+          // Compute tile shape
+          tile_nrows = static_cast<uint32_t>(std::min(max_row_id, chr1_num_bin_entries) - min_row_id);
+          tile_ncols = static_cast<uint32_t>(std::min(max_col_id, chr2_num_bin_entries) - min_col_id);
 
-            auto any_entry = xt::any(mask);
-            if (any_entry){
-                // Filter the values only for the corresponding tile
-                UInt64VecDtype tile_row_ids = xt::filter(row_ids, mask);
-                UInt64VecDtype tile_col_ids = xt::filter(col_ids, mask);
-                UIntVecDtype tile_counts = xt::filter(counts, mask);
+          // Filter entries that belongs to the current tile
+          BinVecDtype mask1 = (row_ids >= min_row_id) && (row_ids < max_row_id);
+          BinVecDtype mask2 = (col_ids >= min_col_id) && (col_ids < max_col_id);
+          BinVecDtype mask = mask1 && mask2;
 
-                if (min_row_id > 0){
-                    tile_row_ids -= min_row_id;
-                }
-                if (min_col_id > 0){
-                    tile_col_ids -= min_col_id;
-                }
+          auto any_entry = xt::any(mask);
+          if (any_entry){
+              // Filter the values only for the corresponding tile
+              UInt64VecDtype tile_row_ids = xt::filter(row_ids, mask);
+              UInt64VecDtype tile_col_ids = xt::filter(col_ids, mask);
+              UIntVecDtype tile_counts = xt::filter(counts, mask);
 
-                if (remove_unaligned_region){
-                    BinVecDtype tile_row_mask = xt::view(row_mask, xt::range(min_row_id, max_row_id));
-                    BinVecDtype tile_col_mask = xt::view(col_mask, xt::range(min_col_id, max_col_id));
+              if (min_row_id > 0){
+                  tile_row_ids -= min_row_id;
+              }
+              if (min_col_id > 0){
+                  tile_col_ids -= min_col_id;
+              }
 
-                    remove_unaligned(
-                        tile_row_ids,
-                        tile_col_ids,
-                        is_intra_tile,
-                        tile_row_mask,
-                        tile_col_mask
-                    );
+              if (remove_unaligned_region){
+                  BinVecDtype tile_row_mask = xt::view(row_mask, xt::range(min_row_id, max_row_id));
+                  BinVecDtype tile_col_mask = xt::view(col_mask, xt::range(min_col_id, max_col_id));
 
-                }
+                  remove_unaligned(
+                      tile_row_ids,
+                      tile_col_ids,
+                      is_intra_tile,
+                      tile_row_mask,
+                      tile_col_mask
+                  );
 
-                UIntMatDtype tile_mat;
+              }
 
-                //TODO(yeremia): Create a specification where sparse2dense transformation is disabled
-                //               better for no transformation compression
-                sparse_to_dense(
-                    tile_row_ids,
-                    tile_col_ids,
-                    tile_counts,
-                    tile_nrows,
-                    tile_ncols,
-                    tile_mat
-                );
-                genie::contact::diag_transform(tile_mat, diag_transform_mode);
+              UIntMatDtype tile_mat;
 
-                if (binarization_mode == BinarizationMode::ROW_BINARIZATION){
-                    genie::contact::BinMatDtype bin_mat;
-                    genie::contact::transform_row_bin(tile_mat, bin_mat);
+              //TODO(yeremia): Create a specification where sparse2dense
+              //               transformation is disabled
+              //               better for no transformation compression
+              sparse_to_dense(
+                  tile_row_ids,
+                  tile_col_ids,
+                  tile_counts,
+                  tile_nrows,
+                  tile_ncols,
+                  tile_mat
+              );
+              genie::contact::diag_transform(tile_mat, diag_transform_mode);
 
-                    ContactMatrixTilePayload tile_payload;
-                    encode_cm_tile(
-                        bin_mat,
-                        codec_ID,
-                        tile_payload
-                    );
+              if (binarization_mode == BinarizationMode::ROW_BINARIZATION){
+                  genie::contact::BinMatDtype bin_mat;
+                  genie::contact::transform_row_bin(tile_mat, bin_mat);
 
-                    scm_payload.SetTilePayload(i_tile, j_tile,
-                                               std::move(tile_payload));
+                  ContactMatrixTilePayload tile_payload;
+                  encode_cm_tile(
+                      bin_mat,
+                      codec_ID,
+                      tile_payload
+                  );
 
-                // BinarizationMode::NONE
-                } else {
-                    UTILS_DIE("Not yet implemented!");
-                }
+                  scm_payload.SetTilePayload(i_tile, j_tile,
+                                             std::move(tile_payload));
 
-            // There is no entry found in the current tile
-            } else {
-                std::vector<uint8_t> codec_payload;
-                ContactMatrixTilePayload tile_payload(core::AlgoID::JBIG, 0, 0, std::move(codec_payload));
-            }
+              // BinarizationMode::NONE
+              } else {
+                  UTILS_DIE("Not yet implemented!");
+              }
 
-        }
-    }
+          // There is no entry found in the current tile
+          } else {
+              std::vector<uint8_t> codec_payload;
+              ContactMatrixTilePayload tile_payload(core::AlgoID::JBIG, 0, 0, std::move(codec_payload));
+          }
+
+      }
+  }
 
     //TODO(yeremia): Separate this loop as another function
 //    // Compression of balanced matrix can be done only for intra SCM
