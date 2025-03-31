@@ -2577,11 +2577,11 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         for (auto& rec: RECS){
           cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                    rec.getChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                    rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -2737,11 +2737,11 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         for (auto& rec: RECS){
           cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                    rec.getChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                    rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -2945,11 +2945,11 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         for (auto& rec : RECS) {
           cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                    rec.getChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                    rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3069,11 +3069,11 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         for (auto& rec : RECS) {
           cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                    rec.getChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                    rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3168,11 +3168,11 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         for (auto& rec: RECS){
           cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                    rec.getChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                    rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3271,11 +3271,11 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         for (auto& rec: RECS){
           cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                    rec.getChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                    rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3378,11 +3378,11 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         for (auto& rec : RECS) {
           cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                    rec.getChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                    rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3481,11 +3481,11 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         for (auto& rec : RECS) {
           cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                    rec.getChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                    rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3580,11 +3580,11 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         for (auto& rec: RECS){
           cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                    rec.getChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                    rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3684,11 +3684,11 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         for (auto& rec: RECS){
           cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                    rec.getChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                    rec.getChr2Length());
         }
 
         auto& REC = RECS.front();

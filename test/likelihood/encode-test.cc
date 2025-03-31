@@ -23,7 +23,7 @@
 
 TEST(Likelihood, ParseLikelihood) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gl_only.vcf.geno";
+    std::string filepath = gitRootDir + "/data/records/variant/1.3.5.header100.gl_only.vcf.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
 
     uint32_t BLOCK_SIZE = 100;
@@ -60,7 +60,7 @@ TEST(Likelihood, ParseLikelihood) {
 
 TEST(Likelihood, RoundTripNoTransform) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gl_only.vcf.geno";
+    std::string filepath = gitRootDir + "/data/records/variant/1.3.5.header100.gl_only.vcf.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
 
     uint32_t BLOCK_SIZE = 100;
@@ -102,7 +102,7 @@ TEST(Likelihood, RoundTripNoTransform) {
 
 TEST(Likelihood, RoundTripTransform) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gl_only.vcf.geno";
+    std::string filepath = gitRootDir + "/data/records/variant/1.3.5.header100.gl_only.vcf.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
 
     uint32_t BLOCK_SIZE = 100;
@@ -145,7 +145,7 @@ TEST(Likelihood, RoundTripTransform) {
 
 TEST(Likelihood, RoundTripNoTransformEncode) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gl_only.vcf.geno";
+    std::string filepath = gitRootDir + "/data/records/variant/1.3.5.header100.gl_only.vcf.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
 
     uint32_t BLOCK_SIZE = 100;
@@ -227,7 +227,7 @@ TEST(Likelihood, RoundTripNoTransformEncode) {
 
 TEST(Likelihood, RoundTripTransformEncode) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gl_only.vcf.geno";
+    std::string filepath = gitRootDir + "/data/records/variant/1.3.5.header100.gl_only.vcf.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
 
     uint32_t BLOCK_SIZE = 100;

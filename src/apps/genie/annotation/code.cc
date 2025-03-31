@@ -224,8 +224,8 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
         auto& info = attributesInfo[formatdata.first];
         std::vector<uint32_t> arrayDims;
         arrayDims.push_back(std::min(BLOCK_SIZE, static_cast<uint32_t>(recs.size())));
-        arrayDims.push_back(recs.at(0).getNumSamples());
-        arrayDims.push_back(recs.at(0).getFormatCount());
+        arrayDims.push_back(recs.at(0).GetSampleCount());
+        arrayDims.push_back(recs.at(0).GetFormatCount());
         attributeTDStream[formatdata.first].set(info.getAttributeType(), static_cast<uint8_t>(arrayDims.size()),
                                                 arrayDims);
         attributeTDStream[formatdata.first].convertToTypedData(formatdata.second);

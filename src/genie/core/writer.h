@@ -101,7 +101,7 @@ class Writer {
             else
                 *logwriter << '"' << str << '"' << endVal;
         } else {
-            if (!str.empty()) binwriter.write(str);
+            if (!str.empty()) binwriter.Write(str);
         }
     }
     /**

@@ -23,7 +23,6 @@ namespace genie::contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//TODO(yeremia): Docstring
 class [[maybe_unused]] ContactMatrixBinPayload {
  private:
     uint16_t sample_ID_;
@@ -32,27 +31,47 @@ class [[maybe_unused]] ContactMatrixBinPayload {
     std::vector<std::vector<double_t>> weight_value_;
 
  public:
-    ContactMatrixBinPayload();
+  // Constructors
+  ContactMatrixBinPayload() = default;
+  ContactMatrixBinPayload(
+      uint16_t  sample_ID,
+      uint8_t  chr_ID,
+      uint32_t  bin_size_multiplier,
+      std::vector<std::vector<double_t>>&& weight_value
+  );
+  ContactMatrixBinPayload(const ContactMatrixBinPayload& other);
+  ContactMatrixBinPayload(ContactMatrixBinPayload&& other) noexcept;
+  ~ContactMatrixBinPayload() = default;
 
-    ContactMatrixBinPayload(const ContactMatrixBinPayload& other) noexcept;
+  // Assignment operators
+  ContactMatrixBinPayload& operator=(const ContactMatrixBinPayload& other);
+  ContactMatrixBinPayload& operator=(ContactMatrixBinPayload&& other) noexcept;
 
-    ContactMatrixBinPayload(ContactMatrixBinPayload&& other) noexcept;
+  // BitReader constructor
+  explicit ContactMatrixBinPayload(
+      genie::util::BitReader& bit_reader,
+      uint8_t num_norm_methods,
+      uint32_t num_bin_entries
+  );
 
-    ContactMatrixBinPayload& operator=(ContactMatrixBinPayload&& other) noexcept;
+  bool operator==(const ContactMatrixBinPayload& other) const;
 
-    explicit ContactMatrixBinPayload(util::BitReader &reader);
+  // Getters
+  [[nodiscard]] uint16_t GetSampleID() const;
+  [[nodiscard]] uint8_t GetChrID() const;
+  [[nodiscard]] uint32_t GetBinSizeMultiplier() const;
+  [[nodiscard]] const std::vector<std::vector<double_t>>& GetWeightValue() const;
 
-    uint16_t GetSampleID() const;
-    uint8_t GetChrId() const;
-    uint32_t GetBinSizeMultiplier() const;
-    const std::vector<std::vector<double_t>>& GetWeightValue() const;
+  // Setters
+  void SetSampleID(uint16_t sample_id);
+  void SetChrID(uint8_t chr_id);
+  void SetBinSizeMultiplier(uint32_t bin_size_multiplier);
+  void SetWeightValue(std::vector<std::vector<double_t>>&& weight_value);
 
-    void SetSampleID(uint16_t sample_ID);
-    void SetChrID(uint8_t chr_ID);
-    void SetBinSizeMultipler(uint32_t bin_size_multiplier);
-    void SetWeightValue(std::vector<std::vector<double_t>>&& weight_value);
+  void ParseWeightValues(const std::string& fpath);
+  void ParseWeightValues(const std::string& fpath, size_t idx);
 
-    void Write(util::BitWriter& writer) const;
+  void Write(util::BitWriter& writer) const;
 
 };
 

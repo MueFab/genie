@@ -44,10 +44,10 @@ class ParameterSetComposer {
 
  
     void setGenotypeParameters(genie::genotype::GenotypeParameters _parameters) { genotypeParameters = _parameters; }
-    void setContactParameters(genie::contact::ContactMatrixParameters _parameters) {
+    [[maybe_unused]] void setContactParameters(genie::contact::ContactMatrixParameters _parameters) {
         contactMatrixParameters = _parameters;
     }
-    void SetSubContactParameters(genie::contact::SubcontactMatrixParameters _parameters) {
+    [[maybe_unused]] void SetSubContactParameters(genie::contact::SubcontactMatrixParameters _parameters) {
         subContactMatrixParameters = _parameters;
     }
     void setLikelihoodParameters(genie::likelihood::LikelihoodParameters _parameters) {
@@ -57,7 +57,7 @@ class ParameterSetComposer {
         contactMatrixParameters = _parameters;
     }
     */
-    void setCompressors(genie::annotation::Compressor _compressors) {
+    [[maybe_unused]] void setCompressors(genie::annotation::Compressor _compressors) {
         compressors = _compressors;
         useCompressors = true;
     }
@@ -79,7 +79,7 @@ class ParameterSetComposer {
     bool AT_pos_40_bits_flag;
     uint8_t n_aux_attribute_groups;
     bool two_dimensional;
-    uint64_t n_tiles;
+    [[maybe_unused]] uint64_t n_tiles;
     uint8_t AG_class;
 
     std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configuration;

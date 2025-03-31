@@ -129,19 +129,19 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
 // ---------------------------------------------------------------------------------------------------------------------
 
 ContactMatrixTilePayload::ContactMatrixTilePayload(
-    core::AlgoID _codec_ID,
-    uint32_t _tile_nrows,
-    uint32_t _tile_ncols,
-    uint8_t** _payload,
-    size_t _payload_len
-): codec_ID_(_codec_ID),
-      tile_nrows_(_tile_nrows),
-      tile_ncols_(_tile_ncols),
-      payload_(*_payload, *(_payload) + _payload_len)
+    core::AlgoID codec_ID,
+    uint32_t tile_nrows,
+    uint32_t tile_ncols,
+    uint8_t** payload,
+    size_t payload_len
+): codec_ID_(codec_ID),
+   tile_nrows_(tile_nrows),
+   tile_ncols_(tile_ncols),
+   payload_(*payload, *(payload) + payload_len)
 {
-    free(*_payload);
+    free(*payload);
 
-    if (codec_ID_ == core::AlgoID::JBIG){
+    if (codec_ID == core::AlgoID::JBIG){
       tile_nrows_ = 0;
       tile_ncols_ = 0;
     }
@@ -222,6 +222,8 @@ size_t ContactMatrixTilePayload::GetSize() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ContactMatrixTilePayload::Write(util::BitWriter &writer) const {
+
+
     writer.WriteBypassBE(codec_ID_);
 
     if (codec_ID_ != core::AlgoID::JBIG){

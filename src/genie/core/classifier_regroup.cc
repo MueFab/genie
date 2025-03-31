@@ -74,7 +74,7 @@ void ClassifierRegroup::queueFinishedChunk(core::record::Chunk& data) {
                     refChunk.setReferenceOnly(true);
                     refChunk.setRefID(refMgr->ref2ID(data.getRef().getRefName()));
                     refChunk.getRef() = data.getRef();
-                    core::record::Record rec(1, core::record::ClassType::CLASS_U, "", "", 0);
+                    core::record::Record rec(1, core::record::ClassType::kClassU, "", "", 0);
                     std::string seq = *data.getRef().getChunkAt(i * refMgr->getChunkSize());
                     if ((i + 1) * refMgr->getChunkSize() > length) {
                         seq = seq.substr(0, length - i * refMgr->getChunkSize());
@@ -112,7 +112,7 @@ ClassifierRegroup::ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr, Re
     for (auto& c : currentChunks) {
         c.resize(2);
         for (auto& c2 : c) {
-            c2.resize((uint8_t)record::ClassType::CLASS_U);
+            c2.resize((uint8_t)record::ClassType::kClassU);
         }
     }
 }
@@ -152,7 +152,7 @@ record::Chunk ClassifierRegroup::getChunk() {
                         refChunk.getRef() = refMgr->load(
                             seq, std::max(cov.first, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize()),
                             std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize()));
-                        core::record::Record rec(1, core::record::ClassType::CLASS_U, "", "", 0);
+                        core::record::Record rec(1, core::record::ClassType::kClassU, "", "", 0);
                         std::string ref_seq =
                             *refChunk.getRef().getChunkAt((chunkOffset + refModeFullChunkID) * refMgr->getChunkSize());
                         if (ref_seq.empty()) {
@@ -237,7 +237,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
             for (auto& pairblock : refblock) {
                 for (auto& classblock : pairblock) {
                     if (classblock.getData().empty() ||
-                        classblock.getData().front().getClassID() == record::ClassType::CLASS_U) {
+                        classblock.getData().front().getClassID() == record::ClassType::kClassU) {
                         continue;
                     }
                     queueFinishedChunk(classblock);
@@ -251,7 +251,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
         bool paired = r.getNumberOfTemplateSegments() > 1;
         bool refBased = false;
 
-        if (r.getClassID() == core::record::ClassType::CLASS_U &&
+        if (r.getClassID() == core::record::ClassType::kClassU &&
             r.getNumberOfTemplateSegments() != r.getSegments().size()) {
             current_unpaired_u_Chunk.getData().emplace_back(std::move(r));
             if (current_unpaired_u_Chunk.getData().size() >= auSize) {
@@ -263,7 +263,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
         ReferenceManager::ReferenceExcerpt record_reference;
 
         // Unaligned reads can't be ref based, otherwise check if reference available
-        if (classtype != core::record::ClassType::CLASS_U) {
+        if (classtype != core::record::ClassType::kClassU) {
             refBased = isCovered(r);
             if (refBased) {
                 size_t end = 0;

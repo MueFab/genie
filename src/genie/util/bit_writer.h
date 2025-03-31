@@ -58,13 +58,13 @@ class BitWriter {
      * @brief Write all characters of string to the stream.
      * @param string String to write.
      */
-    void write(const std::string &string);
+    void Write(const std::string &string);
 
     /**
      * @brief Write the whole data from another stream. Basically appending the data to this stream.
      * @param in Data source
      */
-    void write(std::istream *in);
+    void Write(std::istream *in);
 
     /**
      * @brief Writes all buffered bits to the output stream. If there is no full byte available, the missing bits for
