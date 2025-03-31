@@ -35,19 +35,19 @@ TEST(VariantGenotypeRecord, Genotype_gt_only) {  // NOLINT(cert-err58-cpp)
 
     for (size_t i = 0; i< recs.size(); i++){
         auto& rec = recs[i];
-        ASSERT_EQ(rec.getVariantIndex(), i);
-        ASSERT_EQ(rec.getNumSamples(), 1092u);
-        ASSERT_EQ(rec.getNumberOfAllelesPerSample(), 2);
-        ASSERT_EQ(rec.getLinkedRecord(), false);
+        ASSERT_EQ(rec.GetVariantIndex(), i);
+        ASSERT_EQ(rec.GetSampleCount(), 1092u);
+        ASSERT_EQ(rec.GetNumberOfAllelesPerSample(), 2);
+        ASSERT_EQ(rec.GetLinkedRecord(), false);
     }
 
     {
         auto& rec = recs[0];
-        auto num_samples = rec.getNumSamples();
-        auto num_alleles = rec.getNumberOfAllelesPerSample();
+        auto num_samples = rec.GetSampleCount();
+        auto num_alleles = rec.GetNumberOfAllelesPerSample();
 
         std::vector<uint32_t> num_counts_per_allele(3);
-        auto& rec_alleles = rec.getAlleles();
+        auto& rec_alleles = rec.GetAlleles();
         for (size_t i = 0; i < num_samples; i++){
             for (size_t j = 0; j < num_alleles; j++){
                 auto v = rec_alleles[i][j];
@@ -62,11 +62,11 @@ TEST(VariantGenotypeRecord, Genotype_gt_only) {  // NOLINT(cert-err58-cpp)
 
     {
         auto& rec = recs[recs.size()-1];
-        auto num_samples = rec.getNumSamples();
-        auto num_alleles = rec.getNumberOfAllelesPerSample();
+        auto num_samples = rec.GetSampleCount();
+        auto num_alleles = rec.GetNumberOfAllelesPerSample();
 
         std::vector<uint32_t> num_counts_per_allele(3);
-        auto& rec_alleles = rec.getAlleles();
+        auto& rec_alleles = rec.GetAlleles();
         for (size_t i = 0; i < num_samples; i++){
             for (size_t j = 0; j < num_alleles; j++){
                 auto v = rec_alleles[i][j];
@@ -106,9 +106,9 @@ TEST(VariantGenotypeRecord, Genotype_FORMAT_only) {  // NOLINT(cert-err58-cpp)
 
     for (size_t i = 0; i < recs.size(); i++) {
         auto& rec = recs[i];
-        ASSERT_EQ(rec.getVariantIndex(), i);
-        ASSERT_EQ(rec.getNumSamples(), 1092u);
-        ASSERT_EQ(rec.getLinkedRecord(), false);
+        ASSERT_EQ(rec.GetVariantIndex(), i);
+        ASSERT_EQ(rec.GetSampleCount(), 1092u);
+        ASSERT_EQ(rec.GetLinkedRecord(), false);
     }
     
 }
@@ -138,9 +138,9 @@ TEST(VariantGenotypeRecord, Genotype_FORMAT_CASE2) {  // NOLINT(cert-err58-cpp)
 
     for (size_t i = 0; i < recs.size(); i++) {
         auto& rec = recs[i];
-        ASSERT_EQ(rec.getVariantIndex(), i);
-        ASSERT_EQ(rec.getNumSamples(), 1233u);
-        ASSERT_EQ(rec.getLinkedRecord(), false);
+        ASSERT_EQ(rec.GetVariantIndex(), i);
+        ASSERT_EQ(rec.GetSampleCount(), 1233u);
+        ASSERT_EQ(rec.GetLinkedRecord(), false);
     }
 
 }

@@ -36,7 +36,7 @@ Record::Record()
     : number_of_template_segments(0),
       reads(),
       alignmentInfo(0),
-      class_ID(ClassType::NONE),
+      class_ID(ClassType::kNone),
       read_group(),
       read_1_first(false),
       sharedAlignmentInfo(),
@@ -142,9 +142,9 @@ Record &Record::operator=(Record &&rec) noexcept {
 void Record::addSegment(Segment &&rec) {
     UTILS_DIE_IF(reads.size() == number_of_template_segments, "Record already full");
     if (reads.empty()) {
-        qv_depth = uint8_t(rec.getQualities().size());
+        qv_depth = uint8_t(rec.GetQualities().size());
     }
-    UTILS_DIE_IF(!reads.empty() && rec.getQualities().size() != qv_depth, "Incompatible qv depth");
+    UTILS_DIE_IF(!reads.empty() && rec.GetQualities().size() != qv_depth, "Incompatible qv depth");
     reads.push_back(std::move(rec));
 }
 
@@ -203,14 +203,14 @@ void Record::Write(util::BitWriter &writer) const {
         sharedAlignmentInfo.write(writer);
     }
     for (const auto &a : reads) {
-        writer.WriteBypassBE<uint32_t, 3>(static_cast<uint32_t>(a.getSequence().length()));
+        writer.WriteBypassBE<uint32_t, 3>(static_cast<uint32_t>(a.GetSequence().length()));
     }
     writer.WriteBypassBE(qv_depth);
     writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(read_name.length()));
     writer.WriteAlignedBytes(read_name.data(), read_name.length());
     writer.WriteAlignedBytes(read_group.data(), read_group.length());
     for (const auto &r : reads) {
-        r.write(writer);
+        r.Write(writer);
     }
     for (const auto &a : alignmentInfo) {
         a.write(writer);

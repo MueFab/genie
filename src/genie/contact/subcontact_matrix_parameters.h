@@ -52,7 +52,6 @@ struct TileParameter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//using ChrIDPair = std::pair<uint8_t, uint8_t>;
 using TileParameters = std::vector<std::vector<TileParameter>>;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -71,10 +70,15 @@ class SubcontactMatrixParameters {
     // Default constructor
     SubcontactMatrixParameters();
 
-    // Constructor from move
+    // Parameterized constructor
     SubcontactMatrixParameters(
-        SubcontactMatrixParameters&& other
-    ) noexcept;
+        uint8_t parameter_set_ID,
+        uint8_t chr1_ID,
+        uint8_t chr2_ID,
+        core::AlgoID codec_ID,
+        TileParameters&& tile_parameters,
+        bool row_mask_exists_flag,
+        bool col_mask_exists_flag);
 
     // Constructor by reference
     SubcontactMatrixParameters(
@@ -82,28 +86,19 @@ class SubcontactMatrixParameters {
     ) noexcept;
 
     // Constructor from move
-//    SubcontactMatrixParameters(
-//        uint8_t parameter_set_ID_,
-//        uint8_t chr1_ID_,
-//        uint8_t chr2_ID_,
-//        core::AlgoID codec_ID_,
-//        TileParameters&& tile_parameters_,
-//        bool row_mask_exists_flag_,
-//        bool col_mask_exists_flag_
-//    ) noexcept;
+    SubcontactMatrixParameters(
+        SubcontactMatrixParameters&& other
+    ) noexcept;
+
+    // Assignment operators
+    SubcontactMatrixParameters& operator=(const SubcontactMatrixParameters& other);
+    SubcontactMatrixParameters& operator=(SubcontactMatrixParameters&& other) noexcept;
+
+    bool operator==(const SubcontactMatrixParameters& other);
 
     SubcontactMatrixParameters(
         util::BitReader& reader,
         ContactMatrixParameters& cm_params);
-
-    // Constructor using operator=
-    SubcontactMatrixParameters& operator=(
-        const SubcontactMatrixParameters& other
-    );
-
-    bool operator==(
-        const SubcontactMatrixParameters& other
-    );
 
     /**
      * @brief Get the parameter set ID.
@@ -227,7 +222,7 @@ class SubcontactMatrixParameters {
     void SetNumTiles(
         size_t ntiles_in_row,
         size_t ntiles_in_col,
-        bool free_mem= true);
+        bool free_mem = true);
 
     /**
     * @brief Retrieves a tile parameter from the subcontact matrix parameters.
@@ -303,6 +298,11 @@ class SubcontactMatrixParameters {
      * @param writer The BitWriter to write to.
      */
     void Write(util::BitWriter& writer) const;
+
+    /**
+     *
+     * @param writer
+     */
     void Write(core::Writer& writer) const;
 };
 

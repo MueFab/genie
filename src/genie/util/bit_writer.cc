@@ -99,7 +99,7 @@ L0:
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitWriter::write(const std::string &string) {
+void BitWriter::Write(const std::string &string) {
     for (const auto &a : string) {
         WriteBits(uint8_t(a), 8);
     }
@@ -107,7 +107,7 @@ void BitWriter::write(const std::string &string) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitWriter::write(std::istream *in) {
+void BitWriter::Write(std::istream *in) {
     while (true) {
         char byte = 0;
         in->read(&byte, 1);
