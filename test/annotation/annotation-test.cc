@@ -117,24 +117,27 @@ TEST_P(AnnotationTests, annotationSite) {
     std::string inputFilename = filePath + testParams.sitefile_in;  // "ALL.chrX.10000.site";
     std::string orgfilename = std::filesystem::path(inputFilename).string();
     size_t lastindex = orgfilename.find_last_of(".");
-    orgfilename = orgfilename.substr(0, lastindex) + "_";
+    orgfilename = orgfilename.substr(0, lastindex);
+    lastindex = orgfilename.find_last_of(".");
+    orgfilename = orgfilename.substr(0, lastindex+1);
 
     ASSERT_TRUE(std::filesystem::exists(inputFilename));
     if constexpr (!RUNBIGFILES)
         if (std::filesystem::file_size(inputFilename) > 100 * 1024) return;
 
-    std::string outputFilename = orgfilename + std::to_string(testParams.totNrOfRows);
-    outputFilename += "_Cn_TS" + std::to_string(testParams.defaultTileHeight) + "_site";
+    std::string outputFilename = orgfilename + "R" + std::to_string(testParams.totNrOfRows);
+    outputFilename += "-Cn_TS" + std::to_string(testParams.defaultTileHeight) + "_site";
     std::cerr << outputFilename << std::endl;
     std::filesystem::remove(outputFilename + ".bin");
 
     genie::annotation::Annotation annotationGenerator;
     std::string comment = "# with parameters";
-    std::string set1 = "compressor 1 1 BSC {32 128 1 1}";
+    std::string set1 = "compressor 1 1 BSC";
     std::string set2 = "compressor 3 2 LZMA {8 16777216 3 0 2 32}";
     std::string set3 = "compressor 1 2 ZSTD {0 0}";
     std::stringstream config;
-    config << set1 << '\n' << set2 << '\n' << set3 << '\n';
+    config << set1 << '\n';
+    //<< set2 << '\n' << set3 << '\n';
 
     annotationGenerator.setCompressorConfig(config);
     annotationGenerator.setTileSize(testParams.defaultTileHeight, testParams.defaultTileWidth);
@@ -151,7 +154,9 @@ TEST_P(AnnotationTests, annotationGeno) {
     std::string inputFilename = filePath + testParams.genofile_in;  //"ALL.chrX.10000.geno";
     std::string orgfilename = std::filesystem::path(inputFilename).string();
     size_t lastindex = orgfilename.find_last_of(".");
-    orgfilename = orgfilename.substr(0, lastindex) + "_";
+    orgfilename = orgfilename.substr(0, lastindex);
+    lastindex = orgfilename.find_last_of(".");
+    orgfilename = orgfilename.substr(0, lastindex + 1);
 
     ASSERT_TRUE(std::filesystem::exists(inputFilename));
 
@@ -159,19 +164,19 @@ TEST_P(AnnotationTests, annotationGeno) {
     if constexpr (!RUNBIGFILES)
         if (inputfilesize > 50 * 1024 * 1024) return;
 
-    std::string outputFilename = orgfilename + std::to_string(testParams.totNrOfRows);
-    outputFilename += "-1092_TS" + std::to_string(testParams.defaultTileHeight) + "-" +
+    std::string outputFilename = orgfilename + "R" + std::to_string(testParams.totNrOfRows);
+    outputFilename += "-C1092_TS" + std::to_string(testParams.defaultTileHeight) + "-" +
                       std::to_string(testParams.defaultTileWidth) + "_geno";
     std::cerr << outputFilename << std::endl;
 
     std::filesystem::remove(outputFilename + ".bin");
 
     std::string comment = "# with parameters";
-    std::string set1 = "compressor 1 1 BSC {32 128 1 1}";
+    std::string set1 = "compressor 1 1 BSC";
     std::string set2 = "compressor 3 2 LZMA {8 16777216 3 0 2 32}";
     std::string set3 = "compressor 1 2 ZSTD {0 0}";
     std::stringstream config;
-    config << set1 << '\n' << set2 << '\n' << set3 << '\n';
+    config << set1 << '\n';  // << set2 << '\n' << set3 << '\n';
 
     uint32_t BLOCK_SIZE = testParams.defaultTileHeight;
     bool TRANSFORM_MODE = true;
@@ -247,4 +252,5 @@ INSTANTIATE_TEST_SUITE_P(
                       TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 1000, 3000u),
                     //  TestDetails("ALL.chrX.100000.geno", "ALL.chrX.100000.site", 100000u, 1000, 3000),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 15u, 3000u),
-                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 3000u)));
+                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 5u, 3000u),              
+                        TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 3000u)));
