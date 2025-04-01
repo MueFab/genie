@@ -392,7 +392,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixParameter){
         ASSERT_EQ(recon_obj.GetSampleName(SAMPLE1_ID), SAMPLE1_NAME);
         ASSERT_EQ(recon_obj.GetSampleName(SAMPLE2_ID), SAMPLE2_NAME);
 
-        ASSERT_TRUE(ORIG_CM_PARAM==recon_obj);
+        ASSERT_TRUE(ORIG_CM_PARAM == recon_obj);
     }
 }
 
@@ -631,7 +631,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixBinPayload){
     for (auto& norm_name: NORM_NAMES){
       std::string filepath = gitRootDir + "/data/records/contact/" + filename + std::to_string(RESOLUTION) + "." + std::to_string(chrom) + "." + norm_name + ".weights";
 
-      bin_payload.ParseWeightValues(filepath);
+      bin_payload.ReadWeightValuesFromFile(filepath);
 
       ASSERT_EQ(bin_payload.GetWeightValue()[norm_idx].size(), LENGTHS[chrom_idx]);
       ASSERT_TRUE(fabs((bin_payload.GetWeightValue()[norm_idx][POSS[chrom_idx]] - ORIV_VALS[chrom_idx][norm_idx]) - TOLERANCE));
@@ -655,7 +655,27 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixBinPayload){
     ASSERT_EQ(bin_payload.GetSampleID(), recon_obj.GetSampleID());
     ASSERT_EQ(bin_payload.GetChrID(), recon_obj.GetChrID());
     ASSERT_EQ(bin_payload.GetBinSizeMultiplier(), recon_obj.GetBinSizeMultiplier());
-//    ASSERT_EQ(bin_payload.GetWeightValue(), recon_obj.GetWeightValue()); // TODO(Yeremia): Fix the comparison
+
+    ASSERT_EQ(bin_payload.GetNumNormMethods(), recon_obj.GetNumNormMethods());
+    auto orig_weight_values = bin_payload.GetWeightValue();
+    auto recon_weight_values = recon_obj.GetWeightValue();
+    for (auto i = 0u; i < bin_payload.GetNumNormMethods(); i++){
+      auto orig_norm_weight_values = orig_weight_values[i];
+      auto recon_norm_weight_values = recon_weight_values[i];
+
+      ASSERT_EQ(orig_norm_weight_values.size(), recon_norm_weight_values.size());
+      auto num_entries = orig_norm_weight_values.size();
+
+      for (auto j = 0u; j<num_entries; j++){
+        auto orig_weight_value = orig_norm_weight_values[j];
+        auto recon_weight_value = recon_norm_weight_values[j];
+        auto orig_weight_value_int = *reinterpret_cast<uint64_t*>(&orig_weight_value);
+        auto recon_weight_value_int = *reinterpret_cast<uint64_t*>(&recon_weight_value);
+
+        ASSERT_EQ(orig_weight_value_int, recon_weight_value_int) << "i:" << i << "j:" << j;
+      }
+    }
+    ASSERT_TRUE(bin_payload == recon_obj); // TODO(Yeremia): Fix the comparison
 
     chrom_idx++;
   }

@@ -23,6 +23,12 @@
 
 namespace genie::contact {
 
+ContactMatrixBinPayload::ContactMatrixBinPayload()
+    : sample_ID_(0),
+      chr_ID_(0),
+      bin_size_multiplier_(0),
+      weight_value_(){}
+
 // -----------------------------------------------------------------------------
 
 ContactMatrixBinPayload::ContactMatrixBinPayload(
@@ -87,10 +93,32 @@ ContactMatrixBinPayload::ContactMatrixBinPayload(
 // -----------------------------------------------------------------------------
 
 bool ContactMatrixBinPayload::operator==(const ContactMatrixBinPayload& other) const {
-  return (sample_ID_ == other.sample_ID_ &&
-          chr_ID_ == other.chr_ID_ &&
-          bin_size_multiplier_ == other.bin_size_multiplier_ &&
-          weight_value_ == other.weight_value_);
+  // Check if the sizes match first
+  if (sample_ID_ != other.sample_ID_ ||
+      chr_ID_ != other.chr_ID_ ||
+      bin_size_multiplier_ != other.bin_size_multiplier_ ||
+      weight_value_.size() != other.weight_value_.size()) {
+    return false;
+  }
+
+  // Compare each element, treating NaN as equal
+  for (size_t i = 0; i < weight_value_.size(); ++i) {
+    if (weight_value_[i].size() != other.weight_value_[i].size()) {
+      return false;
+    }
+    for (size_t j = 0; j < weight_value_[i].size(); ++j) {
+      // Check if both are NaN or both are equal
+      if (std::isnan(weight_value_[i][j]) && std::isnan(other.weight_value_[i][j])) {
+        continue;
+      }
+      if (!std::isnan(weight_value_[i][j]) && !std::isnan(other.weight_value_[i][j]) &&
+          weight_value_[i][j] != other.weight_value_[i][j]) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 // -----------------------------------------------------------------------------
@@ -104,6 +132,12 @@ uint8_t ContactMatrixBinPayload::GetChrID() const { return chr_ID_; }
 // -----------------------------------------------------------------------------
 
 uint32_t ContactMatrixBinPayload::GetBinSizeMultiplier() const { return bin_size_multiplier_; }
+
+// -----------------------------------------------------------------------------
+
+size_t ContactMatrixBinPayload::GetNumNormMethods() const {
+  return weight_value_.size();
+}
 
 // -----------------------------------------------------------------------------
 
@@ -133,13 +167,13 @@ void ContactMatrixBinPayload::SetWeightValue(std::vector<std::vector<double_t>>&
   weight_value_ = std::move(weight_value);
 }
 
-void ContactMatrixBinPayload::ParseWeightValues(const std::string& fpath) {
-  ParseWeightValues(fpath, weight_value_.size());
+void ContactMatrixBinPayload::ReadWeightValuesFromFile(const std::string& fpath) {
+  ReadWeightValuesFromFileAtIndex(fpath, weight_value_.size());
 }
 
 // -----------------------------------------------------------------------------
 
-void ContactMatrixBinPayload::ParseWeightValues(const std::string& fpath, size_t idx) {
+void ContactMatrixBinPayload::ReadWeightValuesFromFileAtIndex(const std::string& fpath, size_t idx) {
   std::ifstream reader(fpath, std::ios::binary);
   if (reader.fail()) {
     throw std::runtime_error("Failed to open file: " + fpath);

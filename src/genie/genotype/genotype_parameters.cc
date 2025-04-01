@@ -10,8 +10,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace genotype {
+namespace genie::genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -76,18 +75,27 @@ GenotypeParameters& GenotypeParameters::operator=(GenotypeParameters&& other) no
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-GenotypeParameters::GenotypeParameters(genie::util::BitReader& reader) {
-  binarization_ID_ = static_cast<BinarizationID>(reader.ReadBits(8));
-  concat_axis_ = static_cast<ConcatAxis>(reader.ReadBits(8));
+GenotypeParameters::GenotypeParameters(
+    genie::util::BitReader& reader
+) {
+  UTILS_DIE_IF(!reader.IsByteAligned(), "Not byte aligned!");
+
+  reader.ReadBits(3); // reserved u(3)
+  binarization_ID_ = static_cast<BinarizationID>(reader.ReadBits(3));
+  concat_axis_ = static_cast<ConcatAxis>(reader.ReadBits(2));
+
+  reader.ReadBits(2); // reserved u(2)
   transpose_alleles_mat_flag_ = reader.ReadBits(1);
   sort_alleles_rows_flag_ = reader.ReadBits(1);
   sort_alleles_cols_flag_ = reader.ReadBits(1);
-  alleles_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(5));
+  alleles_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(3));
+
+  reader.ReadBits(1); // reserved u(1)
   encode_phases_data_flag_ = reader.ReadBits(1);
   transpose_phases_mat_flag_ = reader.ReadBits(1);
   sort_phases_rows_flag_ = reader.ReadBits(1);
   sort_phases_cols_flag_ = reader.ReadBits(1);
-  phases_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(5));
+  phases_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(3));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -218,6 +226,12 @@ bool GenotypeParameters::GetEncodePhasesDataFlag() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void GenotypeParameters::SetPhasesCodecID(genie::core::AlgoID codec_id) {
+    phases_codec_ID_ = codec_id;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t GenotypeParameters::GetSize() {
   size_t size = 0u;
 
@@ -263,7 +277,7 @@ void GenotypeParameters::Write(util::BitWriter& writer) const {
   writer.WriteBits(GetTransposePhasesMatFlag(), 1);
   writer.WriteBits(GetSortPhasesRowsFlag(), 1);
   writer.WriteBits(GetSortPhasesColsFlag(), 1);
-  writer.WriteBits(static_cast<uint64_t>(GetAllelesCodecID()), 3);
+  writer.WriteBits(static_cast<uint64_t>(GetPhasesCodecID()), 3);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -292,14 +306,28 @@ void GenotypeParameters::Write(core::Writer& writer) const {
 
 // Read from BitReader
 void GenotypeParameters::read(util::BitReader& reader) {
-  // Placeholder implementation
-  // Actual reading logic should be implemented here
-  (void)reader;
+  UTILS_DIE_IF(!reader.IsByteAligned(), "Not byte aligned!");
+
+  reader.ReadBits(3);  // reserved u(3)
+  binarization_ID_ = static_cast<BinarizationID>(reader.ReadBits(3));
+  concat_axis_ = static_cast<ConcatAxis>(reader.ReadBits(2));
+
+  reader.ReadBits(2);  // reserved u(2)
+  transpose_alleles_mat_flag_ = reader.ReadBits(1);
+  sort_alleles_rows_flag_ = reader.ReadBits(1);
+  sort_alleles_cols_flag_ = reader.ReadBits(1);
+  alleles_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(3));
+
+  reader.ReadBits(1);  // reserved u(1)
+  encode_phases_data_flag_ = reader.ReadBits(1);
+  transpose_phases_mat_flag_ = reader.ReadBits(1);
+  sort_phases_rows_flag_ = reader.ReadBits(1);
+  sort_phases_cols_flag_ = reader.ReadBits(1);
+  phases_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(3));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genotype
-}  // namespace genie
+} // namespace genie::genotype
 
 // ---------------------------------------------------------------------------------------------------------------------

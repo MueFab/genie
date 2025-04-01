@@ -216,6 +216,10 @@ class ContactMatrixTilePayload {
      */
     [[nodiscard]] size_t GetPayloadSize() const;
 
+    uint32_t GetNumRows();
+
+    uint32_t GetNumCols();
+
     /**
      * @brief Gets the size of this structure.
      *

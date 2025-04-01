@@ -22,8 +22,8 @@ BinMatPayload::BinMatPayload()
     : codec_ID_(core::AlgoID::UNDEFINED),
       payload_(),
       nrows_(0),
-      ncols_(0),
-      compressed_payload_() {}
+      ncols_(0) {}
+//      compressed_payload_() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -35,8 +35,8 @@ BinMatPayload::BinMatPayload(
     : codec_ID_(codec_id),
       payload_(std::move(payload)),
       nrows_(nrows),
-      ncols_(ncols),
-      compressed_payload_() {}
+      ncols_(ncols) {}
+//      compressed_payload_() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,8 +48,8 @@ BinMatPayload::BinMatPayload(BinMatPayload&& other) noexcept
     : codec_ID_(other.codec_ID_),
       payload_(std::move(other.payload_)),
       nrows_(other.nrows_),
-      ncols_(other.ncols_),
-      compressed_payload_(std::move(other.compressed_payload_)) {}
+      ncols_(other.ncols_) {}
+//      compressed_payload_(std::move(other.compressed_payload_)) {}
 
 // -----------------------------------------------------------------------------
 
@@ -110,7 +110,7 @@ BinMatPayload& BinMatPayload::operator=(const BinMatPayload& other) {
     payload_ = other.payload_;
     nrows_ = other.nrows_;
     ncols_ = other.ncols_;
-    compressed_payload_ = other.compressed_payload_;
+//    compressed_payload_ = other.compressed_payload_;
   }
   return *this;
 }
@@ -123,7 +123,7 @@ BinMatPayload& BinMatPayload::operator=(BinMatPayload&& other) noexcept {
     payload_ = std::move(other.payload_);
     nrows_ = other.nrows_;
     ncols_ = other.ncols_;
-    compressed_payload_ = std::move(other.compressed_payload_);
+//    compressed_payload_ = std::move(other.compressed_payload_);
   }
   return *this;
 }
@@ -154,13 +154,14 @@ uint32_t BinMatPayload::GetNCols() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] const std::vector<uint8_t>& BinMatPayload::GetCompressedPayload() const {
-  return compressed_payload_;
-}
+//[[maybe_unused]] const std::vector<uint8_t>& BinMatPayload::GetCompressedPayload() const {
+//  return compressed_payload_;
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] void BinMatPayload::SetCodecID(core::AlgoID codec_id) { codec_ID_ = codec_id;
+[[maybe_unused]] void BinMatPayload::SetCodecID(core::AlgoID codec_id) {
+  codec_ID_ = codec_id;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -183,15 +184,33 @@ uint32_t BinMatPayload::GetNCols() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] void BinMatPayload::SetCompressedPayload(std::vector<uint8_t>&& compressed_payload) {
-  compressed_payload_ = std::move(compressed_payload);
+//[[maybe_unused]] void BinMatPayload::SetCompressedPayload(std::vector<uint8_t>&& compressed_payload) {
+//  compressed_payload_ = std::move(compressed_payload);
+//}
+
+size_t BinMatPayload::GetPayloadSize() const { return payload_.size(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+size_t BinMatPayload::GetSize() const {
+  size_t size = 0u;
+  if (codec_ID_ != genie::core::AlgoID::JBIG){
+    size += sizeof(uint32_t); // u(32)
+    size += sizeof(uint32_t); // u(32)
+  }
+
+  size += GetPayloadSize();
+
+  return size;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void BinMatPayload::Write(core::Writer& writer) const {
-  writer.Write(GetNRows(), 32);
-  writer.Write(GetNCols(), 32);
+  if (codec_ID_ != genie::core::AlgoID::JBIG) {
+    writer.Write(GetNRows(), 32);
+    writer.Write(GetNCols(), 32);
+  }
   for (auto byte : payload_) writer.Write(byte, 8);
 }
 
@@ -202,7 +221,7 @@ void BinMatPayload::Write(util::BitWriter writer) const {
     writer.WriteBypassBE(GetNRows());
     writer.WriteBypassBE(GetNCols());
   }
-  writer.WriteAlignedBytes(payload_.data(), payload_.size());
+  writer.WriteAlignedBytes(payload_.data(), GetPayloadSize());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

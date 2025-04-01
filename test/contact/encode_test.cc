@@ -723,8 +723,8 @@ TEST(ContactCoder, RoundTrip_Coding_TransformRowBin) {
 TEST(ContactCoder, RoundTrip_Coding_CodingCMTile) {
     // Test coding of bin_mat using JBIG
     {
-        auto NROWS = 100u;
-        auto NCOLS = 200u;
+        auto NROWS = 154u;
+        auto NCOLS = 213u;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
 
         genie::contact::BinMatDtype ORIG_BIN_MAT = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2u));
@@ -738,6 +738,9 @@ TEST(ContactCoder, RoundTrip_Coding_CodingCMTile) {
             CODEC_ID,
             tile_payload
         );
+
+        ASSERT_EQ(tile_payload.GetNumRows(), NROWS);
+        ASSERT_EQ(tile_payload.GetNumCols(), NCOLS);
 
         decode_cm_tile(
             tile_payload,
@@ -749,8 +752,8 @@ TEST(ContactCoder, RoundTrip_Coding_CodingCMTile) {
     }
     // Test coding of bin_mat using JBIG
     {
-        auto NROWS = 660u;
-        auto NCOLS = 151u;
+        auto NROWS = 2500u;
+        auto NCOLS = 3750u;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
 
         genie::contact::BinMatDtype ORIG_BIN_MAT = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2u));
@@ -764,6 +767,9 @@ TEST(ContactCoder, RoundTrip_Coding_CodingCMTile) {
             CODEC_ID,
             tile_payload
         );
+
+        ASSERT_EQ(tile_payload.GetNumRows(), NROWS);
+        ASSERT_EQ(tile_payload.GetNumCols(), NCOLS);
 
         decode_cm_tile(
             tile_payload,

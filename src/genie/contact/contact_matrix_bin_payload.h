@@ -32,16 +32,15 @@ class [[maybe_unused]] ContactMatrixBinPayload {
 
  public:
   // Constructors
-  ContactMatrixBinPayload() = default;
+  ContactMatrixBinPayload();
   ContactMatrixBinPayload(
-      uint16_t  sample_ID,
-      uint8_t  chr_ID,
-      uint32_t  bin_size_multiplier,
+      uint16_t sample_ID,
+      uint8_t chr_ID,
+      uint32_t bin_size_multiplier,
       std::vector<std::vector<double_t>>&& weight_value
   );
   ContactMatrixBinPayload(const ContactMatrixBinPayload& other);
   ContactMatrixBinPayload(ContactMatrixBinPayload&& other) noexcept;
-  ~ContactMatrixBinPayload() = default;
 
   // Assignment operators
   ContactMatrixBinPayload& operator=(const ContactMatrixBinPayload& other);
@@ -60,6 +59,7 @@ class [[maybe_unused]] ContactMatrixBinPayload {
   [[nodiscard]] uint16_t GetSampleID() const;
   [[nodiscard]] uint8_t GetChrID() const;
   [[nodiscard]] uint32_t GetBinSizeMultiplier() const;
+  size_t GetNumNormMethods() const;
   [[nodiscard]] const std::vector<std::vector<double_t>>& GetWeightValue() const;
 
   // Setters
@@ -68,8 +68,9 @@ class [[maybe_unused]] ContactMatrixBinPayload {
   void SetBinSizeMultiplier(uint32_t bin_size_multiplier);
   void SetWeightValue(std::vector<std::vector<double_t>>&& weight_value);
 
-  void ParseWeightValues(const std::string& fpath);
-  void ParseWeightValues(const std::string& fpath, size_t idx);
+  // Additional Functionalities
+  void ReadWeightValuesFromFile(const std::string& fpath);
+  void ReadWeightValuesFromFileAtIndex(const std::string& fpath, size_t idx);
 
   void Write(util::BitWriter& writer) const;
 

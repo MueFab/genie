@@ -33,7 +33,7 @@ class BinMatPayload {
   std::vector<uint8_t> payload_;  // JBIG or CABAC: ISO/IEC 11544 or ISO/IEC 23092-2
   uint32_t nrows_;
   uint32_t ncols_;
-  std::vector<uint8_t> compressed_payload_;
+//  std::vector<uint8_t> compressed_payload_;
 
  public:
   // Default constructor
@@ -71,14 +71,14 @@ class BinMatPayload {
   [[maybe_unused]] const std::vector<uint8_t>& GetPayload() const;
   uint32_t GetNRows() const;
   uint32_t GetNCols() const;
-  [[maybe_unused]] const std::vector<uint8_t>& GetCompressedPayload() const;
+//  [[maybe_unused]] const std::vector<uint8_t>& GetCompressedPayload() const;
 
   // Setters
   [[maybe_unused]] void SetCodecID(core::AlgoID codec_id);
   [[maybe_unused]] void SetPayload(std::vector<uint8_t>&& payload);
   [[maybe_unused]] void SetNRows(uint32_t nrows);
   [[maybe_unused]] void SetNCols(uint32_t ncols);
-  [[maybe_unused]] void SetCompressedPayload(std::vector<uint8_t>&& compressed_payload);
+//  [[maybe_unused]] void SetCompressedPayload(std::vector<uint8_t>&& compressed_payload);
 
   // Methods
   [[maybe_unused]] size_t GetPayloadSize() const;
