@@ -376,8 +376,9 @@ void bin_mat_from_bytes(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void encode_genotype(
+    // Inputs
     std::vector<core::record::VariantGenotype>& recs,
-    // Output
+    // Outputs
     GenotypeParameters& params,
     GenotypePayload& payload,
     // Options

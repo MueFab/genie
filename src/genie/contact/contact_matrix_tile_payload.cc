@@ -199,9 +199,111 @@ const std::vector<uint8_t>& ContactMatrixTilePayload::GetPayload() const { retur
 //    }
 //}
 
+//std::pair<uint32_t, uint32_t> ContactMatrixTilePayload::GetTileDimensions() const {
+//  if (codec_ID_ != core::AlgoID::JBIG) {
+//    return {tile_nrows_, tile_ncols_};
+//  }
+//
+//  // JBIG payload contains BIE (Binary Image Data) segments
+//  // We need to parse the BIE segment to get the image dimensions
+//  const uint8_t* payload_ptr = payload_.data();
+//  size_t payload_size = payload_.size();
+//
+//  // Skip SOI (Start of Image) marker
+//  if (payload_size < 2 || payload_ptr[0] != 0xFF || payload_ptr[1] != 0xD8) {
+////    throw util::RuntimeException("Invalid JBIG payload - missing SOI marker");
+//    UTILS_DIE("Invalid JBIG payload - missing SOI marker");
+//  }
+//  payload_ptr += 2;
+//  payload_size -= 2;
+//
+//  // Skip BTH (Binary Thumbnail) segment if present
+//  while (payload_size >= 2 && payload_ptr[0] == 0xFF) {
+//    uint8_t marker = payload_ptr[1];
+//    if (marker == 0xD9) {  // EOI marker
+//      break;
+//    }
+//    if (marker == 0x02) {  // BTH marker
+//      // Skip BTH segment
+//      payload_ptr += 2;
+//      if (payload_size < 4) {
+//        UTILS_DIE("Invalid JBIG payload - incomplete BTH segment");
+//      }
+//      uint16_t bth_length = (payload_ptr[0] << 8) | payload_ptr[1];
+//      payload_ptr += bth_length;
+//      payload_size -= bth_length + 2;
+//    } else {
+//      // Skip other markers
+//      payload_ptr += 2;
+//      payload_size -= 2;
+//    }
+//  }
+//
+//  // Now we're at the BIE (Binary Image Data) segment
+//  if (payload_size < 8) {
+//    UTILS_DIE("Invalid JBIG payload - incomplete BTH segment");
+//  }
+//
+//  // BIE segment format:
+//  // - 1 byte: Image width (lsb)
+//  // - 1 byte: Image width (msb)
+//  // - 1 byte: Image height (lsb)
+//  // - 1 byte: Image height (msb)
+//  // - 4 bytes: Image data (not needed for dimensions)
+//
+//  uint32_t width = (payload_ptr[1] << 8) | payload_ptr[0];
+//  uint32_t height = (payload_ptr[3] << 8) | payload_ptr[2];
+//
+//  return {height, width};
+//}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t ContactMatrixTilePayload::GetPayloadSize() const { return payload_.size(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint32_t ContactMatrixTilePayload::GetNumRows() {
+  if (codec_ID_ == core::AlgoID::JBIG) {
+    // Check if the payload has enough data to extract the height
+    if (payload_.size() < 12) {
+      return 0;
+    }
+
+    // Extract height from bytes 8-11 (little-endian)
+    uint32_t height = 0;
+    height |= static_cast<uint32_t>(payload_[8] << 24);
+    height |= static_cast<uint32_t>(payload_[9] << 16);
+    height |= static_cast<uint32_t>(payload_[10] << 8);
+    height |= payload_[11];
+
+    return height;
+  } else {
+    return tile_nrows_;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint32_t ContactMatrixTilePayload::GetNumCols() {
+  if (codec_ID_ == core::AlgoID::JBIG) {
+    // Check if the payload has enough data to extract the width
+    if (payload_.size() < 8) {
+      return 0;
+    }
+
+    // Extract width from bytes 4-7 (little-endian)
+    uint32_t width = 0;
+    width |= static_cast<uint32_t>(payload_[4] << 24);
+    width |= static_cast<uint32_t>(payload_[5] << 16);
+    width |= static_cast<uint32_t>(payload_[6] << 8);
+    width |= payload_[7];
+
+    return width;
+  } else {
+    return tile_ncols_;
+  }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -222,7 +324,6 @@ size_t ContactMatrixTilePayload::GetSize() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ContactMatrixTilePayload::Write(util::BitWriter &writer) const {
-
 
     writer.WriteBypassBE(codec_ID_);
 
