@@ -14,8 +14,7 @@ namespace genie::contact {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ContactMatrixTilePayload::ContactMatrixTilePayload()
-    : codec_ID_(core::AlgoID::JBIG), tile_nrows_(0),
-      tile_ncols_(0),
+    : codec_ID_(core::AlgoID::JBIG), nrows_(0), ncols_(0),
       payload_()
 {}
 
@@ -25,13 +24,13 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
     const ContactMatrixTilePayload& other
 )
     : codec_ID_(other.codec_ID_),
-      tile_nrows_(other.tile_nrows_),
-      tile_ncols_(other.tile_ncols_),
+      nrows_(other.nrows_),
+      ncols_(other.ncols_),
       payload_(other.payload_) {
 
     if (codec_ID_ == core::AlgoID::JBIG){
-      tile_nrows_ = 0;
-      tile_ncols_ = 0;
+      nrows_ = 0;
+      ncols_ = 0;
     }
 }
 
@@ -41,14 +40,14 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
     ContactMatrixTilePayload&& other
 ) noexcept
     : codec_ID_(other.codec_ID_),
-      tile_nrows_(other.tile_nrows_),
-      tile_ncols_(other.tile_ncols_),
+      nrows_(other.nrows_),
+      ncols_(other.ncols_),
       payload_(std::move(other.payload_))
 {
 
     if (codec_ID_ == core::AlgoID::JBIG){
-      tile_nrows_ = 0;
-      tile_ncols_ = 0;
+      nrows_ = 0;
+      ncols_ = 0;
     }
 }
 
@@ -60,8 +59,8 @@ ContactMatrixTilePayload& ContactMatrixTilePayload::operator=(
 {
     if (this != &other) {
       codec_ID_ = other.codec_ID_;
-      tile_nrows_ = other.tile_nrows_;
-      tile_ncols_ = other.tile_ncols_;
+      nrows_ = other.nrows_;
+      ncols_ = other.ncols_;
       payload_ = std::move(other.payload_);
     }
     return *this;
@@ -69,25 +68,47 @@ ContactMatrixTilePayload& ContactMatrixTilePayload::operator=(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ContactMatrixTilePayload::ContactMatrixTilePayload(util::BitReader &reader, size_t payload_size){
+ContactMatrixTilePayload::ContactMatrixTilePayload(
+    util::BitReader &reader,
+    size_t payload_size
+){
     UTILS_DIE_IF(!reader.IsByteAligned(), "Must be byte-aligned");
 
     codec_ID_ = reader.ReadAlignedInt<core::AlgoID>();
     payload_size -= sizeof(uint8_t);
 
-    if (codec_ID_ == core::AlgoID::JBIG){
-      tile_nrows_ = 0;
-      tile_ncols_ = 0;
-    } else {
-      tile_nrows_ = reader.ReadAlignedInt<uint32_t>();
-      tile_ncols_ = reader.ReadAlignedInt<uint32_t>();
-        payload_size -= sizeof(uint32_t);
-        payload_size -= sizeof(uint32_t);
-    }
-
-    payload_.resize(payload_size);
-    for (auto &v: payload_){
-        v = reader.ReadAlignedInt<uint8_t>();
+    switch (codec_ID_) {
+      case genie::core::AlgoID::JBIG: {
+        //TODO: First 4 bytes are width, 2nd 4 bytes are heights
+        nrows_ = 0;
+        ncols_ = 0;
+        payload_.resize(payload_size);
+        reader.ReadAlignedBytes(payload_.data(), payload_size);
+      } break;
+      case genie::core::AlgoID::ZSTD: {
+        nrows_ = reader.Read<uint32_t>();
+        ncols_ = reader.Read<uint32_t>();
+        payload_size -= sizeof(uint32_t) + sizeof(uint32_t);
+        payload_.resize(payload_size);
+        reader.ReadAlignedBytes(payload_.data(), payload_size);
+      } break;
+      case genie::core::AlgoID::BSC: {
+        nrows_ = reader.Read<uint32_t>();
+        ncols_ = reader.Read<uint32_t>();
+        payload_size -= sizeof(uint32_t) + sizeof(uint32_t);
+        payload_.resize(payload_size);
+        reader.ReadAlignedBytes(payload_.data(), payload_size);
+      } break;
+      case genie::core::AlgoID::LZMA: {
+        nrows_ = reader.Read<uint32_t>();
+        ncols_ = reader.Read<uint32_t>();
+        payload_size -= sizeof(uint32_t) + sizeof(uint32_t);
+        payload_.resize(payload_size);
+        reader.ReadAlignedBytes(payload_.data(), payload_size);
+      } break;
+      default:
+        UTILS_DIE("Invalid codec_ID");
+        break;
     }
 }
 
@@ -96,9 +117,9 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(util::BitReader &reader, size
 bool ContactMatrixTilePayload::operator==(const ContactMatrixTilePayload& other) const {
     if (codec_ID_ != other.codec_ID_)
         return false;
-    if (tile_nrows_ != other.tile_nrows_)
+    if (nrows_ != other.nrows_)
         return false;
-    if (tile_ncols_ != other.tile_ncols_)
+    if (ncols_ != other.ncols_)
         return false;
     if (GetPayloadSize() != other.GetPayloadSize())
         return false;
@@ -116,13 +137,13 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
     uint32_t _tile_ncols,
     std::vector<uint8_t>&& _payload
 ): codec_ID_(_codec_ID),
-      tile_nrows_(_tile_nrows),
-      tile_ncols_(_tile_ncols),
+      nrows_(_tile_nrows),
+      ncols_(_tile_ncols),
       payload_(std::move(_payload))
 {
     if (codec_ID_ == core::AlgoID::JBIG){
-      tile_nrows_ = 0;
-      tile_ncols_ = 0;
+      nrows_ = 0;
+      ncols_ = 0;
     }
 }
 
@@ -135,15 +156,15 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
     uint8_t** payload,
     size_t payload_len
 ): codec_ID_(codec_ID),
-   tile_nrows_(tile_nrows),
-   tile_ncols_(tile_ncols),
+      nrows_(tile_nrows),
+      ncols_(tile_ncols),
    payload_(*payload, *(payload) + payload_len)
 {
     free(*payload);
 
     if (codec_ID == core::AlgoID::JBIG){
-      tile_nrows_ = 0;
-      tile_ncols_ = 0;
+      nrows_ = 0;
+      ncols_ = 0;
     }
 }
 
@@ -153,11 +174,11 @@ core::AlgoID ContactMatrixTilePayload::GetCodecID() const { return codec_ID_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t ContactMatrixTilePayload::GetTileNRows() const { return tile_nrows_; }
+uint32_t ContactMatrixTilePayload::GetTileNRows() const { return nrows_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t ContactMatrixTilePayload::GetTileNCols() const { return tile_ncols_; }
+uint32_t ContactMatrixTilePayload::GetTileNCols() const { return ncols_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -169,13 +190,13 @@ const std::vector<uint8_t>& ContactMatrixTilePayload::GetPayload() const { retur
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] void ContactMatrixTilePayload::SetTileNRows(uint32_t rows) {
-  tile_nrows_ = rows; }
+//[[maybe_unused]] void ContactMatrixTilePayload::SetTileNRows(uint32_t rows) {
+//  nrows_ = rows; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] void ContactMatrixTilePayload::SetTileNCols(uint32_t cols) {
-  tile_ncols_ = cols; }
+//[[maybe_unused]] void ContactMatrixTilePayload::SetTileNCols(uint32_t cols) {
+//  ncols_ = cols; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -194,14 +215,14 @@ const std::vector<uint8_t>& ContactMatrixTilePayload::GetPayload() const { retur
 //    free(*_payload);
 //
 //    if (codec_ID_ == core::AlgoID::JBIG){
-//        tile_nrows_ = 0;
-//        tile_ncols_ = 0;
+//        nrows_ = 0;
+//        ncols_ = 0;
 //    }
 //}
 
 //std::pair<uint32_t, uint32_t> ContactMatrixTilePayload::GetTileDimensions() const {
 //  if (codec_ID_ != core::AlgoID::JBIG) {
-//    return {tile_nrows_, tile_ncols_};
+//    return {nrows_, ncols_};
 //  }
 //
 //  // JBIG payload contains BIE (Binary Image Data) segments
@@ -279,7 +300,7 @@ uint32_t ContactMatrixTilePayload::GetNumRows() {
 
     return height;
   } else {
-    return tile_nrows_;
+    return nrows_;
   }
 }
 
@@ -301,7 +322,7 @@ uint32_t ContactMatrixTilePayload::GetNumCols() {
 
     return width;
   } else {
-    return tile_ncols_;
+    return ncols_;
   }
 }
 
@@ -312,9 +333,9 @@ size_t ContactMatrixTilePayload::GetSize() const {
     size += sizeof(uint8_t); // codec_ID_
 
     if (codec_ID_ != core::AlgoID::JBIG){
-        // Adds tile_nrows_, tile_ncols_, and payload_size
-        size += sizeof(uint32_t); // tile_nrows_
-        size += sizeof(uint32_t); // tile_ncols_
+        // Adds nrows_, ncols_, and payload_size
+        size += sizeof(uint32_t); // nrows_
+        size += sizeof(uint32_t); // ncols_
     }
 
     size += GetPayloadSize();
@@ -328,8 +349,8 @@ void ContactMatrixTilePayload::Write(util::BitWriter &writer) const {
     writer.WriteBypassBE(codec_ID_);
 
     if (codec_ID_ != core::AlgoID::JBIG){
-        writer.WriteBypassBE(tile_nrows_);
-        writer.WriteBypassBE(tile_ncols_);
+        writer.WriteBypassBE(nrows_);
+        writer.WriteBypassBE(ncols_);
     }
 
     //writer.WriteBypassBE(static_cast<uint32_t>(GetPayloadSize()));
