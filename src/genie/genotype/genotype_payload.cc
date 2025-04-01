@@ -65,21 +65,27 @@ GenotypePayload::GenotypePayload(GenotypePayload&& other) noexcept {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// Copy assignment operator
-//GenotypePayload& GenotypePayload::operator=(const GenotypePayload& other) {
-//  if (this != &other) {
-//    max_ploidy_ = other.max_ploidy_;
-//    no_reference_flag_ = other.no_reference_flag_;
-//    not_available_flag_ = other.not_available_flag_;
-//    phases_value_ = other.phases_value_;
-//    variants_payloads_ = other.variants_payloads_;
-//    sort_variants_row_ids_payloads_ = other.sort_variants_row_ids_payloads_;
-//    sort_variants_col_ids_payloads_ = other.sort_variants_col_ids_payloads_;
-//    variants_amax_payload_ = other.variants_amax_payload_;
-//    phases_payload_ = other.phases_payload_;
-//  }
-//  return *this;
-//}
+// Copy constructor
+GenotypePayload::GenotypePayload(const GenotypePayload& other) {
+  max_ploidy_ = other.max_ploidy_;
+  no_reference_flag_ = other.no_reference_flag_;
+  not_available_flag_ = other.not_available_flag_;
+  phases_value_ = other.phases_value_;
+
+  variants_payloads_ = other.variants_payloads_;
+
+  if (other.variants_amax_payload_.has_value()) {
+    variants_amax_payload_ = std::make_optional(other.variants_amax_payload_.value());
+  } else {
+    variants_amax_payload_ = std::nullopt;
+  }
+
+  if (other.phases_payload_.has_value()) {
+    phases_payload_ = std::make_optional(other.phases_payload_.value());
+  } else {
+    phases_payload_ = std::nullopt;
+  }
+}
 
 // -----------------------------------------------------------------------------
 
@@ -93,6 +99,33 @@ GenotypePayload& GenotypePayload::operator=(GenotypePayload&& other) noexcept {
     variants_payloads_ = std::move(other.variants_payloads_);
     variants_amax_payload_ = std::move(other.variants_amax_payload_);
     phases_payload_ = std::move(other.phases_payload_);
+  }
+  return *this;
+}
+
+// -----------------------------------------------------------------------------
+
+// Copy assignment operator
+GenotypePayload& GenotypePayload::operator=(const GenotypePayload& other) {
+  if (this != &other) {
+    max_ploidy_ = other.max_ploidy_;
+    no_reference_flag_ = other.no_reference_flag_;
+    not_available_flag_ = other.not_available_flag_;
+    phases_value_ = other.phases_value_;
+
+    variants_payloads_ = other.variants_payloads_;
+
+    if (other.variants_amax_payload_.has_value()) {
+      variants_amax_payload_ = std::make_optional(other.variants_amax_payload_.value());
+    } else {
+      variants_amax_payload_ = std::nullopt;
+    }
+
+    if (other.phases_payload_.has_value()) {
+      phases_payload_ = std::make_optional(other.phases_payload_.value());
+    } else {
+      phases_payload_ = std::nullopt;
+    }
   }
   return *this;
 }

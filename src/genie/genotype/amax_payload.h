@@ -39,8 +39,10 @@ class AmaxPayload {
   AmaxPayload();
 
   // Parameterized constructor
-  explicit AmaxPayload(std::vector<uint64_t>&& amax_elements,
-    std::optional<uint8_t> nbits_per_elem = std::nullopt);
+  explicit AmaxPayload(
+    std::vector<uint64_t>&& amax_elements,
+    std::optional<uint8_t> nbits_per_elem = std::nullopt
+  );
 
   // Copy constructor
   AmaxPayload(const AmaxPayload& other);
