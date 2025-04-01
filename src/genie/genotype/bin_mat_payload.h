@@ -56,7 +56,7 @@ class BinMatPayload {
   // Constructor from bitreader
   BinMatPayload(
       util::BitReader& reader,
-      size_t size,
+      size_t payload_size,
       core::AlgoID codec_ID
   );
 
@@ -65,6 +65,9 @@ class BinMatPayload {
 
   // Move assignment operator
   BinMatPayload& operator=(BinMatPayload&& other) noexcept;
+
+  // Comparison operator
+  bool operator==(const BinMatPayload& other) const;
 
   // Getters
   [[maybe_unused]] core::AlgoID GetCodecID() const;
@@ -76,8 +79,8 @@ class BinMatPayload {
   // Setters
   [[maybe_unused]] void SetCodecID(core::AlgoID codec_id);
   [[maybe_unused]] void SetPayload(std::vector<uint8_t>&& payload);
-  [[maybe_unused]] void SetNRows(uint32_t nrows);
-  [[maybe_unused]] void SetNCols(uint32_t ncols);
+//  [[maybe_unused]] void SetNRows(uint32_t nrows);
+//  [[maybe_unused]] void SetNCols(uint32_t ncols);
 //  [[maybe_unused]] void SetCompressedPayload(std::vector<uint8_t>&& compressed_payload);
 
   // Methods

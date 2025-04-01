@@ -55,7 +55,7 @@ BinMatPayload::BinMatPayload(BinMatPayload&& other) noexcept
 
 BinMatPayload::BinMatPayload(
     util::BitReader& reader,
-    size_t size,
+    size_t payload_size,
     core::AlgoID codec_ID)
     : codec_ID_(codec_ID){
 
@@ -66,40 +66,34 @@ BinMatPayload::BinMatPayload(
           //TODO: First 4 bytes are width, 2nd 4 bytes are heights
           nrows_ = 0;
           ncols_ = 0;
-          payload_.resize(size);
-          reader.ReadAlignedBytes(&payload_, size);
+          payload_.resize(payload_size);
+          reader.ReadAlignedBytes(payload_.data(), payload_size);
         } break;
         case genie::core::AlgoID::ZSTD: {
           nrows_ = reader.Read<uint32_t>();
           ncols_ = reader.Read<uint32_t>();
-          auto payload_size = size - 8;
+          payload_size -= sizeof(uint32_t) + sizeof(uint32_t);
           payload_.resize(payload_size);
-          reader.ReadAlignedBytes(&payload_, payload_size);
+          reader.ReadAlignedBytes(payload_.data(), payload_size);
         } break;
         case genie::core::AlgoID::BSC: {
           nrows_ = reader.Read<uint32_t>();
           ncols_ = reader.Read<uint32_t>();
-          auto payload_size = size - 8;
+          payload_size -= sizeof(uint32_t) + sizeof(uint32_t);
           payload_.resize(payload_size);
-          reader.ReadAlignedBytes(&payload_, payload_size);
+          reader.ReadAlignedBytes(payload_.data(), payload_size);
         } break;
         case genie::core::AlgoID::LZMA: {
           nrows_ = reader.Read<uint32_t>();
           ncols_ = reader.Read<uint32_t>();
-          auto payload_size = size - 8;
+          payload_size -= sizeof(uint32_t) + sizeof(uint32_t);
           payload_.resize(payload_size);
-          reader.ReadAlignedBytes(&payload_, payload_size);
+          reader.ReadAlignedBytes(payload_.data(), payload_size);
         } break;
         default:
           UTILS_DIE("Invalid codec_ID");
           break;
     }
-
-    nrows_ = reader.Read<uint32_t>();
-    ncols_ = reader.Read<uint32_t>();
-    auto payload_size = size - 8;
-    payload_.resize(payload_size);
-    reader.ReadAlignedBytes(&payload_, payload_size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -129,6 +123,21 @@ BinMatPayload& BinMatPayload::operator=(BinMatPayload&& other) noexcept {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+bool BinMatPayload::operator==(const BinMatPayload& other) const {
+  if (codec_ID_ != other.codec_ID_){
+    return false;
+  }
+
+  if (codec_ID_ != core::AlgoID::JBIG){
+      if (nrows_ != other.nrows_ || ncols_ != other.ncols_) {
+          return false;
+      }
+  }
+
+  return payload_ == other.payload_;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 [[maybe_unused]] core::AlgoID BinMatPayload::GetCodecID() const {
   return codec_ID_;
@@ -143,13 +152,45 @@ BinMatPayload& BinMatPayload::operator=(BinMatPayload&& other) noexcept {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint32_t BinMatPayload::GetNRows() const {
-  return nrows_;
+  if (codec_ID_ == core::AlgoID::JBIG) {
+    // Check if the payload has enough data to extract the height
+    if (payload_.size() < 12) {
+      return 0;
+    }
+
+    // Extract height from bytes 8-11 (little-endian)
+    uint32_t height = 0;
+    height |= static_cast<uint32_t>(payload_[8]) << 24;
+    height |= static_cast<uint32_t>(payload_[9]) << 16;
+    height |= static_cast<uint32_t>(payload_[10]) << 8;
+    height |= payload_[11];
+
+    return height;
+  } else {
+    return nrows_;
+  }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint32_t BinMatPayload::GetNCols() const {
-  return ncols_;
+  if (codec_ID_ == core::AlgoID::JBIG) {
+    // Check if the payload has enough data to extract the width
+    if (payload_.size() < 8) {
+      return 0;
+    }
+
+    // Extract width from bytes 4-7 (little-endian)
+    uint32_t width = 0;
+    width |= static_cast<uint32_t>(payload_[4]) << 24;
+    width |= static_cast<uint32_t>(payload_[5]) << 16;
+    width |= static_cast<uint32_t>(payload_[6]) << 8;
+    width |= payload_[7];
+
+    return width;
+  } else {
+    return ncols_;
+  }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -172,15 +213,15 @@ uint32_t BinMatPayload::GetNCols() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] void BinMatPayload::SetNRows(uint32_t nrows) {
-  nrows_ = nrows;
-}
+//[[maybe_unused]] void BinMatPayload::SetNRows(uint32_t nrows) {
+//  nrows_ = nrows;
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] void BinMatPayload::SetNCols(uint32_t ncols) {
-  ncols_ = ncols;
-}
+//[[maybe_unused]] void BinMatPayload::SetNCols(uint32_t ncols) {
+//  ncols_ = ncols;
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
