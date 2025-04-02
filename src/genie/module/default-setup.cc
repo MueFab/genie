@@ -101,10 +101,10 @@ std::unique_ptr<core::FlowGraphDecode> build_default_decoder(size_t threads, con
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, combinePairsFlag, false));
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, combinePairsFlag, true));
     ret->setReadCoderSelector([](const genie::core::AccessUnit& au) -> size_t {
-        if (au.getParameters().IsComputedReference()) {
-            switch (au.getParameters().GetComputedRef().GetAlgorithm()) {
+        if (au.GetParameters().IsComputedReference()) {
+            switch (au.GetParameters().GetComputedRef().GetAlgorithm()) {
                 case core::parameter::ComputedRef::Algorithm::kGlobalAssembly:
-                    if (au.getParameters().GetNumberTemplateSegments() >= 2) {
+                    if (au.GetParameters().GetNumberTemplateSegments() >= 2) {
                         return 4;
                     } else {
                         return 3;
@@ -123,7 +123,7 @@ std::unique_ptr<core::FlowGraphDecode> build_default_decoder(size_t threads, con
                     break;
             }
         } else {
-            if (au.getClassType() == core::record::ClassType::kClassU) {
+            if (au.GetClassType() == core::record::ClassType::kClassU) {
                 return 2;
             } else {
                 return 0;

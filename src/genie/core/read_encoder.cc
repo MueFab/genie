@@ -36,22 +36,22 @@ AccessUnit ReadEncoder::entropyCodeAU(EntropySelector* _entropycoder, AccessUnit
         static std::atomic<uint64_t> id(0);
         auto this_id = id++;
         for (const auto& d : genie::core::GetDescriptors()) {
-            for (auto& s : au.get(d.id)) {
+            for (auto& s : au.Get(d.id)) {
                 if (s.IsEmpty()) {
                     continue;
                 }
                 std::ofstream out_file_stream("rawstream_" + std::to_string(this_id) + "_" +
                                               std::to_string(static_cast<uint8_t>(d.id)) + "_" +
                                               std::to_string(static_cast<uint8_t>(s.GetId().second)));
-                out_file_stream.write(static_cast<char*>(s.getData().GetData()), s.getData().GetRawSize());
+                out_file_stream.write(static_cast<char*>(s.GetData().GetData()), s.GetData().GetRawSize());
             }
         }
     }
     for (auto& d : au) {
         auto encoded = _entropycoder->Process(d);
-        au.getParameters().SetDescriptor(d.GetId(), std::move(std::get<0>(encoded)));
+        au.GetParameters().SetDescriptor(d.GetId(), std::move(std::get<0>(encoded)));
         au.Set(d.GetId(), std::move(std::get<1>(encoded)));
-        au.getStats().Add(std::get<2>(encoded));
+        au.GetStats().Add(std::get<2>(encoded));
     }
     return au;
 }
