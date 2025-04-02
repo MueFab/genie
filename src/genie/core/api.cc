@@ -1,241 +1,257 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/core/api.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include <string>
+#include <vector>
 
-namespace genie {
-namespace core {
-namespace api {
+// -----------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------------------------------------------
+namespace genie::core::api {
+
+// -----------------------------------------------------------------------------
 
 std::string ExceptionPartiallyAuthorized::Msg() const {
-    return "Only partially authorized. " + genie::util::RuntimeException::Msg();
+  return "Only partially authorized. " + RuntimeException::Msg();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::string ExceptionNotAuthorized::Msg() const { return "Not authorized. " + genie::util::RuntimeException::Msg(); }
+std::string ExceptionNotAuthorized::Msg() const {
+  return "Not authorized. " + RuntimeException::Msg();
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 std::string ExceptionVerificationFailed::Msg() const {
-    return "Signature verification failed. " + genie::util::RuntimeException::Msg();
+  return "Signature verification failed. " + RuntimeException::Msg();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 std::string ExceptionDecryptionFailed::Msg() const {
-    return "Decryption failed. " + genie::util::RuntimeException::Msg();
+  return "Decryption failed. " + RuntimeException::Msg();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 std::string ExceptionDatasetGroupNotFound::Msg() const {
-    return "Dataset group not found. " + genie::util::RuntimeException::Msg();
+  return "Dataset group not found. " + RuntimeException::Msg();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 std::string ExceptionDatasetNotFound::Msg() const {
-    return "Dataset not found. " + genie::util::RuntimeException::Msg();
+  return "Dataset not found. " + RuntimeException::Msg();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 std::string ExceptionAccessUnitNotFound::Msg() const {
-    return "Access unit not found. " + genie::util::RuntimeException::Msg();
+  return "Access unit not found. " + RuntimeException::Msg();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 std::string ExceptionReferenceNotFound::Msg() const {
-    return "Reference not found. " + genie::util::RuntimeException::Msg();
+  return "Reference not found. " + RuntimeException::Msg();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 std::string ExceptionSequenceNotFound::Msg() const {
-    return "Sequence not found. " + genie::util::RuntimeException::Msg();
+  return "Sequence not found. " + RuntimeException::Msg();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 std::string ExceptionMetadataFieldNotFound::Msg() const {
-    return "Metadata field not found. " + genie::util::RuntimeException::Msg();
+  return "Metadata field not found. " + RuntimeException::Msg();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 std::string ExceptionMetadataInvalid::Msg() const {
-    return "Metadata invalid. " + genie::util::RuntimeException::Msg();
+  return "Metadata invalid. " + RuntimeException::Msg();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 std::string ExceptionReferenceInvalid::Msg() const {
-    return "Reference invalid. " + genie::util::RuntimeException::Msg();
+  return "Reference invalid. " + RuntimeException::Msg();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 std::string ExceptionParameterInvalid::Msg() const {
-    return "Parameter invalid. " + genie::util::RuntimeException::Msg();
+  return "Parameter invalid. " + RuntimeException::Msg();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 std::string ExceptionBitstreamInvalid::Msg() const {
-    return "Bitstream invalid." + genie::util::RuntimeException::Msg();
+  return "Bitstream invalid." + RuntimeException::Msg();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Hierarchy GenieState::getHierarchy() {
-    // UTILS_DIE("Not implemented");
-    return Hierarchy{};
+Hierarchy GenieState::GetHierarchy() {
+  // UTILS_DIE_("Not implemented");
+  return Hierarchy{};
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::vector<Records> GenieState::getDataBySimpleFilter(uint64_t datasetGroupID, uint64_t datasetID,
-                                                       const SimpleFilter& filter) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)filter;
-    // UTILS_DIE("Not implemented");
-    return std::vector<Records>();
+std::vector<Records> GenieState::GetDataBySimpleFilter(
+    const uint64_t dataset_group_id, const uint64_t dataset_id,
+    const SimpleFilter& filter) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)filter;
+  // UTILS_DIE_("Not implemented");
+  return {};
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::vector<Records> GenieState::getDataByAdvancedFilter(uint64_t datasetGroupID, uint64_t datasetID,
-                                                         const AdvancedFilter& filter) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)filter;
-    // UTILS_DIE("Not implemented");
-    return std::vector<Records>();
+std::vector<Records> GenieState::GetDataByAdvancedFilter(
+    const uint64_t dataset_group_id, const uint64_t dataset_id,
+    const AdvancedFilter& filter) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)filter;
+  // UTILS_DIE_("Not implemented");
+  return {};
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::vector<Records> GenieState::getDataBySignature(uint64_t datasetGroupID, uint64_t datasetID,
-                                                    const char* signature) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)signature;
-    // UTILS_DIE("Not implemented");
-    return std::vector<Records>();
+std::vector<Records> GenieState::GetDataBySignature(
+    const uint64_t dataset_group_id, const uint64_t dataset_id,
+    const char* signature) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)signature;
+  // UTILS_DIE_("Not implemented");
+  return {};
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::vector<Records> GenieState::getDataByLabel(uint64_t datasetGroupID, const std::string& labelID) {
-    (void)datasetGroupID;
-    (void)labelID;
-    // UTILS_DIE("Not implemented");
-    return std::vector<Records>();
+std::vector<Records> GenieState::GetDataByLabel(const uint64_t dataset_group_id,
+                                                const std::string& label_id) {
+  (void)dataset_group_id;
+  (void)label_id;
+  // UTILS_DIE_("Not implemented");
+  return {};
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::vector<std::string> GenieState::getMetadataFields(uint64_t datasetGroupID, uint64_t datasetID) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    // UTILS_DIE("Not implemented");
-    return std::vector<std::string>();
+std::vector<std::string> GenieState::GetMetadataFields(
+    const uint64_t dataset_group_id, const uint64_t dataset_id) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  // UTILS_DIE_("Not implemented");
+  return {};
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::string GenieState::getMetadataContent(uint64_t datasetGroupID, uint64_t datasetID, const std::string& fieldName) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)fieldName;
-    // UTILS_DIE("Not implemented");
-    return std::string();
+std::string GenieState::GetMetadataContent(const uint64_t dataset_group_id,
+                                           const uint64_t dataset_id,
+                                           const std::string& field_name) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)field_name;
+  // UTILS_DIE_("Not implemented");
+  return {};
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::string GenieState::getDatasetGroupProtection(uint64_t datasetGroupID) {
-    (void)datasetGroupID;
-    // UTILS_DIE("Not implemented");
-    return std::string();
+std::string GenieState::GetDatasetGroupProtection(
+    const uint64_t dataset_group_id) {
+  (void)dataset_group_id;
+  // UTILS_DIE_("Not implemented");
+  return {};
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::string GenieState::getDatasetProtection(uint64_t datasetGroupID, uint64_t datasetID) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    // UTILS_DIE("Not implemented");
-    return std::string();
+std::string GenieState::GetDatasetProtection(const uint64_t dataset_group_id,
+                                             const uint64_t dataset_id) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  // UTILS_DIE_("Not implemented");
+  return {};
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::vector<RegionProtection> GenieState::getDatasetRegionProtection(uint64_t datasetGroupID, uint64_t datasetID,
-                                                                     uint64_t sequenceID, uint64_t startPos,
-                                                                     uint64_t endPos) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)sequenceID;
-    (void)startPos;
-    (void)endPos;
-    // UTILS_DIE("Not implemented");
-    return std::vector<RegionProtection>();
+std::vector<RegionProtection> GenieState::GetDatasetRegionProtection(
+    const uint64_t dataset_group_id, const uint64_t dataset_id,
+    const uint64_t sequence_id, const uint64_t start_pos,
+    const uint64_t end_pos) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)sequence_id;
+  (void)start_pos;
+  (void)end_pos;
+  // UTILS_DIE_("Not implemented");
+  return {};
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-OutReference GenieState::getDatasetReference(uint64_t datasetGroupID, uint64_t datasetID, bool includeSequences) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)includeSequences;
-    // UTILS_DIE("Not implemented");
-    return OutReference();
+OutReference GenieState::GetDatasetReference(const uint64_t dataset_group_id,
+                                             const uint64_t dataset_id,
+                                             const bool include_sequences) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)include_sequences;
+  // UTILS_DIE_("Not implemented");
+  return {};
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::vector<SimpleSegmentStatistics> GenieState::getSimpleStatistics(uint64_t datasetGroupID, uint64_t datasetID,
-                                                                     uint64_t sequenceID, uint64_t startPos,
-                                                                     uint64_t endPos) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)sequenceID;
-    (void)startPos;
-    (void)endPos;
-    // UTILS_DIE("Not implemented");
-    return std::vector<SimpleSegmentStatistics>();
+std::vector<SimpleSegmentStatistics> GenieState::GetSimpleStatistics(
+    const uint64_t dataset_group_id, const uint64_t dataset_id,
+    const uint64_t sequence_id, const uint64_t start_pos,
+    const uint64_t end_pos) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)sequence_id;
+  (void)start_pos;
+  (void)end_pos;
+  // UTILS_DIE_("Not implemented");
+  return {};
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::vector<AdvancedSegmentStatistics> GenieState::getAdvancedStatistics(uint64_t datasetGroupID, uint64_t datasetID,
-                                                                         uint64_t sequenceID, uint64_t startPos,
-                                                                         uint64_t endPos) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)sequenceID;
-    (void)startPos;
-    (void)endPos;
-    // UTILS_DIE("Not implemented");
-    return std::vector<AdvancedSegmentStatistics>();
+std::vector<AdvancedSegmentStatistics> GenieState::GetAdvancedStatistics(
+    const uint64_t dataset_group_id, const uint64_t dataset_id,
+    const uint64_t sequence_id, const uint64_t start_pos,
+    const uint64_t end_pos) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)sequence_id;
+  (void)start_pos;
+  (void)end_pos;
+  // UTILS_DIE_("Not implemented");
+  return {};
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace api
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::api
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
