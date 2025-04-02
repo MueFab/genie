@@ -242,7 +242,7 @@ uint8_t Record::GetFlags() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ClassType Record::GetClassID() const {
+ClassType Record::GetClassId() const {
   return class_id_;
 }
 
@@ -369,7 +369,7 @@ size_t Record::GetPosition(size_t alignment, size_t split) const {
   }
   auto &s2 = dynamic_cast<record::alignment_split::SameRec &>(
       *GetAlignments()[alignment].GetAlignmentSplits()[split - 1]);
-  return static_cast<size_t>(GetAlignments()[alignment].GetPosition() + s2.getDelta());
+  return static_cast<size_t>(GetAlignments()[alignment].GetPosition() + s2.GetDelta());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -66,7 +66,7 @@ class SameRec final : public AlignmentSplit {
      * @brief
      * @return
      */
-    [[nodiscard]]  int64_t getDelta() const;
+    [[nodiscard]]  int64_t GetDelta() const;
 
     /**
      * @brief
