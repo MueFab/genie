@@ -22,7 +22,85 @@
 
 // -----------------------------------------------------------------------------
 
-TEST(GenotypeStructure, RoundTrip_Structure_GenotypeParameters_AllCombinations) {
+TEST(GenotypeStructure, RoundTrip_Structure_GenotypeParameters) {
+  // Enum combinations to test
+  std::vector<genie::genotype::BinarizationID> binarization_ids = {
+      genie::genotype::BinarizationID::BIT_PLANE,
+      genie::genotype::BinarizationID::ROW_BIN
+  };
+
+  std::vector<genie::genotype::ConcatAxis> concat_axes = {
+      genie::genotype::ConcatAxis::CONCAT_ROW_DIR,
+      genie::genotype::ConcatAxis::CONCAT_COL_DIR,
+      genie::genotype::ConcatAxis::DO_NOT_CONCAT
+  };
+
+  std::vector<genie::core::AlgoID> codecs = {
+      genie::core::AlgoID::JBIG,
+      genie::core::AlgoID::LZMA,
+      genie::core::AlgoID::ZSTD,
+      genie::core::AlgoID::BSC
+  };
+
+  // Test all combinations of enums
+  for (auto bin_id : binarization_ids) {
+    for (auto concat_axis : concat_axes) {
+      for (auto codec : codecs) {
+        // Create original parameters object
+        genie::genotype::GenotypeParameters orig_params(
+            bin_id,
+            concat_axis,
+            false, // transpose_alleles_mat_flag
+            false, // sort_alleles_rows_flag
+            false, // sort_alleles_cols_flag
+            codec, // alleles_codec_ID
+            false, // encode_phases_data_flag
+            false, // transpose_phases_mat_flag
+            false, // sort_phases_rows_flag
+            false, // sort_phases_cols_flag
+            codec  // phases_codec_ID
+        );
+
+        // Verify initial values
+        EXPECT_EQ(orig_params.GetBinarizationID(), bin_id)
+            << "Failed for bin_id: " << static_cast<uint8_t>(bin_id);
+        EXPECT_EQ(orig_params.GetConcatAxis(), concat_axis)
+            << "Failed for concat_axis: " << static_cast<uint8_t>(concat_axis);
+        EXPECT_EQ(orig_params.GetAllelesCodecID(), codec)
+            << "Failed for codec: " << static_cast<uint8_t>(codec);
+        EXPECT_EQ(orig_params.GetPhasesCodecID(), codec)
+            << "Failed for codec: " << static_cast<uint8_t>(codec);
+
+        // Serialize to bitstream
+        std::stringstream bitstream;
+        genie::util::BitWriter writer(&bitstream);
+        orig_params.Write(writer);
+
+        // Verify size
+        size_t payload_size = bitstream.str().size();
+        ASSERT_EQ(payload_size, orig_params.GetSize())
+            << "Failed for bin_id: " << static_cast<uint8_t>(bin_id)
+            << ", concat_axis: " << static_cast<uint8_t>(concat_axis)
+            << ", codec: " << static_cast<uint8_t>(codec);
+
+        // Deserialize from bitstream
+        std::istream& reader = bitstream;
+        genie::util::BitReader bit_reader(reader);
+        genie::genotype::GenotypeParameters recon_params(bit_reader);
+
+        // Verify reconstructed parameters
+        EXPECT_EQ(orig_params.GetBinarizationID(), recon_params.GetBinarizationID())
+            << "Failed for bin_id: " << static_cast<uint8_t>(bin_id);
+        EXPECT_EQ(orig_params.GetConcatAxis(), recon_params.GetConcatAxis())
+            << "Failed for concat_axis: " << static_cast<uint8_t>(concat_axis);
+        EXPECT_EQ(orig_params.GetAllelesCodecID(), recon_params.GetAllelesCodecID())
+            << "Failed for codec: " << static_cast<uint8_t>(codec);
+        EXPECT_EQ(orig_params.GetPhasesCodecID(), recon_params.GetPhasesCodecID())
+            << "Failed for codec: " << static_cast<uint8_t>(codec);
+      }
+    }
+  }
+
   // Test all possible combinations of flags
   for (int flags = 0; flags < 128; ++flags) {
     bool transpose_alleles_mat_flag = (flags & 0b00000001) != 0;
