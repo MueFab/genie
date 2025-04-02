@@ -14,6 +14,7 @@
 #include <xtensor/xview.hpp>
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/util/runtime_exception.h"
+#include "genie/entropy/bsc/encoder.h"
 
 // -----------------------------------------------------------------------------
 
@@ -485,7 +486,11 @@ void bin_mat_from_bytes(
 
 // -----------------------------------------------------------------------------
 
-[[maybe_unused]] void entropy_encode_bin_mat(BinMatDtype& bin_mat, genie::core::AlgoID codec_ID, std::vector<uint8_t>& payload) {
+[[maybe_unused]] void entropy_encode_bin_mat(
+    BinMatDtype& bin_mat,
+    genie::core::AlgoID codec_ID,
+    std::vector<uint8_t>& payload
+) {
     uint8_t* raw_data;
     size_t raw_data_len;
     uint8_t* compressed_data;
@@ -495,12 +500,44 @@ void bin_mat_from_bytes(
 
     bin_mat_to_bytes(bin_mat, &raw_data, raw_data_len);
 
-    if (codec_ID == genie::core::AlgoID::JBIG) {
-        mpegg_jbig_compress_default(&compressed_data, &compressed_data_len, raw_data, raw_data_len,
-                                    static_cast<unsigned long>(bin_mat.shape(0)),
-                                    static_cast<unsigned long>(bin_mat.shape(1)));
-    } else {
-        UTILS_DIE("Invalid codec_ID_ for entropy coding!");
+    switch (codec_ID) {
+      case genie::core::AlgoID::JBIG: {
+        mpegg_jbig_compress_default(
+            &compressed_data,
+            &compressed_data_len,
+            raw_data,
+            raw_data_len,
+            static_cast<unsigned long>(bin_mat.shape(0)),
+            static_cast<unsigned long>(bin_mat.shape(1))
+        );
+      } break;
+      case genie::core::AlgoID::ZSTD: {
+        mpegg_zstd_compress(
+            &compressed_data,
+            &compressed_data_len,
+            raw_data,
+            raw_data_len,
+            3
+        );
+      } break;
+      case genie::core::AlgoID::BSC: {
+        mpegg_bsc_compress(
+            &compressed_data,
+            &compressed_data_len,
+            raw_data,
+            raw_data_len,
+            20, // lzpHashSize
+            8,  // lzpMinLen
+            1, // LIBBSC_BLOCKSORTER_BWT
+            1
+        );
+      } break;
+      case genie::core::AlgoID::LZMA: {
+        UTILS_DIE("Not yet implemented!");
+      } break;
+      default:
+        UTILS_DIE("Invalid codec_ID");
+        break;
     }
 
     payload = std::vector<uint8_t>(compressed_data, compressed_data + compressed_data_len);
@@ -528,12 +565,6 @@ void encode_genotype(
     UTILS_DIE_IF(binarization_ID == BinarizationID::UNDEFINED, "Invalid BinarizationID");
     UTILS_DIE_IF(sort_row_method == SortingAlgoID::UNDEFINED, "Invalid SortingAlgoID");
     UTILS_DIE_IF(sort_col_method == SortingAlgoID::UNDEFINED, "Invalid SortingAlgoID");
-
-//    params.SetBinarizationID(binarization_ID);
-//    params.SetConcatAxis(concat_axis);
-//    params.SetTransposeAllelesMatFlag(transpose_mat);
-//    params.SetSortAllelesRowsFlag(sort_row_method != SortingAlgoID::NO_SORTING);
-//    params.SetSortAllelesColsFlag(sort_col_method != SortingAlgoID::NO_SORTING);
 
     auto tmp_params = GenotypeParameters(
         binarization_ID,
