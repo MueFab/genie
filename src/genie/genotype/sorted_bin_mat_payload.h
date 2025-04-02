@@ -16,6 +16,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <optional>
 
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
