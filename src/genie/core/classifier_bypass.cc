@@ -1,42 +1,44 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
-#include <utility>
 #include "genie/core/classifier_bypass.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include <utility>
 
-namespace genie {
-namespace core {
+// -----------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------------------------------------------
+namespace genie::core {
 
-record::Chunk ClassifierBypass::getChunk() {
-    flushing = false;
-    record::Chunk ret;
-    if (vec.empty()) {
-        return ret;
-    }
-    ret = std::move(vec.front());
-    vec.erase(vec.begin());
+// -----------------------------------------------------------------------------
+
+record::Chunk ClassifierBypass::GetChunk() {
+  flushing_ = false;
+  record::Chunk ret;
+  if (vec_.empty()) {
     return ret;
+  }
+  ret = std::move(vec_.front());
+  vec_.erase(vec_.begin());
+  return ret;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void ClassifierBypass::add(record::Chunk&& c) { vec.emplace_back(std::move(c)); }
+void ClassifierBypass::Add(record::Chunk&& c) {
+  vec_.emplace_back(std::move(c));
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void ClassifierBypass::Flush() { flushing = true; }
+void ClassifierBypass::Flush() { flushing_ = true; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

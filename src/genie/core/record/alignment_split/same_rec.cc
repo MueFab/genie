@@ -49,7 +49,7 @@ const Alignment &SameRec::GetAlignment() const { return alignment_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-int64_t SameRec::getDelta() const { return delta_; }
+int64_t SameRec::GetDelta() const { return delta_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

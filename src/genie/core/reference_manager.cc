@@ -14,27 +14,27 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const uint64_t ReferenceManager::CHUNK_SIZE = 1 * 1024 * 1024;  //!
+const uint64_t ReferenceManager::chunk_size_ = 1 * 1024 * 1024;  //!
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReferenceManager::touch(const std::string& name, size_t num) {
-    if (cacheInfo.size() < cacheSize) {
-        cacheInfo.push_front(std::make_pair(name, num));
+    if (cache_info_.size() < cache_size_) {
+        cache_info_.push_front(std::make_pair(name, num));
         return;
     }
 
-    for (auto it = cacheInfo.begin(); it != cacheInfo.end(); ++it) {
+    for (auto it = cache_info_.begin(); it != cache_info_.end(); ++it) {
         if (it->first == name && it->second == num) {
-            cacheInfo.erase(it);
-            cacheInfo.push_front(std::make_pair(name, num));
+            cache_info_.erase(it);
+            cache_info_.push_front(std::make_pair(name, num));
             return;
         }
     }
 
-    cacheInfo.push_front(std::make_pair(name, num));
-    auto& line = data[cacheInfo.back().first][cacheInfo.back().second];
-    cacheInfo.pop_back();
+    cache_info_.push_front(std::make_pair(name, num));
+    auto& line = data_[cache_info_.back().first][cache_info_.back().second];
+    cache_info_.pop_back();
 
     line->chunk.reset();
     line->memory.reset();
@@ -43,18 +43,18 @@ void ReferenceManager::touch(const std::string& name, size_t num) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReferenceManager::validateRefID(size_t id) {
-    std::unique_lock<std::mutex> lock2(cacheInfoLock);
+    std::unique_lock<std::mutex> lock2(cache_info_lock_);
     for (size_t i = 0; i <= id; ++i) {
         auto s = std::to_string(i);
-        data[std::string(s.size() < 3 ? (3 - s.size()) : 0, '0') + s];
+        data_[std::string(s.size() < 3 ? (3 - s.size()) : 0, '0') + s];
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t ReferenceManager::ref2ID(const std::string& ref) {
-    std::unique_lock<std::mutex> lock2(cacheInfoLock);
-    for (const auto& r : indices) {
+size_t ReferenceManager::Ref2Id(const std::string& ref) {
+    std::unique_lock<std::mutex> lock2(cache_info_lock_);
+    for (const auto& r : indices_) {
         if (r.second == ref) {
             return r.first;
         }
@@ -64,28 +64,28 @@ size_t ReferenceManager::ref2ID(const std::string& ref) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ReferenceManager::ID2Ref(size_t id) {
-    std::unique_lock<std::mutex> lock2(cacheInfoLock);
-    auto it = indices.find(id);
-    UTILS_DIE_IF(it == indices.end(), "Unknown reference ID. Forgot to specify external reference?");
+std::string ReferenceManager::Id2Ref(size_t id) {
+    std::unique_lock<std::mutex> lock2(cache_info_lock_);
+    auto it = indices_.find(id);
+    UTILS_DIE_IF(it == indices_.end(), "Unknown reference ID. Forgot to specify external reference?");
     return it->second;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool ReferenceManager::refKnown(size_t id) {
-    std::unique_lock<std::mutex> lock2(cacheInfoLock);
-    auto it = indices.find(id);
-    return it != indices.end();
+bool ReferenceManager::RefKnown(size_t id) {
+    std::unique_lock<std::mutex> lock2(cache_info_lock_);
+    auto it = indices_.find(id);
+    return it != indices_.end();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t ReferenceManager::getChunkSize() { return CHUNK_SIZE; }
+size_t ReferenceManager::GetChunkSize() { return chunk_size_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool ReferenceManager::ReferenceExcerpt::isEmpty() const {
+bool ReferenceManager::ReferenceExcerpt::IsEmpty() const {
     for (const auto& p : data) {
         if (isMapped(p)) {
             return false;
@@ -96,35 +96,35 @@ bool ReferenceManager::ReferenceExcerpt::isEmpty() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceManager::ReferenceExcerpt::merge(ReferenceExcerpt& e) {
+void ReferenceManager::ReferenceExcerpt::Merge(ReferenceExcerpt& e) {
     if (this->ref_name.empty()) {
         *this = std::move(e);
         return;
     }
     extend(e.global_end);
-    for (size_t i = e.global_start / CHUNK_SIZE; i < (e.global_end - 1) / CHUNK_SIZE + 1; i++) {
-        if (e.isMapped(i * CHUNK_SIZE)) {
-            mapChunkAt(i * CHUNK_SIZE, e.getChunkAt(i * CHUNK_SIZE));
+    for (size_t i = e.global_start / chunk_size_; i < (e.global_end - 1) / chunk_size_ + 1; i++) {
+        if (e.isMapped(i * chunk_size_)) {
+            mapChunkAt(i * chunk_size_, e.GetChunkAt(i * chunk_size_));
         }
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t ReferenceManager::ReferenceExcerpt::getGlobalStart() const { return global_start; }
+size_t ReferenceManager::ReferenceExcerpt::GetGlobalStart() const { return global_start; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t ReferenceManager::ReferenceExcerpt::getGlobalEnd() const { return global_end; }
+size_t ReferenceManager::ReferenceExcerpt::GetGlobalEnd() const { return global_end; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::string& ReferenceManager::ReferenceExcerpt::getRefName() const { return ref_name; }
+const std::string& ReferenceManager::ReferenceExcerpt::GetRefName() const { return ref_name; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::shared_ptr<const std::string> ReferenceManager::ReferenceExcerpt::getChunkAt(size_t pos) const {
-    int id = static_cast<int>(size_t(pos / CHUNK_SIZE) - size_t(global_start / CHUNK_SIZE));
+std::shared_ptr<const std::string> ReferenceManager::ReferenceExcerpt::GetChunkAt(size_t pos) const {
+    int id = static_cast<int>(size_t(pos / chunk_size_) - size_t(global_start / chunk_size_));
     UTILS_DIE_IF(id < 0 || id >= (int)data.size(), "Invalid index");
     return data[id];
 }
@@ -132,7 +132,7 @@ std::shared_ptr<const std::string> ReferenceManager::ReferenceExcerpt::getChunkA
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReferenceManager::ReferenceExcerpt::mapChunkAt(size_t pos, std::shared_ptr<const std::string> dat) {
-    int id = static_cast<int>(size_t(pos / CHUNK_SIZE) - size_t(global_start / CHUNK_SIZE));
+    int id = static_cast<int>(size_t(pos / chunk_size_) - size_t(global_start / chunk_size_));
     UTILS_DIE_IF(id < 0 || id >= (int)data.size(), "Invalid index");
     data[id] = std::move(dat);
 }
@@ -147,12 +147,12 @@ ReferenceManager::ReferenceExcerpt::ReferenceExcerpt(std::string name, size_t st
     : ref_name(std::move(name)),
       global_start(start),
       global_end(end),
-      data(((global_end - 1) / CHUNK_SIZE) - (global_start / CHUNK_SIZE) + 1, undef_page()) {}
+      data(((global_end - 1) / chunk_size_) - (global_start / chunk_size_) + 1, undef_page()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::shared_ptr<const std::string>& ReferenceManager::ReferenceExcerpt::undef_page() {
-    static std::shared_ptr<const std::string> ret = std::make_shared<const std::string>(CHUNK_SIZE, 'N');
+    static std::shared_ptr<const std::string> ret = std::make_shared<const std::string>(chunk_size_, 'N');
     return ret;
 }
 
@@ -162,7 +162,7 @@ void ReferenceManager::ReferenceExcerpt::extend(size_t newEnd) {
     if (newEnd < global_end) {
         return;
     }
-    size_t id = (newEnd - 1) / CHUNK_SIZE;
+    size_t id = (newEnd - 1) / chunk_size_;
     for (size_t i = data.size() - 1; i < id; ++i) {
         data.push_back(undef_page());
     }
@@ -178,7 +178,7 @@ bool ReferenceManager::ReferenceExcerpt::isMapped(const std::shared_ptr<const st
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool ReferenceManager::ReferenceExcerpt::isMapped(size_t pos) const {
-    return isMapped(data[(pos - (global_start - global_start % CHUNK_SIZE)) / CHUNK_SIZE]);
+    return isMapped(data[(pos - (global_start - global_start % chunk_size_)) / chunk_size_]);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -187,7 +187,7 @@ ReferenceManager::ReferenceExcerpt::Stepper::Stepper(const ReferenceExcerpt& e) 
     startVecIt = e.data.begin();
     vecIt = e.data.begin();
     endVecIt = e.data.end();
-    stringPos = e.global_start % CHUNK_SIZE;
+    stringPos = e.global_start % chunk_size_;
     curString = (**vecIt).data();
 }
 
@@ -195,8 +195,8 @@ ReferenceManager::ReferenceExcerpt::Stepper::Stepper(const ReferenceExcerpt& e) 
 
 void ReferenceManager::ReferenceExcerpt::Stepper::inc(size_t off) {
     stringPos += off;
-    while (stringPos >= CHUNK_SIZE) {
-        stringPos -= CHUNK_SIZE;
+    while (stringPos >= chunk_size_) {
+        stringPos -= chunk_size_;
         vecIt++;
     }
     if (vecIt != endVecIt) {
@@ -236,31 +236,31 @@ std::string ReferenceManager::ReferenceExcerpt::getString(size_t start, size_t e
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceManager::ReferenceManager(size_t csize) : cacheSize(csize) {}
+ReferenceManager::ReferenceManager(size_t csize) : cache_size_(csize) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReferenceManager::addRef(size_t index, std::unique_ptr<Reference> ref) {
-    std::unique_lock<std::mutex> lock2(cacheInfoLock);
-    UTILS_DIE_IF(indices.find(index) != indices.end(), "Ref index already taken");
-    indices.insert(std::make_pair(index, ref->getName()));
-    auto sequence = data.find(ref->getName());
-    size_t curChunks = sequence == data.end() ? 0 : sequence->second.size();
-    for (size_t i = curChunks; i < (ref->getEnd() - 1) / CHUNK_SIZE + 1; i++) {
-        data[ref->getName()].push_back(genie::util::make_unique<CacheLine>());
+    std::unique_lock<std::mutex> lock2(cache_info_lock_);
+    UTILS_DIE_IF(indices_.find(index) != indices_.end(), "Ref index already taken");
+    indices_.insert(std::make_pair(index, ref->getName()));
+    auto sequence = data_.find(ref->getName());
+    size_t curChunks = sequence == data_.end() ? 0 : sequence->second.size();
+    for (size_t i = curChunks; i < (ref->getEnd() - 1) / chunk_size_ + 1; i++) {
+        data_[ref->getName()].push_back(genie::util::make_unique<CacheLine>());
     }
-    mgr.registerRef(std::move(ref));
+    mgr_.registerRef(std::move(ref));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::shared_ptr<const std::string> ReferenceManager::loadAt(const std::string& name, size_t pos) {
-    std::unique_lock<std::mutex> lock2(cacheInfoLock);
-    size_t id = pos / CHUNK_SIZE;
-    auto it = data.find(name);
+    std::unique_lock<std::mutex> lock2(cache_info_lock_);
+    size_t id = pos / chunk_size_;
+    auto it = data_.find(name);
 
     // Invalid chunk
-    if (it == data.end()) {
+    if (it == data_.end()) {
         return ReferenceExcerpt::undef_page();
     }
 
@@ -268,7 +268,7 @@ std::shared_ptr<const std::string> ReferenceManager::loadAt(const std::string& n
     lock2.unlock();
 
     // Very important that lock2 is released and we lock again in that specific order, to avoid deadlocks.
-    std::lock_guard<std::mutex> lock1(cacheline.loadMutex);
+    std::lock_guard<std::mutex> lock1(cacheline.load_mutex);
     lock2.lock();
 
     // Chunk already loaded
@@ -291,7 +291,7 @@ std::shared_ptr<const std::string> ReferenceManager::loadAt(const std::string& n
     // Reference is not in memory. We have to do a slow read from disc...
     // Loading mutex keeps locked for this chunk, but other chunks can be accessed, main lock is opened.
     lock2.unlock();
-    ret = std::make_shared<const std::string>(mgr.getSequence(name, id * CHUNK_SIZE, (id + 1) * CHUNK_SIZE));
+    ret = std::make_shared<const std::string>(mgr_.getSequence(name, id * chunk_size_, (id + 1) * chunk_size_));
     lock2.lock();
 
     cacheline.chunk = ret;
@@ -302,25 +302,25 @@ std::shared_ptr<const std::string> ReferenceManager::loadAt(const std::string& n
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceManager::ReferenceExcerpt ReferenceManager::load(const std::string& name, size_t start, size_t end) {
+ReferenceManager::ReferenceExcerpt ReferenceManager::Load(const std::string& name, size_t start, size_t end) {
     ReferenceExcerpt ret(name, start, end);
-    for (size_t i = start / CHUNK_SIZE; i <= (end - 1) / CHUNK_SIZE; i++) {
-        ret.mapChunkAt(i * CHUNK_SIZE, loadAt(name, i * CHUNK_SIZE));
+    for (size_t i = start / chunk_size_; i <= (end - 1) / chunk_size_; i++) {
+        ret.mapChunkAt(i * chunk_size_, loadAt(name, i * chunk_size_));
     }
     return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<std::pair<size_t, size_t>> ReferenceManager::getCoverage(const std::string& name) const {
-    return mgr.getCoverage(name);
+std::vector<std::pair<size_t, size_t>> ReferenceManager::GetCoverage(const std::string& name) const {
+    return mgr_.getCoverage(name);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<std::string> ReferenceManager::getSequences() const {
+std::vector<std::string> ReferenceManager::GetSequences() const {
     std::vector<std::string> ret;
-    for (const auto& i : indices) {
+    for (const auto& i : indices_) {
         ret.push_back(i.second);
     }
     return ret;
@@ -328,8 +328,8 @@ std::vector<std::string> ReferenceManager::getSequences() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t ReferenceManager::getLength(const std::string& name) {
-    auto cov = getCoverage(name);
+size_t ReferenceManager::GetLength(const std::string& name) {
+    auto cov = GetCoverage(name);
 
     size_t ret = 0;
     for (const auto& c : cov) {

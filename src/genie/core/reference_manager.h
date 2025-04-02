@@ -31,20 +31,20 @@ namespace core {
  */
 class ReferenceManager {
  private:
-    ReferenceCollection mgr;  //!< @brief
+    ReferenceCollection mgr_;  //!< @brief
 
     struct CacheLine {
         std::shared_ptr<const std::string> chunk;  //!< @brief
         std::weak_ptr<const std::string> memory;   //!< @brief
-        std::mutex loadMutex;                      //!< @brief
+        std::mutex load_mutex;                      //!< @brief
     };
 
-    std::map<std::string, std::vector<std::unique_ptr<CacheLine>>> data;  //!< @brief
-    std::map<size_t, std::string> indices;
-    std::deque<std::pair<std::string, size_t>> cacheInfo;  //!< @brief
-    std::mutex cacheInfoLock;                              //!< @brief
-    uint64_t cacheSize;                                    //!< @brief
-    static const uint64_t CHUNK_SIZE;                      //!< @brief
+    std::map<std::string, std::vector<std::unique_ptr<CacheLine>>> data_;  //!< @brief
+    std::map<size_t, std::string> indices_;
+    std::deque<std::pair<std::string, size_t>> cache_info_;  //!< @brief
+    std::mutex cache_info_lock_;                              //!< @brief
+    uint64_t cache_size_;                                    //!< @brief
+    static const uint64_t chunk_size_;                      //!< @brief
 
     /**
      * @brief
@@ -65,27 +65,27 @@ class ReferenceManager {
      * @param ref
      * @return
      */
-    size_t ref2ID(const std::string& ref);
+    size_t Ref2Id(const std::string& ref);
 
     /**
      * @brief
      * @param id
      * @return
      */
-    std::string ID2Ref(size_t id);
+    std::string Id2Ref(size_t id);
 
     /**
      * @brief
      * @param id
      * @return
      */
-    bool refKnown(size_t id);
+    bool RefKnown(size_t id);
 
     /**
      * @brief
      * @return
      */
-    static size_t getChunkSize();
+    static size_t GetChunkSize();
 
     /**
      * @brief
@@ -102,38 +102,38 @@ class ReferenceManager {
          * @brief
          * @return
          */
-        bool isEmpty() const;
+        bool IsEmpty() const;
 
         /**
          * @brief
          * @param e
          */
-        void merge(ReferenceExcerpt& e);
+        void Merge(ReferenceExcerpt& e);
 
         /**
          * @brief
          * @return
          */
-        size_t getGlobalStart() const;
+        size_t GetGlobalStart() const;
 
         /**
          * @brief
          * @return
          */
-        size_t getGlobalEnd() const;
+        size_t GetGlobalEnd() const;
 
         /**
          * @brief
          * @return
          */
-        const std::string& getRefName() const;
+        const std::string& GetRefName() const;
 
         /**
          * @brief
          * @param pos
          * @return
          */
-        std::shared_ptr<const std::string> getChunkAt(size_t pos) const;
+        std::shared_ptr<const std::string> GetChunkAt(size_t pos) const;
 
         /**
          * @brief
@@ -261,27 +261,27 @@ class ReferenceManager {
      * @param end
      * @return
      */
-    ReferenceExcerpt load(const std::string& name, size_t start, size_t end);
+    ReferenceExcerpt Load(const std::string& name, size_t start, size_t end);
 
     /**
      * @brief
      * @param name
      * @return
      */
-    std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const;
+    std::vector<std::pair<size_t, size_t>> GetCoverage(const std::string& name) const;
 
     /**
      * @brief
      * @return
      */
-    std::vector<std::string> getSequences() const;
+    std::vector<std::string> GetSequences() const;
 
     /**
      * @brief
      * @param name
      * @return
      */
-    size_t getLength(const std::string& name);
+    size_t GetLength(const std::string& name);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
