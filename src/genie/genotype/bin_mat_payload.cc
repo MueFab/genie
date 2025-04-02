@@ -61,39 +61,52 @@ BinMatPayload::BinMatPayload(
 
     UTILS_DIE_IF(!reader.IsByteAligned(), "reader must be byte aligned!");
 
-    switch (codec_ID_) {
-        case genie::core::AlgoID::JBIG: {
-          //TODO: First 4 bytes are width, 2nd 4 bytes are heights
-          nrows_ = 0;
-          ncols_ = 0;
-          payload_.resize(payload_size);
-          reader.ReadAlignedBytes(payload_.data(), payload_size);
-        } break;
-        case genie::core::AlgoID::ZSTD: {
-          nrows_ = reader.Read<uint32_t>();
-          ncols_ = reader.Read<uint32_t>();
-          payload_size -= sizeof(uint32_t) + sizeof(uint32_t);
-          payload_.resize(payload_size);
-          reader.ReadAlignedBytes(payload_.data(), payload_size);
-        } break;
-        case genie::core::AlgoID::BSC: {
-          nrows_ = reader.Read<uint32_t>();
-          ncols_ = reader.Read<uint32_t>();
-          payload_size -= sizeof(uint32_t) + sizeof(uint32_t);
-          payload_.resize(payload_size);
-          reader.ReadAlignedBytes(payload_.data(), payload_size);
-        } break;
-        case genie::core::AlgoID::LZMA: {
-          nrows_ = reader.Read<uint32_t>();
-          ncols_ = reader.Read<uint32_t>();
-          payload_size -= sizeof(uint32_t) + sizeof(uint32_t);
-          payload_.resize(payload_size);
-          reader.ReadAlignedBytes(payload_.data(), payload_size);
-        } break;
-        default:
-          UTILS_DIE("Invalid codec_ID");
-          break;
+    if (codec_ID_ == genie::core::AlgoID::JBIG){
+      nrows_ = 0;
+      ncols_ = 0;
+      payload_.resize(payload_size);
+      reader.ReadAlignedBytes(payload_.data(), payload_size);
+    } else {
+      nrows_ = reader.Read<uint32_t>();
+      ncols_ = reader.Read<uint32_t>();
+      payload_size -= sizeof(uint32_t) + sizeof(uint32_t);
+      payload_.resize(payload_size);
+      reader.ReadAlignedBytes(payload_.data(), payload_size);
     }
+
+//    switch (codec_ID_) {
+//        case genie::core::AlgoID::JBIG: {
+//          //TODO: First 4 bytes are width, 2nd 4 bytes are heights
+//          nrows_ = 0;
+//          ncols_ = 0;
+//          payload_.resize(payload_size);
+//          reader.ReadAlignedBytes(payload_.data(), payload_size);
+//        } break;
+//        case genie::core::AlgoID::ZSTD: {
+//          nrows_ = reader.Read<uint32_t>();
+//          ncols_ = reader.Read<uint32_t>();
+//          payload_size -= sizeof(uint32_t) + sizeof(uint32_t);
+//          payload_.resize(payload_size);
+//          reader.ReadAlignedBytes(payload_.data(), payload_size);
+//        } break;
+//        case genie::core::AlgoID::BSC: {
+//          nrows_ = reader.Read<uint32_t>();
+//          ncols_ = reader.Read<uint32_t>();
+//          payload_size -= sizeof(uint32_t) + sizeof(uint32_t);
+//          payload_.resize(payload_size);
+//          reader.ReadAlignedBytes(payload_.data(), payload_size);
+//        } break;
+//        case genie::core::AlgoID::LZMA: {
+//          nrows_ = reader.Read<uint32_t>();
+//          ncols_ = reader.Read<uint32_t>();
+//          payload_size -= sizeof(uint32_t) + sizeof(uint32_t);
+//          payload_.resize(payload_size);
+//          reader.ReadAlignedBytes(payload_.data(), payload_size);
+//        } break;
+//        default:
+//          UTILS_DIE("Invalid codec_ID");
+//          break;
+//    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
