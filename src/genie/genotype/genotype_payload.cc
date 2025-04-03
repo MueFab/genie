@@ -335,7 +335,28 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
 // -----------------------------------------------------------------------------
 
 void GenotypePayload::Write(core::Writer& writer) const {
+  writer.Write(GetMaxPloidy(),8);
 
+  uint8_t flag = 0;
+  flag |= GetNoReferenceFlag() << 2;
+  flag |= GetNotAvailableFlag() << 1;
+  flag |= GetPhasesValue() << 0;
+  writer.Write(flag,8);
+
+  writer.Write(GetNumBitPlanes(),8);
+  for (const auto& variant_payload : GetVariantsPayloads()) {
+    variant_payload.Write(writer);
+  }
+
+  if (IsAmaxPayloadExist()) {
+    writer.Write(
+        static_cast<uint32_t>(GetVariantsAmaxPayload()->GetSize()),32);
+    GetVariantsAmaxPayload()->Write(writer);
+  }
+
+  if (EncodePhaseValues()) {
+    GetPhasesPayload()->Write(writer);
+  }
 }
 
 // -----------------------------------------------------------------------------
