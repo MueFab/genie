@@ -204,7 +204,15 @@ void debinarize_bit_plane(
 
 // -----------------------------------------------------------------------------
 
-void binarize_row_bin(Int8MatDtype& allele_mat, std::vector<BinMatDtype>& bin_mats, UIntVecDtype& amax_vec) {
+void binarize_row_bin(
+    // Input
+    Int8MatDtype& allele_mat,
+    // Output
+    std::vector<BinMatDtype>& bin_mats,
+//    uint8_t& num_bit_planes,
+    UIntVecDtype& amax_vec
+) {
+
     auto nrows = allele_mat.shape(0);
     auto ncols = allele_mat.shape(1);
 
@@ -272,9 +280,12 @@ void binarize_allele_mat(
             break;
         }
         case genie::genotype::BinarizationID::ROW_BIN: {
+            num_bit_planes = 1;
+
             binarize_row_bin(
                 allele_mat,
                 bin_mats,
+//                num_bit_planes,
                 amax_vec
             );
             break;
@@ -327,8 +338,13 @@ void random_sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& ids, uint8_t axis) 
 
 // -----------------------------------------------------------------------------
 
-void sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& row_ids, UIntVecDtype& col_ids, SortingAlgoID sort_row_method,
-                  SortingAlgoID sort_col_method) {
+void sort_bin_mat(
+    BinMatDtype& bin_mat,
+    UIntVecDtype& row_ids,
+    UIntVecDtype& col_ids,
+    SortingAlgoID sort_row_method,
+    SortingAlgoID sort_col_method
+) {
     switch (sort_row_method) {
         case genie::genotype::SortingAlgoID::NO_SORTING:
             row_ids = UIntVecDtype({0});
@@ -495,8 +511,6 @@ void bin_mat_from_bytes(
     size_t raw_data_len;
     uint8_t* compressed_data;
     size_t compressed_data_len;
-    if (codec_ID == genie::core::AlgoID::BSC) {
-    }
 
     bin_mat_to_bytes(bin_mat, &raw_data, raw_data_len);
 
@@ -547,6 +561,77 @@ void bin_mat_from_bytes(
 
 // -----------------------------------------------------------------------------
 
+void encode_and_sort_bin_mat(
+    BinMatDtype& bin_mat,
+    // Output
+    SortedBinMatPayload& sorted_bin_mat_payload,
+    // Options
+    SortingAlgoID sort_row_method,
+    SortingAlgoID sort_col_method,
+    genie::core::AlgoID codec_ID
+){
+
+  auto sort_rows_flag = sort_row_method != SortingAlgoID::NO_SORTING;
+  auto sort_cols_flag = sort_col_method != SortingAlgoID::NO_SORTING;
+
+  UIntVecDtype row_ids;
+  UIntVecDtype col_ids;
+
+  sort_bin_mat(
+      bin_mat,
+      row_ids,
+      col_ids,
+      sort_row_method,
+      sort_col_method
+  );
+
+  if (sort_rows_flag) {
+    std::vector<uint64_t> row_ids_vec(row_ids.begin(), row_ids.end());
+
+    RowColIdsPayload row_ids_payload(std::move(row_ids_vec));
+
+    sorted_bin_mat_payload.SetRowIdsPayload(
+        std::move(row_ids_payload)
+    );
+  }
+
+  if (sort_cols_flag) {
+    std::vector<uint64_t> col_ids_vec(col_ids.begin(), col_ids.end());
+
+    RowColIdsPayload col_ids_payload(std::move(col_ids_vec));
+
+    sorted_bin_mat_payload.SetColIdsPayload(
+        std::move(col_ids_payload)
+    );
+  }
+
+  {
+    auto nrows = static_cast<uint32_t>(bin_mat.shape(0));
+    auto ncols = static_cast<uint32_t>(bin_mat.shape(1));
+    std::vector<uint8_t> payload;
+
+    entropy_encode_bin_mat(
+        bin_mat,
+        codec_ID,
+        payload
+    );
+
+    BinMatPayload bin_mat_payload(
+        codec_ID,
+        std::move(payload),
+        nrows,
+        ncols
+    );
+
+    sorted_bin_mat_payload.SetBinMatPayload(
+        std::move(bin_mat_payload)
+    );
+  }
+
+}
+
+// -----------------------------------------------------------------------------
+
 void encode_genotype(
     // Inputs
     std::vector<core::record::VariantGenotype>& recs,
@@ -565,6 +650,8 @@ void encode_genotype(
     UTILS_DIE_IF(binarization_ID == BinarizationID::UNDEFINED, "Invalid BinarizationID");
     UTILS_DIE_IF(sort_row_method == SortingAlgoID::UNDEFINED, "Invalid SortingAlgoID");
     UTILS_DIE_IF(sort_col_method == SortingAlgoID::UNDEFINED, "Invalid SortingAlgoID");
+
+    auto tmp_payload = GenotypePayload();
 
     auto tmp_params = GenotypeParameters(
         binarization_ID,
@@ -585,8 +672,6 @@ void encode_genotype(
     bool na_flag;
 
     std::vector<BinMatDtype> allele_bin_mat_vect;
-    std::vector<UIntVecDtype> allele_row_ids_vect;
-    std::vector<UIntVecDtype> allele_col_ids_vect;
 
     BinMatDtype phasing_mat;
     uint8_t num_bin_mats;
@@ -607,6 +692,9 @@ void encode_genotype(
             na_flag
         );
 
+        tmp_payload.SetNoReferenceFlag(dot_flag);
+        tmp_payload.SetNotAvailableFlag(na_flag);
+
         UIntVecDtype amax_vec;
 
         binarize_allele_mat(
@@ -617,35 +705,50 @@ void encode_genotype(
             tmp_params.GetBinarizationID(),
             tmp_params.GetConcatAxis()
         );
+
+        if (tmp_params.GetBinarizationID() == BinarizationID::ROW_BIN){
+            std::vector<uint64_t> amax_elements(amax_vec.begin(), amax_vec.end());
+
+            AmaxPayload amax_payload(std::move(amax_elements));
+
+            tmp_payload.SetVariantsAmaxPayload(std::move(amax_payload));
+        }
     }
 
-    allele_row_ids_vect.resize(num_bin_mats);
-    allele_col_ids_vect.resize(num_bin_mats);
-
     for (auto i_mat = 0u; i_mat < num_bin_mats; i_mat++) {
-        sort_bin_mat(
-            allele_bin_mat_vect[i_mat],
-            allele_row_ids_vect[i_mat],
-            allele_col_ids_vect[i_mat],
-            sort_row_method,
-            sort_col_method
-        );
+      genie::genotype::SortedBinMatPayload sorted_bin_mat_payload;
+
+      encode_and_sort_bin_mat(
+        allele_bin_mat_vect[i_mat],
+        sorted_bin_mat_payload,
+        sort_row_method,
+        sort_col_method,
+        codec_ID
+      );
+
+      tmp_payload.AddVariantsPayload(
+        std::move(sorted_bin_mat_payload)
+      );
     }
 
     {
-        UIntVecDtype phasing_row_ids;
-        UIntVecDtype phasing_col_ids;
+      genie::genotype::SortedBinMatPayload sorted_bin_mat_payload;
 
-        sort_bin_mat(
-            phasing_mat,
-            phasing_row_ids,
-            phasing_col_ids,
-            sort_row_method,
-            sort_col_method
-        );
+      encode_and_sort_bin_mat(
+        phasing_mat,
+        sorted_bin_mat_payload,
+        sort_row_method,
+        sort_col_method,
+        codec_ID
+      );
+
+      tmp_payload.AddVariantsPayload(
+          std::move(sorted_bin_mat_payload)
+      );
     }
 
     params = std::move(tmp_params);
+    payload = std::move(tmp_payload);
 //    sort_format(recs, opt.block_size < recs.size() ? opt.block_size : recs.size(), block);
 }
 

@@ -94,6 +94,8 @@ class GenotypePayload {
   void SetNoReferenceFlag(bool no_reference_flag);
   void SetNotAvailableFlag(bool not_available_flag);
   void SetPhasesValue(bool phases_value);
+  void AddVariantsPayload(SortedBinMatPayload&& payload);
+  void AddVariantsPayload(const SortedBinMatPayload& payload);
   void SetVariantsPayloads(std::vector<SortedBinMatPayload>&& variants_payload);
   void SetVariantsAmaxPayload(std::optional<AmaxPayload>&& variants_amax_payload);
   void SetPhasesPayload(std::optional<SortedBinMatPayload>&& phases_payload);

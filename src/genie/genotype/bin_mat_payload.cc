@@ -152,6 +152,12 @@ bool BinMatPayload::operator==(const BinMatPayload& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool BinMatPayload::operator!=(const BinMatPayload& other) const {
+  return !(*this == other);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 [[maybe_unused]] core::AlgoID BinMatPayload::GetCodecID() const {
   return codec_ID_;
 }

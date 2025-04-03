@@ -175,7 +175,14 @@ void debinarize_bit_plane(
  * @param bin_mats The output vector of binary matrices.
  * @param amax_vec The output vector of maximum values for each row.
  */
-void binarize_row_bin(Int8MatDtype& allele_mat, std::vector<BinMatDtype>& bin_mats, UIntVecDtype& amax_vec);
+void binarize_row_bin(
+    // Input
+    Int8MatDtype& allele_mat,
+    // Output
+    std::vector<BinMatDtype>& bin_mats,
+//    uint8_t& num_bit_planes,
+    UIntVecDtype& amax_vec
+);
 
 // -----------------------------------------------------------------------------
 
@@ -373,7 +380,19 @@ void bin_mat_from_bytes(
     std::vector<uint8_t>& payload
 );
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+void encode_and_sort_bin_mat(
+    BinMatDtype& bin_mat,
+    // Output
+    SortedBinMatPayload& sorted_bin_mat_payload,
+    // Options
+    SortingAlgoID sort_row_method,
+    SortingAlgoID sort_col_method,
+    genie::core::AlgoID codec_ID
+);
+
+// -----------------------------------------------------------------------------
 
 void encode_genotype(
     // Inputs

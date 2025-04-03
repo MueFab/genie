@@ -17,12 +17,13 @@
 #include "genie/util/bit_writer.h"
 #include "genie/genotype/amax_payload.h"
 #include "genie/genotype/bin_mat_payload.h"
+#include "genie/genotype/row_col_ids_payload.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "helpers.h"
 
 // -----------------------------------------------------------------------------
 
-TEST(GenotypeStructure, RoundTrip_Structure_GenotypeParameters) {
+TEST(GenotypeStructure, RoundTrip_GenotypeParameters) {
   // Enum combinations to test
   std::vector<genie::genotype::BinarizationID> binarization_ids = {
       genie::genotype::BinarizationID::BIT_PLANE,
@@ -126,7 +127,6 @@ TEST(GenotypeStructure, RoundTrip_Structure_GenotypeParameters) {
         genie::core::AlgoID::ZSTD
     );
 
-
     EXPECT_EQ(orig_params.GetTransposeAllelesMatFlag(), transpose_alleles_mat_flag) << "Failed for flags: " << std::hex << flags;
     EXPECT_EQ(orig_params.GetSortAllelesRowsFlag(), sort_alleles_rows_flag) << "Failed for flags: " << std::hex << flags;
     EXPECT_EQ(orig_params.GetSortAllelesColsFlag(), sort_alleles_cols_flag) << "Failed for flags: " << std::hex << flags;
@@ -166,7 +166,7 @@ TEST(GenotypeStructure, RoundTrip_Structure_GenotypeParameters) {
 
 // -----------------------------------------------------------------------------
 
-TEST(GenotypeStructure, RoundTrip_Structure_BinMatPayload) {
+TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
     uint32_t ORIG_NCOLS = 23;
     uint32_t ORIG_NROWS = 5;
 
@@ -269,6 +269,67 @@ TEST(GenotypeStructure, RoundTrip_Structure_BinMatPayload) {
         // Verify payload equality
         ASSERT_TRUE(bin_mat_payload == recon_obj);
     }
+}
+
+TEST(GenotypeStructure, RoundTrip_RowColIdsPayload) {
+  // Small test case
+  {
+    std::vector<uint64_t> ORIG_IDS = {1, 2, 3, 4, 5};
+    auto NUM_ELEMENTS = ORIG_IDS.size();
+
+    std::vector<uint64_t> ids(ORIG_IDS);
+    auto orig_obj = genie::genotype::RowColIdsPayload(std::move(ids));
+
+    // Verify size
+    size_t expected_size = orig_obj.GetSize();
+    EXPECT_EQ(expected_size, orig_obj.GetSizeInBytes());
+
+    // Serialize
+    std::stringstream obj_payload;
+    std::ostream& writer = obj_payload;
+    auto bit_writer = genie::util::BitWriter(&writer);
+    orig_obj.Write(bit_writer);
+
+    // Deserialize
+    std::istream& reader = obj_payload;
+    auto bit_reader = genie::util::BitReader(reader);
+    auto recon_obj = genie::genotype::RowColIdsPayload(bit_reader, NUM_ELEMENTS);
+
+    // Verify equality
+    EXPECT_TRUE(orig_obj == recon_obj);
+    EXPECT_EQ(orig_obj.GetRowColIdsElements(), recon_obj.GetRowColIdsElements());
+  }
+
+  // Larger test case
+  {
+    size_t NUM_ELEMENTS = 100;
+    std::vector<uint64_t> row_col_ids(NUM_ELEMENTS);
+    for (size_t i = 0; i < NUM_ELEMENTS; ++i) {
+      row_col_ids[i] = i;
+    }
+
+    auto orig_obj = genie::genotype::RowColIdsPayload(std::move(row_col_ids));
+
+    // Verify size
+    size_t expected_size = orig_obj.GetSize();
+    EXPECT_EQ(expected_size, orig_obj.GetSizeInBytes());
+
+    // Serialize
+    std::stringstream obj_payload;
+    std::ostream& writer = obj_payload;
+    auto bit_writer = genie::util::BitWriter(&writer);
+    orig_obj.Write(bit_writer);
+
+    // Deserialize
+    std::istream& reader = obj_payload;
+    auto bit_reader = genie::util::BitReader(reader);
+    auto recon_obj = genie::genotype::RowColIdsPayload(bit_reader, NUM_ELEMENTS);
+
+    // Verify equality
+    EXPECT_TRUE(orig_obj == recon_obj);
+    EXPECT_EQ(orig_obj.GetRowColIdsElements().size(), recon_obj.GetRowColIdsElements().size());
+    EXPECT_EQ(orig_obj.GetRowColIdsElements(), recon_obj.GetRowColIdsElements());
+  }
 }
 
 // -----------------------------------------------------------------------------
