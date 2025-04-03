@@ -620,7 +620,7 @@ void inverse_transform_row_bin(
 
     size_t mat_ncols = bin_mat_ncols-1;
 
-    UIntVecDtype first_col = xt::cast<uint32_t>(xt::view(bin_mat, xt::all(), 0));
+    UIntVecDtype first_col = xt::cast<uint32_t>(xt::view(bin_mat, xt::all(), 0u));
     size_t mat_nrows = xt::sum(first_col)(0);
 
     UTILS_DIE_IF(mat_nrows == 0, "Invalid mat_nrows!");

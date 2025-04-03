@@ -176,7 +176,6 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
         0, 25, 211, 149, 216, 214, 10, 197, 251, 121, 11, 254, 217, 140, 25,  128, 255, 2
     };
 
-    // Test for JBIG codec
     {
         auto ORIG_CODEC_ID = genie::core::AlgoID::JBIG;
         std::vector<uint8_t> payload(std::begin(ORIG_PAYLOAD), std::end(ORIG_PAYLOAD));
@@ -217,57 +216,124 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
         ASSERT_TRUE(bin_mat_payload == recon_obj);
     }
 
-    // List of codecs to test
-    std::vector<genie::core::AlgoID> codecs_to_test = {
-        genie::core::AlgoID::ZSTD,
-        genie::core::AlgoID::BSC,
-        genie::core::AlgoID::LZMA
-    };
+    {
+      auto ORIG_CODEC_ID = genie::core::AlgoID::ZSTD;
+      std::vector<uint8_t> payload(std::begin(ORIG_PAYLOAD), std::end(ORIG_PAYLOAD));
 
-    // Loop through each codec
-    for (auto ORIG_CODEC_ID : codecs_to_test) {
-        std::vector<uint8_t> payload(std::begin(ORIG_PAYLOAD), std::end(ORIG_PAYLOAD));
+      genie::genotype::BinMatPayload bin_mat_payload(
+          ORIG_CODEC_ID,
+          std::move(payload),
+          ORIG_NROWS,
+          ORIG_NCOLS
+      );
 
-        genie::genotype::BinMatPayload bin_mat_payload(
-            ORIG_CODEC_ID,
-            std::move(payload),
-            ORIG_NROWS,
-            ORIG_NCOLS
-        );
+      ASSERT_EQ(ORIG_NROWS, bin_mat_payload.GetNRows());
+      ASSERT_EQ(ORIG_NCOLS, bin_mat_payload.GetNCols());
+      ASSERT_EQ(ORIG_PAYLOAD_LEN, bin_mat_payload.GetPayloadSize());
+      ASSERT_EQ(ORIG_CODEC_ID, bin_mat_payload.GetCodecID());
 
-        // Verify initial values
-        ASSERT_EQ(ORIG_NROWS, bin_mat_payload.GetNRows());
-        ASSERT_EQ(ORIG_NCOLS, bin_mat_payload.GetNCols());
-        ASSERT_EQ(ORIG_PAYLOAD_LEN, bin_mat_payload.GetPayloadSize());
-        ASSERT_EQ(ORIG_CODEC_ID, bin_mat_payload.GetCodecID());
+      auto obj_payload = std::stringstream();
+      std::ostream& writer = obj_payload;
+      auto bit_writer = genie::util::BitWriter(&writer);
+      bin_mat_payload.Write(bit_writer);
 
-        // Serialize to bitstream
-        auto obj_payload = std::stringstream();
-        std::ostream& writer = obj_payload;
-        auto bit_writer = genie::util::BitWriter(&writer);
-        bin_mat_payload.Write(bit_writer);
+      auto payload_size = obj_payload.str().size();
+      ASSERT_EQ(payload_size, bin_mat_payload.GetSize());
 
-        // Verify payload size
-        auto payload_size = obj_payload.str().size();
-        ASSERT_EQ(payload_size, bin_mat_payload.GetSize());
+      std::istream& reader = obj_payload;
+      auto bit_reader = genie::util::BitReader(reader);
+      auto recon_obj = genie::genotype::BinMatPayload(
+          bit_reader,
+          payload_size,
+          ORIG_CODEC_ID
+      );
 
-        // Deserialize from bitstream
-        std::istream& reader = obj_payload;
-        auto bit_reader = genie::util::BitReader(reader);
-        auto recon_obj = genie::genotype::BinMatPayload(
-            bit_reader,
-            payload_size,
-            ORIG_CODEC_ID
-        );
+      ASSERT_EQ(ORIG_NROWS, recon_obj.GetNRows());
+      ASSERT_EQ(ORIG_NCOLS, recon_obj.GetNCols());
+      ASSERT_EQ(ORIG_PAYLOAD_LEN, recon_obj.GetPayloadSize());
+      ASSERT_EQ(ORIG_CODEC_ID, recon_obj.GetCodecID());
 
-        // Verify reconstructed values
-        ASSERT_EQ(ORIG_NROWS, recon_obj.GetNRows());
-        ASSERT_EQ(ORIG_NCOLS, recon_obj.GetNCols());
-        ASSERT_EQ(ORIG_PAYLOAD_LEN, recon_obj.GetPayloadSize());
-        ASSERT_EQ(ORIG_CODEC_ID, recon_obj.GetCodecID());
+      ASSERT_TRUE(bin_mat_payload == recon_obj);
+    }
 
-        // Verify payload equality
-        ASSERT_TRUE(bin_mat_payload == recon_obj);
+    {
+      auto ORIG_CODEC_ID = genie::core::AlgoID::BSC;
+      std::vector<uint8_t> payload(std::begin(ORIG_PAYLOAD), std::end(ORIG_PAYLOAD));
+
+      genie::genotype::BinMatPayload bin_mat_payload(
+          ORIG_CODEC_ID,
+          std::move(payload),
+          ORIG_NROWS,
+          ORIG_NCOLS
+      );
+
+      ASSERT_EQ(ORIG_NROWS, bin_mat_payload.GetNRows());
+      ASSERT_EQ(ORIG_NCOLS, bin_mat_payload.GetNCols());
+      ASSERT_EQ(ORIG_PAYLOAD_LEN, bin_mat_payload.GetPayloadSize());
+      ASSERT_EQ(ORIG_CODEC_ID, bin_mat_payload.GetCodecID());
+
+      auto obj_payload = std::stringstream();
+      std::ostream& writer = obj_payload;
+      auto bit_writer = genie::util::BitWriter(&writer);
+      bin_mat_payload.Write(bit_writer);
+
+      auto payload_size = obj_payload.str().size();
+      ASSERT_EQ(payload_size, bin_mat_payload.GetSize());
+
+      std::istream& reader = obj_payload;
+      auto bit_reader = genie::util::BitReader(reader);
+      auto recon_obj = genie::genotype::BinMatPayload(
+          bit_reader,
+          payload_size,
+          ORIG_CODEC_ID
+      );
+
+      ASSERT_EQ(ORIG_NROWS, recon_obj.GetNRows());
+      ASSERT_EQ(ORIG_NCOLS, recon_obj.GetNCols());
+      ASSERT_EQ(ORIG_PAYLOAD_LEN, recon_obj.GetPayloadSize());
+      ASSERT_EQ(ORIG_CODEC_ID, recon_obj.GetCodecID());
+
+      ASSERT_TRUE(bin_mat_payload == recon_obj);
+    }
+
+    {
+      auto ORIG_CODEC_ID = genie::core::AlgoID::LZMA;
+      std::vector<uint8_t> payload(std::begin(ORIG_PAYLOAD), std::end(ORIG_PAYLOAD));
+
+      genie::genotype::BinMatPayload bin_mat_payload(
+          ORIG_CODEC_ID,
+          std::move(payload),
+          ORIG_NROWS,
+          ORIG_NCOLS
+      );
+
+      ASSERT_EQ(ORIG_NROWS, bin_mat_payload.GetNRows());
+      ASSERT_EQ(ORIG_NCOLS, bin_mat_payload.GetNCols());
+      ASSERT_EQ(ORIG_PAYLOAD_LEN, bin_mat_payload.GetPayloadSize());
+      ASSERT_EQ(ORIG_CODEC_ID, bin_mat_payload.GetCodecID());
+
+      auto obj_payload = std::stringstream();
+      std::ostream& writer = obj_payload;
+      auto bit_writer = genie::util::BitWriter(&writer);
+      bin_mat_payload.Write(bit_writer);
+
+      auto payload_size = obj_payload.str().size();
+      ASSERT_EQ(payload_size, bin_mat_payload.GetSize());
+
+      std::istream& reader = obj_payload;
+      auto bit_reader = genie::util::BitReader(reader);
+      auto recon_obj = genie::genotype::BinMatPayload(
+          bit_reader,
+          payload_size,
+          ORIG_CODEC_ID
+      );
+
+      ASSERT_EQ(ORIG_NROWS, recon_obj.GetNRows());
+      ASSERT_EQ(ORIG_NCOLS, recon_obj.GetNCols());
+      ASSERT_EQ(ORIG_PAYLOAD_LEN, recon_obj.GetPayloadSize());
+      ASSERT_EQ(ORIG_CODEC_ID, recon_obj.GetCodecID());
+
+      ASSERT_TRUE(bin_mat_payload == recon_obj);
     }
 }
 
