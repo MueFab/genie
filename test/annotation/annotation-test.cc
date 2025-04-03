@@ -143,7 +143,7 @@ TEST_P(AnnotationTests, annotationSite) {
   auto testParams = GetParam();
 
   std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-  std::string filePath = gitRootDir + "/data/records/";
+  std::string filePath = gitRootDir + "/data/records/annotation/";
   std::string inputFilename =
       filePath + testParams.sitefile_in;  // "ALL.chrX.10000.site";
 
@@ -174,7 +174,7 @@ TEST_P(AnnotationTests, annotationSite) {
 
 TEST_P(AnnotationTests, annotationGeno) {
   std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-  std::string filePath = gitRootDir + "/data/records/";
+  std::string filePath = gitRootDir + "/data/records/annotation/";
   auto testParams = GetParam();
 
   std::string inputFilename =
@@ -235,44 +235,7 @@ TEST_P(AnnotationTests, annotationGeno) {
 
 INSTANTIATE_TEST_SUITE_P(
     testoutputs, AnnotationTests,
-    ::testing::Values(/* TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 100u, 3000u),
-                      TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 950u, 3000u),
-                       TestDetails("chrX_10x10000/ALL.chrX_40000-49999.geno",
-                                       "chrX_10x10000/ALL.chrX_40000-49999.site",
-                                  10000u, 1000, 3000u),
-                      TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 1000u, 3000u),
-                      TestDetails("ALL.chrX.50000.geno", "ALL.chrX.50000.site", 50000, 1000u, 3000u),
-                      TestDetails("chrX_10x10000/ALL.chrX_0-9999.geno", "chrX_10x10000/ALL.chrX_0-9999.site", 10000u,
-                      1000, 3000u), TestDetails("chrX_10x10000/ALL.chrX_10000-19999.geno",
-                      "chrX_10x10000/ALL.chrX_10000-19999.site", 10000u, 1000, 3000u),
-                      TestDetails("chrX_10x10000/ALL.chrX_20000-29999.geno", "chrX_10x10000/ALL.chrX_20000-29999.site",
-                      10000u, 1000, 3000u), TestDetails("chrX_10x10000/ALL.chrX_30000-39999.geno",
-                      "chrX_10x10000/ALL.chrX_30000-39999.site", 10000u, 1000, 3000u),
-                      TestDetails("chrX_10x10000/ALL.chrX_40000-49999.geno", "chrX_10x10000/ALL.chrX_40000-49999.site",
-                      10000u, 1000, 3000u), TestDetails("chrX_10x10000/ALL.chrX_50000-59999.geno",
-                      "chrX_10x10000/ALL.chrX_50000-59999.site", 10000u, 1000, 3000u),
-                      TestDetails("chrX_10x10000/ALL.chrX_60000-69999.geno", "chrX_10x10000/ALL.chrX_60000-69999.site",
-                      10000u, 1000, 3000u), TestDetails("chrX_10x10000/ALL.chrX_70000-79999.geno",
-                      "chrX_10x10000/ALL.chrX_70000-79999.site", 10000u, 1000, 3000u),
-                      TestDetails("chrX_10x10000/ALL.chrX_80000-89999.geno", "chrX_10x10000/ALL.chrX_80000-89999.site",
-                      10000u, 1000, 3000u), TestDetails("chrX_10x10000/ALL.chrX_90000-99999.geno",
-                      "chrX_10x10000/ALL.chrX_90000-99999.site", 10000u, 1000, 3000u),
-                      TestDetails("chrX_10x1000/ALL.chrX_40000-40999.geno", "chrX_10x1000/ALL.chrX_40000-40999.site",
-                      1000u, 1000, 3000u), TestDetails("chrX_10x1000/ALL.chrX_41000-41999.geno",
-                      "chrX_10x1000/ALL.chrX_41000-41999.site", 1000u, 1000, 3000u),
-                      TestDetails("chrX_10x1000/ALL.chrX_42000-42999.geno", "chrX_10x1000/ALL.chrX_42000-42999.site",
-                      1000u, 1000, 3000u), TestDetails("chrX_10x1000/ALL.chrX_43000-43999.geno",
-                      "chrX_10x1000/ALL.chrX_43000-43999.site", 1000u, 1000, 3000u),
-                      TestDetails("chrX_10x1000/ALL.chrX_44000-44999.geno", "chrX_10x1000/ALL.chrX_44000-44999.site",
-                      1000u, 1000, 3000u), TestDetails("chrX_10x1000/ALL.chrX_45000-45999.geno",
-                      "chrX_10x1000/ALL.chrX_45000-45999.site", 1000u, 1000, 3000u),
-                      TestDetails("chrX_10x1000/ALL.chrX_46000-46999.geno", "chrX_10x1000/ALL.chrX_46000-46999.site",
-                      1000u, 1000, 3000u), TestDetails("chrX_10x1000/ALL.chrX_47000-47999.geno",
-                      "chrX_10x1000/ALL.chrX_47000-47999.site", 1000u, 1000, 3000u),
-                      TestDetails("chrX_10x1000/ALL.chrX_48000-48999.geno", "chrX_10x1000/ALL.chrX_48000-48999.site",
-                      1000u, 1000, 3000u),
-                      */
-                      TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 1000, 3000u),
-                    //  TestDetails("ALL.chrX.100000.geno", "ALL.chrX.100000.site", 100000u, 1000, 3000),
+    ::testing::Values(
+        TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 1000, 3000u),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 15u, 3000u),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 3000u)));
