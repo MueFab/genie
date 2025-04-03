@@ -69,15 +69,19 @@ class [[maybe_unused]] SortedBinMatPayload {
     bool cols_sorted
   );
 
+  // Comparison operator
+  bool operator==(const SortedBinMatPayload& other) const;
+  bool operator!=(const SortedBinMatPayload& other) const;
+
   // Getters
-  [[maybe_unused]] const BinMatPayload& GetBinMatPayload() const;
+  const BinMatPayload& GetBinMatPayload() const;
   bool IsRowsSorted() const;
   bool IsColsSorted() const;
   const std::optional<RowColIdsPayload>& GetRowIdsPayload() const;
   const std::optional<RowColIdsPayload>& GetColIdsPayload() const;
 
   // Setters
-  [[maybe_unused]] void SetBinMatPayload(BinMatPayload& bin_mat_payload);
+  [[maybe_unused]] void SetBinMatPayload(BinMatPayload&& bin_mat_payload);
   [[maybe_unused]] void SetRowIdsPayload(std::optional<RowColIdsPayload>&& row_ids_payload);
   [[maybe_unused]] void SetColIdsPayload(std::optional<RowColIdsPayload>&& col_ids_payload);
 

@@ -258,6 +258,19 @@ void GenotypePayload::SetVariantsPayloads(std::vector<SortedBinMatPayload>&& var
 
 // -----------------------------------------------------------------------------
 
+// Add new method implementations
+void GenotypePayload::AddVariantsPayload(SortedBinMatPayload&& payload) {
+  variants_payloads_.emplace_back(std::move(payload));
+}
+
+// -----------------------------------------------------------------------------
+
+void GenotypePayload::AddVariantsPayload(const SortedBinMatPayload& payload) {
+  variants_payloads_.push_back(payload);
+}
+
+// -----------------------------------------------------------------------------
+
 void GenotypePayload::SetVariantsAmaxPayload(std::optional<AmaxPayload>&& variants_amax_payload) {
   variants_amax_payload_ = std::move(variants_amax_payload);
 }

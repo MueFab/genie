@@ -29,7 +29,7 @@ namespace genie::genotype {
 
 class RowColIdsPayload {
   private:
-   std::vector<uint8_t> payload_;
+//   std::vector<uint8_t> payload_;
 
    // Only available when decoded, requires num_elements
    std::vector<uint64_t> row_col_ids_elements_;
@@ -59,8 +59,10 @@ class RowColIdsPayload {
    // Constructor from BitReader
    explicit RowColIdsPayload(
        genie::util::BitReader& reader,
-       size_t size
-   );
+       size_t num_elements);
+
+   bool operator==(const RowColIdsPayload& other) const;
+   bool operator!=(const RowColIdsPayload& other) const;
  
    // Getters
    [[nodiscard]] uint64_t GetNelements() const;

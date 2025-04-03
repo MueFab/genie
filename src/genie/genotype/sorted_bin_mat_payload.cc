@@ -94,7 +94,36 @@ SortedBinMatPayload& SortedBinMatPayload::operator=(
 
 // -----------------------------------------------------------------------------
 
-[[maybe_unused]] const BinMatPayload& SortedBinMatPayload::GetBinMatPayload() const {
+// Comparison operator
+bool SortedBinMatPayload::operator==(const SortedBinMatPayload& other) const {
+  // Compare all members for equality
+  if (GetBinMatPayload() != other.GetBinMatPayload()) {
+    return false;
+  }
+
+  // Compare row ids payloads
+  if (GetRowIdsPayload() != other.GetRowIdsPayload()) {
+    return false;
+  }
+
+  // Compare column ids payloads
+  if (GetColIdsPayload() != other.GetColIdsPayload()) {
+    return false;
+  }
+
+  return true;
+}
+
+// -----------------------------------------------------------------------------
+
+// Non-equality operator
+bool SortedBinMatPayload::operator!=(const SortedBinMatPayload& other) const {
+  return !(*this == other);
+}
+
+// -----------------------------------------------------------------------------
+
+const BinMatPayload& SortedBinMatPayload::GetBinMatPayload() const {
   return bin_mat_payload_;
 }
 
@@ -126,7 +155,7 @@ const std::optional<RowColIdsPayload>& SortedBinMatPayload::GetColIdsPayload()
 
 // -----------------------------------------------------------------------------
 
-[[maybe_unused]] void SortedBinMatPayload::SetBinMatPayload(BinMatPayload& bin_mat_payload) {
+[[maybe_unused]] void SortedBinMatPayload::SetBinMatPayload(BinMatPayload&& bin_mat_payload) {
   bin_mat_payload_ = std::move(bin_mat_payload);
 }
 

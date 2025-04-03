@@ -68,6 +68,7 @@ class BinMatPayload {
 
   // Comparison operator
   bool operator==(const BinMatPayload& other) const;
+  bool operator!=(const BinMatPayload& other) const;
 
   // Getters
   [[maybe_unused]] core::AlgoID GetCodecID() const;
