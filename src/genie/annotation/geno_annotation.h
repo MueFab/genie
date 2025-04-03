@@ -69,21 +69,33 @@ class GenoAnnotation {
     uint8_t formatCount;
 
     RecData();
-    RecData(uint32_t _rowStart, uint32_t _colStart,
+    RecData(
+        uint32_t _rowStart, uint32_t _colStart,
         std::tuple<genie::genotype::GenotypeParameters,
-                   genie::genotype::GenotypePayload> _genotypeData,
+                   genie::genotype::GenotypePayload>
+            _genotypeData,
         genie::likelihood::EncodingBlock _likelihoodDatablock,
         uint32_t _numSamples, uint8_t _formatCount,
-        std::map<std::string,std::tuple<core::record::annotation_parameter_set::AttributeData,
-                       std::vector<std::vector<std::vector<AttrType>>>>> attributes);
+        std::map<
+            std::string,
+            std::tuple<core::record::annotation_parameter_set::AttributeData,
+                       std::vector<std::vector<std::vector<AttrType>>>>>
+            attributes);
 
     RecData& RecData::operator=(const RecData& other);
 
-    void set(uint32_t _rowStart, uint32_t _colStart,
-             std::tuple<genie::genotype::GenotypeParameters,
-                        genie::genotype::GenotypePayload> _genotypeData,
-             genie::likelihood::EncodingBlock _likelihoodDatablock,
-             uint32_t _numSamples, uint8_t _formatCount);
+    void set(
+        uint32_t _rowStart, uint32_t _colStart,
+        std::tuple<genie::genotype::GenotypeParameters,
+                   genie::genotype::GenotypePayload>
+            _genotypeData,
+        genie::likelihood::EncodingBlock _likelihoodDatablock,
+        uint32_t _numSamples, uint8_t _formatCount,
+        std::map<
+            std::string,
+            std::tuple<core::record::annotation_parameter_set::AttributeData,
+                       std::vector<std::vector<std::vector<AttrType>>>>>
+            _attributes);
   };
 
   // std::vector<GenoUnits> parseGenotype(std::ifstream& inputfile);
