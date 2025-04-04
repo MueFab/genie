@@ -395,8 +395,11 @@ void sort_bin_mat(
 
 // -----------------------------------------------------------------------------
 
-void invert_sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& row_ids,
-                         UIntVecDtype& col_ids) {
+void invert_sort_bin_mat(
+    BinMatDtype& bin_mat,
+    UIntVecDtype& row_ids,
+    UIntVecDtype& col_ids
+) {
   if (row_ids.shape(0) != 1) {
     genie::genotype::sort_matrix(bin_mat, row_ids, 0);
     row_ids.resize({0});
@@ -443,7 +446,9 @@ void bin_mat_to_bytes(
     // Inputs
     const BinMatDtype& bin_mat,
     // Outputs
-    uint8_t** payload, size_t& payload_len) {
+    uint8_t** payload,
+    size_t& payload_len
+) {
   auto nrows = static_cast<size_t>(bin_mat.shape(0));
   auto ncols = static_cast<size_t>(bin_mat.shape(1));
 
@@ -525,7 +530,7 @@ void bin_mat_from_bytes(
 
 // -----------------------------------------------------------------------------
 
-[[maybe_unused]] void entropy_encode_bin_mat(
+void entropy_encode_bin_mat(
     // Inputs
     BinMatDtype& bin_mat,
     genie::core::AlgoID codec_ID,
@@ -585,6 +590,75 @@ void bin_mat_from_bytes(
 
     free(raw_data);
 }
+
+void entropy_decode_bin_mat(
+    // Inputs
+    const std::vector<uint8_t>& payload,
+    genie::core::AlgoID codec_ID,
+    size_t nrows,
+    size_t ncols,
+    // Outputs
+    BinMatDtype& bin_mat
+){
+  uint8_t* raw_data;
+  size_t raw_data_len;
+//  uint8_t* compressed_data;
+//  size_t compressed_data_len;
+
+  switch (codec_ID) {
+    case genie::core::AlgoID::JBIG: {
+//      auto nrows = static_cast<unsigned long>(bin_mat.shape(0));
+//      auto ncols = static_cast<unsigned long>(bin_mat.shape(1));
+      mpegg_jbig_decompress_default(
+          &raw_data,
+          &raw_data_len,
+          payload.data(),  // Use payload.data() as compressed_data
+          payload.size(),  // Use payload.size() as compressed_data_len
+          &nrows,
+          &ncols
+      );
+    } break;
+    case genie::core::AlgoID::ZSTD: {
+//      mpegg_zstd_compress(
+//          &compressed_data,
+//          &compressed_data_len,
+//          raw_data,
+//          raw_data_len,
+//          3
+//      );
+      UTILS_DIE("Not yet implemented!");
+    } break;
+    case genie::core::AlgoID::BSC: {
+//      mpegg_bsc_compress(
+//          &compressed_data,
+//          &compressed_data_len,
+//          raw_data,
+//          raw_data_len,
+//          20, // lzpHashSize
+//          8,  // lzpMinLen
+//          1, // LIBBSC_BLOCKSORTER_BWT
+//          1
+//      );
+      UTILS_DIE("Not yet implemented!");
+    } break;
+    case genie::core::AlgoID::LZMA: {
+      UTILS_DIE("Not yet implemented!");
+    } break;
+    default:
+      UTILS_DIE("Invalid codec_ID");
+      break;
+  }
+
+  bin_mat_from_bytes(
+    raw_data,
+    raw_data_len,
+    nrows,
+    ncols,
+    bin_mat
+  );
+  free(raw_data);
+
+};
 
 // -----------------------------------------------------------------------------
 
@@ -654,7 +728,39 @@ void encode_and_sort_bin_mat(
         std::move(bin_mat_payload)
     );
   }
+}
 
+void decode_and_inverse_sort_bin_mat(
+  // Inputs
+  SortedBinMatPayload& sorted_bin_mat_payload,
+  // Output
+  BinMatDtype& bin_mat,
+  // Options
+  genie::core::AlgoID codec_ID,
+  bool sort_rows_flag,
+  bool sort_cols_flag
+){
+
+  auto& bin_mat_payload = sorted_bin_mat_payload.GetBinMatPayload();
+
+  entropy_decode_bin_mat(bin_mat_payload.GetPayload(),
+    codec_ID,
+    bin_mat_payload.GetNRows(),
+    bin_mat_payload.GetNCols(),
+    bin_mat
+  );
+
+  if (sort_rows_flag) {
+    auto row_ids_vec = sorted_bin_mat_payload.GetRowIdsPayload()->GetRowColIdsElements();
+    UIntVecDtype row_ids = xt::adapt(row_ids_vec.data(), {row_ids_vec.size()});
+    sort_matrix(bin_mat, row_ids, 0);
+  }
+
+  if (sort_cols_flag) {
+    auto col_ids_vec = sorted_bin_mat_payload.GetColIdsPayload()->GetRowColIdsElements();
+    UIntVecDtype col_ids = xt::adapt(col_ids_vec.data(), {col_ids_vec.size()});
+    sort_matrix(bin_mat, col_ids, 1);
+  }
 }
 
 // -----------------------------------------------------------------------------
