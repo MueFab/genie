@@ -83,12 +83,14 @@ SortedBinMatPayload& SortedBinMatPayload::operator=(
 
   if (rows_sorted) {
     auto row_ids_payload_size = static_cast<size_t>(reader.Read<uint32_t>());
-    row_ids_payload_ = RowColIdsPayload(reader, row_ids_payload_size);
+    auto num_rows = bin_mat_payload_.GetNRows();
+    row_ids_payload_ = RowColIdsPayload(reader, num_rows);
   }
 
   if (cols_sorted) {
     auto col_ids_payload_size = static_cast<size_t>(reader.Read<uint32_t>());
-    row_ids_payload_ = RowColIdsPayload(reader, col_ids_payload_size);
+    auto num_cols = bin_mat_payload_.GetNCols();
+    col_ids_payload_ = RowColIdsPayload(reader, num_cols);
   }
 }
 
@@ -96,17 +98,14 @@ SortedBinMatPayload& SortedBinMatPayload::operator=(
 
 // Comparison operator
 bool SortedBinMatPayload::operator==(const SortedBinMatPayload& other) const {
-  // Compare all members for equality
   if (GetBinMatPayload() != other.GetBinMatPayload()) {
     return false;
   }
 
-  // Compare row ids payloads
   if (GetRowIdsPayload() != other.GetRowIdsPayload()) {
     return false;
   }
 
-  // Compare column ids payloads
   if (GetColIdsPayload() != other.GetColIdsPayload()) {
     return false;
   }
@@ -167,7 +166,7 @@ const std::optional<RowColIdsPayload>& SortedBinMatPayload::GetColIdsPayload()
 
 // -----------------------------------------------------------------------------
 
-[[maybe_unused]] [[maybe_unused]] void SortedBinMatPayload::SetColIdsPayload(std::optional<RowColIdsPayload>&& col_ids_payload) {
+[[maybe_unused]] void SortedBinMatPayload::SetColIdsPayload(std::optional<RowColIdsPayload>&& col_ids_payload) {
   col_ids_payload_ = std::move(col_ids_payload);
 }
 
@@ -176,8 +175,10 @@ const std::optional<RowColIdsPayload>& SortedBinMatPayload::GetColIdsPayload()
 // Size calculation
 size_t SortedBinMatPayload::GetSize() const {
   size_t size = 0;
+
   size += sizeof(uint32_t); //bin_mat_payload_size u(32)
   size += bin_mat_payload_.GetSize();
+
   if (IsRowsSorted()) {
     size += sizeof(uint32_t); //row_ids_payload_size u(32)
     size += GetRowIdsPayload()->GetSize();
@@ -194,18 +195,23 @@ size_t SortedBinMatPayload::GetSize() const {
 void SortedBinMatPayload::Write(util::BitWriter& writer) const {
   UTILS_DIE_IF(!writer.IsByteAligned(), "Byte is not aligned!");
 
-  writer.WriteBypassBE(bin_mat_payload_.GetSize());
+  auto bin_mat_payload_size = static_cast<uint32_t>(bin_mat_payload_.GetSize());
+  writer.WriteBypassBE(bin_mat_payload_size);
   bin_mat_payload_.Write(writer);
 
   if (IsRowsSorted()){
-    writer.WriteBypassBE(static_cast<uint32_t>(GetRowIdsPayload()->GetSize()));
+    auto row_ids_size = static_cast<uint32_t>(GetRowIdsPayload()->GetSize());
+    writer.WriteBypassBE(row_ids_size);
     GetRowIdsPayload()->Write(writer);
   }
 
   if (IsColsSorted()){
-    writer.WriteBypassBE(static_cast<uint32_t>(GetColIdsPayload()->GetSize()));
+    auto col_ids_size = static_cast<uint32_t>(GetColIdsPayload()->GetSize());
+    writer.WriteBypassBE(col_ids_size);
     GetColIdsPayload()->Write(writer);
   }
+
+  UTILS_DIE_IF(!writer.IsByteAligned(), "Byte is not aligned!");
 }
 
 // -----------------------------------------------------------------------------

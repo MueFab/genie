@@ -242,8 +242,8 @@ size_t BinMatPayload::GetPayloadSize() const { return payload_.size(); }
 size_t BinMatPayload::GetSize() const {
   size_t size = 0u;
   if (codec_ID_ != genie::core::AlgoID::JBIG){
-    size += sizeof(uint32_t); // u(32)
-    size += sizeof(uint32_t); // u(32)
+    size += sizeof(uint32_t); // nrows u(32)
+    size += sizeof(uint32_t); // ncols u(32)
   }
 
   size += GetPayloadSize();
@@ -258,7 +258,9 @@ void BinMatPayload::Write(core::Writer& writer) const {
     writer.Write(GetNRows(), 32);
     writer.Write(GetNCols(), 32);
   }
-  for (auto byte : payload_) writer.Write(byte, 8);
+  for (auto byte : payload_){
+    writer.Write(byte, 8);
+  }
 }
 
 // -----------------------------------------------------------------------------

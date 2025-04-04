@@ -526,8 +526,10 @@ void bin_mat_from_bytes(
 // -----------------------------------------------------------------------------
 
 [[maybe_unused]] void entropy_encode_bin_mat(
+    // Inputs
     BinMatDtype& bin_mat,
     genie::core::AlgoID codec_ID,
+    // Outputs
     std::vector<uint8_t>& payload
 ) {
     uint8_t* raw_data;
@@ -539,13 +541,15 @@ void bin_mat_from_bytes(
 
     switch (codec_ID) {
       case genie::core::AlgoID::JBIG: {
+        auto nrows = static_cast<unsigned long>(bin_mat.shape(0));
+        auto ncols = static_cast<unsigned long>(bin_mat.shape(1));
         mpegg_jbig_compress_default(
             &compressed_data,
             &compressed_data_len,
             raw_data,
             raw_data_len,
-            static_cast<unsigned long>(bin_mat.shape(0)),
-            static_cast<unsigned long>(bin_mat.shape(1))
+            nrows,
+            ncols
         );
       } break;
       case genie::core::AlgoID::ZSTD: {
@@ -609,7 +613,7 @@ void encode_and_sort_bin_mat(
   );
 
   if (sort_rows_flag) {
-    std::vector<uint64_t> row_ids_vec(row_ids.begin(), row_ids.end());
+    std::vector<uint32_t> row_ids_vec(row_ids.begin(), row_ids.end());
 
     RowColIdsPayload row_ids_payload(std::move(row_ids_vec));
 
@@ -619,7 +623,7 @@ void encode_and_sort_bin_mat(
   }
 
   if (sort_cols_flag) {
-    std::vector<uint64_t> col_ids_vec(col_ids.begin(), col_ids.end());
+    std::vector<uint32_t> col_ids_vec(col_ids.begin(), col_ids.end());
 
     RowColIdsPayload col_ids_payload(std::move(col_ids_vec));
 

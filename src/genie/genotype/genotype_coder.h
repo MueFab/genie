@@ -375,8 +375,10 @@ void bin_mat_from_bytes(
 // -----------------------------------------------------------------------------
 
 [[maybe_unused]] void entropy_encode_bin_mat(
+    // Inputs
     BinMatDtype& bin_mat,
     genie::core::AlgoID codec_ID,
+    // Outputs
     std::vector<uint8_t>& payload
 );
 

@@ -150,17 +150,28 @@ TEST(GenotypeStructure, RoundTrip_GenotypeParameters) {
     genie::genotype::GenotypeParameters recon_params(bit_reader);
 
     // Verify parameters
-    EXPECT_EQ(orig_params.GetBinarizationID(), recon_params.GetBinarizationID()) << "Failed for flags: " << std::hex << flags;
-    EXPECT_EQ(orig_params.GetConcatAxis(), recon_params.GetConcatAxis()) << "Failed for flags: " << std::hex << flags;
-    EXPECT_EQ(orig_params.GetTransposeAllelesMatFlag(), recon_params.GetTransposeAllelesMatFlag()) << "Failed for flags: " << std::hex << flags;
-    EXPECT_EQ(orig_params.GetSortAllelesRowsFlag(), recon_params.GetSortAllelesRowsFlag()) << "Failed for flags: " << std::hex << flags;
-    EXPECT_EQ(orig_params.GetSortAllelesColsFlag(), recon_params.GetSortAllelesColsFlag()) << "Failed for flags: " << std::hex << flags;
-    EXPECT_EQ(orig_params.GetAllelesCodecID(), recon_params.GetAllelesCodecID()) << "Failed for flags: " << std::hex << flags;
-    EXPECT_EQ(orig_params.GetEncodePhasesDataFlag(), recon_params.GetEncodePhasesDataFlag()) << "Failed for flags: " << std::hex << flags;
-    EXPECT_EQ(orig_params.GetTransposePhasesMatFlag(), recon_params.GetTransposePhasesMatFlag()) << "Failed for flags: " << std::hex << flags;
-    EXPECT_EQ(orig_params.GetSortPhasesRowsFlag(), recon_params.GetSortPhasesRowsFlag()) << "Failed for flags: " << std::hex << flags;
-    EXPECT_EQ(orig_params.GetSortPhasesColsFlag(), recon_params.GetSortPhasesColsFlag()) << "Failed for flags: " << std::hex << flags;
-    EXPECT_EQ(orig_params.GetPhasesCodecID(), recon_params.GetPhasesCodecID()) << "Failed for flags: " << std::hex << flags;
+    EXPECT_EQ(orig_params.GetBinarizationID(), recon_params.GetBinarizationID())
+        << "Failed for flags: " << std::hex << flags;
+    EXPECT_EQ(orig_params.GetConcatAxis(), recon_params.GetConcatAxis())
+        << "Failed for flags: " << std::hex << flags;
+    EXPECT_EQ(orig_params.GetTransposeAllelesMatFlag(), recon_params.GetTransposeAllelesMatFlag())
+        << "Failed for flags: " << std::hex << flags;
+    EXPECT_EQ(orig_params.GetSortAllelesRowsFlag(), recon_params.GetSortAllelesRowsFlag())
+        << "Failed for flags: " << std::hex << flags;
+    EXPECT_EQ(orig_params.GetSortAllelesColsFlag(), recon_params.GetSortAllelesColsFlag())
+        << "Failed for flags: " << std::hex << flags;
+    EXPECT_EQ(orig_params.GetAllelesCodecID(), recon_params.GetAllelesCodecID())
+        << "Failed for flags: " << std::hex << flags;
+    EXPECT_EQ(orig_params.GetEncodePhasesDataFlag(), recon_params.GetEncodePhasesDataFlag())
+        << "Failed for flags: " << std::hex << flags;
+    EXPECT_EQ(orig_params.GetTransposePhasesMatFlag(), recon_params.GetTransposePhasesMatFlag())
+        << "Failed for flags: " << std::hex << flags;
+    EXPECT_EQ(orig_params.GetSortPhasesRowsFlag(), recon_params.GetSortPhasesRowsFlag())
+        << "Failed for flags: " << std::hex << flags;
+    EXPECT_EQ(orig_params.GetSortPhasesColsFlag(), recon_params.GetSortPhasesColsFlag())
+        << "Failed for flags: " << std::hex << flags;
+    EXPECT_EQ(orig_params.GetPhasesCodecID(), recon_params.GetPhasesCodecID())
+        << "Failed for flags: " << std::hex << flags;
   }
 }
 
@@ -340,10 +351,10 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
 TEST(GenotypeStructure, RoundTrip_RowColIdsPayload) {
   // Small test case
   {
-    std::vector<uint64_t> ORIG_IDS = {1, 2, 3, 4, 5};
+    std::vector<uint32_t> ORIG_IDS = {1, 2, 3, 4, 5};
     auto NUM_ELEMENTS = ORIG_IDS.size();
 
-    std::vector<uint64_t> ids(ORIG_IDS);
+    std::vector<uint32_t> ids(ORIG_IDS);
     auto orig_obj = genie::genotype::RowColIdsPayload(std::move(ids));
 
     // Verify size
@@ -368,12 +379,40 @@ TEST(GenotypeStructure, RoundTrip_RowColIdsPayload) {
 
   // Larger test case
   {
-    size_t NUM_ELEMENTS = 100;
-    std::vector<uint64_t> row_col_ids(NUM_ELEMENTS);
-    for (size_t i = 0; i < NUM_ELEMENTS; ++i) {
-      row_col_ids[i] = i;
+    size_t NUM_ELEMENTS = 100u;
+    std::vector<uint32_t> row_col_ids(NUM_ELEMENTS);
+    for (size_t i = 0u; i < NUM_ELEMENTS; ++i) {
+      row_col_ids[i] = static_cast<uint32_t>(i);
     }
 
+    auto orig_obj = genie::genotype::RowColIdsPayload(std::move(row_col_ids));
+
+    // Verify size
+    size_t expected_size = orig_obj.GetSize();
+    EXPECT_EQ(expected_size, orig_obj.GetSizeInBytes());
+
+    // Serialize
+    std::stringstream obj_payload;
+    std::ostream& writer = obj_payload;
+    auto bit_writer = genie::util::BitWriter(&writer);
+    orig_obj.Write(bit_writer);
+
+    // Deserialize
+    std::istream& reader = obj_payload;
+    auto bit_reader = genie::util::BitReader(reader);
+    auto recon_obj = genie::genotype::RowColIdsPayload(bit_reader, NUM_ELEMENTS);
+
+    // Verify equality
+    EXPECT_TRUE(orig_obj == recon_obj);
+    EXPECT_EQ(orig_obj.GetRowColIdsElements().size(), recon_obj.GetRowColIdsElements().size());
+    EXPECT_EQ(orig_obj.GetRowColIdsElements(), recon_obj.GetRowColIdsElements());
+  }
+
+  for (size_t NUM_ELEMENTS : {2u, 3u, 4u, 5u, 7u, 8u, 15u, 16u}){
+    auto ORIG_IDS = xt::random::permutation<uint32_t>(NUM_ELEMENTS);
+    auto ORIG_IDS_VEC = std::vector<uint32_t>(ORIG_IDS.begin(), ORIG_IDS.end());
+
+    auto row_col_ids = ORIG_IDS_VEC;
     auto orig_obj = genie::genotype::RowColIdsPayload(std::move(row_col_ids));
 
     // Verify size

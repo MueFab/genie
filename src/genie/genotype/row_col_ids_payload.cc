@@ -19,7 +19,7 @@ RowColIdsPayload::RowColIdsPayload() = default;
 // -----------------------------------------------------------------------------
 
 // Parameterized constructor with move semantics
-RowColIdsPayload::RowColIdsPayload(std::vector<uint64_t>&& row_col_ids_elements)
+RowColIdsPayload::RowColIdsPayload(std::vector<uint32_t>&& row_col_ids_elements)
     : row_col_ids_elements_(std::move(row_col_ids_elements)) {
 }
 
@@ -86,7 +86,7 @@ bool RowColIdsPayload::operator!=(const RowColIdsPayload& other) const {
 
 // -----------------------------------------------------------------------------
 
-uint64_t RowColIdsPayload::GetNelements() const {
+uint32_t RowColIdsPayload::GetNelements() const {
   return row_col_ids_elements_.size();
 }
 
@@ -98,25 +98,25 @@ uint8_t RowColIdsPayload::GetNbitsPerElem() const {
 
 // -----------------------------------------------------------------------------
 
-[[maybe_unused]] const std::vector<uint64_t>& RowColIdsPayload::GetRowColIdsElements() const {
+[[maybe_unused]] const std::vector<uint32_t>& RowColIdsPayload::GetRowColIdsElements() const {
   return row_col_ids_elements_;
 }
 
 // -----------------------------------------------------------------------------
 
-[[maybe_unused]] void RowColIdsPayload::SetNelements(uint64_t nelements) {
-  row_col_ids_elements_.resize(nelements);
-}
+//[[maybe_unused]] void RowColIdsPayload::SetNelements(uint64_t nelements) {
+//  row_col_ids_elements_.resize(nelements);
+//}
 
 // -----------------------------------------------------------------------------
 
-[[maybe_unused]] void RowColIdsPayload::SetNbitsPerElem(uint32_t nbits_per_elem) {
-  UTILS_DIE("Forbidden call! nbits_per_elem is computed!");
-}
+//[[maybe_unused]] void RowColIdsPayload::SetNbitsPerElem(uint32_t nbits_per_elem) {
+//  UTILS_DIE("Forbidden call! nbits_per_elem is computed!");
+//}
 
 // -----------------------------------------------------------------------------
 
-[[maybe_unused]] void RowColIdsPayload::SetRowColIdsElements(std::vector<uint64_t>&& row_col_ids_elements) {
+[[maybe_unused]] void RowColIdsPayload::SetRowColIdsElements(std::vector<uint32_t>&& row_col_ids_elements) {
   row_col_ids_elements_ = std::move(row_col_ids_elements);
 }
 
@@ -135,11 +135,16 @@ size_t RowColIdsPayload::GetSizeInBytes() const {
 // -----------------------------------------------------------------------------
 
 size_t RowColIdsPayload::GetSize() const {
+  // auto num_elements = row_col_ids_elements_.size();
+  // auto nbits_per_elem = ComputeNBitsPerElem(num_elements);
+  // auto size_in_bits = num_elements * nbits_per_elem;
+  // auto remain = 8 - (size_in_bits & 8);
+  // return (size_in_bits + remain) >> 3;
+
   auto num_elements = row_col_ids_elements_.size();
   auto nbits_per_elem = ComputeNBitsPerElem(num_elements);
   auto size_in_bits = num_elements * nbits_per_elem;
-  auto remain = 8 - (size_in_bits & 8);
-  return (size_in_bits + remain) >> 3;
+  return (size_in_bits + 7) / 8; // Rounds up to the nearest byte
 }
 
 // -----------------------------------------------------------------------------

@@ -32,7 +32,7 @@ class RowColIdsPayload {
 //   std::vector<uint8_t> payload_;
 
    // Only available when decoded, requires num_elements
-   std::vector<uint64_t> row_col_ids_elements_;
+   std::vector<uint32_t> row_col_ids_elements_;
  
   public:
    // Static function to calculate the number of bits per element
@@ -42,7 +42,7 @@ class RowColIdsPayload {
    RowColIdsPayload();
  
    // Parameterized constructor with move semantics
-   explicit RowColIdsPayload(std::vector<uint64_t>&& row_col_ids_elements);
+   explicit RowColIdsPayload(std::vector<uint32_t>&& row_col_ids_elements);
  
    // Copy constructor
    RowColIdsPayload(const RowColIdsPayload& other);
@@ -65,14 +65,14 @@ class RowColIdsPayload {
    bool operator!=(const RowColIdsPayload& other) const;
  
    // Getters
-   [[nodiscard]] uint64_t GetNelements() const;
+   [[nodiscard]] uint32_t GetNelements() const;
    [[nodiscard]] uint8_t GetNbitsPerElem() const;
-   [[maybe_unused]] [[nodiscard]] const std::vector<uint64_t>& GetRowColIdsElements() const;
+   [[maybe_unused]] [[nodiscard]] const std::vector<uint32_t>& GetRowColIdsElements() const;
  
    // Setters
-   [[maybe_unused]] void SetNelements(uint64_t nelements);
-   [[maybe_unused]] void SetNbitsPerElem(uint32_t nbits_per_elem);
-   [[maybe_unused]] void SetRowColIdsElements(std::vector<uint64_t>&& row_col_ids_elements);
+//   [[maybe_unused]] void SetNelements(uint64_t nelements);
+//   [[maybe_unused]] void SetNbitsPerElem(uint32_t nbits_per_elem);
+   [[maybe_unused]] void SetRowColIdsElements(std::vector<uint32_t>&& row_col_ids_elements);
  
    // Size functions
    [[nodiscard]] size_t GetSizeInBytes() const;
