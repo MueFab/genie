@@ -594,7 +594,7 @@ TEST(Genotype, RoundTrip_EncodeAndSortBinMat) {
   size_t NROWS = 27;
   size_t NCOLS = 5;
   int8_t MAX_ALLELE_VAL = 2;
-  auto codec_ID = genie::core::AlgoID::JBIG;
+  auto CODEC_ID = genie::core::AlgoID::JBIG;
 
   genie::genotype::BinMatDtype ORIG_BIN_MAT;
   genie::genotype::BinMatDtype bin_mat;
@@ -629,9 +629,7 @@ TEST(Genotype, RoundTrip_EncodeAndSortBinMat) {
           bin_mat,
           sorted_bin_mat_payload,
           sort_row_method,
-          sort_col_method,
-          codec_ID
-      );
+          sort_col_method, CODEC_ID);
 
       if (sort_rows_flag | sort_cols_flag){
         EXPECT_NE(bin_mat, ORIG_BIN_MAT);
@@ -653,8 +651,7 @@ TEST(Genotype, RoundTrip_EncodeAndSortBinMat) {
       std::istream& reader = bitstream;
       genie::util::BitReader bit_reader(reader);
       genie::genotype::SortedBinMatPayload recon_obj(
-          bit_reader,
-          codec_ID,
+          bit_reader, CODEC_ID,
           sort_rows_flag,
           sort_cols_flag
       );
@@ -687,6 +684,30 @@ TEST(Genotype, RoundTrip_EncodeAndSortBinMat) {
 
       ASSERT_TRUE(sorted_bin_mat_payload == recon_obj)
           << "Mismatch in reconstructed object";
+
+      genie::genotype::BinMatDtype recon_bin_mat;
+      decode_and_inverse_sort_bin_mat(
+        recon_obj,
+        recon_bin_mat,
+        CODEC_ID,
+        sort_rows_flag,
+        sort_cols_flag
+      );
+
+      ASSERT_EQ(ORIG_BIN_MAT, recon_bin_mat);
+
+//      auto& recon_bin_mat_payload = recon_obj.GetBinMatPayload();
+//      genie::genotype::entropy_decode_bin_mat(
+//        recon_bin_mat_payload.GetPayload(),
+//        CODEC_ID,
+//        recon_bin_mat_payload.GetNRows(),
+//        recon_bin_mat_payload.GetNCols(),
+//        recon_bin_mat
+//      );
+
+//      if (!sort_rows_flag && !sort_cols_flag){
+//        ASSERT_EQ(ORIG_BIN_MAT, recon_bin_mat);
+//      }
     }
   }
 }

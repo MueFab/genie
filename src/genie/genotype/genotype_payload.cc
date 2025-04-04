@@ -310,9 +310,9 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
   writer.WriteBypassBE(GetMaxPloidy());
 
   uint8_t flag = 0;
-  flag |= GetNoReferenceFlag() << 2u;
-  flag |= GetNotAvailableFlag() << 1u;
-  flag |= GetPhasesValue() << 0u;
+  flag |= static_cast<uint8_t>(GetNoReferenceFlag()) << 2u;
+  flag |= static_cast<uint8_t>(GetNotAvailableFlag()) << 1u;
+  flag |= static_cast<uint8_t>(GetPhasesValue()) << 0u;
   writer.WriteBypassBE(flag);
 
   writer.WriteBypassBE(GetNumBitPlanes());
@@ -336,9 +336,9 @@ void GenotypePayload::Write(core::Writer& writer) const {
   writer.Write(GetMaxPloidy(),8);
 
   uint8_t flag = 0;
-  flag |= GetNoReferenceFlag() << 2u;
-  flag |= GetNotAvailableFlag() << 1u;
-  flag |= GetPhasesValue() << 0u;
+  flag |= static_cast<uint8_t>(GetNoReferenceFlag()) << 2u;
+  flag |= static_cast<uint8_t>(GetNotAvailableFlag()) << 1u;
+  flag |= static_cast<uint8_t>(GetPhasesValue()) << 0u;
   writer.Write(flag,8);
 
   writer.Write(GetNumBitPlanes(),8);
