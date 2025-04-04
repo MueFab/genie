@@ -10,8 +10,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace genotype {
+namespace genie::genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -76,18 +75,27 @@ GenotypeParameters& GenotypeParameters::operator=(GenotypeParameters&& other) no
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-GenotypeParameters::GenotypeParameters(genie::util::BitReader& reader) {
-  binarization_ID_ = static_cast<BinarizationID>(reader.ReadBits(8));
-  concat_axis_ = static_cast<ConcatAxis>(reader.ReadBits(8));
+GenotypeParameters::GenotypeParameters(
+    genie::util::BitReader& reader
+) {
+  UTILS_DIE_IF(!reader.IsByteAligned(), "Not byte aligned!");
+
+  reader.ReadBits(3); // reserved u(3)
+  binarization_ID_ = static_cast<BinarizationID>(reader.ReadBits(3));
+  concat_axis_ = static_cast<ConcatAxis>(reader.ReadBits(2));
+
+  reader.ReadBits(2); // reserved u(2)
   transpose_alleles_mat_flag_ = reader.ReadBits(1);
   sort_alleles_rows_flag_ = reader.ReadBits(1);
   sort_alleles_cols_flag_ = reader.ReadBits(1);
-  alleles_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(5));
+  alleles_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(3));
+
+  reader.ReadBits(1); // reserved u(1)
   encode_phases_data_flag_ = reader.ReadBits(1);
   transpose_phases_mat_flag_ = reader.ReadBits(1);
   sort_phases_rows_flag_ = reader.ReadBits(1);
   sort_phases_cols_flag_ = reader.ReadBits(1);
-  phases_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(5));
+  phases_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(3));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -218,33 +226,32 @@ bool GenotypeParameters::GetEncodePhasesDataFlag() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void GenotypeParameters::SetPhasesCodecID(genie::core::AlgoID codec_id) {
+    phases_codec_ID_ = codec_id;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t GenotypeParameters::GetSize() {
   size_t size = 0u;
 
-  size+= 3; // reserved(3)
-  size+= 3; // binarization_ID(3)
-  size+= 2; // concat_axis(2)
+  size += sizeof(uint8_t); // reserved(3) + binarization_ID(3) + concat_axis(2)
 
-  size+= 2; // reserved(2)
-  size+= 1; // transpose_alleles_mat_flag_(1)
-  size+= 1; // sort_alleles_rows_flag_(1)
-  size+= 1; // sort_alleles_cols_flag_(1)
-  size+= 3; // alleles_codec_ID(3)
+  size += sizeof(uint8_t); // reserved(2) + transpose_alleles_mat_flag_(1) + sort_alleles_rows_flag_(1)
+                          // + sort_alleles_cols_flag_(1) + alleles_codec_ID(3)
 
-  size+= 1; // reserved(1)
-  size+= 1; // encode_phase_data_flag(1)
-  size+= 1; // transpose_phases_mat_flag_(1)
-  size+= 1; // sort_phases_rows_flag_(1)
-  size+= 1; // sort_phases_cols_flag_(1)
-  size+= 3; // phases_codec_ID(3)
+  size += sizeof(uint8_t); // reserved(1) + encode_phase_data_flag(1) + transpose_phases_mat_flag_(1)
+                          // sort_phases_rows_flag_(1) + sort_phases_cols_flag_(1) + phases_codec_ID(3)
 
-  size <<= 3; // Bits to bytes
   return size;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void GenotypeParameters::Write(util::BitWriter& writer) const{
+void GenotypeParameters::Write(util::BitWriter& writer) const {
+
+  UTILS_DIE_IF(!writer.IsByteAligned(), "Not byte aligned!");
+
   writer.WriteBits(0u, 3); // reserved(3)
   writer.WriteBits(static_cast<uint64_t>(binarization_ID_), 3);
   writer.WriteBits(static_cast<uint64_t>(concat_axis_), 2);
@@ -257,12 +264,10 @@ void GenotypeParameters::Write(util::BitWriter& writer) const{
 
   writer.WriteBits(0u, 1); // reserved(1)
   writer.WriteBits(GetEncodePhasesDataFlag(), 1);
-  writer.WriteBits(GetTransposeAllelesMatFlag(), 1);
-  writer.WriteBits(GetSortAllelesRowsFlag(), 1);
-  writer.WriteBits(GetSortAllelesColsFlag(), 1);
-  writer.WriteBits(static_cast<uint64_t>(GetAllelesCodecID()), 3);
-
-  writer.FlushBits();
+  writer.WriteBits(GetTransposePhasesMatFlag(), 1);
+  writer.WriteBits(GetSortPhasesRowsFlag(), 1);
+  writer.WriteBits(GetSortPhasesColsFlag(), 1);
+  writer.WriteBits(static_cast<uint64_t>(GetPhasesCodecID()), 3);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -280,10 +285,10 @@ void GenotypeParameters::Write(core::Writer& writer) const {
 
   writer.Write(0u, 1); // reserved(1)
   writer.Write(GetEncodePhasesDataFlag(), 1);
-  writer.Write(GetTransposeAllelesMatFlag(), 1);
-  writer.Write(GetSortAllelesRowsFlag(), 1);
-  writer.Write(GetSortAllelesColsFlag(), 1);
-  writer.Write(static_cast<uint64_t>(GetAllelesCodecID()), 3);
+  writer.Write(GetTransposePhasesMatFlag(), 1);
+  writer.Write(GetSortPhasesRowsFlag(), 1);
+  writer.Write(GetSortPhasesColsFlag(), 1);
+  writer.Write(static_cast<uint64_t>(GetPhasesCodecID()), 3);
   writer.Flush();
 }
 
@@ -291,14 +296,28 @@ void GenotypeParameters::Write(core::Writer& writer) const {
 
 // Read from BitReader
 void GenotypeParameters::read(util::BitReader& reader) {
-  // Placeholder implementation
-  // Actual reading logic should be implemented here
-  (void)reader;
+  UTILS_DIE_IF(!reader.IsByteAligned(), "Not byte aligned!");
+
+  reader.ReadBits(3);  // reserved u(3)
+  binarization_ID_ = static_cast<BinarizationID>(reader.ReadBits(3));
+  concat_axis_ = static_cast<ConcatAxis>(reader.ReadBits(2));
+
+  reader.ReadBits(2);  // reserved u(2)
+  transpose_alleles_mat_flag_ = reader.ReadBits(1);
+  sort_alleles_rows_flag_ = reader.ReadBits(1);
+  sort_alleles_cols_flag_ = reader.ReadBits(1);
+  alleles_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(3));
+
+  reader.ReadBits(1);  // reserved u(1)
+  encode_phases_data_flag_ = reader.ReadBits(1);
+  transpose_phases_mat_flag_ = reader.ReadBits(1);
+  sort_phases_rows_flag_ = reader.ReadBits(1);
+  sort_phases_cols_flag_ = reader.ReadBits(1);
+  phases_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(3));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genotype
-}  // namespace genie
+} // namespace genie::genotype
 
 // ---------------------------------------------------------------------------------------------------------------------

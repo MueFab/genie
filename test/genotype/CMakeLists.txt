@@ -12,7 +12,7 @@ message(STATUS "xtensor: ${xtensor_INCLUDE_DIRS}")
 
 set(source_files
         helpers.cc
-        encode-test.cc
+        encode_test.cc
         structure_test.cc
 )
 

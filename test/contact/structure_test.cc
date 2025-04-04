@@ -5,14 +5,18 @@
 */
 
 #include <gtest/gtest.h>
+
 #include <cstdlib>
 #include <ctime>
+#include <cmath>  // For fabs function
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <vector>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xrandom.hpp>
 #include "genie/contact/contact_coder.h"
+#include "genie/contact/contact_matrix_bin_payload.h"
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -388,7 +392,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixParameter){
         ASSERT_EQ(recon_obj.GetSampleName(SAMPLE1_ID), SAMPLE1_NAME);
         ASSERT_EQ(recon_obj.GetSampleName(SAMPLE2_ID), SAMPLE2_NAME);
 
-        ASSERT_TRUE(ORIG_CM_PARAM==recon_obj);
+        ASSERT_TRUE(ORIG_CM_PARAM == recon_obj);
     }
 }
 
@@ -572,16 +576,110 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixPayload){
-    // Intra SCM
-    {
+TEST(ContactStructure, RoundTrip_Structure_ContactMatrixBinPayload){
+  const double TOLERANCE = 1e-6;
 
+  std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+  std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-";
+  auto RESOLUTION = 250000u;
+  std::vector<std::string> NORM_NAMES = {
+    std::string("GW_KR"),
+    std::string("GW_VC"),
+    std::string("INTER_KR"),
+    std::string("INTER_VC"),
+    std::string("KR"),
+    std::string("VC"),
+    std::string("VC_SQRT")
+  };
+
+  uint16_t SAMPLE_ID = 0;
+  uint32_t BIN_SIZE_MULT = 5;
+  size_t NUM_NORM_METHODS = 7;
+
+  std::vector<uint8_t> CHROMS = {
+    21, // 193
+    22  // 206
+  };
+
+  std::vector<uint8_t> LENGTHS = {
+    193, // 193
+    206  // 206
+  };
+
+  std::vector<uint8_t> POSS = {
+    192, // 193
+    204  // 206
+  };
+
+
+  std::vector<std::vector<double>> ORIV_VALS = {
+    // GW_KR, GW_VC, INTER_KR, INTER_VC, KR, VC, VC_SQRT
+    {0.561230,  0.579038,  0.781984,  0.952380,  0.564981,  1.311789,  0.679117}, // Chrom 21 idx 192
+    {1.015586,  1.256156,  1.517353,  1.897584,  0.788887,  1.165799,  0.839396} // Chrom 22 idx 204
+  };
+
+  auto chrom_idx = 0u;
+  for (auto& chrom:  CHROMS){
+
+    auto norm_idx = 0u;
+
+    genie::contact::ContactMatrixBinPayload bin_payload;
+    bin_payload.SetSampleID(SAMPLE_ID);
+    bin_payload.SetChrID(CHROMS[chrom_idx]);
+    bin_payload.SetBinSizeMultiplier(BIN_SIZE_MULT);
+
+    for (auto& norm_name: NORM_NAMES){
+      std::string filepath = gitRootDir + "/data/records/contact/" + filename + std::to_string(RESOLUTION) + "." + std::to_string(chrom) + "." + norm_name + ".weights";
+
+      bin_payload.ReadWeightValuesFromFile(filepath);
+
+      ASSERT_EQ(bin_payload.GetWeightValue()[norm_idx].size(), LENGTHS[chrom_idx]);
+      ASSERT_TRUE(fabs((bin_payload.GetWeightValue()[norm_idx][POSS[chrom_idx]] - ORIV_VALS[chrom_idx][norm_idx]) - TOLERANCE));
+
+      norm_idx++;
     }
 
-    // Inter SCM
-    {
+    auto obj_payload = std::stringstream();
+    std::ostream& writer = obj_payload;
+    auto bit_writer = genie::util::BitWriter(&writer);
+    bin_payload.Write(bit_writer);
 
+    std::istream& reader = obj_payload;
+    auto bit_reader = genie::util::BitReader(reader);
+    auto recon_obj = genie::contact::ContactMatrixBinPayload(
+        bit_reader,
+        static_cast<uint8_t>(NUM_NORM_METHODS),
+        static_cast<uint32_t>(LENGTHS[chrom_idx])
+    );
+
+    ASSERT_EQ(bin_payload.GetSampleID(), recon_obj.GetSampleID());
+    ASSERT_EQ(bin_payload.GetChrID(), recon_obj.GetChrID());
+    ASSERT_EQ(bin_payload.GetBinSizeMultiplier(), recon_obj.GetBinSizeMultiplier());
+
+    ASSERT_EQ(bin_payload.GetNumNormMethods(), recon_obj.GetNumNormMethods());
+    auto orig_weight_values = bin_payload.GetWeightValue();
+    auto recon_weight_values = recon_obj.GetWeightValue();
+    for (auto i = 0u; i < bin_payload.GetNumNormMethods(); i++){
+      auto orig_norm_weight_values = orig_weight_values[i];
+      auto recon_norm_weight_values = recon_weight_values[i];
+
+      ASSERT_EQ(orig_norm_weight_values.size(), recon_norm_weight_values.size());
+      auto num_entries = orig_norm_weight_values.size();
+
+      for (auto j = 0u; j<num_entries; j++){
+        auto orig_weight_value = orig_norm_weight_values[j];
+        auto recon_weight_value = recon_norm_weight_values[j];
+        auto orig_weight_value_int = *reinterpret_cast<uint64_t*>(&orig_weight_value);
+        auto recon_weight_value_int = *reinterpret_cast<uint64_t*>(&recon_weight_value);
+
+        ASSERT_EQ(orig_weight_value_int, recon_weight_value_int) << "i:" << i << "j:" << j;
+      }
     }
+    ASSERT_TRUE(bin_payload == recon_obj); // TODO(Yeremia): Fix the comparison
+
+    chrom_idx++;
+  }
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

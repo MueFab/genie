@@ -10,8 +10,6 @@
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"
 
-// #include "genie/variantsite/parameterset_composer.h"
-// #include "genie/variantsite/variantsite_parser.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

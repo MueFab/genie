@@ -36,8 +36,8 @@ namespace genie::contact {
 class ContactMatrixTilePayload {
   private:
     core::AlgoID codec_ID_;
-    uint32_t tile_nrows_;
-    uint32_t tile_ncols_;
+    uint32_t nrows_;
+    uint32_t ncols_;
     std::vector<uint8_t> payload_;
 
   public:
@@ -187,7 +187,7 @@ class ContactMatrixTilePayload {
      *
      * @param rows The new number of rows.
      */
-    [[maybe_unused]] void SetTileNRows(uint32_t rows);
+//    [[maybe_unused]] void SetTileNRows(uint32_t rows);
 
     /**
      * @brief Set the number of columns in the tile.
@@ -196,7 +196,7 @@ class ContactMatrixTilePayload {
      *
      * @param cols The new number of columns.
      */
-    [[maybe_unused]] void SetTileNCols(uint32_t cols);
+//    [[maybe_unused]] void SetTileNCols(uint32_t cols);
 
     /**
      * @brief Set the payload_.
@@ -215,6 +215,10 @@ class ContactMatrixTilePayload {
      * @return The size of the payload_.
      */
     [[nodiscard]] size_t GetPayloadSize() const;
+
+    uint32_t GetNumRows();
+
+    uint32_t GetNumCols();
 
     /**
      * @brief Gets the size of this structure.

@@ -65,21 +65,26 @@ GenotypePayload::GenotypePayload(GenotypePayload&& other) noexcept {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// Copy assignment operator
-//GenotypePayload& GenotypePayload::operator=(const GenotypePayload& other) {
-//  if (this != &other) {
-//    max_ploidy_ = other.max_ploidy_;
-//    no_reference_flag_ = other.no_reference_flag_;
-//    not_available_flag_ = other.not_available_flag_;
-//    phases_value_ = other.phases_value_;
-//    variants_payloads_ = other.variants_payloads_;
-//    sort_variants_row_ids_payloads_ = other.sort_variants_row_ids_payloads_;
-//    sort_variants_col_ids_payloads_ = other.sort_variants_col_ids_payloads_;
-//    variants_amax_payload_ = other.variants_amax_payload_;
-//    phases_payload_ = other.phases_payload_;
-//  }
-//  return *this;
-//}
+// Copy constructor
+GenotypePayload::GenotypePayload(const GenotypePayload& other) {
+  max_ploidy_ = other.max_ploidy_;
+  no_reference_flag_ = other.no_reference_flag_;
+  not_available_flag_ = other.not_available_flag_;
+  phases_value_ = other.phases_value_;
+  variants_payloads_ = other.variants_payloads_;
+  
+  if (other.variants_amax_payload_.has_value()) {
+    variants_amax_payload_ = std::make_optional(other.variants_amax_payload_.value());
+  } else {
+    variants_amax_payload_ = std::nullopt;
+  }
+
+  if (other.phases_payload_.has_value()) {
+    phases_payload_ = std::make_optional(other.phases_payload_.value());
+  } else {
+    phases_payload_ = std::nullopt;
+  }
+}
 
 // -----------------------------------------------------------------------------
 
@@ -93,6 +98,32 @@ GenotypePayload& GenotypePayload::operator=(GenotypePayload&& other) noexcept {
     variants_payloads_ = std::move(other.variants_payloads_);
     variants_amax_payload_ = std::move(other.variants_amax_payload_);
     phases_payload_ = std::move(other.phases_payload_);
+  }
+  return *this;
+}
+
+// -----------------------------------------------------------------------------
+
+// Copy assignment operator
+GenotypePayload& GenotypePayload::operator=(const GenotypePayload& other) {
+  if (this != &other) {
+    max_ploidy_ = other.max_ploidy_;
+    no_reference_flag_ = other.no_reference_flag_;
+    not_available_flag_ = other.not_available_flag_;
+    phases_value_ = other.phases_value_;
+    variants_payloads_ = other.variants_payloads_;
+    
+    if (other.variants_amax_payload_.has_value()) {
+      variants_amax_payload_ = std::make_optional(other.variants_amax_payload_.value());
+    } else {
+      variants_amax_payload_ = std::nullopt;
+    }
+
+    if (other.phases_payload_.has_value()) {
+      phases_payload_ = std::make_optional(other.phases_payload_.value());
+    } else {
+      phases_payload_ = std::nullopt;
+    }
   }
   return *this;
 }
@@ -225,6 +256,19 @@ void GenotypePayload::SetVariantsPayloads(std::vector<SortedBinMatPayload>&& var
 
 // -----------------------------------------------------------------------------
 
+// Add new method implementations
+void GenotypePayload::AddVariantsPayload(SortedBinMatPayload&& payload) {
+  variants_payloads_.emplace_back(std::move(payload));
+}
+
+// -----------------------------------------------------------------------------
+
+void GenotypePayload::AddVariantsPayload(const SortedBinMatPayload& payload) {
+  variants_payloads_.push_back(payload);
+}
+
+// -----------------------------------------------------------------------------
+
 void GenotypePayload::SetVariantsAmaxPayload(std::optional<AmaxPayload>&& variants_amax_payload) {
   variants_amax_payload_ = std::move(variants_amax_payload);
 }
@@ -262,12 +306,13 @@ size_t GenotypePayload::GetSize() const {
 
 void GenotypePayload::Write(util::BitWriter& writer) const {
   UTILS_DIE_IF(!writer.IsByteAligned(), "Not byte aligned!");
+
   writer.WriteBypassBE(GetMaxPloidy());
 
   uint8_t flag = 0;
-  flag |= GetNoReferenceFlag() << 2;
-  flag |= GetNotAvailableFlag() << 1;
-  flag |= GetPhasesValue() << 0;
+  flag |= static_cast<uint8_t>(GetNoReferenceFlag()) << 2u;
+  flag |= static_cast<uint8_t>(GetNotAvailableFlag()) << 1u;
+  flag |= static_cast<uint8_t>(GetPhasesValue()) << 0u;
   writer.WriteBypassBE(flag);
 
   writer.WriteBypassBE(GetNumBitPlanes());
@@ -288,7 +333,28 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
 // -----------------------------------------------------------------------------
 
 void GenotypePayload::Write(core::Writer& writer) const {
+  writer.Write(GetMaxPloidy(),8);
 
+  uint8_t flag = 0;
+  flag |= static_cast<uint8_t>(GetNoReferenceFlag()) << 2u;
+  flag |= static_cast<uint8_t>(GetNotAvailableFlag()) << 1u;
+  flag |= static_cast<uint8_t>(GetPhasesValue()) << 0u;
+  writer.Write(flag,8);
+
+  writer.Write(GetNumBitPlanes(),8);
+  for (const auto& variant_payload : GetVariantsPayloads()) {
+    variant_payload.Write(writer);
+  }
+
+  if (IsAmaxPayloadExist()) {
+    writer.Write(
+        static_cast<uint32_t>(GetVariantsAmaxPayload()->GetSize()),32);
+    GetVariantsAmaxPayload()->Write(writer);
+  }
+
+  if (EncodePhaseValues()) {
+    GetPhasesPayload()->Write(writer);
+  }
 }
 
 // -----------------------------------------------------------------------------

@@ -21,7 +21,6 @@
 #include "genie/core/writer.h"
 #include "genie/genotype/amax_payload.h"
 #include "genie/genotype/row_col_ids_payload.h"
-#include "genie/genotype/amax_payload.h"
 #include "genie/genotype/sorted_bin_mat_payload.h"
 #include "genie/genotype/genotype_parameters.h"
 
@@ -44,10 +43,6 @@ class GenotypePayload {
   std::optional<AmaxPayload> variants_amax_payload_;
   std::optional<SortedBinMatPayload> phases_payload_;
 
-  // Forbidden operations
-  GenotypePayload(const GenotypePayload&) = delete;
-  GenotypePayload& operator=(const GenotypePayload&) = delete;
-
  public:
   // Default constructor
   GenotypePayload();
@@ -63,13 +58,13 @@ class GenotypePayload {
       std::optional<SortedBinMatPayload>&& phases_payload = std::nullopt);
 
   // Copy constructor
-//  GenotypePayload(const GenotypePayload& other);
+  GenotypePayload(const GenotypePayload& other);
 
   // Move constructor
   GenotypePayload(GenotypePayload&& other) noexcept;
 
   // Copy assignment operator
-//  GenotypePayload& operator=(const GenotypePayload& other);
+  GenotypePayload& operator=(const GenotypePayload& other);
 
   // Move assignment operator
   GenotypePayload& operator=(GenotypePayload&& other) noexcept;
@@ -77,6 +72,9 @@ class GenotypePayload {
   // Constructor from BitReader
   explicit GenotypePayload(util::BitReader& reader,
                            [[maybe_unused]] GenotypeParameters& parameters);
+
+  // Equality operator
+  bool operator==(const GenotypePayload& other) const;
 
   // Getters
   [[maybe_unused]] uint8_t GetMaxPloidy() const;
@@ -95,6 +93,8 @@ class GenotypePayload {
   void SetNoReferenceFlag(bool no_reference_flag);
   void SetNotAvailableFlag(bool not_available_flag);
   void SetPhasesValue(bool phases_value);
+  void AddVariantsPayload(SortedBinMatPayload&& payload);
+  void AddVariantsPayload(const SortedBinMatPayload& payload);
   void SetVariantsPayloads(std::vector<SortedBinMatPayload>&& variants_payload);
   void SetVariantsAmaxPayload(std::optional<AmaxPayload>&& variants_amax_payload);
   void SetPhasesPayload(std::optional<SortedBinMatPayload>&& phases_payload);
