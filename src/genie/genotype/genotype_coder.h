@@ -179,7 +179,14 @@ void debinarize_bit_plane(
  * @param bin_mats The output vector of binary matrices.
  * @param amax_vec The output vector of maximum values for each row.
  */
-void binarize_row_bin(Int8MatDtype& allele_mat, std::vector<BinMatDtype>& bin_mats, UIntVecDtype& amax_vec);
+void binarize_row_bin(
+    // Input
+    Int8MatDtype& allele_mat,
+    // Output
+    std::vector<BinMatDtype>& bin_mats,
+//    uint8_t& num_bit_planes,
+    UIntVecDtype& amax_vec
+);
 
 // -----------------------------------------------------------------------------
 
@@ -371,17 +378,56 @@ void bin_mat_from_bytes(
 
 // -----------------------------------------------------------------------------
 
-[[maybe_unused]] void entropy_encode_bin_mat(
+void entropy_encode_bin_mat(
+    // Inputs
     BinMatDtype& bin_mat,
     genie::core::AlgoID codec_ID,
+    // Outputs
     std::vector<uint8_t>& payload
 );
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+void entropy_decode_bin_mat(
+    // Inputs
+    const std::vector<uint8_t>& payload,
+    genie::core::AlgoID codec_ID,
+    size_t nrows,
+    size_t ncols,
+    // Outputs
+    BinMatDtype& bin_mat
+);
+
+// -----------------------------------------------------------------------------
+
+void encode_and_sort_bin_mat(
+    BinMatDtype& bin_mat,
+    // Output
+    SortedBinMatPayload& sorted_bin_mat_payload,
+    // Options
+    SortingAlgoID sort_row_method,
+    SortingAlgoID sort_col_method,
+    genie::core::AlgoID codec_ID
+);
+
+// -----------------------------------------------------------------------------
+
+void decode_and_inverse_sort_bin_mat(
+    // Inputs
+    SortedBinMatPayload& sorted_bin_mat_payload,
+    // Output
+    BinMatDtype& bin_mat,
+    // Options
+    genie::core::AlgoID codec_ID,
+    bool sort_rows_flag,
+    bool sort_cols_flag);
+
+// -----------------------------------------------------------------------------
 
 void encode_genotype(
+    // Inputs
     std::vector<core::record::VariantGenotype>& recs,
-    // Output
+    // Outputs
     GenotypeParameters& params,
     GenotypePayload& payload,
     // Options
