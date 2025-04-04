@@ -235,13 +235,13 @@ void GenotypeParameters::SetPhasesCodecID(genie::core::AlgoID codec_id) {
 size_t GenotypeParameters::GetSize() {
   size_t size = 0u;
 
-  size+= sizeof(uint8_t); // reserved(3) + binarization_ID(3) + concat_axis(2)
+  size += sizeof(uint8_t); // reserved(3) + binarization_ID(3) + concat_axis(2)
 
-  size+= sizeof(uint8_t); // reserved(2) + transpose_alleles_mat_flag_(1) + sort_alleles_rows_flag_(1)
-                            // + sort_alleles_cols_flag_(1) + alleles_codec_ID(3)
+  size += sizeof(uint8_t); // reserved(2) + transpose_alleles_mat_flag_(1) + sort_alleles_rows_flag_(1)
+                          // + sort_alleles_cols_flag_(1) + alleles_codec_ID(3)
 
-  size+= sizeof(uint8_t); // reserved(1) + encode_phase_data_flag(1) + transpose_phases_mat_flag_(1)
-                            // sort_phases_rows_flag_(1) + sort_phases_cols_flag_(1) + phases_codec_ID(3)
+  size += sizeof(uint8_t); // reserved(1) + encode_phase_data_flag(1) + transpose_phases_mat_flag_(1)
+                          // sort_phases_rows_flag_(1) + sort_phases_cols_flag_(1) + phases_codec_ID(3)
 
   return size;
 }

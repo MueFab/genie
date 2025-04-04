@@ -379,6 +379,10 @@ TEST(Genotype, RoundTrip_RandomSort) {
         );
         orig_bin_mat = bin_mat;
 
+        std::stringstream test_description;
+        test_description << "Sort rows";
+        SCOPED_TRACE(test_description.str());
+
         genie::genotype::sort_bin_mat(
             bin_mat,
             row_ids,
@@ -405,6 +409,10 @@ TEST(Genotype, RoundTrip_RandomSort) {
         bin_mat = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
         orig_bin_mat = bin_mat;
 
+        std::stringstream test_description;
+        test_description << "Sort cols";
+        SCOPED_TRACE(test_description.str());
+
         genie::genotype::sort_bin_mat(
             bin_mat,
             row_ids,
@@ -430,6 +438,10 @@ TEST(Genotype, RoundTrip_RandomSort) {
     {
         bin_mat = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
         orig_bin_mat = bin_mat;
+
+        std::stringstream test_description;
+        test_description << "Sort rows and cols";
+        SCOPED_TRACE(test_description.str());
 
         genie::genotype::sort_bin_mat(
             bin_mat,
@@ -579,8 +591,8 @@ TEST(Genotype, RoundTrip_JBIG) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 TEST(Genotype, RoundTrip_EncodeAndSortBinMat) {
-  size_t NROWS = 100;
-  size_t NCOLS = 200;
+  size_t NROWS = 27;
+  size_t NCOLS = 5;
   int8_t MAX_ALLELE_VAL = 2;
   auto codec_ID = genie::core::AlgoID::JBIG;
 
@@ -600,54 +612,81 @@ TEST(Genotype, RoundTrip_EncodeAndSortBinMat) {
 
   for (const auto sort_row_method : sorting_methods) {
     for (const auto sort_col_method : sorting_methods) {
+      auto sort_rows_flag = sort_row_method != genie::genotype::SortingAlgoID::NO_SORTING;
+      auto sort_cols_flag = sort_col_method != genie::genotype::SortingAlgoID::NO_SORTING;
+
       // Reset bin_mat to original for each test iteration
       bin_mat = ORIG_BIN_MAT;
       genie::genotype::SortedBinMatPayload sorted_bin_mat_payload;
 
+      std::stringstream test_description;
+      test_description << "sort_row_method: " << static_cast<int>(sort_row_method)
+                       << ", sort_col_method: " << static_cast<int>(sort_col_method);
+      SCOPED_TRACE(test_description.str());
+
       // Encode and sort the binary matrix
       encode_and_sort_bin_mat(
-        bin_mat,
-        sorted_bin_mat_payload,
-        sort_row_method,
-        sort_col_method,
+          bin_mat,
+          sorted_bin_mat_payload,
+          sort_row_method,
+          sort_col_method,
           codec_ID
       );
+
+      if (sort_rows_flag | sort_cols_flag){
+        EXPECT_NE(bin_mat, ORIG_BIN_MAT);
+      }
+
+      EXPECT_EQ(sorted_bin_mat_payload.IsRowsSorted(), sort_rows_flag);
+      EXPECT_EQ(sorted_bin_mat_payload.IsColsSorted(), sort_cols_flag);
 
       std::stringstream bitstream;
       genie::util::BitWriter writer(&bitstream);
       sorted_bin_mat_payload.Write(writer);
 
+      ASSERT_TRUE(writer.IsByteAligned());
+
       size_t payload_size = bitstream.str().size();
-      ASSERT_EQ(payload_size, sorted_bin_mat_payload.GetSize());
+      EXPECT_EQ(payload_size, sorted_bin_mat_payload.GetSize())
+          << "Mismatch in payload size";
 
       std::istream& reader = bitstream;
       genie::util::BitReader bit_reader(reader);
       genie::genotype::SortedBinMatPayload recon_obj(
-        bit_reader,
-        codec_ID,
-        sort_row_method != genie::genotype::SortingAlgoID::NO_SORTING,
-        sort_col_method != genie::genotype::SortingAlgoID::NO_SORTING
+          bit_reader,
+          codec_ID,
+          sort_rows_flag,
+          sort_cols_flag
       );
 
-      ASSERT_TRUE(sorted_bin_mat_payload == recon_obj);
+      EXPECT_EQ(sorted_bin_mat_payload.IsRowsSorted(), recon_obj.IsRowsSorted());
+      EXPECT_EQ(sorted_bin_mat_payload.IsColsSorted(), recon_obj.IsColsSorted());
+      EXPECT_EQ(sorted_bin_mat_payload.GetSize(), recon_obj.GetSize());
 
-//      // Check if the sorted matrix matches expectations
-//      if (sort_row_method == genie::genotype::SortingAlgoID::NO_SORTING) {
-//        // For NO_SORTING, the matrix should remain unchanged
-//        EXPECT_EQ(bin_mat, ORIG_BIN_MAT)
-//            << "NO_SORTING failed: Matrix was altered when it should remain unchanged.";
-//      } else {
-//        // For RANDOM_SORT, the matrix should be different from the original
-//        EXPECT_NE(bin_mat, ORIG_BIN_MAT)
-//            << "RANDOM_SORT failed: Matrix was not altered as expected.";
-//
-//        // Invert the sorting to check if we can recover the original matrix
-//        invert_sort_bin_mat(bin_mat, row_ids, col_ids);
-//        EXPECT_EQ(bin_mat, ORIG_BIN_MAT)
-//            << "RANDOM_SORT failed: Could not recover the original matrix after inversion.";
-//      }
+      if (sort_rows_flag) {
+        EXPECT_TRUE(
+            sorted_bin_mat_payload.GetRowIdsPayload()->GetRowColIdsElements() ==
+            recon_obj.GetRowIdsPayload()->GetRowColIdsElements()
+        );
+
+        EXPECT_EQ(
+          sorted_bin_mat_payload.GetRowIdsPayload()->GetSize(),
+          recon_obj.GetRowIdsPayload()->GetSize()
+        );
+      }
+      if (sort_cols_flag) {
+        EXPECT_EQ(
+          sorted_bin_mat_payload.GetColIdsPayload()->GetRowColIdsElements(),
+          recon_obj.GetColIdsPayload()->GetRowColIdsElements()
+        );
+        EXPECT_EQ(
+          sorted_bin_mat_payload.GetColIdsPayload()->GetSize(),
+          recon_obj.GetColIdsPayload()->GetSize()
+        );
+      }
+
+      ASSERT_TRUE(sorted_bin_mat_payload == recon_obj)
+          << "Mismatch in reconstructed object";
     }
   }
-
-
 }

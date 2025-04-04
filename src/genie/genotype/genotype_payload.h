@@ -21,7 +21,6 @@
 #include "genie/core/writer.h"
 #include "genie/genotype/amax_payload.h"
 #include "genie/genotype/row_col_ids_payload.h"
-#include "genie/genotype/amax_payload.h"
 #include "genie/genotype/sorted_bin_mat_payload.h"
 #include "genie/genotype/genotype_parameters.h"
 

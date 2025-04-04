@@ -71,9 +71,8 @@ GenotypePayload::GenotypePayload(const GenotypePayload& other) {
   no_reference_flag_ = other.no_reference_flag_;
   not_available_flag_ = other.not_available_flag_;
   phases_value_ = other.phases_value_;
-
   variants_payloads_ = other.variants_payloads_;
-
+  
   if (other.variants_amax_payload_.has_value()) {
     variants_amax_payload_ = std::make_optional(other.variants_amax_payload_.value());
   } else {
@@ -112,9 +111,8 @@ GenotypePayload& GenotypePayload::operator=(const GenotypePayload& other) {
     no_reference_flag_ = other.no_reference_flag_;
     not_available_flag_ = other.not_available_flag_;
     phases_value_ = other.phases_value_;
-
     variants_payloads_ = other.variants_payloads_;
-
+    
     if (other.variants_amax_payload_.has_value()) {
       variants_amax_payload_ = std::make_optional(other.variants_amax_payload_.value());
     } else {
@@ -312,9 +310,9 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
   writer.WriteBypassBE(GetMaxPloidy());
 
   uint8_t flag = 0;
-  flag |= GetNoReferenceFlag() << 2;
-  flag |= GetNotAvailableFlag() << 1;
-  flag |= GetPhasesValue() << 0;
+  flag |= GetNoReferenceFlag() << 2u;
+  flag |= GetNotAvailableFlag() << 1u;
+  flag |= GetPhasesValue() << 0u;
   writer.WriteBypassBE(flag);
 
   writer.WriteBypassBE(GetNumBitPlanes());
@@ -338,9 +336,9 @@ void GenotypePayload::Write(core::Writer& writer) const {
   writer.Write(GetMaxPloidy(),8);
 
   uint8_t flag = 0;
-  flag |= GetNoReferenceFlag() << 2;
-  flag |= GetNotAvailableFlag() << 1;
-  flag |= GetPhasesValue() << 0;
+  flag |= GetNoReferenceFlag() << 2u;
+  flag |= GetNotAvailableFlag() << 1u;
+  flag |= GetPhasesValue() << 0u;
   writer.Write(flag,8);
 
   writer.Write(GetNumBitPlanes(),8);
