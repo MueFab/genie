@@ -70,8 +70,10 @@ class GenotypePayload {
   GenotypePayload& operator=(GenotypePayload&& other) noexcept;
 
   // Constructor from BitReader
-  explicit GenotypePayload(util::BitReader& reader,
-                           [[maybe_unused]] GenotypeParameters& parameters);
+  explicit GenotypePayload(
+      util::BitReader& reader,
+      GenotypeParameters& parameters
+  );
 
   // Equality operator
   bool operator==(const GenotypePayload& other) const;
@@ -82,6 +84,7 @@ class GenotypePayload {
   bool GetNotAvailableFlag() const;
   bool GetPhasesValue() const;
   uint8_t GetNumBitPlanes() const;
+  size_t GetNumVariantsPayloads() const;
   const std::vector<SortedBinMatPayload>& GetVariantsPayloads() const;
   bool IsAmaxPayloadExist() const;
   const std::optional<AmaxPayload>& GetVariantsAmaxPayload() const;

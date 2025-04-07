@@ -167,10 +167,12 @@ void binarize_bit_plane(
 
 void debinarize_bit_plane(
     // Input
-    std::vector<BinMatDtype>& bin_mats, uint8_t num_bit_planes,
+    std::vector<BinMatDtype>& bin_mats,
+    uint8_t num_bit_planes,
     const ConcatAxis concat_axis,
     // Output
-    Int8MatDtype& allele_mat) {
+    Int8MatDtype& allele_mat
+) {
   size_t nrows;
   size_t ncols;
 
@@ -245,8 +247,13 @@ void binarize_row_bin(
 
 // -----------------------------------------------------------------------------
 
-void debinarize_row_bin(std::vector<BinMatDtype>& bin_mats,
-                        UIntVecDtype& amax_vec, Int8MatDtype& allele_mat) {
+void debinarize_row_bin(
+  // Inputs
+  std::vector<BinMatDtype>& bin_mats,
+  UIntVecDtype& amax_vec,
+  // Outputs
+  Int8MatDtype& allele_mat
+) {
   auto& bin_mat = bin_mats.front();
   auto nrows = amax_vec.shape(0);
   auto ncols = bin_mat.shape(1);
@@ -270,7 +277,8 @@ void binarize_allele_mat(
     // Input
     Int8MatDtype& allele_mat,
     // Output
-    std::vector<BinMatDtype>& bin_mats, uint8_t& num_bit_planes,
+    std::vector<BinMatDtype>& bin_mats,
+    uint8_t& num_bit_planes,
     UIntVecDtype& amax_vec,
     // Options
     BinarizationID binarization_ID,
@@ -308,7 +316,26 @@ void binarize_allele_mat(
 
 // -----------------------------------------------------------------------------
 
-void sort_matrix(BinMatDtype& bin_mat, const UIntVecDtype& ids, uint8_t axis) {
+void inverse_binarize_allele_mat(
+    // Input
+    std::vector<BinMatDtype>& bin_mats,
+    uint8_t& num_bit_planes,
+    BinarizationID binarization_ID,
+    ConcatAxis concat_axis,
+    UIntVecDtype& amax_vec,
+    // Output
+    Int8MatDtype& allele_mat
+){
+
+}
+
+// -----------------------------------------------------------------------------
+
+void sort_matrix(
+  BinMatDtype& bin_mat,
+  const UIntVecDtype& ids,
+  uint8_t axis
+) {
   UTILS_DIE_IF(axis > 1, "Invalid axis value!");
   UTILS_DIE_IF(bin_mat.shape(axis) != ids.shape(0),
                "bin_mat and ids have different dimension!");
@@ -474,9 +501,13 @@ void bin_mat_to_bytes(
 // Move this to somewhere elsee
 void bin_mat_from_bytes(
     // Inputs
-    const uint8_t* payload, size_t payload_len, size_t nrows, size_t ncols,
+    const uint8_t* payload,
+    size_t payload_len,
+    size_t nrows,
+    size_t ncols,
     // Outputs
-    BinMatDtype& bin_mat) {
+    BinMatDtype& bin_mat
+) {
   auto bpl = (ncols >> 3u) +
              ((ncols & 7u) > 0u);  // bytes per line with ceil operation
   UTILS_DIE_IF(payload_len != static_cast<size_t>(nrows * bpl),
@@ -730,6 +761,8 @@ void encode_and_sort_bin_mat(
   }
 }
 
+// -----------------------------------------------------------------------------
+
 void decode_and_inverse_sort_bin_mat(
   // Inputs
   SortedBinMatPayload& sorted_bin_mat_payload,
@@ -840,9 +873,7 @@ void encode_genotype(
 
         if (tmp_params.GetBinarizationID() == BinarizationID::ROW_BIN){
             std::vector<uint64_t> amax_elements(amax_vec.begin(), amax_vec.end());
-
             AmaxPayload amax_payload(std::move(amax_elements));
-
             tmp_payload.SetVariantsAmaxPayload(std::move(amax_payload));
         }
     }
@@ -882,6 +913,126 @@ void encode_genotype(
     params = std::move(tmp_params);
     payload = std::move(tmp_payload);
 //    sort_format(recs, opt.block_size < recs.size() ? opt.block_size : recs.size(), block);
+}
+
+// -----------------------------------------------------------------------------
+
+void decode_genotype(
+    // Inputs
+    const GenotypeParameters& params,
+    const GenotypePayload& payload,
+    // Outputs
+    Int8MatDtype& allele_mat,
+    BinMatDtype& phasing_mat
+) {
+
+//  auto num_bin_mats = payload.GetNumBitPlanes();
+//  auto num_allele_payloads = payload.GetNumVariantsPayloads();
+//  std::vector<BinMatDtype> bin_mats;
+//
+//  for (const auto& sorted_bin_mat_payload : payload.GetVariantsPayloads()){
+//    BinMatDtype recon_bin_mat;
+//    decode_and_inverse_sort_bin_mat(
+//        sorted_bin_mat_payload,
+//        recon_bin_mat,
+//        params.GetAllelesCodecID(),
+//        params.GetSortAllelesRowsFlag(),
+//        params.GetSortAllelesColsFlag()
+//    );
+//
+//    bin_mats.emplace_back(std::move(recon_bin_mat));
+//  }
+//
+//  if (params.GetBinarizationID() == BinarizationID::ROW_BIN){
+//
+//  }
+
+//  debinarize_row_bin(
+//      // Inputs
+//      bin_mats,
+//      UIntVecDtype& amax_vec,
+//      // Outputs
+//      Int8MatDtype& allele_mat
+//  );
+
+//
+//  // Decode each binary matrix
+//  for (size_t i_mat = 0; i_mat < num_bin_mats; ++i_mat) {
+//    const auto& sorted_bin_mat_payload = payload.GetVariantsPayloads();
+//    const auto& bin_mat_payload = payload.GetVariantsPayloads()[i_mat];
+//    BinMatDtype decoded_bin_mat;
+//
+//    // Entropy decode the binary matrix
+//    entropy_decode_bin_mat(
+//        bin_mat_payload.GetPayload(),
+//        params.GetCodecID(),
+//        bin_mat_payload.GetNRows(),
+//        bin_mat_payload.GetNCols(),
+//        decoded_bin_mat
+//    );
+//
+//    // Inverse sort if applicable
+//    if (params.GetSortRowsFlag()) {
+//      const auto& row_ids = bin_mat_payload.GetRowIdsPayload()->GetRowColIdsElements();
+//      UIntVecDtype row_ids_vec = xt::adapt(row_ids.data(), {row_ids.size()});
+//      genie::genotype::sort_matrix(decoded_bin_mat, row_ids_vec, 0);
+//    }
+//
+//    if (params.GetSortColsFlag()) {
+//      const auto& col_ids = bin_mat_payload.GetColIdsPayload()->GetRowColIdsElements();
+//      UIntVecDtype col_ids_vec = xt::adapt(col_ids.data(), {col_ids.size()});
+//      genie::genotype::sort_matrix(decoded_bin_mat, col_ids_vec, 1);
+//    }
+//
+//    // Debinarize the matrix
+//    if (params.GetBinarizationID() == BinarizationID::BIT_PLANE) {
+//      genie::genotype::debinarize_bit_plane(
+//          {decoded_bin_mat},
+//          params.GetNumBitPlanes(),
+//          params.GetConcatAxis(),
+//          allele_mat
+//      );
+//    } else if (params.GetBinarizationID() == BinarizationID::ROW_BIN) {
+//      genie::genotype::debinarize_row_bin(
+//          {decoded_bin_mat},
+//          payload.GetVariantsAmaxPayload()->GetAmaxElements(),
+//          allele_mat
+//      );
+//    }
+//  }
+//
+//  // Decode phasing matrix
+//  const auto& phasing_payload = payload.GetVariantsPayload().back();
+//  BinMatDtype decoded_phasing_mat;
+//
+//  entropy_decode_bin_mat(
+//      phasing_payload.GetPayload(),
+//      params.GetCodecID(),
+//      phasing_payload.GetNRows(),
+//      phasing_payload.GetNCols(),
+//      decoded_phasing_mat
+//  );
+//
+//  if (params.GetSortRowsFlag()) {
+//    const auto& row_ids = phasing_payload.GetRowIdsPayload()->GetRowColIdsElements();
+//    UIntVecDtype row_ids_vec = xt::adapt(row_ids.data(), {row_ids.size()});
+//    genie::genotype::sort_matrix(decoded_phasing_mat, row_ids_vec, 0);
+//  }
+//
+//  if (params.GetSortColsFlag()) {
+//    const auto& col_ids = phasing_payload.GetColIdsPayload()->GetRowColIdsElements();
+//    UIntVecDtype col_ids_vec = xt::adapt(col_ids.data(), {col_ids.size()});
+//    genie::genotype::sort_matrix(decoded_phasing_mat, col_ids_vec, 1);
+//  }
+//
+//  phasing_mat = decoded_phasing_mat;
+//
+//  // Inverse transform max value
+//  inverse_transform_max_val(
+//      allele_mat,
+//      payload.GetNoReferenceFlag(),
+//      payload.GetNotAvailableFlag()
+//  );
 }
 
 // -----------------------------------------------------------------------------
