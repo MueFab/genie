@@ -629,7 +629,9 @@ TEST(Genotype, RoundTrip_EncodeAndSortBinMat) {
           bin_mat,
           sorted_bin_mat_payload,
           sort_row_method,
-          sort_col_method, CODEC_ID);
+          sort_col_method,
+          CODEC_ID
+      );
 
       if (sort_rows_flag | sort_cols_flag){
         EXPECT_NE(bin_mat, ORIG_BIN_MAT);
