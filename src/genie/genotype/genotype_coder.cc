@@ -776,10 +776,11 @@ void decode_and_inverse_sort_bin_mat(
 
   auto& bin_mat_payload = sorted_bin_mat_payload.GetBinMatPayload();
 
-  entropy_decode_bin_mat(bin_mat_payload.GetPayload(),
+  entropy_decode_bin_mat(
+    bin_mat_payload.GetPayload(),
     codec_ID,
-    bin_mat_payload.GetNRows(),
-    bin_mat_payload.GetNCols(),
+    static_cast<size_t>(bin_mat_payload.GetNRows()),
+    static_cast<size_t>(bin_mat_payload.GetNCols()),
     bin_mat
   );
 
