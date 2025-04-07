@@ -348,6 +348,8 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
     }
 }
 
+// -----------------------------------------------------------------------------
+
 TEST(GenotypeStructure, RoundTrip_RowColIdsPayload) {
   // Small test case
   {
@@ -434,6 +436,134 @@ TEST(GenotypeStructure, RoundTrip_RowColIdsPayload) {
     EXPECT_TRUE(orig_obj == recon_obj);
     EXPECT_EQ(orig_obj.GetRowColIdsElements().size(), recon_obj.GetRowColIdsElements().size());
     EXPECT_EQ(orig_obj.GetRowColIdsElements(), recon_obj.GetRowColIdsElements());
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+TEST(GenotypeStructure, RoundTrip_AmaxPayload) {
+  // Test default constructor
+  {
+    SCOPED_TRACE("Testing default constructor");
+    genie::genotype::AmaxPayload payload;
+    EXPECT_EQ(payload.GetNElems(), 0u);
+    EXPECT_EQ(payload.GetNBitsPerElem(), 0u);
+    EXPECT_TRUE(payload.GetAmaxElements().empty());
+  }
+
+  // Test parameterized constructor
+  {
+    SCOPED_TRACE("Testing parameterized constructor");
+    std::vector<uint64_t> ORIG_ELEMENTS = {1, 2, 3};
+    size_t NUM_ELEMENTS = ORIG_ELEMENTS.size();
+    std::vector<uint64_t> elements(ORIG_ELEMENTS);
+    uint8_t ORIG_NBITS = 8;
+
+    genie::genotype::AmaxPayload recon_obj(
+        std::move(elements),
+        std::optional<uint8_t>(ORIG_NBITS)
+    );
+
+    EXPECT_EQ(recon_obj.GetNElems(), NUM_ELEMENTS);
+    EXPECT_EQ(recon_obj.GetNBitsPerElem(), ORIG_NBITS);
+    EXPECT_EQ(recon_obj.GetAmaxElements(), ORIG_ELEMENTS);
+  }
+
+  // Test move constructor
+  {
+    SCOPED_TRACE("Testing move constructor");
+    std::vector<uint64_t> ORIG_ELEMENTS = {1, 8, 9};
+    uint8_t ORIG_NBITS = 32;
+    size_t NUM_ELEMENTS = ORIG_ELEMENTS.size();
+    std::vector<uint64_t> elements(ORIG_ELEMENTS);
+
+    genie::genotype::AmaxPayload orig(
+        std::move(elements),
+        ORIG_NBITS
+    );
+
+    genie::genotype::AmaxPayload moved(std::move(orig));
+    EXPECT_EQ(moved.GetAmaxElements().size(), NUM_ELEMENTS);
+    EXPECT_EQ(moved.GetNElems(), NUM_ELEMENTS);
+    EXPECT_EQ(moved.GetNBitsPerElem(), ORIG_NBITS);
+    EXPECT_TRUE(orig.GetAmaxElements().empty());
+  }
+
+  // Test move assignment operator
+  {
+    SCOPED_TRACE("Testing move assignment operator");
+    std::vector<uint64_t> ORIG_ELEMENTS = {1, 11, 12};
+    uint8_t ORIG_NBITS = 64;
+    size_t NUM_ELEMENTS = ORIG_ELEMENTS.size();
+    std::vector<uint64_t> elements(ORIG_ELEMENTS);
+
+    genie::genotype::AmaxPayload orig(
+        std::move(elements),
+        std::optional<uint8_t>(ORIG_NBITS)
+    );
+
+    genie::genotype::AmaxPayload moved;
+    moved = std::move(orig);
+
+    EXPECT_EQ(moved.GetNElems(), NUM_ELEMENTS);
+    EXPECT_EQ(moved.GetNBitsPerElem(), ORIG_NBITS);
+    // Original should be empty after move
+    EXPECT_TRUE(orig.GetAmaxElements().empty());
+  }
+
+  // Test setters
+  {
+    SCOPED_TRACE("Testing setters");
+    std::vector<uint64_t> ORIG_ELEMENTS = {1, 11, 12};
+    uint8_t ORIG_NBITS = 64;
+    size_t NUM_ELEMENTS = ORIG_ELEMENTS.size();
+    std::vector<uint64_t> elements(ORIG_ELEMENTS);
+
+    genie::genotype::AmaxPayload payload;
+    payload.SetAmaxElements(std::move(elements));
+    payload.SetNbitsPerElem(ORIG_NBITS);
+
+    EXPECT_EQ(payload.GetNElems(), NUM_ELEMENTS);
+    EXPECT_EQ(payload.GetNBitsPerElem(), ORIG_NBITS);
+    EXPECT_EQ(payload.GetAmaxElements(), ORIG_ELEMENTS);
+  }
+
+  // Test parameterized constructor
+  {
+    SCOPED_TRACE("Testing round trip parameterized constructor");
+    std::vector<uint64_t> ORIG_ELEMENTS = {1, 2, 3};
+    size_t NUM_ELEMENTS = ORIG_ELEMENTS.size();
+    std::vector<uint64_t> elements(ORIG_ELEMENTS);
+    uint8_t ORIG_NBITS = 8;
+
+    genie::genotype::AmaxPayload orig_obj(
+        std::move(elements),
+        std::optional<uint8_t>(ORIG_NBITS)
+    );
+
+    EXPECT_EQ(orig_obj.GetNElems(), NUM_ELEMENTS);
+    EXPECT_EQ(orig_obj.GetNBitsPerElem(), ORIG_NBITS);
+    EXPECT_EQ(orig_obj.GetAmaxElements(), ORIG_ELEMENTS);
+
+    auto obj_payload = std::stringstream();
+    std::ostream& writer = obj_payload;
+    auto bit_writer = genie::util::BitWriter(&writer);
+    orig_obj.Write(bit_writer);
+
+    auto payload_size = obj_payload.str().size();
+    ASSERT_EQ(payload_size, orig_obj.GetSize());
+
+    std::istream& reader = obj_payload;
+    auto bit_reader = genie::util::BitReader(reader);
+    auto recon_obj = genie::genotype::AmaxPayload(
+        bit_reader
+    );
+
+    EXPECT_EQ(recon_obj.GetNElems(), NUM_ELEMENTS);
+    EXPECT_EQ(recon_obj.GetNBitsPerElem(), ORIG_NBITS);
+    EXPECT_EQ(recon_obj.GetAmaxElements(), ORIG_ELEMENTS);
+
+    ASSERT_TRUE(recon_obj == orig_obj);
   }
 }
 

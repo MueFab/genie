@@ -398,7 +398,7 @@ void entropy_decode_bin_mat(
 
 void encode_and_sort_bin_mat(
     // Inputs
-    const BinMatDtype& bin_mat,
+    BinMatDtype& bin_mat,
     // Output
     SortedBinMatPayload& sorted_bin_mat_payload,
     // Options
@@ -425,7 +425,6 @@ void encode_genotype(
     // Inputs
     std::vector<core::record::VariantGenotype>& recs,
     // Outputs
-    GenotypeParameters& params,
     GenotypePayload& payload,
     // Options
     size_t block_size=512,
@@ -439,7 +438,14 @@ void encode_genotype(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//
+void decode_genotype(
+    // Inputs
+    const GenotypeParameters& params,
+    const GenotypePayload& payload,
+    // Outputs
+    Int8MatDtype& allele_mat,
+    BinMatDtype& phasing_mat
+);
 
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -765,7 +765,7 @@ void encode_and_sort_bin_mat(
 
 void decode_and_inverse_sort_bin_mat(
   // Inputs
-  SortedBinMatPayload& sorted_bin_mat_payload,
+  const SortedBinMatPayload& sorted_bin_mat_payload,
   // Output
   BinMatDtype& bin_mat,
   // Options

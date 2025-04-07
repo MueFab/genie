@@ -23,7 +23,7 @@ AmaxPayload::AmaxPayload()
 AmaxPayload::AmaxPayload(std::vector<uint64_t>&& amax_elements, 
                          std::optional<uint8_t> nbits_per_elem)
     : amax_elements_{std::move(amax_elements)} {
-  UTILS_DIE_IF(amax_elements.empty(), "amax_elements cannot be empty!");
+  UTILS_DIE_IF(amax_elements_.empty(), "amax_elements cannot be empty!");
 
   if (nbits_per_elem.has_value()) {
     nbits_per_elem_ = nbits_per_elem.value();
@@ -34,7 +34,10 @@ AmaxPayload::AmaxPayload(std::vector<uint64_t>&& amax_elements,
 
 // -----------------------------------------------------------------------------
 
-AmaxPayload::AmaxPayload(const AmaxPayload& other) = default;
+AmaxPayload::AmaxPayload(
+    const AmaxPayload& other
+): amax_elements_(other.amax_elements_),
+   nbits_per_elem_(other.nbits_per_elem_) {}
 
 // -----------------------------------------------------------------------------
 
@@ -61,6 +64,14 @@ AmaxPayload& AmaxPayload::operator=(AmaxPayload&& other) noexcept {
   }
   return *this;
 }
+
+// -----------------------------------------------------------------------------
+
+bool AmaxPayload::operator==(const AmaxPayload& other) noexcept {
+  return (nbits_per_elem_ && other.nbits_per_elem_ &&
+          amax_elements_ == other.amax_elements_);
+}
+
 
 // -----------------------------------------------------------------------------
 
@@ -114,16 +125,24 @@ const std::vector<uint64_t>& AmaxPayload::GetAmaxElements() const {
 // -----------------------------------------------------------------------------
 
 size_t AmaxPayload::GetSize() const {
-  size_t size_in_bits = 32 + 8;  // size of nelems_ + size of nbits_per_elem_
-  size_in_bits += amax_elements_.size(); // Bits for the flag
-  for (unsigned long amax_element : amax_elements_) {
-    if (amax_element > 1) {
-      size_in_bits += nbits_per_elem_;  // nbits_per_entry == nbits_per_elem_
-    }
-  }
-  uint8_t remain = 8 - (size_in_bits & 8);
+  std::stringstream bitstream;
+  genie::util::BitWriter writer(&bitstream);
+  Write(writer);
 
-  return (size_in_bits + remain) >> 3;
+  bitstream.str().size();
+  size_t payload_size = bitstream.str().size();
+  return payload_size;
+
+//  size_t size_in_bits = 32 + 8;  // size of nelems_ + size of nbits_per_elem_
+//  size_in_bits += amax_elements_.size(); // Bits for the flag
+//  for (unsigned long amax_element : amax_elements_) {
+//    if (amax_element > 1) {
+//      size_in_bits += nbits_per_elem_;  // nbits_per_entry == nbits_per_elem_
+//    }
+//  }
+//  uint8_t remain = 8 - (size_in_bits & 8);
+//
+//  return (size_in_bits + remain) >> 3;
 }
 
 // -----------------------------------------------------------------------------
@@ -131,7 +150,7 @@ size_t AmaxPayload::GetSize() const {
 void AmaxPayload::Write(util::BitWriter& writer) const {
   UTILS_DIE_IF(!writer.IsByteAligned(), "Byte is not aligned!");
   writer.WriteBypassBE(static_cast<uint32_t>(GetNElems()));
-  writer.WriteBypassBE(static_cast<uint32_t>(GetNBitsPerElem()));
+  writer.WriteBypassBE(static_cast<uint8_t>(GetNBitsPerElem()));
 
   for (auto amax_element : GetAmaxElements()) {
     auto is_one_flag = amax_element > 1;
