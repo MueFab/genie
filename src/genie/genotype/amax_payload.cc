@@ -129,7 +129,6 @@ size_t AmaxPayload::GetSize() const {
   genie::util::BitWriter writer(&bitstream);
   Write(writer);
 
-  bitstream.str().size();
   size_t payload_size = bitstream.str().size();
   return payload_size;
 
