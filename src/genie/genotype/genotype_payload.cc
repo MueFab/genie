@@ -146,7 +146,14 @@ GenotypePayload::GenotypePayload(
   phases_value_ = (flags >> 0) & 1;
 
   auto num_bit_planes = reader.Read<uint8_t>();
-  for (auto i=0u; i< num_bit_planes; i++){
+
+  auto num_variants_payloads = 1;
+  // Special case for num_variants_payloads
+  if (parameters.GetBinarizationID() == BinarizationID::BIT_PLANE && parameters.GetConcatAxis() == ConcatAxis::DO_NOT_CONCAT){
+    num_variants_payloads = num_bit_planes;
+  }
+
+  for (auto i=0u; i< num_variants_payloads; i++){
     variants_payloads_.emplace_back(
       reader,
       parameters.GetAllelesCodecID(),
@@ -197,6 +204,12 @@ bool GenotypePayload::GetPhasesValue() const {
 // -----------------------------------------------------------------------------
 
 uint8_t GenotypePayload::GetNumBitPlanes() const { return static_cast<uint8_t>(GetVariantsPayloads().size()); }
+
+// -----------------------------------------------------------------------------
+
+size_t GenotypePayload::GetNumVariantsPayloads() const{
+  return variants_payloads_.size();
+}
 
 // -----------------------------------------------------------------------------
 
