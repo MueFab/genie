@@ -645,8 +645,8 @@ void entropy_decode_bin_mat(
           &raw_data_len,
           payload.data(),  // Use payload.data() as compressed_data
           payload.size(),  // Use payload.size() as compressed_data_len
-          &nrows,
-          &ncols
+          (unsigned long*) & nrows, 
+          (unsigned long*)&ncols
       );
     } break;
     case genie::core::AlgoID::ZSTD: {

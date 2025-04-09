@@ -425,6 +425,7 @@ void encode_genotype(
     // Inputs
     std::vector<core::record::VariantGenotype>& recs,
     // Outputs
+    GenotypeParameters& params, 
     GenotypePayload& payload,
     // Options
     size_t block_size=512,
