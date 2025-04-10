@@ -46,9 +46,9 @@ class DescriptorConfiguration {
     DescriptorConfiguration();
     explicit DescriptorConfiguration(util::BitReader& reader);
 
-    DescriptorConfiguration(genie::genotype::GenotypeParameters genotype_parameters);
+    explicit DescriptorConfiguration(genie::genotype::GenotypeParameters genotype_parameters);
 
-    DescriptorConfiguration(genie::likelihood::LikelihoodParameters likelihood_parameters);
+    explicit DescriptorConfiguration(genie::likelihood::LikelihoodParameters likelihood_parameters);
 
     DescriptorConfiguration(genie::contact::ContactMatrixParameters _contact_matrix_parameters, std::vector<genie::contact::SubcontactMatrixParameters> _subconstract_matrix_parameters);
 

@@ -11,6 +11,8 @@
 #include <list>
 #include <map>
 #include <sstream>
+#include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
