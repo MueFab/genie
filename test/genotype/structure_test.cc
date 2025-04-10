@@ -411,7 +411,7 @@ TEST(GenotypeStructure, RoundTrip_RowColIdsPayload) {
   }
 
   for (size_t NUM_ELEMENTS : {2u, 3u, 4u, 5u, 7u, 8u, 15u, 16u}){
-    auto ORIG_IDS = xt::random::permutation<uint32_t>(NUM_ELEMENTS);
+    auto ORIG_IDS = xt::random::permutation<uint32_t>(static_cast<uint32_t>(NUM_ELEMENTS));
     auto ORIG_IDS_VEC = std::vector<uint32_t>(ORIG_IDS.begin(), ORIG_IDS.end());
 
     auto row_col_ids = ORIG_IDS_VEC;
