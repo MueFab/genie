@@ -4,8 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <codecs/include/mpegg-codecs.h>
+#include <map>
 #include <string>
+#include <vector>
+
+#include <codecs/include/mpegg-codecs.h>
 #include "genie/annotation/annotation.h"
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"

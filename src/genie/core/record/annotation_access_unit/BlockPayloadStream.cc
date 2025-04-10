@@ -32,7 +32,7 @@ BlockPayloadStream::BlockPayloadStream(genie::core::record::annotation_parameter
                                        uint32_t _block_payload_size, const std::stringstream& _generic_payload)
     : descriptor_ID(_descriptorID),
       block_payload_size(_block_payload_size),
-      generic_payload(){
+      generic_payload() {
 
     generic_payload << _generic_payload.rdbuf();
 }

@@ -5,8 +5,10 @@
  */
 
 #include <algorithm>
+#include <map>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/core/constants.h"
