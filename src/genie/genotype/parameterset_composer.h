@@ -79,7 +79,7 @@ class ParameterSetComposer {
     bool AT_pos_40_bits_flag;
     uint8_t n_aux_attribute_groups;
     bool two_dimensional;
-    [[maybe_unused]] uint64_t n_tiles;
+    uint64_t n_tiles;
     uint8_t AG_class;
 
     std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configuration;

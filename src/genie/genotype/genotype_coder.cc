@@ -136,7 +136,8 @@ void binarize_bit_plane(
     // Output
     std::vector<BinMatDtype>& bin_mats, uint8_t& num_bit_planes,
     // Options
-    const ConcatAxis concat_axis) {
+    const ConcatAxis concat_axis
+) {
   auto max_val = static_cast<uint8_t>(xt::amax(allele_mat)(0));
   num_bit_planes = static_cast<uint8_t>(std::ceil(std::log2(max_val + 1)));
 
@@ -488,7 +489,8 @@ void bin_mat_to_bytes(
     for (auto j = 0u; j < ncols; j++) {
       auto byte_offset = row_offset + (j >> 3u);
       uint8_t shift = (7u - (j & 7u));
-      auto val = static_cast<uint8_t>(bin_mat(i, j));
+      auto bool_val = bin_mat(i, j);
+      auto val = static_cast<uint8_t>(bool_val);
       val = static_cast<uint8_t>(val << shift);
       *(*payload + byte_offset) |= val;
     }
@@ -563,7 +565,7 @@ void bin_mat_from_bytes(
 
 void entropy_encode_bin_mat(
     // Inputs
-    BinMatDtype& bin_mat,
+    const BinMatDtype& bin_mat,
     genie::core::AlgoID codec_ID,
     // Outputs
     std::vector<uint8_t>& payload
@@ -694,6 +696,7 @@ void entropy_decode_bin_mat(
 // -----------------------------------------------------------------------------
 
 void encode_and_sort_bin_mat(
+    // Inputs
     BinMatDtype& bin_mat,
     // Output
     SortedBinMatPayload& sorted_bin_mat_payload,
@@ -737,6 +740,7 @@ void encode_and_sort_bin_mat(
     );
   }
 
+  // Handle entropy coding
   {
     auto nrows = static_cast<uint32_t>(bin_mat.shape(0));
     auto ncols = static_cast<uint32_t>(bin_mat.shape(1));
@@ -803,7 +807,8 @@ void encode_genotype(
     // Inputs
     std::vector<core::record::VariantGenotype>& recs,
     // Outputs
-    GenotypeParameters& params, GenotypePayload& payload,
+    GenotypeParameters& params,
+    GenotypePayload& payload,
     // Options
     size_t block_size,
     BinarizationID binarization_ID,
@@ -840,7 +845,7 @@ void encode_genotype(
     std::vector<BinMatDtype> allele_bin_mat_vect;
 
     BinMatDtype phasing_mat;
-    uint8_t num_bin_mats;
+    uint8_t num_bit_planes;
 
     {
         Int8MatDtype allele_mat;
@@ -866,7 +871,7 @@ void encode_genotype(
         binarize_allele_mat(
             allele_mat,
             allele_bin_mat_vect,
-            num_bin_mats,
+            num_bit_planes,
             amax_vec,
             tmp_params.GetBinarizationID(),
             tmp_params.GetConcatAxis()
@@ -879,12 +884,21 @@ void encode_genotype(
         }
     }
 
-    for (auto i_mat = 0u; i_mat < num_bin_mats; i_mat++) {
+    auto num_variants_payloads = 1;
+    // Special case for num_variants_payloads
+    if (tmp_params.GetBinarizationID() == BinarizationID::BIT_PLANE && tmp_params.GetConcatAxis() == ConcatAxis::DO_NOT_CONCAT){
+      num_variants_payloads = num_bit_planes;
+    }
+
+    for (auto i_mat = 0u; i_mat < num_variants_payloads; i_mat++) {
       genie::genotype::SortedBinMatPayload sorted_bin_mat_payload;
 
       encode_and_sort_bin_mat(
+        // Inputs
         allele_bin_mat_vect[i_mat],
+        // Outputs
         sorted_bin_mat_payload,
+        // Options
         sort_row_method,
         sort_col_method,
         codec_ID
