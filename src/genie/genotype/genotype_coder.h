@@ -376,7 +376,7 @@ void bin_mat_from_bytes(
 
 void entropy_encode_bin_mat(
     // Inputs
-    BinMatDtype& bin_mat,
+    const BinMatDtype& bin_mat,
     genie::core::AlgoID codec_ID,
     // Outputs
     std::vector<uint8_t>& payload
@@ -425,6 +425,7 @@ void encode_genotype(
     // Inputs
     std::vector<core::record::VariantGenotype>& recs,
     // Outputs
+    GenotypeParameters& params,
     GenotypePayload& payload,
     // Options
     size_t block_size=512,
