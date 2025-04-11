@@ -64,7 +64,7 @@ RowColIdsPayload::RowColIdsPayload(genie::util::BitReader& reader, size_t num_el
 //    payload_.resize(num_elements);
   auto n_bits_per_elem = ComputeNBitsPerElem(num_elements);
   for (auto i = 0u; i < num_elements; i++){
-    row_col_ids_elements_.push_back(reader.ReadBits(n_bits_per_elem));
+    row_col_ids_elements_.push_back(static_cast<uint32_t>(reader.ReadBits(n_bits_per_elem)));
   }
   reader.FlushHeldBits();
 }
@@ -87,7 +87,7 @@ bool RowColIdsPayload::operator!=(const RowColIdsPayload& other) const {
 // -----------------------------------------------------------------------------
 
 uint32_t RowColIdsPayload::GetNelements() const {
-  return row_col_ids_elements_.size();
+  return static_cast<uint32_t>(row_col_ids_elements_.size());
 }
 
 // -----------------------------------------------------------------------------

@@ -19,7 +19,7 @@ struct ContactTestDetails {
                      bool REMOVE_UNALIGNED_REGION, bool TRANSFORM_MASK,
                      bool ENA_DIAG_TRANSFORM, bool ENA_BINARIZATION,
                      bool NORM_AS_WEIGHT, bool MULTIPLICATIVE_NORM,
-                     uint32_t TILE_SIZE, uint32_t MULT = 1u) {
+                     uint32_t TILE_SIZE, uint32_t MULT = 1u){//, std::vector<uint32_t> BINSIZEMULT ={}) {
     filename = contactin;
     cm_pars.REMOVE_UNALIGNED_REGION = REMOVE_UNALIGNED_REGION;
     cm_pars.TRANSFORM_MASK = TRANSFORM_MASK;
@@ -30,10 +30,13 @@ struct ContactTestDetails {
     cm_pars.CODEC_ID = genie::core::AlgoID::JBIG, cm_pars.TILE_SIZE = TILE_SIZE;
     cm_pars.MULT = MULT;
     outputfile = casename;
+    //binSizemultipliers = BINSIZEMULT;
   }
+
   std::string filename;
   std::string outputfile;
   genie::annotation::ContactMatrixParameters cm_pars;
+ // std::vector<uint32_t> binSizemultipliers;
 };
 
 class AnnotationContactTests
@@ -117,11 +120,11 @@ INSTANTIATE_TEST_SUITE_P(
         ContactTestDetails(
             "CASE08",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-50000-21_21.cont",
-            false, false, true, true, true, false, 150, 5u),
+            false, false, true, true, true, false, 150, 5u),//, {1,5}),
         ContactTestDetails(
             "CASE09",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
-            true, false, true, true, true, false, 1000, 5u),
+            true, false, true, true, true, false, 1000),
         ContactTestDetails(
             "CASE12",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
