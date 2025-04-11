@@ -15,7 +15,7 @@
 
 TEST(VariantGenotypeRecord, Genotype_gt_only) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
+    std::string filepath = gitRootDir + "/data/records/variant/1.3.5.header100.gt_only.vcf.geno";
     ASSERT_TRUE(std::filesystem::exists(filepath)) << filepath;
 
     std::vector<genie::core::record::VariantGenotype> recs;
@@ -87,7 +87,7 @@ TEST(VariantGenotypeRecord, Genotype_gt_only) {  // NOLINT(cert-err58-cpp)
 
 TEST(VariantGenotypeRecord, Genotype_FORMAT_only) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.fmt_only.vcf.geno";
+    std::string filepath = gitRootDir + "/data/records/variant/1.3.5.header100.fmt_only.vcf.geno";
     ASSERT_TRUE(std::filesystem::exists(filepath)) << filepath;
     std::vector<genie::core::record::VariantGenotype> recs;
 
