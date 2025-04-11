@@ -4,8 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <codecs/include/mpegg-codecs.h>
+#include <map>
 #include <string>
+#include <vector>
+
+#include <codecs/include/mpegg-codecs.h>
 #include "genie/annotation/annotation.h"
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"
@@ -35,6 +38,7 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
     }
 
     RECS.pop_back();
+
     auto cm_param = genie::contact::ContactMatrixParameters();
     auto scm_param = genie::contact::SubcontactMatrixParameters();
     auto scm_payload = genie::contact::SubcontactMatrixPayload();
@@ -49,6 +53,7 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
         cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
                                   rec.getChr2Length());
     }
+    cm_param.UpsertBinSizeMultiplier(contactMatrixParameters.MULT);
 
     auto& REC = RECS.front();
     auto rec = genie::core::record::ContactRecord(REC);

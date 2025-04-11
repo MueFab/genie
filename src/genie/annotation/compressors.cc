@@ -6,8 +6,6 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/annotation/compressors.h"
-
 #include <cctype>
 #include <cstdint>
 #include <memory>
@@ -15,6 +13,9 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "genie/annotation/compressors.h"
+
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"

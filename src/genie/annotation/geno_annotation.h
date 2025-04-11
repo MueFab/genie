@@ -11,6 +11,8 @@
 #include <list>
 #include <map>
 #include <sstream>
+#include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -82,7 +84,7 @@ class GenoAnnotation {
                        std::vector<std::vector<std::vector<AttrType>>>>>
             attributes);
 
-    RecData& RecData::operator=(const RecData& other);
+    RecData& operator=(const RecData& other);
 
     void set(
         uint32_t _rowStart, uint32_t _colStart,

@@ -37,6 +37,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wdouble-promotion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=conversion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=sign-conversion")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-strict-aliasing")
 # Create an interface library for xtensor with suppressed warnings
 target_compile_options(xtensor_no_warnings INTERFACE
         -Wno-undef
@@ -48,7 +49,9 @@ target_compile_options(xtensor_no_warnings INTERFACE
         -Wno-unused-parameter
         -Wno-unused-but-set-variable
         -Wno-implicit-fallthrough
-        -Werror=maybe-uninitialized
+        -Wno-maybe-uninitialized
+        -Wno-array-bounds
+        -Wno-stringop-overflow
 )
 else ()
 target_compile_options(xtensor_no_warnings INTERFACE "/w")
