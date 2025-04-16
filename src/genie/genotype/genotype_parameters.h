@@ -46,14 +46,14 @@ class GenotypeParameters {
  private:
   BinarizationID binarization_ID_;
   ConcatAxis concat_axis_;
-  bool transpose_alleles_mat_flag_;
-  bool sort_alleles_rows_flag_;
-  bool sort_alleles_cols_flag_;
-  genie::core::AlgoID alleles_codec_ID_;
+  bool sort_variants_rows_flag_;
+  bool sort_variants_cols_flag_;
+  bool transpose_variants_mat_flag_;
+  genie::core::AlgoID variants_codec_ID_;
   bool encode_phases_data_flag_;
-  bool transpose_phases_mat_flag_;
   bool sort_phases_rows_flag_;
   bool sort_phases_cols_flag_;
+  bool transpose_phases_mat_flag_;
   genie::core::AlgoID phases_codec_ID_;
 
  public:
@@ -64,14 +64,14 @@ class GenotypeParameters {
   GenotypeParameters(
       BinarizationID binarization_id,
       ConcatAxis concat_axis,
-      bool transpose_alleles_mat_flag,
-      bool sort_alleles_rows_flag,
-      bool sort_alleles_cols_flag,
-      genie::core::AlgoID alleles_codec_id,
+      bool sort_variants_rows_flag,
+      bool sort_variants_cols_flag,
+      bool transpose_variants_mat_flag,
+      genie::core::AlgoID variants_codec_id,
       bool encode_phases_data_flag,
-      bool transpose_phases_mat_flag,
       bool sort_phases_rows_flag,
       bool sort_phases_cols_flag,
+      bool transpose_phases_mat_flag,
       genie::core::AlgoID phases_codec_id
   );
 
@@ -93,10 +93,10 @@ class GenotypeParameters {
   // Getters
   [[maybe_unused]] BinarizationID GetBinarizationID() const;
   [[maybe_unused]] ConcatAxis GetConcatAxis() const;
-  bool GetTransposeAllelesMatFlag() const;
-  bool GetSortAllelesRowsFlag() const;
-  bool GetSortAllelesColsFlag() const;
-  genie::core::AlgoID GetAllelesCodecID() const;
+  bool GetTransposeVariantsMatFlag() const;
+  bool GetSortVariantsRowsFlag() const;
+  bool GetSortVariantsColsFlag() const;
+  genie::core::AlgoID GetVariantsCodecID() const;
   bool GetEncodePhasesDataFlag() const;
   [[maybe_unused]] bool GetTransposePhasesMatFlag() const;
   [[maybe_unused]] bool GetSortPhasesRowsFlag() const;
@@ -106,10 +106,10 @@ class GenotypeParameters {
   // Setters
   [[maybe_unused]] void SetBinarizationID(BinarizationID binarization_id);
   [[maybe_unused]] void SetConcatAxis(ConcatAxis concat_axis);
-  [[maybe_unused]] void SetTransposeAllelesMatFlag(bool flag);
-  [[maybe_unused]] void SetSortAllelesRowsFlag(bool flag);
-  [[maybe_unused]] void SetSortAllelesColsFlag(bool flag);
-  [[maybe_unused]] void SetAllelesCodecID(genie::core::AlgoID codec_id);
+  [[maybe_unused]] void SetTransposeVariantsMatFlag(bool flag);
+  [[maybe_unused]] void SetSortVariantsRowsFlag(bool flag);
+  [[maybe_unused]] void SetSortVariantsColsFlag(bool flag);
+  [[maybe_unused]] void SetVariantsCodecID(genie::core::AlgoID codec_id);
   [[maybe_unused]] void SetEncodePhasesDataFlag(bool flag);
   [[maybe_unused]] void SetTransposePhasesMatFlag(bool flag);
   [[maybe_unused]] void SetSortPhasesRowsFlag(bool flag);

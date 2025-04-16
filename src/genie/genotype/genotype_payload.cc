@@ -156,9 +156,9 @@ GenotypePayload::GenotypePayload(
   for (auto i=0u; i< num_variants_payloads; i++){
     variants_payloads_.emplace_back(
       reader,
-      parameters.GetAllelesCodecID(),
-      parameters.GetSortAllelesRowsFlag(),
-      parameters.GetSortAllelesColsFlag()
+      parameters.GetVariantsCodecID(),
+      parameters.GetSortVariantsRowsFlag(),
+      parameters.GetSortVariantsColsFlag()
     );
   }
 
