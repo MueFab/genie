@@ -4,16 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/annotation/contact_annotation.h"
+
+#include <codecs/include/mpegg-codecs.h>
+
 #include <map>
 #include <string>
 #include <vector>
 
-#include <codecs/include/mpegg-codecs.h>
 #include "genie/annotation/annotation.h"
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"
 
-#include "genie/annotation/contact_annotation.h"
 #include "genie/contact/contact_coder.h"
 #include "genie/core/record/contact/record.h"
 
