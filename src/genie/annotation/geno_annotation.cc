@@ -226,7 +226,7 @@ size_t genie::annotation::GenoAnnotation::readOneBlock(
   genie::genotype::GenotypeParameters pars;
   genie::genotype::GenotypePayload payload;
 
-  genie::genotype::encode_genotype(varGenoType,pars, payload, genotype_opt.block_size,
+  genie::genotype::encode_genotype(varGenoType, pars, payload, genotype_opt.block_size,
       genotype_opt.binarization_ID, genotype_opt.concat_axis, genotype_opt.transpose_mat,
       genotype_opt.sort_row_method, genotype_opt.sort_col_method, genotype_opt.codec_ID);  //, pars);
 

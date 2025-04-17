@@ -273,17 +273,17 @@ void GenotypeParameters::Write(util::BitWriter& writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void GenotypeParameters::Write(core::Writer& writer) const {
-  writer.Write(0u, 3); // reserved(3)
+  writer.WriteReserved(3);
   writer.Write(static_cast<uint64_t>(binarization_ID_), 3);
   writer.Write(static_cast<uint64_t>(concat_axis_), 2);
 
-  writer.Write(0u, 2); // reserved(2)
+  writer.WriteReserved(2);
   writer.Write(GetSortVariantsRowsFlag(), 1);
   writer.Write(GetSortVariantsColsFlag(), 1);
   writer.Write(GetTransposeVariantsMatFlag(), 1);
   writer.Write(static_cast<uint64_t>(GetVariantsCodecID()), 3);
 
-  writer.Write(0u, 1); // reserved(1)
+  writer.WriteReserved(1);
   writer.Write(GetEncodePhasesDataFlag(), 1);
   writer.Write(GetSortPhasesRowsFlag(), 1);
   writer.Write(GetSortPhasesColsFlag(), 1);

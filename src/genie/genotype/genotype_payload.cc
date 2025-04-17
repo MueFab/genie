@@ -24,6 +24,7 @@ GenotypePayload::GenotypePayload() {
   no_reference_flag_ = false;
   not_available_flag_ = false;
   phases_value_ = false;
+  num_bit_planes_ = 0;
 }
 
 // -----------------------------------------------------------------------------
@@ -34,6 +35,7 @@ GenotypePayload::GenotypePayload(
     bool no_reference_flag,
     bool not_available_flag,
     bool phases_value,
+    uint8_t num_bit_planes,
     std::vector<SortedBinMatPayload>&& variants_payload,
     std::optional<AmaxPayload>&& variants_amax_payload,
     std::optional<SortedBinMatPayload>&& phases_payload)
@@ -41,6 +43,7 @@ GenotypePayload::GenotypePayload(
       no_reference_flag_(no_reference_flag),
       not_available_flag_(not_available_flag),
       phases_value_(phases_value),
+      num_bit_planes_(num_bit_planes),
       variants_payloads_(std::move(variants_payload)),
       variants_amax_payload_(std::move(variants_amax_payload)),
       phases_payload_(std::move(phases_payload)) {}
@@ -58,6 +61,7 @@ GenotypePayload::GenotypePayload(GenotypePayload&& other) noexcept {
   no_reference_flag_ = other.no_reference_flag_;
   not_available_flag_ = other.not_available_flag_;
   phases_value_ = other.phases_value_;
+  num_bit_planes_ = other.num_bit_planes_;
   variants_payloads_ = std::move(other.variants_payloads_);
   variants_amax_payload_ = std::move(other.variants_amax_payload_);
   phases_payload_ = std::move(other.phases_payload_);
@@ -71,6 +75,7 @@ GenotypePayload::GenotypePayload(const GenotypePayload& other) {
   no_reference_flag_ = other.no_reference_flag_;
   not_available_flag_ = other.not_available_flag_;
   phases_value_ = other.phases_value_;
+  num_bit_planes_ = other.num_bit_planes_;
   variants_payloads_ = other.variants_payloads_;
   
   if (other.variants_amax_payload_.has_value()) {
@@ -95,6 +100,7 @@ GenotypePayload& GenotypePayload::operator=(GenotypePayload&& other) noexcept {
     no_reference_flag_ = other.no_reference_flag_;
     not_available_flag_ = other.not_available_flag_;
     phases_value_ = other.phases_value_;
+    num_bit_planes_ = other.num_bit_planes_;
     variants_payloads_ = std::move(other.variants_payloads_);
     variants_amax_payload_ = std::move(other.variants_amax_payload_);
     phases_payload_ = std::move(other.phases_payload_);
@@ -111,6 +117,7 @@ GenotypePayload& GenotypePayload::operator=(const GenotypePayload& other) {
     no_reference_flag_ = other.no_reference_flag_;
     not_available_flag_ = other.not_available_flag_;
     phases_value_ = other.phases_value_;
+    num_bit_planes_ = other.num_bit_planes_;
     variants_payloads_ = other.variants_payloads_;
     
     if (other.variants_amax_payload_.has_value()) {
@@ -145,15 +152,15 @@ GenotypePayload::GenotypePayload(
   not_available_flag_ = (flags >> 1) & 1;
   phases_value_ = (flags >> 0) & 1;
 
-  auto num_bit_planes = reader.Read<uint8_t>();
+  num_bit_planes_ = reader.Read<uint8_t>();
 
   auto num_variants_payloads = 1;
   // Special case for num_variants_payloads
   if (parameters.GetBinarizationID() == BinarizationID::BIT_PLANE && parameters.GetConcatAxis() == ConcatAxis::DO_NOT_CONCAT){
-    num_variants_payloads = num_bit_planes;
+    num_variants_payloads = num_bit_planes_;
   }
 
-  for (auto i=0u; i< num_variants_payloads; i++){
+  for (auto i=0u; i< num_variants_payloads; i++) {
     variants_payloads_.emplace_back(
       reader,
       parameters.GetVariantsCodecID(),
@@ -162,12 +169,12 @@ GenotypePayload::GenotypePayload(
     );
   }
 
-  if (parameters.GetBinarizationID() == BinarizationID::ROW_BIN){
+  if (parameters.GetBinarizationID() == BinarizationID::ROW_BIN) {
     auto amax_payload_size = reader.Read<uint32_t>();
     variants_amax_payload_ = AmaxPayload(reader);
   }
 
-  if (parameters.GetEncodePhasesDataFlag()){
+  if (parameters.GetEncodePhasesDataFlag()) {
     phases_payload_ = SortedBinMatPayload(
       reader,
         parameters.GetPhasesCodecID(),
@@ -203,11 +210,13 @@ bool GenotypePayload::GetPhasesValue() const {
 
 // -----------------------------------------------------------------------------
 
-uint8_t GenotypePayload::GetNumBitPlanes() const { return static_cast<uint8_t>(GetVariantsPayloads().size()); }
+uint8_t GenotypePayload::GetNumBitPlanes() const {
+  return num_bit_planes_;
+}
 
 // -----------------------------------------------------------------------------
 
-size_t GenotypePayload::GetNumVariantsPayloads() const{
+size_t GenotypePayload::GetNumVariantsPayloads() const {
   return variants_payloads_.size();
 }
 
@@ -219,7 +228,9 @@ const std::vector<SortedBinMatPayload>& GenotypePayload::GetVariantsPayloads() c
 
 // -----------------------------------------------------------------------------
 
-bool GenotypePayload::IsAmaxPayloadExist() const { return variants_amax_payload_.has_value(); }
+bool GenotypePayload::IsAmaxPayloadExist() const {
+  return variants_amax_payload_.has_value();
+}
 
 // -----------------------------------------------------------------------------
 
@@ -229,7 +240,9 @@ const std::optional<AmaxPayload>& GenotypePayload::GetVariantsAmaxPayload() cons
 
 // -----------------------------------------------------------------------------
 
-bool GenotypePayload::EncodePhaseValues() const { return GetPhasesPayload().has_value(); }
+bool GenotypePayload::EncodePhaseValues() const {
+  return GetPhasesPayload().has_value();
+}
 
 // -----------------------------------------------------------------------------
 
@@ -259,6 +272,12 @@ void GenotypePayload::SetNotAvailableFlag(bool not_available_flag) {
 
 void GenotypePayload::SetPhasesValue(bool phases_value) {
   phases_value_ = phases_value;
+}
+
+// -----------------------------------------------------------------------------
+
+void GenotypePayload::SetNumBitPlanes(uint8_t num_bit_planes) {
+  num_bit_planes_ = num_bit_planes;
 }
 
 // -----------------------------------------------------------------------------
@@ -298,9 +317,9 @@ void GenotypePayload::SetPhasesPayload(std::optional<SortedBinMatPayload>&& phas
 size_t GenotypePayload::GetSize() const {
   size_t size = 0;
   size += sizeof(max_ploidy_);
+  size += sizeof(uint8_t); // reserved, no_reference_flag, not_available_flag_, phases_value_
   size += sizeof(uint8_t); // num_bit_planes
-  size += sizeof(uint8_t); // no_reference_flag, not_available_flag_, phases_value_
-  for (auto& variant_payload: variants_payloads_){
+  for (auto& variant_payload: variants_payloads_) {
     size += variant_payload.GetSize();
   }
 
@@ -323,13 +342,13 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
   writer.WriteBypassBE(GetMaxPloidy());
 
   uint8_t flag = 0;
-  if (GetNoReferenceFlag()){
+  if (GetNoReferenceFlag()) {
     flag |= static_cast<uint8_t>(GenotypePayloadFlags::NO_REFERENCE_BIT);
   }
-  if (GetNotAvailableFlag()){
+  if (GetNotAvailableFlag()) {
     flag |= static_cast<uint8_t>(GenotypePayloadFlags::NOT_AVAILABLE_BIT);
   }
-  if (GetPhasesValue()){
+  if (GetPhasesValue()) {
     flag |= static_cast<uint8_t>(GenotypePayloadFlags::PHASE_VALUES_BIT);
   }
   writer.WriteBypassBE(flag);
