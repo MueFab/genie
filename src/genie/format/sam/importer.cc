@@ -116,7 +116,7 @@ std::pair<std::vector<SamRecord>, std::optional<int>> Importer::ReadSamChunk() {
       sam_records.back().rid_ =
           sam_hdr_to_fasta_lut_.at(sam_records.back().rid_);
     }
-    if (!sam_records.back().IsMateUnmapped()) {
+    if (sam_records.back().IsPaired() && !sam_records.back().IsMateUnmapped()) {
       sam_records.back().mate_rid_ =
           sam_hdr_to_fasta_lut_.at(sam_records.back().mate_rid_);
     }
