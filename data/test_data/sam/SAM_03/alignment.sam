@@ -1,0 +1,9 @@
+@HD	VN:1.6	SO:unsorted
+@SQ	SN:ref1	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
+@SQ	SN:ref2	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
+half_mapped_1	73	ref1	11	60	12M	=	11	0	AAAAAAAAAAAA	!!!!!!!!!!!!
+half_mapped_1	133	*	0	0	*	*	0	0	TTTTTTTTTTTT	############
+half_mapped_2	137	ref1	61	60	12M	=	61	0	GGGGGGGGGGGG	$$$$$$$$$$$$
+half_mapped_2	69	*	0	0	*	ref1	61	0	CCCCCCCCCCCC	%%%%%%%%%%%%
+half_mapped_3	73	ref1	111	60	12M	=	111	0	NNNNNNNNNNNN	&&&&&&&&&&&&
+half_mapped_3	133	*	0	0	*	ref1	111	0	AAAAAAAAAAAA	''''''''''''
