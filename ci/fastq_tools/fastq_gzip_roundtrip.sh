@@ -41,7 +41,11 @@ git_root_dir="$(git rev-parse --show-toplevel)"
 
 compress_roundtrip () {
     genie_encoder_parameters="$1"
-    fastq_cmp_error_parameters="${2::-3}"
+    if [[ "$2" != "" ]]; then
+      fastq_cmp_error_parameters="${2::-3}"
+    else
+      fastq_cmp_error_parameters="$2"
+    fi
     fastq_cmp_error_parameters_refdecoder="$fastq_cmp_error_parameters"
     genie_decoder_recombine=""
 
@@ -108,6 +112,9 @@ compress_roundtrip () {
     rm $working_dir/output_1.fastq
     rm -f $working_dir/output_2.fastq
 
+    rm $working_dir/output_1.fastq.gz
+    rm -f $working_dir/output_2.fastq.gz
+
     if [[ "$OSTYPE" != "win32" && "$OSTYPE" != "cygwin" && "$OSTYPE" != "msys" ]]; then
         echo "-----------------Refdecoder decompress"
         eval $timing_command \
@@ -140,7 +147,12 @@ compress_roundtrip () {
 
         rm $working_dir/output_1.fastq
         rm -f $working_dir/output_2.fastq
+
     fi
+
+    rm $primary_fastq_file_unzipped
+    rm -f $paired_fastq_file_unzipped
+
 }
 
 if [[ "$paired_fastq_file" == "" ]]; then
