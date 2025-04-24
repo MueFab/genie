@@ -100,7 +100,9 @@ std::pair<std::string, std::string> Encoder::GetReferences(
     state.max_pos = std::max(state.max_pos, end);
   }
 
-  if (r.GetSegments().size() > 1) {
+  if (r.GetClassId() == core::record::ClassType::kClassHm) {
+    ret.second = std::string(r.GetSegments()[1].GetSequence().length(), '\0');
+  } else if (r.GetSegments().size() > 1) {
     const auto& second_record =
         *reinterpret_cast<const core::record::alignment_split::SameRec*>(
             r.GetAlignments().front().GetAlignmentSplits().front().get());
