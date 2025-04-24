@@ -42,7 +42,10 @@ std::vector<std::string> Decoder::GetReferences(
     ret.emplace_back(excerpt.GetString(begin, end) +
                      std::string(clip_length, 'N'));
   }
-  if (meta.num_segments == 2) {
+  if (dynamic_cast<RefDecodingState&>(state).class_type ==
+      core::record::ClassType::kClassHm) {
+    ret.emplace_back(std::string(meta.length[1], '\0'));
+  } else if (meta.num_segments == 2) {
     const auto begin = static_cast<uint32_t>(meta.position[1]);
     const auto end =
         std::min<uint32_t>(begin + static_cast<uint32_t>(meta.length[1]),
@@ -65,7 +68,9 @@ Decoder::CreateDecodingState(core::AccessUnit& t) {
 // -----------------------------------------------------------------------------
 
 Decoder::RefDecodingState::RefDecodingState(core::AccessUnit& t_data)
-    : DecodingState(t_data), ref_excerpt(t_data.GetReferenceExcerpt()) {}
+    : DecodingState(t_data),
+      ref_excerpt(t_data.GetReferenceExcerpt()),
+      class_type(t_data.GetClassType()) {}
 
 // -----------------------------------------------------------------------------
 
