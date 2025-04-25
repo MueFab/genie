@@ -98,9 +98,6 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bit_reader) {
               b.load();
               b.parse();
             }
-            UTILS_DIE_IF(ret.GetHeader().GetClass() ==
-                             genie::core::record::ClassType::kClassHm,
-                         "Class HM not supported");
             UTILS_LOG(util::Logger::Severity::INFO,
                       ret.DebugPrint(
                           parameters_.at(ret.GetHeader().GetParameterId())));

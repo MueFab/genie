@@ -163,15 +163,25 @@ void Encoder::Add(const core::record::Record& rec, const std::string& ref1,
 
   // Check if record is paired
   if (rec.GetSegments().size() > 1) {
-    // Same record
-    const core::record::alignment_split::SameRec& split_rec =
-        ExtractPairedAlignment(rec);
-    const auto& sequence2 = rec.GetSegments()[1].GetSequence();
-    const auto length2 = sequence2.length();
-    EncodeAdditionalSegment(length2, split_rec, rec.IsRead1First());
+    if (rec.GetClassId() == core::record::ClassType::kClassHm) {
+      const auto& sequence2 = rec.GetSegments()[1].GetSequence();
+      const auto length2 = sequence2.length();
+      container_.Push(core::gen_sub::kReadLength,
+                      length2 - 1);
+      container_.Push(core::gen_sub::kPairSameRec, !rec.IsRead1First());
+      const std::string cigar2 = std::to_string(length2) + "=";
+      EncodeCigar(sequence2, cigar2, ref2, rec.GetClassId());
+    } else {
+      // Same record
+      const core::record::alignment_split::SameRec& split_rec =
+          ExtractPairedAlignment(rec);
+      const auto& sequence2 = rec.GetSegments()[1].GetSequence();
+      const auto length2 = sequence2.length();
+      EncodeAdditionalSegment(length2, split_rec, rec.IsRead1First());
 
-    const auto& cigar2 = split_rec.GetAlignment().GetECigar();
-    clips.second = EncodeCigar(sequence2, cigar2, ref2, rec.GetClassId());
+      const auto& cigar2 = split_rec.GetAlignment().GetECigar();
+      clips.second = EncodeCigar(sequence2, cigar2, ref2, rec.GetClassId());
+    }
   } else if (rec.GetNumberOfTemplateSegments() > 1) {
     // Unpaired
     if (rec.GetAlignments().front().GetAlignmentSplits().front()->GetType() ==

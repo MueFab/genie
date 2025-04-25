@@ -113,10 +113,23 @@ std::pair<std::vector<SamRecord>, std::optional<int>> Importer::ReadSamChunk() {
     }
 
     if (!sam_records.back().IsUnmapped()) {
+      const auto is_invalid =
+          sam_records.back().rid_ < 0 ||
+          sam_records.back().rid_ >=
+              static_cast<int32_t>(sam_hdr_to_fasta_lut_.size());
+      UTILS_DIE_IF(is_invalid, "Reference ID not found in FASTA header: " +
+                                   std::to_string(sam_records.back().rid_));
       sam_records.back().rid_ =
           sam_hdr_to_fasta_lut_.at(sam_records.back().rid_);
     }
     if (sam_records.back().IsPaired() && !sam_records.back().IsMateUnmapped()) {
+      const auto is_invalid =
+          sam_records.back().mate_rid_ < 0 ||
+          sam_records.back().mate_rid_ >=
+              static_cast<int32_t>(sam_hdr_to_fasta_lut_.size());
+      UTILS_DIE_IF(is_invalid,
+                   "Reference ID for mate not found in FASTA header: " +
+                       std::to_string(sam_records.back().mate_rid_));
       sam_records.back().mate_rid_ =
           sam_hdr_to_fasta_lut_.at(sam_records.back().mate_rid_);
     }
