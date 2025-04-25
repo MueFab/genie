@@ -115,7 +115,7 @@ compress_roundtrip () {
     rm $working_dir/output_1.fastq.gz
     rm -f $working_dir/output_2.fastq.gz
 
-    if [[ "$OSTYPE" != "win32" && "$OSTYPE" != "cygwin" && "$OSTYPE" != "msys" ]]; then
+    if [[ "$genie_encoder_parameters" == *"--entropy gabac"*  ]]; then
         echo "-----------------Refdecoder decompress"
         eval $timing_command \
             $MPEGG_REF_DECODER \
@@ -156,13 +156,15 @@ compress_roundtrip () {
 }
 
 if [[ "$paired_fastq_file" == "" ]]; then
-#    compress_roundtrip "--low-latency --qv none --read-ids none" "--broken_names --broken_qualities"
+    compress_roundtrip "--low-latency --qv none --read-ids none --entropy gabac" "--broken_names --broken_qualities"
+    compress_roundtrip "--low-latency --entropy gabac" ""
     compress_roundtrip "--low-latency" ""
-#    compress_roundtrip "--qv none --read-ids none" "--broken_names --broken_qualities --broken_order"
-#    compress_roundtrip "" "--broken_order"
+    compress_roundtrip "--qv none --read-ids none --entropy gabac" "--broken_names --broken_qualities --broken_order"
+    compress_roundtrip "--entropy gabac" "--broken_order"
 else
-#    compress_roundtrip "--low-latency --qv none --read-ids none" "--broken_names --broken_qualities"
+    compress_roundtrip "--low-latency --qv none --read-ids none --entropy gabac" "--broken_names --broken_qualities"
+    compress_roundtrip "--low-latency --entropy gabac" "--patched_names"
     compress_roundtrip "--low-latency" "--patched_names"
-#    compress_roundtrip "--qv none --read-ids none" "--broken_names --broken_qualities --broken_order --broken_pairing"
-#    compress_roundtrip "" "--broken_order --patched_names"
+    compress_roundtrip "--qv none --read-ids none --entropy gabac" "--broken_names --broken_qualities --broken_order --broken_pairing"
+    compress_roundtrip "--entropy gabac" "--broken_order --patched_names"
 fi
