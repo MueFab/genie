@@ -221,6 +221,23 @@ uint16_t ComputeSamFlags(const size_t s, const size_t a,
   if (record.GetFlags() & core::gen_const::kFlagsPcrDuplicateMask) {
     flags |= 0x400;
   }
+
+  // If 0x4 is set, no assumptions can be made about 0x2, 0x100, and 0x800.
+  if (flags & 0x4) {
+    flags &= ~0x2;
+    flags &= ~0x100;
+    flags &= ~0x800;
+  }
+
+  // If 0x1 is unset, no assumptions can be made about 0x2, 0x8, 0x20,
+  // 0x40 and 0x80
+  if (!(flags & 0x1)) {
+    flags &= ~0x2;
+    flags &= ~0x8;
+    flags &= ~0x20;
+    flags &= ~0x40;
+    flags &= ~0x80;
+  }
   return flags;
 }
 
