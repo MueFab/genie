@@ -38,7 +38,7 @@ function execute_fastq_roundtrip() {
 	eval "$path" "$file_1" "$file_2" &>> "log.txt"
 		if [ $? -ne 0 ]; then
     			echo "Roundtrip failed. Here are the last 20 lines of the output:" >> "$result"
-    			tail -n 20 log.txt >> "$result"
+    			cat log.txt >> "$result"
 			echo "$(basename ${1})	"
 
 		else
@@ -78,7 +78,7 @@ function execute_sam_roundtrip() {
 	eval "$path" "$file_1" "$fasta_file" &>> "log.txt"
 		if [ $? -ne 0 ]; then
     			echo "Roundtrip failed. Here are the last 20 lines of the output:" >> "$result"
-    			tail -n 20 log.txt >> "$result"
+    			cat log.txt >> "$result"
     			echo "$(basename ${1})	"
 		else
     			echo "Roundtrip ended successfully." >> "$result"
@@ -94,7 +94,7 @@ function execute_sam_roundtrip() {
 	} >> "$result"
 }
 
-for i in $(seq -w 1 54); do
+for i in $(seq -w 1 55); do
   if [ $i -le 12 ]; then
     execute_fastq_roundtrip "${data_path}/${i}"
   else

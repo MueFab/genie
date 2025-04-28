@@ -2,5 +2,5 @@
 @SQ	SN:ref1	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
 @SQ	SN:ref2	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
 softclip_5prime	0	ref1	21	60	5S20M	*	0	0	NNNNNACGTACGTACGTACGTACGT	!!!!!!!!!!!!!!!!!!!!!!!!!
-softclip_3prime	0	ref1	21	60	20M5S	*	0	0	ACGTACGTACGTACGTACGTYYYYY	#########################
-softclip_both	0	ref1	21	60	5S20M5S	*	0	0	NNNNNACGTACGTACGTACGTACGTYYYYY	$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+softclip_3prime	0	ref1	21	60	20M5S	*	0	0	ACGTACGTACGTACGTACGTCCCCC	#########################
+softclip_both	0	ref1	21	60	5S20M5S	*	0	0	NNNNNACGTACGTACGTACGTACGTCCCCC	$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
