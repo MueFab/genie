@@ -70,6 +70,17 @@ class Decoder {
   Decoder(core::AccessUnit&& au, size_t segments, size_t pos = 0);
 
   /**
+   * @brief Holds information about soft and hard clips.
+   */
+  struct Clips {
+    /// Hard clips for both segments and both ends.
+    std::array<std::array<size_t, 2>, 2> hard_clips = {{{0, 0}, {0, 0}}};
+
+    /// Soft clips for both segments and both ends.
+    std::array<std::array<std::string, 2>, 2> soft_clips;
+  };
+
+  /**
    * @brief Holds metadata for segments.
    */
   struct SegmentMeta {
@@ -87,7 +98,27 @@ class Decoder {
 
     /// Number of segments.
     uint8_t num_segments;
+
+    /// Clipping information for the segments.
+    Clips clips;
   };
+
+  /**
+   * @brief Decodes the clips from the access unit.
+   * @return The decoded clips.
+   */
+  Clips DecodeClips();
+
+  /**
+   * @brief Applies clips to the sequences and CIGAR strings.
+   * @param clips The clips to apply.
+   * @param sequences Vector of sequences.
+   * @param cigar_extended Vector of extended CIGAR strings.
+   * @return A tuple containing the soft clip offsets for both segments.
+   */
+  static std::tuple<size_t, size_t> ApplyClips(
+      const Clips& clips, std::vector<std::string>& sequences,
+      std::vector<std::string>& cigar_extended);
 
   /**
    * @brief Pulls a record from the access unit.
@@ -152,16 +183,6 @@ class Decoder {
                         std::string& cigar_extended);
 
   /**
-   * @brief Decodes soft and hard clips from the sequence.
-   * @param sequences The sequences to Decode.
-   * @param cigar_extended The extended CIGAR string.
-   * @return A tuple with the start and end clip sizes.
-   */
-  std::tuple<size_t, size_t> DecodeClips(
-      std::vector<std::string>& sequences,
-      std::vector<std::string>& cigar_extended);
-
-  /**
    * @brief Clears the internal state of the decoder.
    */
   void Clear();
@@ -170,6 +191,8 @@ class Decoder {
 // -----------------------------------------------------------------------------
 
 }  // namespace genie::read::basecoder
+
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_READ_BASECODER_DECODER_H_
 
