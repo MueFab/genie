@@ -169,6 +169,8 @@ void Encoder::Add(const core::record::Record& rec, const std::string& ref1,
   // Check if record is paired
   if (rec.GetSegments().size() > 1) {
     if (rec.GetClassId() == core::record::ClassType::kClassHm) {
+      container_.Push(core::gen_sub::kMismatchPosTerminator,
+                    core::gen_const::kMismatchPosTerminate);
       const auto& sequence2 = rec.GetSegments()[1].GetSequence();
 
       const auto length_var_2 = rec.GetSegments()[1].GetSequence().length() - 1;
@@ -426,7 +428,8 @@ Encoder::ClipInformation Encoder::EncodeCigar(
     UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
   }
 
-  if (type > core::record::ClassType::kClassP) {
+  if (type > core::record::ClassType::kClassP &&
+      type != core::record::ClassType::kClassHm) {
     container_.Push(core::gen_sub::kMismatchPosTerminator,
                     core::gen_const::kMismatchPosTerminate);
   }

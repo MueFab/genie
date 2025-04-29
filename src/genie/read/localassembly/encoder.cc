@@ -20,6 +20,7 @@
 #include <string>
 #include <utility>
 
+#include "genie/core/parameter/descriptor_present/descriptor_present.h"
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
 #include "genie/util/log.h"
 
@@ -81,8 +82,11 @@ core::AccessUnit Encoder::Pack(const size_t id, core::QvEncoder::qv_coded qv,
       0, dynamic_cast<LaEncodingState&>(state).ref_coder.GetMaxBufferSize()));
   ret.GetParameters().SetComputedRef(computed_reference_params);
 
-  UTILS_DIE_IF(ret.GetClassType() == core::record::ClassType::kClassHm,
-               "Local assembly class HM broken in ISO standard.");
+  if (ret.GetClassType() == core::record::ClassType::kClassHm) {
+    if (!ret.Get(core::gen_sub::kRtype).IsEmpty()) {
+      ret.Get(core::gen_sub::kRtype).tmp_rtype_issue_flag_ = true;
+    }
+  }
 
   return ret;
 }

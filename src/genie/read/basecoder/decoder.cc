@@ -266,10 +266,9 @@ void Decoder::DecodeAdditional(
     std::tuple<core::record::AlignmentBox, core::record::Record>& state) {
   auto sequence = std::move(seq);
 
-  std::string e_cigar = std::move(cigar);
-  DecodeMismatches(softclip_offset, sequence, e_cigar);
-
   if (std::get<1>(state).GetClassId() != core::record::ClassType::kClassHm) {
+    std::string e_cigar = std::move(cigar);
+    DecodeMismatches(softclip_offset, sequence, e_cigar);
     const auto reverse_comp = static_cast<uint8_t>(
         container_.Pull(core::gen_sub::kReverseComplement));
     const auto mapping_score =
@@ -280,6 +279,13 @@ void Decoder::DecodeAdditional(
     std::get<0>(state).AddAlignmentSplit(
         std::make_unique<core::record::alignment_split::SameRec>(delta_pos,
                                                                  alignment));
+  } else {
+    for (auto& c : sequence) {
+      if (c == 0) {
+        c = GetAlphabetProperties(core::AlphabetId::kAcgtn)
+                .lut[container_.Pull(core::gen_sub::kUnalignedReads)];
+      }
+    }
   }
   core::record::Segment segment(std::move(sequence));
   std::get<1>(state).AddSegment(std::move(segment));
