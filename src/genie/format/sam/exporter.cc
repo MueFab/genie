@@ -362,15 +362,12 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
         if (other_mapped && record.GetNumberOfTemplateSegments() == 2) {
           ProcessSecondMappedSegment(s, record, tlen, flags, pnext, rnext,
                                      refinf);
+          // Use "=" shorthand
+          if (rnext == rname && rnext != "*") {
+            rnext = "=";
+          }
         } else {
-          rnext = rname;
-          pnext = pos;
           tlen = 0;
-        }
-
-        // Use "=" shorthand
-        if (rnext == rname && rnext != "*") {
-          rnext = "=";
         }
 
         if (record.GetClassId() == core::record::ClassType::kClassHm ||
