@@ -67,6 +67,18 @@ std::pair<std::string, std::string> Encoder::GetReferences(
 
 // -----------------------------------------------------------------------------
 
+core::AccessUnit Encoder::Pack(const size_t id, core::QvEncoder::qv_coded qv,
+                               core::AccessUnit::Descriptor read_name,
+                               EncodingState& state) {
+  auto ret = EncoderStub::Pack(id, std::move(qv), std::move(read_name), state);
+
+  ret.Get(core::GenDesc::kRtype).Get(0).GetData().Clear();
+
+  return ret;
+}
+
+// -----------------------------------------------------------------------------
+
 std::unique_ptr<Encoder::EncodingState> Encoder::CreateState(
     const core::record::Chunk& data) const {
   return std::make_unique<RefEncodingState>(data);

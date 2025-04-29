@@ -159,7 +159,17 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::Decode(
     size_t clip_offset, std::string&& seq, std::string&& cigar) {
   auto sequence = std::move(seq);
 
-  const auto rtype = container_.Pull(core::gen_sub::kRtype);
+  uint8_t rtype = 0;
+  if (container_.IsEnd(core::gen_sub::kRtype)) {
+    rtype = static_cast<uint8_t> (this->container_.GetClassType());
+  } else {
+    rtype = container_.Pull(core::gen_sub::kRtype);
+    if (rtype == 5) {
+      rtype = 6;
+    } else if (rtype == 6) {
+      rtype = 5;
+    }
+  }
 
   const auto reverse_comp =
       static_cast<uint8_t>(container_.Pull(core::gen_sub::kReverseComplement));

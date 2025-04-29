@@ -65,8 +65,14 @@ void Encoder::EncodeFirstSegment(const core::record::Record& rec) {
       rec.GetAlignments().front();  // TODO(Fabian): Multiple alignments.
                                     // Currently only 1 supported
 
-  container_.Push(core::gen_sub::kRtype,
-                  static_cast<uint8_t>(rec.GetClassId()));
+  if (rec.GetClassId() == core::record::ClassType::kClassHm) {
+    container_.Push(core::gen_sub::kRtype, 6);
+  } else if (rec.GetClassId() == core::record::ClassType::kClassU) {
+    container_.Push(core::gen_sub::kRtype, 5);
+  } else {
+    container_.Push(core::gen_sub::kRtype,
+                    static_cast<uint8_t>(rec.GetClassId()));
+  }
 
   const auto position = alignment.GetPosition() - pos_;
   pos_ = alignment.GetPosition();

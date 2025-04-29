@@ -81,6 +81,9 @@ core::AccessUnit Encoder::Pack(const size_t id, core::QvEncoder::qv_coded qv,
       0, dynamic_cast<LaEncodingState&>(state).ref_coder.GetMaxBufferSize()));
   ret.GetParameters().SetComputedRef(computed_reference_params);
 
+  UTILS_DIE_IF(ret.GetClassType() == core::record::ClassType::kClassHm,
+               "Local assembly class HM broken in ISO standard.");
+
   return ret;
 }
 

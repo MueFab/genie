@@ -95,6 +95,9 @@ function execute_sam_roundtrip() {
 }
 
 for i in $(seq -w 1 55); do
+  if [ ! -d "${data_path}/${i}" ]; then
+    continue
+  fi
   if [ $i -le 12 ]; then
     execute_fastq_roundtrip "${data_path}/${i}"
   else
