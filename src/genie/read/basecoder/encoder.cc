@@ -99,7 +99,7 @@ void Encoder::EncodeFirstSegment(const core::record::Record& rec) {
   container_.Push(core::gen_sub::kFlagsNotPrimary, flag_not_primary);
   const auto flag_supplementary =
       (rec.GetFlags() & core::gen_const::kFlagsSupplementaryMask) >>
-      core::gen_const::kFlagsNotPrimaryPos;
+      core::gen_const::kFlagsSupplementaryPos;
   container_.Push(core::gen_sub::kFlagsSupplementary, flag_supplementary);
 
   const auto mapping_score =

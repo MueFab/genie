@@ -31,9 +31,9 @@ void Exporter::FlowIn(core::record::Chunk&& t, const util::Section& id) {
   for (auto& i : data.GetData()) {
     i.Write(writer_);
   }
-  data.GetStats().AddInteger("size-mgrec-export",
-                             static_cast<int64_t>((writer_
-                             .GetTotalBitsWritten() - bits) / 8));
+  data.GetStats().AddInteger(
+      "size-mgrec-export",
+      static_cast<int64_t>((writer_.GetTotalBitsWritten() - bits) / 8));
   data.GetStats().AddDouble("time-mgrec-export", watch.Check());
   GetStats().Add(data.GetStats());
 }

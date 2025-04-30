@@ -94,19 +94,15 @@ void DecoderStub::DecodeQualities(DecodingState& state,
   size_t qv_counter = 0;
   for (auto& r : chunk.GetData()) {
     auto& s_first = r.GetSegments()[0];
-    if (!std::get<0>(qvs)[qv_counter].empty()) {
-      s_first.AddQualities(std::move(std::get<0>(qvs)[qv_counter++]));
-      r.SetQvDepth(1);
-    }
+    s_first.AddQualities(std::move(std::get<0>(qvs)[qv_counter++]));
+    r.SetQvDepth(1);
 
     if (r.GetSegments().size() == 1) {
       continue;
     }
 
     auto& s_second = r.GetSegments()[1];
-    if (!std::get<0>(qvs)[qv_counter].empty()) {
-      s_second.AddQualities(std::move(std::get<0>(qvs)[qv_counter++]));
-    }
+    s_second.AddQualities(std::move(std::get<0>(qvs)[qv_counter++]));
   }
 }
 

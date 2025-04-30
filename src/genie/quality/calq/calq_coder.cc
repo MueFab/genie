@@ -83,13 +83,18 @@ void encode(const EncodingOptions& opt, const SideInformation& side_information,
 // -----------------------------------------------------------------------------
 
 void decode(const DecodingOptions&, const SideInformation& side_information,
-            const DecodingBlock& input, EncodingBlock* output) {
+            const DecodingBlock& input, EncodingBlock* output,
+            core::AccessUnit::Subsequence& present) {
   // Decode the quality values
   QualityDecoder quality_decoder(input, side_information.positions[0][0],
                                  side_information.quality_offset, output);
   output->quality_values.clear();
   output->quality_values.emplace_back();
   for (size_t i = 0; i < side_information.positions[0].size(); ++i) {
+    if (!present.end() && !present.Pull()) {
+      quality_decoder.DecodeDummy();
+      continue;
+    }
     DecodingRead r = {side_information.positions[0][i],
                       side_information.cigars[0][i]};
     quality_decoder.DecodeMappedRecordFromBlock(r);

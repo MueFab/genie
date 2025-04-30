@@ -186,8 +186,7 @@ void ProcessSecondMappedSegment(const size_t s,
 
 // -----------------------------------------------------------------------------
 
-uint16_t ComputeSamFlags(const size_t s,
-                         const core::record::Record& record) {
+uint16_t ComputeSamFlags(const size_t s, const core::record::Record& record) {
   uint16_t flags = 0;
   if (record.GetNumberOfTemplateSegments() > 1) {
     flags |= 0x1;
@@ -387,7 +386,8 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
         sam_record += pnext + "\t";
         sam_record += std::to_string(tlen) + "\t";
         sam_record += record.GetSegments()[s].GetSequence() + "\t";
-        if (record.GetSegments()[s].GetQualities().empty()) {
+        if (record.GetSegments()[s].GetQualities().empty() ||
+            record.GetSegments()[s].GetQualities().front().empty()) {
           sam_record += "*\n";
         } else {
           sam_record += record.GetSegments()[s].GetQualities()[0] + "\n";

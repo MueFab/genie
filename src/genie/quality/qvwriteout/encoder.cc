@@ -84,6 +84,7 @@ void Encoder::EncodeAlignedSegment(const core::record::Segment& s,
 
 void Encoder::EncodeUnalignedSegment(const core::record::Segment& s,
                                      core::AccessUnit::Descriptor& desc) {
+  desc.Get(0).Push(1);
   for (const auto& q : s.GetQualities()) {
     for (const auto& c : q) {
       UTILS_DIE_IF(c < 33 || c > 126, "Invalid quality score");
@@ -102,34 +103,51 @@ core::QvEncoder::qv_coded Encoder::Process(const core::record::Chunk& rec) {
 
   SetUpParameters(rec, *param, desc);
 
-  for (const auto& r : rec.GetData()) {
-    auto& s_first = r.GetSegments()[0];
+  bool all_qvs_present = true;
 
-    if (r.GetAlignments().empty()) {
-      EncodeUnalignedSegment(s_first, desc);
+  for (const auto& r : rec.GetData()) {
+    if (auto& s_first = r.GetSegments()[0];
+        s_first.GetQualities().front().empty()) {
+      desc.Get(0).Push(0);
+      all_qvs_present = false;
     } else {
-      EncodeAlignedSegment(
-          s_first, r.GetAlignments().front().GetAlignment().GetECigar(), desc);
+      desc.Get(0).Push(1);
+      if (r.GetAlignments().empty()) {
+        EncodeUnalignedSegment(s_first, desc);
+      } else {
+        EncodeAlignedSegment(
+            s_first, r.GetAlignments().front().GetAlignment().GetECigar(),
+            desc);
+      }
     }
 
     if (r.GetSegments().size() == 1) {
       continue;
     }
 
-    auto& s_second = r.GetSegments()[1];
-
-    if (r.GetClassId() == core::record::ClassType::kClassHm ||
-        r.GetClassId() == core::record::ClassType::kClassU) {
-      EncodeUnalignedSegment(s_second, desc);
+    if (auto& s_second = r.GetSegments()[1];
+        s_second.GetQualities().front().empty()) {
+      desc.Get(0).Push(0);
+      all_qvs_present = false;
     } else {
-      EncodeAlignedSegment(
-          s_second,
-          dynamic_cast<const core::record::alignment_split::SameRec*>(
-              r.GetAlignments().front().GetAlignmentSplits().front().get())
-              ->GetAlignment()
-              .GetECigar(),
-          desc);
+      desc.Get(0).Push(1);
+      if (r.GetClassId() == core::record::ClassType::kClassHm ||
+          r.GetClassId() == core::record::ClassType::kClassU) {
+        EncodeUnalignedSegment(s_second, desc);
+      } else {
+        EncodeAlignedSegment(
+            s_second,
+            dynamic_cast<const core::record::alignment_split::SameRec*>(
+                r.GetAlignments().front().GetAlignmentSplits().front().get())
+                ->GetAlignment()
+                .GetECigar(),
+            desc);
+      }
     }
+  }
+
+  if (all_qvs_present) {
+    desc.Get(0).GetData().Clear();
   }
 
   core::stats::PerfStats stats;

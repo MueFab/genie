@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "core/access_unit.h"
+
 // -----------------------------------------------------------------------------
 
 namespace genie::quality::calq {
@@ -243,9 +245,11 @@ struct DecodingBlock {
  * @param side_information The alignment and reference data needed for decoding.
  * @param input The encoded quality values to be decoded.
  * @param output The output structure to store the decoded quality values.
+ * @param present Subsequence indicating the presence of quality values.
  */
 void decode(const DecodingOptions& opt, const SideInformation& side_information,
-            const DecodingBlock& input, EncodingBlock* output);
+            const DecodingBlock& input, EncodingBlock* output,
+            core::AccessUnit::Subsequence& present);
 
 // -----------------------------------------------------------------------------
 

@@ -76,6 +76,9 @@ std::string SamRecord::GetSeqString(const bam1_t* sam_alignment) {
 std::string SamRecord::GetQualString(const bam1_t* sam_alignment) {
   const auto seq_len = sam_alignment->core.l_qseq;
   const auto qual_ptr = bam_get_qual(sam_alignment);
+  if (*qual_ptr == 0xff) {
+    return std::string();
+  }
   std::string tmp_qual(seq_len, ' ');
   for (auto i = 0; i < seq_len; i++) {
     tmp_qual[i] = static_cast<char>(qual_ptr[i] + 33);

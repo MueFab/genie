@@ -118,6 +118,14 @@ class QualityDecoder {
    * read.
    */
   void DecodeMappedRecordFromBlock(const DecodingRead& sam_record);
+
+  /**
+   * @brief Decodes a dummy record (no operation).
+   *
+   * This function is a placeholder for decoding a dummy record. It does not
+   * perform any operations and just pushes an empty string into the output
+   */
+  void DecodeDummy();
 };
 
 // -----------------------------------------------------------------------------

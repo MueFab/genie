@@ -51,13 +51,14 @@ std::vector<std::string> Decoder::DecodeAligned(
 
   side_information.pos_offset = positions[0];
   side_information.quality_offset = 0;
+  auto present = std::move(desc.Get(0));
   FillInput(input, desc, param);
 
   // fill sideInformation
   side_information.positions.emplace_back(positions);
   side_information.cigars.emplace_back(e_cigar_vec);
 
-  decode(options, side_information, input, &output);
+  decode(options, side_information, input, &output, present);
 
   return output.quality_values.front();
 }
@@ -72,6 +73,9 @@ std::vector<std::string> Decoder::DecodeUnaligned(
 
   for (const auto& e_cigar : e_cigar_vec) {
     qv.emplace_back();
+    if (!desc.Get(0).end() && !desc.Get(0).Pull()) {
+      continue;
+    }
     core::CigarTokenizer::Tokenize(
         e_cigar, core::GetECigarInfo(),
         [&qv, &desc, &param_casted](const uint8_t cigar,

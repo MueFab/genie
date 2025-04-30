@@ -57,6 +57,10 @@ QualityDecoder::~QualityDecoder() = default;
 
 // -----------------------------------------------------------------------------
 
+void QualityDecoder::DecodeDummy() {
+  out_->quality_values[0].push_back(std::string());
+}
+
 void QualityDecoder::DecodeMappedRecordFromBlock(
     const DecodingRead& sam_record) {
   std::string quality;

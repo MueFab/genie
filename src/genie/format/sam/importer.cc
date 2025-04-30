@@ -151,6 +151,8 @@ std::vector<SamRecordPair> Importer::MatchPairs(
 }
 
 core::record::Segment CreateSegment(SamRecord& sam_record) {
+  UTILS_DIE_IF(sam_record.seq_.empty() || sam_record.seq_ == "*",
+               "Empty nucleotide sequence not supported");
   core::record::Segment segment(std::move(sam_record.seq_));
   segment.AddQualities(std::move(sam_record.qual_));
   return segment;
