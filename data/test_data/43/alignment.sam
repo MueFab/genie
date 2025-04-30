@@ -2,3 +2,10 @@
 @SQ	SN:ref1	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
 @SQ	SN:ref2	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
 no_qual_read	0	ref1	11	60	20M	*	0	0	AAAAAAAAAAAAAAAAAAAA	*
+no_qual_read2	0	ref1	12	60	20M	*	0	0	AAAAAAAAAAAAAAAAAAAA	AAAAAAAAAAAAAAAAAAAA
+no_qual_read3	65	ref1	13	60	20M	=	14	0	AAAAAAAAAAAAAAAAAAAA	*
+no_qual_read3	129	ref1	14	60	20M	=	13	0	AAAAAAAAAAAAAAAAAAAA	AAAAAAAAAAAAAAAAAAAA
+no_qual_read4	65	ref1	15	60	20M	=	16	0	AAAAAAAAAAAAAAAAAAAA	AAAAAAAAAAAAAAAAAAAA
+no_qual_read4	129	ref1	16	60	20M	=	15	0	AAAAAAAAAAAAAAAAAAAA	*
+no_qual_read5	65	ref1	17	60	20M	=	18	0	AAAAAAAAAAAAAAAAAAAA	*
+no_qual_read5	129	ref1	18	60	20M	=	17	0	AAAAAAAAAAAAAAAAAAAA	*
