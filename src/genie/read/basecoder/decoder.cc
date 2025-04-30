@@ -187,7 +187,19 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::Decode(
                              ? 0
                              : container_.Pull(core::gen_sub::kFlagsProperPair)
                                    << core::gen_const::kFlagsProperPairPos;
-  const auto flags = static_cast<uint8_t>(flag_pcr | flag_quality | flag_pair);
+  const auto flag_not_primary =
+      container_.IsEnd(core::gen_sub::kFlagsNotPrimary)
+          ? 0
+          : container_.Pull(core::gen_sub::kFlagsNotPrimary)
+                << core::gen_const::kFlagsNotPrimaryPos;
+  const auto flag_supplementary =
+      container_.IsEnd(core::gen_sub::kFlagsSupplementary)
+          ? 0
+          : container_.Pull(core::gen_sub::kFlagsSupplementary)
+                << core::gen_const::kFlagsSupplementaryPos;
+  const auto flags =
+      static_cast<uint8_t>(flag_pcr | flag_quality | flag_pair |
+                           flag_not_primary | flag_supplementary);
 
   const auto mapping_score =
       static_cast<uint32_t>(container_.Pull(core::gen_sub::kMappingScore));

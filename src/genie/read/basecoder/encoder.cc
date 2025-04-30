@@ -93,6 +93,14 @@ void Encoder::EncodeFirstSegment(const core::record::Record& rec) {
       (rec.GetFlags() & core::gen_const::kFlagsProperPairMask) >>
       core::gen_const::kFlagsProperPairPos;
   container_.Push(core::gen_sub::kFlagsProperPair, flag_pair);
+  const auto flag_not_primary =
+      (rec.GetFlags() & core::gen_const::kFlagsNotPrimaryMask) >>
+      core::gen_const::kFlagsNotPrimaryPos;
+  container_.Push(core::gen_sub::kFlagsNotPrimary, flag_not_primary);
+  const auto flag_supplementary =
+      (rec.GetFlags() & core::gen_const::kFlagsSupplementaryMask) >>
+      core::gen_const::kFlagsNotPrimaryPos;
+  container_.Push(core::gen_sub::kFlagsSupplementary, flag_supplementary);
 
   const auto mapping_score =
       alignment.GetAlignment().GetMappingScores().empty()

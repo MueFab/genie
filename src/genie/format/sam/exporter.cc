@@ -186,7 +186,7 @@ void ProcessSecondMappedSegment(const size_t s,
 
 // -----------------------------------------------------------------------------
 
-uint16_t ComputeSamFlags(const size_t s, const size_t a,
+uint16_t ComputeSamFlags(const size_t s,
                          const core::record::Record& record) {
   uint16_t flags = 0;
   if (record.GetNumberOfTemplateSegments() > 1) {
@@ -212,8 +212,11 @@ uint16_t ComputeSamFlags(const size_t s, const size_t a,
     flags |= 0x80;
   }
   // Secondary alignment
-  if (a > 0) {
+  if (record.GetFlags() & core::gen_const::kFlagsNotPrimaryMask) {
     flags |= 0x100;
+  }
+  if (record.GetFlags() & core::gen_const::kFlagsSupplementaryMask) {
+    flags |= 0x800;
   }
   if (record.GetFlags() & core::gen_const::kFlagsQualityFailMask) {
     flags |= 0x200;
@@ -328,7 +331,7 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
            ++a) {
         std::string sam_record = record.GetName() + "\t";
 
-        uint16_t flags = ComputeSamFlags(s, a, record);
+        uint16_t flags = ComputeSamFlags(s, record);
         bool mapped = !(flags & 0x4);
         bool other_mapped = !(flags & 0x8);
 
