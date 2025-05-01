@@ -117,6 +117,13 @@ core::record::Record Importer::BuildRecord(
                                   data[FIRST][ID].substr(1), "", 0);
 
   for (auto& cur_rec : data) {
+    if (cur_rec[ID].empty() && cur_rec[RESERVED].empty() &&
+        cur_rec[SEQUENCE].empty() && cur_rec[QUALITY].empty()) {
+      if (ret.GetSegments().empty()) {
+        ret.SetRead1First(false);
+      }
+      continue;
+    }
     auto seg = core::record::Segment(std::move(cur_rec[SEQUENCE]));
     if (!cur_rec[QUALITY].empty()) {
       seg.AddQualities(std::move(cur_rec[QUALITY]));
@@ -134,16 +141,22 @@ std::vector<std::array<std::string, kLinesPerRecord>> Importer::ReadData(
   for (size_t cur_file = 0; cur_file < file_list.size(); ++cur_file) {
     for (size_t cur_line = 0; cur_line < kLinesPerRecord; ++cur_line) {
       if (!std::getline(*file_list[cur_file], data[cur_file][cur_line])) {
-        if (cur_line != 0 || cur_file != 0) {
+        if (cur_line != 0) {
           UTILS_LOG(util::Logger::Severity::WARNING,
                     "Unexpected end of file in fastq");
         }
-        data.clear();
-        return data;
+        data[cur_file] = {"", "", "", ""};
+        break;
       }
     }
 
     SanityCheck(data[cur_file]);
+  }
+  if (std::all_of(data.begin(), data.end(), [](const auto& d) {
+        return std::all_of(d.begin(), d.end(),
+                           [](const auto& s) { return s.empty(); });
+      })) {
+    return {};
   }
   return data;
 }
@@ -152,6 +165,10 @@ std::vector<std::array<std::string, kLinesPerRecord>> Importer::ReadData(
 
 void Importer::SanityCheck(
     const std::array<std::string, kLinesPerRecord>& data) {
+  if (data[ID].empty() && data[RESERVED].empty() && data[SEQUENCE].empty() &&
+      data[QUALITY].empty()) {
+    return;
+  }
   constexpr char id_token = '@';
   UTILS_DIE_IF(data[Lines::ID].front() != id_token, "Invalid fastq identifier");
   constexpr char reserved_token = '+';

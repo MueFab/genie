@@ -142,7 +142,9 @@ void Preprocessor::preprocess_record(const core::record::Record& rec,
                                      const size_t record_index) {
   UTILS_DIE_IF(
       rec.GetSegments().size() != static_cast<std::size_t>(cp.paired_end + 1),
-      "Number of segments differs between global assembly data chunks.");
+      "Number of segments differs between global assembly data chunks. "
+      "SPRING / global assembly does not support missing mates in a "
+      "paired-end dataset.");
 
   std::size_t seg_index = 0;
 

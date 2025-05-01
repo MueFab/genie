@@ -18,8 +18,8 @@ def _fastq_sort_read_fastq_record(file):
                 return ""
             else:
                 raise RuntimeError("Truncated fastq record")
-        ret = ret + read[:-1] + "\xff"
-    ret = ret + file.readline()
+        ret += read[:-1] + "\xff"
+    ret += file.readline()
     return ret
 
 
@@ -58,42 +58,59 @@ def _fastq_sort_split_single_end(input_path, output_path):
 def _fastq_sort_merge_paired_end(input_path1, input_path2, output_path):
     """
     Merge paired records into single lines separated by a 0xff delimiter
+    Handles unequal file lengths by writing leftover records as singletons.
     :param input_path1: Path of input fastq 1
     :param input_path2: Path of input fastq 2
     :param output_path: Path of output tmp file
     """
-    with open(input_path1, "r") as file_input:
-        with open(input_path2, "r") as file_input2:
-            with open(output_path, "w") as file_output:
+    with open(input_path1, "r") as file1, open(input_path2, "r") as file2, open(output_path, "w") as out:
+        while True:
+            read1 = _fastq_sort_read_fastq_record(file1)
+            read2 = _fastq_sort_read_fastq_record(file2)
+            if not read1 and not read2:
+                break
+            # if both present, write combined
+            if read1 and read2:
+                out.write(read1[:-1] + "\xff" + read2)
+            else:
+                # write leftover single-end records
+                if read1:
+                    out.write(read1)
+                if read2:
+                    out.write(read2)
+                # continue writing remaining in whichever file
+                source = file1 if read1 else file2
                 while True:
-                    read1 = _fastq_sort_read_fastq_record(file_input)
-                    read2 = _fastq_sort_read_fastq_record(file_input2)
-                    if len(read1) == 0 and len(read2) == 0:
+                    rem = _fastq_sort_read_fastq_record(source)
+                    if not rem:
                         break
-                    elif len(read1) == 0 and len(read2) > 0 or len(read1) > 0 and len(read2) == 0:
-                        raise RuntimeError("Fastq files have different lengths")
-                    file_output.write(read1[:-1] + "\xff")
-                    file_output.write(read2[:-1] + "\n")
+                    out.write(rem)
+                break
 
 
 def _fastq_sort_split_paired_end(input_path, output_path1, output_path2):
     """
     Split merged records to output file
+    Handles both combined pairs and singleton records.
     :param input_path: Merged tmp input file
-    :param output_path: Fastq output file
+    :param output_path1: Fastq output file 1
+    :param output_path2: Fastq output file 2
     """
-    with open(input_path, "r") as file_input:
-        with open(output_path1, "w") as file_output:
-            with open(output_path2, "w") as file_output2:
-                for read in file_input:
-                    read = read.split(sep="\xff")
-                    if len(read) != 8:
-                        raise RuntimeError("Truncated paired fastq record: " + str(len(read)))
-                    read[7] = read[7][:-1]
-                    for i in range(4):
-                        file_output.write(read[i] + "\n")
-                    for i in range(4, 8):
-                        file_output2.write(read[i] + "\n")
+    with open(input_path, "r") as inp, open(output_path1, "w") as out1, open(output_path2, "w") as out2:
+        for line in inp:
+            parts = line.rstrip("\n").split("\xff")
+            if len(parts) == 4:
+                # singleton: only write to first
+                for p in parts:
+                    out1.write(p + "\n")
+            elif len(parts) == 8:
+                # proper pair
+                for p in parts[:4]:
+                    out1.write(p + "\n")
+                for p in parts[4:]:
+                    out2.write(p + "\n")
+            else:
+                raise RuntimeError(f"Unexpected merged record length: {len(parts)} fields")
 
 
 def _fastq_sort_unix_sort(input_path, output_path):
