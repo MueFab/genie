@@ -630,7 +630,9 @@ TEST(Genotype, RoundTrip_EncodeAndSortBinMat) {
           bin_mat,
           sorted_bin_mat_payload,
           sort_row_method,
-          sort_col_method, CODEC_ID);
+          sort_col_method,
+          CODEC_ID
+      );
 
       if (sort_rows_flag | sort_cols_flag){
         EXPECT_NE(bin_mat, ORIG_BIN_MAT);
@@ -712,3 +714,57 @@ TEST(Genotype, RoundTrip_EncodeAndSortBinMat) {
     }
   }
 }
+
+// -----------------------------------------------------------------------------
+
+TEST(Genotype, RoundTrip_CASE12) {
+  std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+  std::string filename = "1.3.11.bgz.CASE03.geno";
+  std::string filepath = gitRootDir + "/data/records/variant/" + filename;
+
+  std::vector<genie::core::record::VariantGenotype> RECS;
+  {
+    std::ifstream reader(filepath, std::ios::binary);
+    ASSERT_EQ(reader.fail(), false);
+    genie::util::BitReader bitreader(reader);
+
+    while (bitreader.IsStreamGood()) {
+      RECS.emplace_back(bitreader);
+    }
+
+    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    RECS.pop_back();
+  }
+
+  {
+    genie::genotype::GenotypeParameters params;
+    genie::genotype::GenotypePayload payload;
+
+    size_t BLOCK_SIZE = 512;
+    auto BINARIZATION_ID = genie::genotype::BinarizationID::BIT_PLANE;
+    auto CONCAT_AXIS = genie::genotype::ConcatAxis::CONCAT_ROW_DIR;
+    auto TRANSPOSE_MAT = false;
+    auto SORT_ROWS_METHOD = genie::genotype::SortingAlgoID::NO_SORTING;
+    auto SORT_COLS_METHOD = genie::genotype::SortingAlgoID::NO_SORTING;
+    auto CODEC_ID = genie::core::AlgoID::JBIG;
+
+    genie::genotype::encode_genotype(
+      // Inputs
+      RECS,
+      // Outputs
+      params,
+      payload,
+      // Options
+      BLOCK_SIZE,
+      BINARIZATION_ID,
+      CONCAT_AXIS,
+      TRANSPOSE_MAT,
+      SORT_ROWS_METHOD,
+      SORT_COLS_METHOD,
+      CODEC_ID
+    );
+  }
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------

@@ -2,7 +2,7 @@ project("annotationAccessUnit-tests")
 
 set(source_files
         annotationAccessUnit-test.cc
-		blockTests.cc
+        blockTests.cc
         main.cc
 #        ../likelihood/encode-test.cc
 )

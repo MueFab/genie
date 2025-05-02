@@ -24,11 +24,19 @@
 #include "genie/genotype/sorted_bin_mat_payload.h"
 #include "genie/genotype/genotype_parameters.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::genotype {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+enum class GenotypePayloadFlags : uint8_t {
+  NO_REFERENCE_BIT = 1 << 2,
+  NOT_AVAILABLE_BIT = 1 << 1,
+  PHASE_VALUES_BIT = 1 << 0
+};
+
+// -----------------------------------------------------------------------------
 
 class GenotypePayload {
  private:
@@ -37,7 +45,7 @@ class GenotypePayload {
   bool no_reference_flag_;
   bool not_available_flag_;
   bool phases_value_;
-//  uint8_t num_bit_planes_; //? Only for bit plane binarization
+  uint8_t num_bit_planes_; //? Only for bit plane binarization
 
   std::vector<SortedBinMatPayload> variants_payloads_;
   std::optional<AmaxPayload> variants_amax_payload_;
@@ -53,6 +61,7 @@ class GenotypePayload {
       bool no_reference_flag,
       bool not_available_flag,
       bool phases_value,
+      uint8_t num_bit_plane,
       std::vector<SortedBinMatPayload>&& variants_payload,
       std::optional<AmaxPayload>&& variants_amax_payload = std::nullopt,
       std::optional<SortedBinMatPayload>&& phases_payload = std::nullopt);
@@ -70,8 +79,10 @@ class GenotypePayload {
   GenotypePayload& operator=(GenotypePayload&& other) noexcept;
 
   // Constructor from BitReader
-  explicit GenotypePayload(util::BitReader& reader,
-                           [[maybe_unused]] GenotypeParameters& parameters);
+  explicit GenotypePayload(
+      util::BitReader& reader,
+      GenotypeParameters& parameters
+  );
 
   // Equality operator
   bool operator==(const GenotypePayload& other) const;
@@ -82,6 +93,7 @@ class GenotypePayload {
   bool GetNotAvailableFlag() const;
   bool GetPhasesValue() const;
   uint8_t GetNumBitPlanes() const;
+  size_t GetNumVariantsPayloads() const;
   const std::vector<SortedBinMatPayload>& GetVariantsPayloads() const;
   bool IsAmaxPayloadExist() const;
   const std::optional<AmaxPayload>& GetVariantsAmaxPayload() const;
@@ -93,6 +105,7 @@ class GenotypePayload {
   void SetNoReferenceFlag(bool no_reference_flag);
   void SetNotAvailableFlag(bool not_available_flag);
   void SetPhasesValue(bool phases_value);
+  void SetNumBitPlanes(uint8_t num_bit_planes);
   void AddVariantsPayload(SortedBinMatPayload&& payload);
   void AddVariantsPayload(const SortedBinMatPayload& payload);
   void SetVariantsPayloads(std::vector<SortedBinMatPayload>&& variants_payload);

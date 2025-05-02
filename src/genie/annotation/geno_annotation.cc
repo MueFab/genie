@@ -8,9 +8,13 @@
 
 #include <codecs/include/mpegg-codecs.h>
 
+#include <algorithm>
 #include <iostream>
+#include <map>
 #include <string>
 #include <tuple>
+#include <utility>
+#include <vector>
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
@@ -221,7 +225,10 @@ size_t genie::annotation::GenoAnnotation::readOneBlock(
 
   genie::genotype::GenotypeParameters pars;
   genie::genotype::GenotypePayload payload;
-  genie::genotype::encode_genotype(varGenoType, pars, payload);
+
+  genie::genotype::encode_genotype(varGenoType, pars, payload, genotype_opt.block_size,
+      genotype_opt.binarization_ID, genotype_opt.concat_axis, genotype_opt.transpose_mat,
+      genotype_opt.sort_row_method, genotype_opt.sort_col_method, genotype_opt.codec_ID);  //, pars);
 
   std::tuple<genie::likelihood::LikelihoodParameters,
              genie::likelihood::EncodingBlock>

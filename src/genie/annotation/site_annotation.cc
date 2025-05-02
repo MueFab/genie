@@ -3,16 +3,21 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-// #include <chrono>
+
+#include "genie/annotation/site_annotation.h"
 
 #include <codecs/include/mpegg-codecs.h>
+
+// #include <chrono>
+#include <map>
+#include <string>
+#include <vector>
 
 #include "genie/core/record/annotation_access_unit/TypedData.h"
 #include "genie/variantsite/accessunit_composer.h"
 
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"
-#include "genie/annotation/site_annotation.h"
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"

@@ -380,7 +380,7 @@ void bin_mat_from_bytes(
 
 void entropy_encode_bin_mat(
     // Inputs
-    BinMatDtype& bin_mat,
+    const BinMatDtype& bin_mat,
     genie::core::AlgoID codec_ID,
     // Outputs
     std::vector<uint8_t>& payload
@@ -401,6 +401,7 @@ void entropy_decode_bin_mat(
 // -----------------------------------------------------------------------------
 
 void encode_and_sort_bin_mat(
+    // Inputs
     BinMatDtype& bin_mat,
     // Output
     SortedBinMatPayload& sorted_bin_mat_payload,
@@ -414,7 +415,7 @@ void encode_and_sort_bin_mat(
 
 void decode_and_inverse_sort_bin_mat(
     // Inputs
-    SortedBinMatPayload& sorted_bin_mat_payload,
+    const SortedBinMatPayload& sorted_bin_mat_payload,
     // Output
     BinMatDtype& bin_mat,
     // Options
@@ -439,6 +440,18 @@ void encode_genotype(
     SortingAlgoID sort_col_method=SortingAlgoID::NO_SORTING,
     genie::core::AlgoID codec_ID=genie::core::AlgoID::JBIG
 );
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void decode_genotype(
+    // Inputs
+    const GenotypeParameters& params,
+    const GenotypePayload& payload,
+    // Outputs
+    Int8MatDtype& allele_mat,
+    BinMatDtype& phasing_mat
+);
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 

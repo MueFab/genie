@@ -10,9 +10,12 @@
 #include <fstream>
 #include <iostream>
 #include <istream>
+#include <map>
 #include <sstream>
+#include <string>
 #include <tuple>
 #include <utility>
+#include <vector>
 
 #include "filesystem/filesystem.hpp"
 #include "genie/core/record/data_unit/record.h"
@@ -221,7 +224,7 @@ void encodeVariantGenotype(const std::string& _input_fpath,
   uint8_t AG_class = 0;
   genie::genotype::GenotypeParameters genotypeParameters; /* =
       std::get<genie::genotype::GenotypeParameters>(genotypeData);
-  auto datablock = std::get<genie::genotype::EncodingBlock>(genotypeData);*/
+  auto datablock = std::get<genie::genotype::EncodingBlock>(genotypeData); */
   std::map<std::string,
            genie::core::record::annotation_parameter_set::AttributeData>
       info;

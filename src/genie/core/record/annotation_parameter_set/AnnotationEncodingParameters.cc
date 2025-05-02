@@ -151,20 +151,20 @@ void AnnotationEncodingParameters::read(util::BitReader& reader) {
 void AnnotationEncodingParameters::write(core::Writer& writer) const {
   writer.Write(n_filter, 8);
     for (auto i = 0; i < n_filter; ++i) {
-      writer.Write(filter_ID_len[i], 6);
+        writer.Write(filter_ID_len[i], 6);
         for (auto byte : filter_ID[i]) writer.Write(byte, 8);
         writer.Write(desc_len[i], 10);
         for (auto byte : description[i]) writer.Write(byte, 8);
     }
     writer.Write(n_features_names, 8);
     for (auto i = 0; i < n_features_names; ++i) {
-      writer.Write(feature_name_len[i], 6);
+        writer.Write(feature_name_len[i], 6);
         for (auto byte : feature_name[i]) writer.Write(byte, 8);
     }
 
     writer.Write(n_ontology_terms, 8);
     for (auto i = 0; i < n_ontology_terms; ++i) {
-      writer.Write(ontology_term_name_len[i], 6);
+        writer.Write(ontology_term_name_len[i], 6);
         for (auto byte : ontology_term_name[i]) writer.Write(byte, 8);
     }
 
