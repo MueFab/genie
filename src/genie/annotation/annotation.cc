@@ -74,13 +74,13 @@ void Annotation::writeToFile(std::string& outputFileName) {
 
     for (auto& pars : annotationParameterSet) {
         genie::core::record::data_unit::Record APS_dataUnit(pars);
-        sizeSofar = APS_dataUnit.write(testwriter);
+        sizeSofar = APS_dataUnit.Write(testwriter);
         APS_dataUnit.write(txtwriter, sizeSofar);
     }
     for (auto& aau : annotationAccessUnit) {
       genie::core::record::data_unit::Record AAU_dataUnit(aau);
-        sizeSofar = AAU_dataUnit.write(testwriter);
-        AAU_dataUnit.write(txtwriter, sizeSofar);
+        sizeSofar = AAU_dataUnit.Write(testwriter);
+        AAU_dataUnit.Write(txtwriter, sizeSofar);
     }
     testfile.close();
     txtfile.close();

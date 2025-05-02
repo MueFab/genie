@@ -167,7 +167,7 @@ class Record {
    * @brief
    * @return
    */
-  [[nodiscard]] ClassType GetClassID() const;
+  [[nodiscard]] ClassType GetClassId() const;
 
   /**
    * @brief

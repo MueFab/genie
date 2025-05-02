@@ -11,7 +11,7 @@
 
 #include "genie/annotation/annotation.h"
 #include "genie/contact/contact_coder.h"
-#include "genie/core/record/contact/record.h"
+#include "genie/core/record/contact_record/record.h"
 #include "helpers.h"
 
 struct ContactTestDetails {
