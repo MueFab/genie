@@ -3646,8 +3646,8 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
 
         ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
-            genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
+            genie::contact::UInt64VecDtype START1 = xt::adapt(REC.GetStartPos1(), {REC.GetNumEntries()});
+            genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.GetStartPos1(), {recon_rec.GetNumEntries()});
             auto mask = xt::not_equal(START1, recon_start1);
             ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
         }

@@ -95,7 +95,7 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //    std::ostream* out_ptr = &std::cout;
 //    if (pOpts.outputFile.substr(0, 2) != "-.") {
 //        outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile));
-//        out_ptr = outputFiles.back().get();
+//        out_ptr = outputFiles.back().Get();
 //    }
 //    if (file_extension(pOpts.outputFile) == "mgrec") {
 //        flow.addExporter(genie::util::make_unique<genie::format::mgrec::Exporter>(*out_ptr));
@@ -161,15 +161,15 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //                                                     std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
 //    constexpr size_t BLOCKSIZE = 128000;
 //    genie::core::ClassifierRegroup::RefMode mode;
-//    if (pOpts.refMode == "none") {
-//        mode = genie::core::ClassifierRegroup::RefMode::NONE;
-//    } else if (pOpts.refMode == "full") {
-//        mode = genie::core::ClassifierRegroup::RefMode::FULL;
+//    if (pOpts.ref_mode_ == "none") {
+//        mode = genie::core::ClassifierRegroup::RefMode::kNone;
+//    } else if (pOpts.ref_mode_ == "full") {
+//        mode = genie::core::ClassifierRegroup::RefMode::kFull;
 //    } else {
-//        mode = genie::core::ClassifierRegroup::RefMode::RELEVANT;
+//        mode = genie::core::ClassifierRegroup::RefMode::kRelevant;
 //    }
 //    if (file_extension(pOpts.inputFile) == "fasta") {
-//        mode = genie::core::ClassifierRegroup::RefMode::FULL;
+//        mode = genie::core::ClassifierRegroup::RefMode::kFull;
 //    }
 //    auto flow = genie::module::BuildDefaultEncoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE, mode,
 //                                                   pOpts.rawReference, pOpts.rawStreams);

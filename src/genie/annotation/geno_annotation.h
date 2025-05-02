@@ -18,7 +18,7 @@
 
 #include "genie/contact/contact_coder.h"
 #include "genie/core/constants.h"
-#include "genie/core/record/variant_genotype/record.h"
+#include "genie/core/variant_genotype_record/record.h"
 // #include "genie/genotype/ParameterSetComposer.h"
 #include "genie/annotation/compressors.h"
 #include "genie/genotype/genotype_coder.h"

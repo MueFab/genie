@@ -202,10 +202,10 @@ TEST(ContactRecord, IntraContactRecord_HR_Raw) {
     ASSERT_EQ(rec.GetChr2ID(), 21u);
     ASSERT_EQ(rec.GetChr2Name(), "22");
     //TODO: Complete all with the correct values
-    //    ASSERT_EQ(rec.getNumEntries(), 9812u);
+    //    ASSERT_EQ(rec.GetNumEntries(), 9812u);
     //    ASSERT_EQ(rec.getNumNormCounts(), 0u);
-    //    ASSERT_EQ(rec.getStartPos1().front(), 16000000u);
-    //    ASSERT_EQ(rec.getStartPos1().back(), 51000000u);
+    //    ASSERT_EQ(rec.GetStartPos1().front(), 16000000u);
+    //    ASSERT_EQ(rec.GetStartPos1().back(), 51000000u);
     //    ASSERT_EQ(rec.getEndPos1().front(), 16250000u);
     //    ASSERT_EQ(rec.getEndPos1().back(), 51250000u);
     //    ASSERT_EQ(rec.getStartPos2().front(), 16000000u);
@@ -261,10 +261,10 @@ TEST(ContactRecord, IntraContactRecord_HR_All) {
     ASSERT_EQ(rec.GetChr2ID(), 21u);
     ASSERT_EQ(rec.GetChr2Name(), "22");
     //TODO: Complete all with the correct values
-    //    ASSERT_EQ(rec.getNumEntries(), 9812u);
+    //    ASSERT_EQ(rec.GetNumEntries(), 9812u);
     //    ASSERT_EQ(rec.getNumNormCounts(), 0u);
-    //    ASSERT_EQ(rec.getStartPos1().front(), 16000000u);
-    //    ASSERT_EQ(rec.getStartPos1().back(), 51000000u);
+    //    ASSERT_EQ(rec.GetStartPos1().front(), 16000000u);
+    //    ASSERT_EQ(rec.GetStartPos1().back(), 51000000u);
     //    ASSERT_EQ(rec.getEndPos1().front(), 16250000u);
     //    ASSERT_EQ(rec.getEndPos1().back(), 51250000u);
     //    ASSERT_EQ(rec.getStartPos2().front(), 16000000u);
@@ -320,10 +320,10 @@ TEST(ContactRecord, InterContactRecord_LR_Raw) {
     ASSERT_EQ(rec.GetChr2ID(), 22u);
     ASSERT_EQ(rec.GetChr2Name(), "X");
     //TODO: Complete all with the correct values
-//    ASSERT_EQ(rec.getNumEntries(), 59740);
+//    ASSERT_EQ(rec.GetNumEntries(), 59740);
 //    ASSERT_EQ(rec.getNumNormCounts(), 0u);
-//    ASSERT_EQ(rec.getStartPos1().front(), 16000000u);
-//    ASSERT_EQ(rec.getStartPos1().back(), 51000000u);
+//    ASSERT_EQ(rec.GetStartPos1().front(), 16000000u);
+//    ASSERT_EQ(rec.GetStartPos1().back(), 51000000u);
 //    ASSERT_EQ(rec.getEndPos1().front(), 16250000u);
 //    ASSERT_EQ(rec.getEndPos1().back(), 51250000u);
 //    ASSERT_EQ(rec.getStartPos2().front(), 16000000u);
@@ -379,10 +379,10 @@ TEST(ContactRecord, InterContactRecord_HR_Raw) {
     ASSERT_EQ(rec.GetChr2ID(), 22u);
     ASSERT_EQ(rec.GetChr2Name(), "X");
     //TODO: Complete all with the correct values
-    //    ASSERT_EQ(rec.getNumEntries(), 59740);
+    //    ASSERT_EQ(rec.GetNumEntries(), 59740);
     //    ASSERT_EQ(rec.getNumNormCounts(), 0u);
-    //    ASSERT_EQ(rec.getStartPos1().front(), 16000000u);
-    //    ASSERT_EQ(rec.getStartPos1().back(), 51000000u);
+    //    ASSERT_EQ(rec.GetStartPos1().front(), 16000000u);
+    //    ASSERT_EQ(rec.GetStartPos1().back(), 51000000u);
     //    ASSERT_EQ(rec.getEndPos1().front(), 16250000u);
     //    ASSERT_EQ(rec.getEndPos1().back(), 51250000u);
     //    ASSERT_EQ(rec.getStartPos2().front(), 16000000u);
