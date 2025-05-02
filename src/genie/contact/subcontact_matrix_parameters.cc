@@ -359,7 +359,7 @@ void SubcontactMatrixParameters::Write(util::BitWriter& writer) const {
 
     flags = 0u;
     flags |= static_cast<uint8_t>((static_cast<uint8_t>(row_mask_exists_flag_) << 1));
-    flags |= static_cast<uint8_t>(row_mask_exists_flag_);
+    flags |= static_cast<uint8_t>(col_mask_exists_flag_);
     writer.WriteBypassBE(flags);
 
     writer.FlushBits();
@@ -371,6 +371,7 @@ void SubcontactMatrixParameters::Write(core::Writer& writer) const {
   writer.Write(parameter_set_ID_, 8);
     writer.Write(chr1_ID_, 8);
     writer.Write(chr2_ID_, 8);
+
     writer.WriteReserved(3);
     uint8_t flags = 0u;
     flags |= (static_cast<uint8_t>(codec_ID_) & 0x1F);

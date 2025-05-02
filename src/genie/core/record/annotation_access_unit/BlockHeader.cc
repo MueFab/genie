@@ -37,17 +37,21 @@ BlockHeader::BlockHeader(bool attribute_contiguity,
       block_payload_size(block_payload_size) {}
 
 void BlockHeader::read(genie::util::BitReader& reader) {
-    descriptor_ID = static_cast<AnnotDesc>(reader.ReadBits(8));
-    if (descriptor_ID == AnnotDesc::ATTRIBUTE)
-        attribute_ID = static_cast<uint16_t>(reader.ReadBits(16));
+    if (!attribute_contiguity) {
+      descriptor_ID = static_cast<AnnotDesc>(reader.ReadBits(8));
+      if (descriptor_ID == AnnotDesc::ATTRIBUTE)
+          attribute_ID = static_cast<uint16_t>(reader.ReadBits(16));
+    }
     reader.ReadBits(2);
     indexed = static_cast<bool>(reader.ReadBits(1));
     block_payload_size = static_cast<uint32_t>(reader.ReadBits(29));
 }
 
 void BlockHeader::write(core::Writer& writer) const {
-  writer.Write(static_cast<uint8_t>(descriptor_ID), 8);
-    if (descriptor_ID == AnnotDesc::ATTRIBUTE) writer.Write(attribute_ID, 16);
+    if (!attribute_contiguity) {
+      writer.Write(static_cast<uint8_t>(descriptor_ID), 8);
+      if (descriptor_ID == AnnotDesc::ATTRIBUTE) writer.Write(attribute_ID, 16);
+    }
     writer.WriteReserved(2);
     writer.Write(indexed, 1);
     writer.Write(block_payload_size, 29);

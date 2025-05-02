@@ -9,6 +9,7 @@
 #include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"

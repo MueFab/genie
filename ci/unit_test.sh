@@ -43,14 +43,14 @@ run_the_test()
 echo "Running unit tests:"
 
 
-#run_the_test "annotationParameterSet-tests"
-#run_the_test "entropy-tests"
-run_the_test "genie-test-annotation"
-#run_the_test "genie-test-conformance"
-#run_the_test "genie-test-contact"
-#run_the_test "genie-test-genotype"
-#run_the_test "genie-test-likelihood"
-#run_the_test "genie-test-records"
-#run_the_test "VariantSiteRecord-tests"
+run_the_test "annotationParameterSet-tests"
+run_the_test "entropy-tests"
+#run_the_test "genie-test-annotation"
+run_the_test "genie-test-conformance"
+run_the_test "genie-test-contact"
+run_the_test "genie-test-genotype"
+run_the_test "genie-test-likelihood"
+run_the_test "genie-test-records"
+run_the_test "VariantSiteRecord-tests"
 
 

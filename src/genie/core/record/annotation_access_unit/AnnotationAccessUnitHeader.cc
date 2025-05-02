@@ -83,7 +83,7 @@ void AnnotationAccessUnitHeader::read(util::BitReader& reader, bool attributeCon
 }
 
 void AnnotationAccessUnitHeader::write(core::Writer& writer) const {
-    uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size); 
+    uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size);
     if (attribute_contiguity) {
       writer.Write(is_attribute, 1);
         if (is_attribute)
@@ -136,7 +136,7 @@ size_t AnnotationAccessUnitHeader::getSize(core::Writer& writesize) const {
 }
 
 void AnnotationAccessUnitHeader::read(util::BitReader& reader) {
-    uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size); 
+    uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size);
     if (attribute_contiguity) {
         is_attribute = static_cast<bool>(reader.ReadBits(1));
         if (is_attribute) {

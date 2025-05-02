@@ -80,7 +80,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixTilePayload){
 
     // Test other codec
     {
-        auto CODEC_ID = genie::core::AlgoID::CABAC;
+        auto CODEC_ID = genie::core::AlgoID::BSC;
         auto NROWS = 100u;
         auto NCOLS = 200u;
         auto PAYLOAD_SIZE = 128u;

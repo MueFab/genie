@@ -52,7 +52,7 @@ class AttributeParameterSet {
  public:
     AttributeParameterSet();
     AttributeParameterSet(uint16_t attribute_ID,  std::string attribute_name,
-                          core::DataType attribute_type, 
+                          core::DataType attribute_type,
                           std::vector<uint8_t> attribute_array_dims, std::vector<uint8_t> attribute_default_val,
                           bool attribute_miss_val_flag, bool attribute_miss_default_flag,
                           std::vector<uint8_t> attribute_miss_val, std::string attribute_miss_str,
@@ -62,7 +62,7 @@ class AttributeParameterSet {
                                 attribute_miss_val_flag, attribute_miss_default_flag, attribute_miss_val,
                                 attribute_miss_str, compressor_ID, 0u, {}, {}, {{}}, {{}}, {{}})
     {}
-        
+
 
     AttributeParameterSet(uint16_t attribute_ID, uint8_t attribute_name_len, std::string attribute_name,
                           core::DataType attribute_type, uint8_t attribute_num_array_dims,

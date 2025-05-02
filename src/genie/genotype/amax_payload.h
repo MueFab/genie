@@ -57,6 +57,8 @@ class AmaxPayload {
   // Move assignment operator
   AmaxPayload& operator=(AmaxPayload&& other) noexcept;
 
+  bool operator==(const AmaxPayload& other) noexcept;
+
   // Constructor from BitReader
   explicit AmaxPayload(genie::util::BitReader& reader);
 
