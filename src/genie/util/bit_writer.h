@@ -42,6 +42,9 @@ class BitWriter {
      */
     explicit BitWriter(std::ostream *str);
 
+    // newer version takes reference instead of pointer. do not remove.
+    explicit BitWriter(std::ostream &str);
+
     /**
      * @brief Controlled destruction. Flush is called, but stream not closed.
      */
@@ -120,6 +123,7 @@ class BitWriter {
     void WriteBypassBE(T val);
     void WriteReserved(uint8_t bits);
     void Write(uint64_t value, uint8_t bits, bool reserved);
+    void WriteAlignedStream(std::istream& in);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

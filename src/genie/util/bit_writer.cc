@@ -19,6 +19,10 @@ BitWriter::BitWriter(std::ostream *str) : stream(str), m_heldBits(0), m_numHeldB
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+BitWriter::BitWriter(std::ostream &str) : stream(&str), m_heldBits(0), m_numHeldBits(0), m_bitsWritten(0) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 BitWriter::~BitWriter() { FlushBits(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -151,6 +155,20 @@ void BitWriter::WriteAlignedStream(std::istream *in) {
         stream->write(byte, in->gcount());
         this->m_bitsWritten += in->gcount() * 8;
     } while (in->gcount() == BUFFERSIZE);
+}
+
+// -----------------------------------------------------------------------------
+
+// BitWriter::WriteAlignedStream(std::istream *in) is incompatible, so this is temporarily added.
+constexpr size_t kWriteBufferSize = 100;
+void BitWriter::WriteAlignedStream(std::istream& in) {
+  UTILS_DIE_IF(!IsByteAligned(), "Writer not aligned when it should be");
+  do {
+    char byte[kWriteBufferSize];
+    in.read(byte, kWriteBufferSize);
+    stream->write(byte, in.gcount());
+    this->m_bitsWritten += in.gcount() * 8;
+  } while (in.gcount() == kWriteBufferSize);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
