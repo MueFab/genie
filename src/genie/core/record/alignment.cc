@@ -25,11 +25,15 @@ Alignment::Alignment(std::string&& e_cigar_string, const uint8_t reverse_comp)
 
 // -----------------------------------------------------------------------------
 
-Alignment::Alignment(const uint8_t as_depth, util::BitReader& reader) {
+Alignment::Alignment(const uint8_t as_depth, const bool extended_alignment,
+                     util::BitReader& reader) {
   e_cigar_string_.resize(reader.ReadAlignedInt<uint32_t, 3>());
   reader.ReadAlignedBytes(&e_cigar_string_[0], e_cigar_string_.size());
 
   reverse_comp_ = reader.ReadAlignedInt<uint8_t>();
+  if (extended_alignment) {
+    flags_ = reader.ReadAlignedInt<uint8_t>();
+  }
   mapping_score_.resize(as_depth);
   reader.ReadAlignedBytes(&mapping_score_[0], as_depth * sizeof(int32_t));
   for (auto& s : mapping_score_) {
@@ -68,9 +72,24 @@ void Alignment::Write(util::BitWriter& writer) const {
       static_cast<uint32_t>(e_cigar_string_.length()));
   writer.WriteAlignedBytes(e_cigar_string_.data(), e_cigar_string_.length());
   writer.WriteAlignedInt(reverse_comp_);
+  if (flags_.has_value()) {
+    writer.WriteAlignedInt(flags_.value());
+  }
   for (const auto s : mapping_score_) {
     writer.WriteAlignedInt(s);
   }
+}
+
+// -----------------------------------------------------------------------------
+
+[[nodiscard]] std::optional<uint8_t> Alignment::GetFlags() const {
+  return flags_;
+}
+
+// -----------------------------------------------------------------------------
+
+void Alignment::SetFlags(const std::optional<uint8_t> flags) {
+  flags_ = flags;
 }
 
 // -----------------------------------------------------------------------------

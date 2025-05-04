@@ -33,6 +33,12 @@ std::unique_ptr<AlignmentSplit> Unpaired::clone() const {
 
 // -----------------------------------------------------------------------------
 
+[[nodiscard]] std::optional<bool> Unpaired::IsExtendedAlignment() const {
+  return std::nullopt;
+}
+
+// -----------------------------------------------------------------------------
+
 }  // namespace genie::core::record::alignment_split
 
 // -----------------------------------------------------------------------------

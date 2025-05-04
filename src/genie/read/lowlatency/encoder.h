@@ -51,6 +51,9 @@ class Encoder final : public core::ReadEncoder {
 
     /// Flag indicating if only reference data is being processed.
     bool ref_only{};
+
+    /// If extended alignment is used.
+    bool extended_alignment{};
   };
 
  public:

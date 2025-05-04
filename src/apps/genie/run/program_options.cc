@@ -107,6 +107,10 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help_(false) {
                "--low-latency in case of aligned reads only. \nDoes not work "
                "if encoded with --read-ids \"none\"\n");
 
+  no_extended_alignment_ = false;
+  app.add_flag("--no_extended_alignment", no_extended_alignment_,
+               "Do not use extended alignment");
+
   low_latency_ = false;
   app.add_flag("--low-latency", low_latency_,
                "Flag, if set no global reference will be \n"

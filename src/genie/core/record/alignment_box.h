@@ -34,6 +34,10 @@ class AlignmentBox {
       split_alignment_info_;  //!< @brief
 
  public:
+  [[nodiscard]] bool IsExtendedAlignment() const {
+    return alignment_.GetFlags().has_value();
+  }
+
   /**
    * @brief
    * @param writer
@@ -44,10 +48,12 @@ class AlignmentBox {
    * @brief
    * @param type
    * @param as_depth
+   * @param extended_alignment
    * @param number_of_template_segments
    * @param reader
    */
   explicit AlignmentBox(ClassType type, uint8_t as_depth,
+                        bool extended_alignment,
                         uint8_t number_of_template_segments,
                         util::BitReader& reader);
 

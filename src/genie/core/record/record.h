@@ -16,6 +16,7 @@
 #include <utility>
 #include <vector>
 
+#include "alignment_split/same_rec.h"
 #include "genie/core/record/alignment_box.h"
 #include "genie/core/record/alignment_external.h"
 #include "genie/core/record/alignment_shared_data.h"
@@ -23,6 +24,7 @@
 #include "genie/core/record/segment.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
+#include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
@@ -72,13 +74,24 @@ class Record {
   std::vector<AlignmentBox> alignment_info_;   //!< @brief
   ClassType class_id_{ClassType::kNone};       //!< @brief
   std::string read_group_;                     //!< @brief
+  uint8_t reserved_{};                         //!< @brief
+  bool extended_alignment_{};                  //!< @brief
   bool read_1_first_{};                        //!< @brief
   AlignmentSharedData shared_alignment_info_;  //!< @brief
   uint8_t qv_depth_{};                         //!< @brief
   std::string read_name_;                      //!< @brief
-  uint8_t flags_{};                            //!< @brief
+  std::vector<uint8_t> flags_{};               //!< @brief
 
   std::unique_ptr<AlignmentExternal> more_alignment_info_;  //!< @brief
+
+  void ResizeFlags() {
+    const size_t num_flags = !extended_alignment_              ? 1
+                             : class_id_ == ClassType::kClassU ? reads_.size()
+                             : class_id_ == ClassType::kClassHm
+                                 ? reads_.size() - 1
+                                 : 0;
+    flags_.resize(num_flags);
+  }
 
  public:
   /**
@@ -193,7 +206,12 @@ class Record {
    * @brief
    * @return
    */
-  [[nodiscard]] uint8_t GetFlags() const;
+  [[nodiscard]] const std::vector<uint8_t>& GetFlags() const;
+
+  void SetFlags(const size_t index, const uint8_t& flags) {
+    UTILS_DIE_IF(index >= flags_.size(), "Index out of bounds");
+    flags_[index] = flags;
+  }
 
   /**
    * @brief
@@ -296,6 +314,24 @@ class Record {
    * @return
    */
   [[nodiscard]] bool GetRead1First() const;
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsExtendedAlignment() const;
+
+  /**
+   * @brief
+   * @return
+   */
+  void SetExtendedAlignment(bool extended);
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint8_t GetFlagsOfSegment(size_t index) const;
 
   /**
    * @brief

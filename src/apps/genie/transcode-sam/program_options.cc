@@ -33,6 +33,7 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[])
       help_(false),
       no_ref_(false),
       clean_(false),
+      no_extended_alignment_(false),
       num_threads_(1) {
   ProcessCommandLine(argc, argv);
 }
@@ -75,6 +76,9 @@ void ProgramOptions::ProcessCommandLine(const int argc, char* argv[]) {
                "Override existing output files\n");
   no_ref_ = false;
   app.add_flag("--no_ref", no_ref_, "Don't use a reference.\n");
+  no_extended_alignment_ = false;
+  app.add_flag("--no_extended_alignment", no_extended_alignment_,
+               "Don't use extended alignment.\n");
   clean_ = false;
   app.add_flag("-c,--clean_records", clean_, "Remove unsupported reads.\n");
   num_threads_ = std::thread::hardware_concurrency();

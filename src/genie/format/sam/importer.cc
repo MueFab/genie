@@ -18,7 +18,6 @@
 
 #include <algorithm>
 #include <fstream>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
@@ -28,7 +27,6 @@
 #include "genie/core/record/alignment_split/other_rec.h"
 #include "genie/core/record/alignment_split/same_rec.h"
 #include "genie/core/record/class_type.h"
-#include "genie/format/sam/pair_matcher.h"
 #include "genie/format/sam/sam_reader.h"
 #include "genie/format/sam/sam_sorter.h"
 #include "genie/util/ordered_section.h"
@@ -38,7 +36,23 @@
 
 constexpr auto kLogModuleName = "TranscoderSam";
 
+// -----------------------------------------------------------------------------
+
 namespace genie::format::sam {
+
+// -----------------------------------------------------------------------------
+
+core::record::Record::Flags GetFlags(const SamRecord& rec) {
+  core::record::Record::Flags flags;
+  flags.duplicate = rec.IsDuplicates();
+  flags.quality_check_fail = rec.IsQualityFail();
+  flags.proper_mapped_pair = rec.IsProperlyPaired();
+  flags.not_primary_alignment = !rec.IsPrimary();
+  flags.supplementary_alignment = rec.IsSupplementary();
+  return flags;
+}
+
+// -----------------------------------------------------------------------------
 
 RefInfo::RefInfo(const std::string& fasta_name)
     : ref_mgr_(std::make_unique<core::ReferenceManager>(4)), valid_(false) {
@@ -138,6 +152,8 @@ std::pair<std::vector<SamRecord>, std::optional<int>> Importer::ReadSamChunk() {
   return {sam_records, watcher.get()};
 }
 
+// -----------------------------------------------------------------------------
+
 std::vector<SamRecordPair> Importer::MatchPairs(
     std::vector<SamRecord>&& records) {
   for (auto& r : records) {
@@ -150,6 +166,8 @@ std::vector<SamRecordPair> Importer::MatchPairs(
   return sorter_.GetPairs();
 }
 
+// -----------------------------------------------------------------------------
+
 core::record::Segment CreateSegment(SamRecord& sam_record) {
   UTILS_DIE_IF(sam_record.seq_.empty() || sam_record.seq_ == "*",
                "Empty nucleotide sequence not supported");
@@ -158,16 +176,26 @@ core::record::Segment CreateSegment(SamRecord& sam_record) {
   return segment;
 }
 
+// -----------------------------------------------------------------------------
+
 core::record::Alignment CreateAlignment(const SamRecord& sam_record,
-                                        const std::string& seq) {
+                                        const std::string& seq,
+                                        const bool extended_alignment) {
   std::string e_cigar = SamRecord::ConvertCigar2ECigar(sam_record.cigar_, seq);
   core::record::Alignment alignment(std::move(e_cigar), sam_record.IsReverse());
+  if (extended_alignment) {
+    alignment.SetFlags(GetFlags(sam_record).Get());
+  }
   return alignment;
 }
+
+// -----------------------------------------------------------------------------
 
 uint8_t GetNumberOfTemplateSegments(const SamRecordPair& pair) {
   return pair.first.IsPaired() ? 2 : 1;
 }
+
+// -----------------------------------------------------------------------------
 
 core::record::ClassType GetClassType(const SamRecordPair& pair) {
   // Unpaired
@@ -194,6 +222,8 @@ core::record::ClassType GetClassType(const SamRecordPair& pair) {
   return core::record::ClassType::kClassI;
 }
 
+// -----------------------------------------------------------------------------
+
 SamRecordPair FixOrder(SamRecordPair&& pair) {
   if (!pair.second.has_value()) {
     return std::move(pair);
@@ -217,17 +247,10 @@ SamRecordPair FixOrder(SamRecordPair&& pair) {
   return std::move(pair);
 }
 
-core::record::Record::Flags GetFlags(const SamRecord& rec) {
-  core::record::Record::Flags flags;
-  flags.duplicate = rec.IsDuplicates();
-  flags.quality_check_fail = rec.IsQualityFail();
-  flags.proper_mapped_pair = rec.IsProperlyPaired();
-  flags.not_primary_alignment = !rec.IsPrimary();
-  flags.supplementary_alignment = rec.IsSupplementary();
-  return flags;
-}
+// -----------------------------------------------------------------------------
 
-Importer::Importer(const size_t block_size, std::string input, std::string ref)
+Importer::Importer(const size_t block_size, const bool extended_alignment,
+                   std::string input, std::string ref)
     : block_size_(block_size),
       input_sam_file_(std::move(input)),
       input_ref_file_(std::move(ref)),
@@ -236,7 +259,8 @@ Importer::Importer(const size_t block_size, std::string input, std::string ref)
       refinf_(input_ref_file_),
       eof_(false),
       sam_reader_(this->input_sam_file_),
-      sorter_(100000) {
+      sorter_(100000),
+      extended_alignment_(extended_alignment) {
   refs_ = sam_reader_.GetRefs();
   if (!input_ref_file_.empty()) {
     for (const auto& [fst, snd] : refs_) {
@@ -257,12 +281,16 @@ Importer::Importer(const size_t block_size, std::string input, std::string ref)
   }
 }
 
+// -----------------------------------------------------------------------------
+
 bool IsOriginalOrder(const SamRecordPair& pair) {
   if (pair.first.IsPaired() && pair.first.IsRead2()) {
     return false;
   }
   return true;
 }
+
+// -----------------------------------------------------------------------------
 
 core::record::Record AddSegments(core::record::Record&& rec,
                                  SamRecordPair& corrected_pair) {
@@ -273,10 +301,12 @@ core::record::Record AddSegments(core::record::Record&& rec,
   return std::move(rec);
 }
 
+// -----------------------------------------------------------------------------
+
 core::record::AlignmentBox AddSplitAlignment(
     core::record::AlignmentBox&& box, const core::record::Record& rec,
     const SamRecordPair& corrected_pair,
-    const core::record::ClassType class_type) {
+    const core::record::ClassType class_type, const bool extended_alignment) {
   // Class HM or unpaired: No split alignment
   if (class_type != core::record::ClassType::kClassI ||
       !corrected_pair.first.IsPaired()) {
@@ -285,7 +315,8 @@ core::record::AlignmentBox AddSplitAlignment(
 
   if (corrected_pair.second.has_value()) {
     auto alignment = CreateAlignment(*corrected_pair.second,
-                                     rec.GetSegments().back().GetSequence());
+                                     rec.GetSegments().back().GetSequence(),
+                                     extended_alignment);
     alignment.AddMappingScore(corrected_pair.second->mapq_);
     // Second mate available
     box.AddAlignmentSplit(
@@ -293,39 +324,57 @@ core::record::AlignmentBox AddSplitAlignment(
             corrected_pair.second->pos_ - corrected_pair.first.pos_,
             std::move(alignment)));
   } else {
+    std::optional<core::record::Alignment> a = std::nullopt;
+    if (extended_alignment) {
+      a = core::record::Alignment("", corrected_pair.first.GetFlag() & 0x20);
+      a->AddMappingScore(255);
+    }
     // Second mate unavailable
     box.AddAlignmentSplit(
         std::make_unique<core::record::alignment_split::OtherRec>(
-            corrected_pair.first.mate_pos_, corrected_pair.first.mate_rid_));
+            corrected_pair.first.mate_pos_, corrected_pair.first.mate_rid_, a));
   }
   return std::move(box);
 }
+
+// -----------------------------------------------------------------------------
+
 core::record::AlignmentBox CreateFirstAlignment(
-    const core::record::Record& rec, const SamRecordPair& corrected_pair) {
+    const core::record::Record& rec, const SamRecordPair& corrected_pair,
+    const bool extended_alignment_) {
   auto alignment = CreateAlignment(corrected_pair.first,
-                                   rec.GetSegments().front().GetSequence());
+                                   rec.GetSegments().front().GetSequence(),
+                                   extended_alignment_);
   alignment.AddMappingScore(corrected_pair.first.mapq_);
   return core::record::AlignmentBox(corrected_pair.first.pos_,
                                     std::move(alignment));
 }
 
+// -----------------------------------------------------------------------------
+
 core::record::Record AddAlignments(core::record::Record&& rec,
                                    const SamRecordPair& corrected_pair,
-                                   const core::record::ClassType class_type) {
+                                   const core::record::ClassType class_type,
+                                   const bool extended_alignment) {
   // Class U -> No Alignments
   if (class_type == core::record::ClassType::kClassU) {
     return std::move(rec);
   }
   // First alignment
-  auto alignment_box = CreateFirstAlignment(rec, corrected_pair);
+  auto alignment_box =
+      CreateFirstAlignment(rec, corrected_pair, extended_alignment);
   // Split alignment
-  alignment_box = AddSplitAlignment(std::move(alignment_box), rec,
-                                    corrected_pair, class_type);
+  alignment_box =
+      AddSplitAlignment(std::move(alignment_box), rec, corrected_pair,
+                        class_type, extended_alignment);
   rec.AddAlignment(corrected_pair.first.rid_, std::move(alignment_box));
   return std::move(rec);
 }
 
-core::record::Record ConvertPair(SamRecordPair&& pair) {
+// -----------------------------------------------------------------------------
+
+core::record::Record ConvertPair(SamRecordPair&& pair,
+                                 bool extended_alignment) {
   auto corrected_pair = FixOrder(std::move(pair));
   auto class_type = GetClassType(corrected_pair);
   core::record::Record ret(GetNumberOfTemplateSegments(corrected_pair),
@@ -333,15 +382,32 @@ core::record::Record ConvertPair(SamRecordPair&& pair) {
                            "", GetFlags(corrected_pair.first).Get(),
                            IsOriginalOrder(corrected_pair));
   ret = AddSegments(std::move(ret), corrected_pair);
-  ret = AddAlignments(std::move(ret), corrected_pair, class_type);
+  ret = AddAlignments(std::move(ret), corrected_pair, class_type,
+                      extended_alignment);
+  if (extended_alignment) {
+    if (ret.GetClassId() == core::record::ClassType::kClassHm) {
+      ret.SetFlags(0, GetFlags(pair.second.value()).Get());
+    }
+    if (ret.GetClassId() == core::record::ClassType::kClassU) {
+      ret.SetExtendedAlignment(true);
+      ret.SetFlags(0, GetFlags(pair.first).Get());
+      if (pair.second.has_value()) {
+        ret.SetFlags(1, GetFlags(pair.second.value()).Get());
+      }
+    }
+  }
   return ret;
 }
+
+// -----------------------------------------------------------------------------
 
 struct SamStats {
   size_t size_seq = 0;
   size_t size_qual = 0;
   size_t size_name = 0;
 };
+
+// -----------------------------------------------------------------------------
 
 SamStats CollectStats(SamStats stats, const SamRecordPair& pair) {
   stats.size_seq += pair.first.seq_.size();
@@ -354,6 +420,8 @@ SamStats CollectStats(SamStats stats, const SamRecordPair& pair) {
   }
   return stats;
 }
+
+// -----------------------------------------------------------------------------
 
 bool Importer::PumpRetrieve(core::Classifier* classifier) {
   core::record::Chunk chunk;
@@ -374,7 +442,8 @@ bool Importer::PumpRetrieve(core::Classifier* classifier) {
   SamStats stats;
   for (auto& p : sam_pairs) {
     stats = CollectStats(stats, p);
-    chunk.GetData().emplace_back(ConvertPair(std::move(p)));
+    chunk.GetData().emplace_back(
+        ConvertPair(std::move(p), extended_alignment_));
     if (!current_ref_id.has_value() &&
         !chunk.GetData().back().GetAlignments().empty()) {
       current_ref_id =

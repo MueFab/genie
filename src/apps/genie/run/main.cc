@@ -286,7 +286,8 @@ void AttachImporterSam(
     // in_ptr = inputFiles.back().get();
   }
   flow.AddImporter(std::make_unique<genie::format::sam::Importer>(
-      block_size, p_opts.input_file_, p_opts.input_ref_file_));
+      block_size, !p_opts.no_extended_alignment_, p_opts.input_file_,
+      p_opts.input_ref_file_));
 }
 
 // -----------------------------------------------------------------------------

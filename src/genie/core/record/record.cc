@@ -50,7 +50,7 @@ Record::Record(const uint8_t number_of_template_segments,
       read_group_(std::move(read_group)),
       read_1_first_(is_read_1_first),
       read_name_(std::move(read_name)),
-      flags_(flags),
+      flags_(1, flags),
       more_alignment_info_(std::make_unique<alignment_external::None>()) {}
 
 // -----------------------------------------------------------------------------
@@ -61,10 +61,12 @@ Record::Record(util::BitReader& reader)
       alignment_info_(reader.ReadAlignedInt<uint16_t>()),
       class_id_(reader.ReadAlignedInt<ClassType>()),
       read_group_(reader.ReadAlignedInt<uint8_t>(), 0),
-      read_1_first_(reader.ReadAlignedInt<uint8_t>()),
+      reserved_(reader.ReadAlignedInt<uint8_t>()),
       shared_alignment_info_(!alignment_info_.empty()
                                  ? AlignmentSharedData(reader)
                                  : AlignmentSharedData()) {
+  extended_alignment_ = (reserved_ & 0x02) >> 1;
+  read_1_first_ = reserved_ & 0x01;
   std::vector<uint32_t> read_sizes(reads_.size());
   for (auto& s : read_sizes) {
     s = reader.ReadAlignedInt<uint32_t, 3>();
@@ -81,9 +83,17 @@ Record::Record(util::BitReader& reader)
   }
   for (auto& a : alignment_info_) {
     a = AlignmentBox(class_id_, shared_alignment_info_.GetAsDepth(),
-                     number_of_template_segments_, reader);
+                     extended_alignment_, number_of_template_segments_, reader);
   }
-  flags_ = reader.ReadAlignedInt<uint8_t>();
+  const size_t num_flags = !extended_alignment_              ? 1
+                           : class_id_ == ClassType::kClassU ? reads_.size()
+                           : class_id_ == ClassType::kClassHm
+                               ? reads_.size() - 1
+                               : 0;
+  flags_.resize(num_flags);
+  for (auto& f : flags_) {
+    f = reader.ReadAlignedInt<uint8_t>();
+  }
   more_alignment_info_ = AlignmentExternal::Factory(reader);
 }
 
@@ -107,6 +117,8 @@ Record& Record::operator=(const Record& rec) {
   this->shared_alignment_info_ = rec.shared_alignment_info_;
   this->qv_depth_ = rec.qv_depth_;
   this->read_name_ = rec.read_name_;
+  this->reserved_ = rec.reserved_;
+  this->extended_alignment_ = rec.extended_alignment_;
   this->read_group_ = rec.read_group_;
   this->reads_ = rec.reads_;
   this->alignment_info_ = rec.alignment_info_;
@@ -124,6 +136,8 @@ Record& Record::operator=(Record&& rec) noexcept {
   this->shared_alignment_info_ = rec.shared_alignment_info_;
   this->qv_depth_ = rec.qv_depth_;
   this->read_name_ = std::move(rec.read_name_);
+  this->reserved_ = rec.reserved_;
+  this->extended_alignment_ = rec.extended_alignment_;
   this->read_group_ = std::move(rec.read_group_);
   this->reads_ = std::move(rec.reads_);
   this->alignment_info_ = std::move(rec.alignment_info_);
@@ -143,6 +157,7 @@ void Record::AddSegment(Segment&& rec) {
   UTILS_DIE_IF(!reads_.empty() && rec.GetQualities().size() != qv_depth_,
                "Incompatible qv depth");
   reads_.push_back(std::move(rec));
+  ResizeFlags();
 }
 
 // -----------------------------------------------------------------------------
@@ -152,7 +167,12 @@ void Record::AddAlignment(const uint16_t seq_id, AlignmentBox&& rec) {
     shared_alignment_info_ = AlignmentSharedData(
         seq_id,
         static_cast<uint8_t>(rec.GetAlignment().GetMappingScores().size()));
+    if (rec.IsExtendedAlignment()) {
+      SetExtendedAlignment(true);
+    }
   } else {
+    UTILS_DIE_IF(rec.IsExtendedAlignment() != extended_alignment_,
+                 "Incompatible extended alignment");
     UTILS_DIE_IF(rec.GetAlignment().GetMappingScores().size() !=
                      shared_alignment_info_.GetAsDepth(),
                  "Incompatible AS depth");
@@ -163,6 +183,7 @@ void Record::AddAlignment(const uint16_t seq_id, AlignmentBox&& rec) {
                  "Incompatible seq id");
   }
   alignment_info_.push_back(std::move(rec));
+  ResizeFlags();
 }
 
 // -----------------------------------------------------------------------------
@@ -205,7 +226,8 @@ void Record::Write(util::BitWriter& writer) const {
       static_cast<uint16_t>(alignment_info_.size()));
   writer.WriteAlignedInt(class_id_);
   writer.WriteAlignedInt<uint8_t>(static_cast<uint8_t>(read_group_.length()));
-  writer.WriteAlignedInt(read_1_first_);
+  const uint8_t reserved = read_1_first_ | extended_alignment_ << 1;
+  writer.WriteAlignedInt(reserved);
   if (!alignment_info_.empty()) {
     shared_alignment_info_.Write(writer);
   }
@@ -223,13 +245,15 @@ void Record::Write(util::BitWriter& writer) const {
   for (const auto& a : alignment_info_) {
     a.Write(writer);
   }
-  writer.WriteAlignedInt(flags_);
+  for (const auto& f : flags_) {
+    writer.WriteAlignedInt(f);
+  }
   more_alignment_info_->Write(writer);
 }
 
 // -----------------------------------------------------------------------------
 
-uint8_t Record::GetFlags() const { return flags_; }
+const std::vector<uint8_t>& Record::GetFlags() const { return flags_; }
 
 // -----------------------------------------------------------------------------
 
@@ -273,7 +297,10 @@ void Record::SetName(const std::string& name) { read_name_ = name; }
 
 // -----------------------------------------------------------------------------
 
-void Record::SetClassType(const ClassType type) { this->class_id_ = type; }
+void Record::SetClassType(const ClassType type) {
+  this->class_id_ = type;
+  ResizeFlags();
+}
 
 // -----------------------------------------------------------------------------
 
@@ -320,6 +347,11 @@ size_t Record::GetMappedLength(const size_t alignment,
 // -----------------------------------------------------------------------------
 
 void Record::SetAlignment(const size_t id, AlignmentBox&& b) {
+  if (alignment_info_.size() != 1) {
+    UTILS_DIE_IF(alignment_info_.front().IsExtendedAlignment() !=
+                     b.IsExtendedAlignment(),
+                 "Incompatible extended alignment");
+  }
   this->alignment_info_[id] = std::move(b);
 }
 
@@ -353,6 +385,44 @@ size_t Record::GetPosition(const size_t alignment, const size_t split) const {
 void Record::SetMoreAlignmentInfo(
     std::unique_ptr<AlignmentExternal> more_alignment_info) {
   more_alignment_info_ = std::move(more_alignment_info);
+}
+
+// -----------------------------------------------------------------------------
+
+[[nodiscard]] bool Record::IsExtendedAlignment() const {
+  return extended_alignment_;
+}
+
+// -----------------------------------------------------------------------------
+
+void Record::SetExtendedAlignment(const bool extended) {
+  UTILS_DIE_IF(!alignment_info_.empty(),
+               "Extended alignment can only be set before alignment is "
+               "appended to record");
+  extended_alignment_ = extended;
+  ResizeFlags();
+}
+
+// -----------------------------------------------------------------------------
+
+[[nodiscard]] uint8_t Record::GetFlagsOfSegment(const size_t index) const {
+  if (!extended_alignment_) {
+    return flags_.front();
+  }
+  if (class_id_ == ClassType::kClassU) {
+    return flags_[index];
+  }
+  if (index == 0) {
+    return alignment_info_.front().GetAlignment().GetFlags().value();
+  }
+  if (class_id_ == ClassType::kClassHm) {
+    return flags_.front();
+  }
+  return dynamic_cast<const alignment_split::SameRec*>(
+             alignment_info_.front().GetAlignmentSplits().front().get())
+      ->GetAlignment()
+      .GetFlags()
+      .value();
 }
 
 // -----------------------------------------------------------------------------

@@ -33,12 +33,13 @@ void AlignmentBox::Write(util::BitWriter& writer) const {
 // -----------------------------------------------------------------------------
 
 AlignmentBox::AlignmentBox(const ClassType type, const uint8_t as_depth,
+                           const bool extended_alignment,
                            const uint8_t number_of_template_segments,
                            util::BitReader& reader)
     : split_alignment_info_(
           type == ClassType::kClassHm ? 0 : number_of_template_segments - 1) {
   mapping_pos_ = reader.ReadAlignedInt<uint64_t, 5>();
-  alignment_ = Alignment(as_depth, reader);
+  alignment_ = Alignment(as_depth, extended_alignment, reader);
 
   if (type == ClassType::kClassHm) {
     return;
@@ -46,7 +47,7 @@ AlignmentBox::AlignmentBox(const ClassType type, const uint8_t as_depth,
   for (size_t i_segment = 1; i_segment < number_of_template_segments;
        i_segment++) {
     split_alignment_info_[i_segment - 1] =
-        AlignmentSplit::Factory(as_depth, reader);
+        AlignmentSplit::Factory(as_depth, extended_alignment, reader);
   }
 }
 
@@ -58,6 +59,10 @@ AlignmentBox::AlignmentBox() : split_alignment_info_(0) {}
 
 void AlignmentBox::AddAlignmentSplit(
     std::unique_ptr<AlignmentSplit> alignment) {
+  const auto status = alignment->IsExtendedAlignment();
+  UTILS_DIE_IF(
+      status.has_value() && alignment->IsExtendedAlignment() != status.value(),
+      "Split alignment type incompatible: extended alignment status differs");
   if (alignment->GetType() == AlignmentSplit::Type::kSameRec) {
     UTILS_DIE_IF(dynamic_cast<alignment_split::SameRec&>(*alignment)
                          .GetAlignment()

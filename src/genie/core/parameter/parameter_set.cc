@@ -54,7 +54,8 @@ EncodingSet::EncodingSet(util::BitReader& bit_reader) {
   }
   multiple_alignments_flag_ = bit_reader.Read<bool>(1);
   spliced_reads_flag_ = bit_reader.Read<bool>(1);
-  reserved_ = bit_reader.Read<uint32_t>(30);
+  extended_alignment_flag_ = bit_reader.Read<bool>(1);
+  reserved_ = bit_reader.Read<uint32_t>(29);
   if (bit_reader.Read<bool>(1)) {
     signature_cfg_ = SignatureCfg();
     if (bit_reader.Read<bool>(1)) {
@@ -85,7 +86,8 @@ EncodingSet::EncodingSet(const DataUnit::DatasetType dataset_type,
                          const bool pos_40_bits_flag, const uint8_t qv_depth,
                          const uint8_t as_depth,
                          const bool multiple_alignments_flag,
-                         const bool spliced_reads_flag)
+                         const bool spliced_reads_flag,
+                         const bool extended_alignment_flag)
     : dataset_type_(dataset_type),
       alphabet_id_(alphabet_id),
       read_length_(read_length),
@@ -99,6 +101,7 @@ EncodingSet::EncodingSet(const DataUnit::DatasetType dataset_type,
       read_group_index_ds_(0),
       multiple_alignments_flag_(multiple_alignments_flag),
       spliced_reads_flag_(spliced_reads_flag),
+      extended_alignment_flag_(extended_alignment_flag),
       qv_coding_configs_(0) {}
 
 // -----------------------------------------------------------------------------
@@ -117,6 +120,7 @@ EncodingSet::EncodingSet()
       read_group_index_ds_(0),
       multiple_alignments_flag_(false),
       spliced_reads_flag_(false),
+      extended_alignment_flag_(false),
       qv_coding_configs_(0) {}
 
 // -----------------------------------------------------------------------------
@@ -215,7 +219,8 @@ void EncodingSet::Write(util::BitWriter& writer) const {
   }
   writer.WriteBits(multiple_alignments_flag_, 1);
   writer.WriteBits(spliced_reads_flag_, 1);
-  writer.WriteBits(reserved_, 30);
+  writer.WriteBits(extended_alignment_flag_, 1);
+  writer.WriteBits(reserved_, 29);
   writer.WriteBits(signature_cfg_ != std::nullopt, 1);
   if (signature_cfg_ != std::nullopt) {
     writer.WriteBits(signature_cfg_->signature_length != std::nullopt, 1);
@@ -231,6 +236,12 @@ void EncodingSet::Write(util::BitWriter& writer) const {
     computed_reference_->Write(writer);
   }
   writer.FlushBits();
+}
+
+// -----------------------------------------------------------------------------
+
+[[nodiscard]] AlphabetId EncodingSet::GetAlphabetId() const {
+  return alphabet_id_;
 }
 
 // -----------------------------------------------------------------------------
@@ -343,6 +354,7 @@ EncodingSet& EncodingSet::operator=(const EncodingSet& other) {
   read_group_index_ds_ = other.read_group_index_ds_;
   multiple_alignments_flag_ = other.multiple_alignments_flag_;
   spliced_reads_flag_ = other.spliced_reads_flag_;
+  extended_alignment_flag_ = other.extended_alignment_flag_;
   signature_cfg_ = other.signature_cfg_;
   qv_coding_configs_.clear();
   for (const auto& c : other.qv_coding_configs_) {
@@ -369,6 +381,7 @@ EncodingSet& EncodingSet::operator=(EncodingSet&& other) noexcept {
   read_group_index_ds_ = std::move(other.read_group_index_ds_);
   multiple_alignments_flag_ = other.multiple_alignments_flag_;
   spliced_reads_flag_ = other.spliced_reads_flag_;
+  extended_alignment_flag_ = other.extended_alignment_flag_;
   signature_cfg_ = other.signature_cfg_;
   qv_coding_configs_ = std::move(other.qv_coding_configs_);
   computed_reference_ = other.computed_reference_;
@@ -391,6 +404,7 @@ EncodingSet::EncodingSet(const EncodingSet& other)
       read_group_index_ds_(0),
       multiple_alignments_flag_(false),
       spliced_reads_flag_(false),
+      extended_alignment_flag_(false),
       qv_coding_configs_(0) {
   *this = other;
 }
@@ -411,6 +425,7 @@ EncodingSet::EncodingSet(EncodingSet&& other) noexcept
       read_group_index_ds_(0),
       multiple_alignments_flag_(false),
       spliced_reads_flag_(false),
+      extended_alignment_flag_(false),
       qv_coding_configs_(0) {
   *this = std::move(other);
 }
@@ -459,8 +474,21 @@ bool EncodingSet::operator==(const EncodingSet& ps) const {
          read_group_index_ds_ == ps.read_group_index_ds_ &&
          multiple_alignments_flag_ == ps.multiple_alignments_flag_ &&
          spliced_reads_flag_ == ps.spliced_reads_flag_ &&
+         extended_alignment_flag_ == ps.extended_alignment_flag_ &&
          signature_cfg_ == ps.signature_cfg_ && QualityValueCmp(ps) &&
          computed_reference_ == ps.computed_reference_;
+}
+
+// -----------------------------------------------------------------------------
+
+[[nodiscard]] bool EncodingSet::IsExtendedAlignment() const {
+  return extended_alignment_flag_;
+}
+
+// -----------------------------------------------------------------------------
+
+void EncodingSet::SetExtendedAlignment(const bool extended_alignment) {
+  extended_alignment_flag_ = extended_alignment;
 }
 
 // -----------------------------------------------------------------------------
@@ -495,12 +523,14 @@ ParameterSet::ParameterSet(
     const DatasetType dataset_type, const AlphabetId alphabet_id,
     const uint32_t read_length, const bool paired_end,
     const bool pos_40_bits_flag, const uint8_t qv_depth, const uint8_t as_depth,
-    const bool multiple_alignments_flag, const bool spliced_reads_flag)
+    const bool multiple_alignments_flag, const bool spliced_reads_flag,
+    const bool extended_alignment_flag)
     : DataUnit(DataUnitType::kParameterSet),
       parameter_set_id_(parameter_set_id),
       parent_parameter_set_id_(parent_parameter_set_id),
       set_(dataset_type, alphabet_id, read_length, paired_end, pos_40_bits_flag,
-           qv_depth, as_depth, multiple_alignments_flag, spliced_reads_flag) {}
+           qv_depth, as_depth, multiple_alignments_flag, spliced_reads_flag,
+           extended_alignment_flag) {}
 
 // -----------------------------------------------------------------------------
 

@@ -30,10 +30,11 @@ SameRec::SameRec(const int64_t delta, Alignment alignment)
 
 // -----------------------------------------------------------------------------
 
-SameRec::SameRec(const uint8_t as_depth, util::BitReader& reader)
+SameRec::SameRec(const uint8_t as_depth, const bool extended_alignment,
+                 util::BitReader& reader)
     : AlignmentSplit(Type::kSameRec),
       delta_(reader.ReadAlignedInt<int64_t, 6>()),
-      alignment_(as_depth, reader) {}
+      alignment_(as_depth, extended_alignment, reader) {}
 
 // -----------------------------------------------------------------------------
 
@@ -58,6 +59,12 @@ std::unique_ptr<AlignmentSplit> SameRec::clone() const {
   ret->delta_ = this->delta_;
   ret->alignment_ = this->alignment_;
   return ret;
+}
+
+// -----------------------------------------------------------------------------
+
+std::optional<bool> SameRec::IsExtendedAlignment() const {
+  return alignment_.GetFlags().has_value();
 }
 
 // -----------------------------------------------------------------------------

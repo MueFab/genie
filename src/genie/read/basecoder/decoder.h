@@ -60,6 +60,11 @@ class Decoder {
   /// Number of template segments to Decode.
   size_t number_template_segments_;
 
+  uint8_t DecodeFlags();
+
+  /// If the records are encoded in extended alignment format.
+  bool extended_alignment_;
+
  public:
   /**
    * @brief Constructs a `Decoder` object.

@@ -47,7 +47,7 @@ void Encoder::FlowIn(core::record::Chunk&& t, const util::Section& id) {
       data.GetData().front().GetSegments().front().GetSequence().length(),
       data.GetData().front().GetNumberOfTemplateSegments() > 1,
       core::AccessUnit(std::move(set.GetEncodingSet()), data.GetData().size()),
-      data.IsReferenceOnly()};
+      data.IsReferenceOnly(), data.GetData().front().IsExtendedAlignment()};
   size_t num_reads = 0;
   for (auto& r : data.GetData()) {
     for (auto& s : r.GetSegments()) {
@@ -119,7 +119,8 @@ core::AccessUnit Encoder::pack(
   core::parameter::ParameterSet ret(
       static_cast<uint8_t>(id.start), static_cast<uint8_t>(id.start), data_type,
       core::AlphabetId::kAcgtn, static_cast<uint32_t>(state.read_length),
-      state.paired_end, false, qv_depth, 0, false, false);
+      state.paired_end, false, qv_depth, 0, false, false,
+      state.extended_alignment);
   ret.GetEncodingSet().AddClass(core::record::ClassType::kClassU,
                                 std::move(quality_value_params));
 

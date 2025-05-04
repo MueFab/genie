@@ -34,12 +34,15 @@ void AlignmentSplit::Write(util::BitWriter& writer) const {
 // -----------------------------------------------------------------------------
 
 std::unique_ptr<AlignmentSplit> AlignmentSplit::Factory(
-    uint8_t as_depth, util::BitReader& reader) {
+    const uint8_t as_depth, const bool extended_alignment,
+    util::BitReader& reader) {
   switch (reader.ReadAlignedInt<Type>()) {
     case Type::kSameRec:
-      return std::make_unique<alignment_split::SameRec>(as_depth, reader);
+      return std::make_unique<alignment_split::SameRec>(
+          as_depth, extended_alignment, reader);
     case Type::kOtherRec:
-      return std::make_unique<alignment_split::OtherRec>(reader);
+      return std::make_unique<alignment_split::OtherRec>(extended_alignment,
+                                                         reader);
     case Type::kUnpaired:
       return std::make_unique<alignment_split::Unpaired>();
     default:

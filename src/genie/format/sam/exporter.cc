@@ -177,6 +177,11 @@ void ProcessSecondMappedSegment(const size_t s,
       rnext = refinfo.IsValid() ? refinfo.GetMgr()->Id2Ref(split.GetNextSeq())
                                 : std::to_string(split.GetNextSeq());
       pnext = std::to_string(split.GetNextPos() + 1);
+      if (record.IsExtendedAlignment()) {
+        if (split.GetExtendedAlignment().value().GetRComp()) {
+          flags |= 0x20;
+        }
+      }
       tlen = 0;  // Not available without reading second record
     } else {
       tlen = 0;
@@ -191,7 +196,7 @@ uint16_t ComputeSamFlags(const size_t s, const core::record::Record& record) {
   if (record.GetNumberOfTemplateSegments() > 1) {
     flags |= 0x1;
   }
-  if (record.GetFlags() & core::gen_const::kFlagsProperPairMask) {
+  if (record.GetFlagsOfSegment(s) & core::gen_const::kFlagsProperPairMask) {
     flags |= 0x2;
   }
   // This read is unmapped
@@ -211,16 +216,16 @@ uint16_t ComputeSamFlags(const size_t s, const core::record::Record& record) {
     flags |= 0x80;
   }
   // Secondary alignment
-  if (record.GetFlags() & core::gen_const::kFlagsNotPrimaryMask) {
+  if (record.GetFlagsOfSegment(s) & core::gen_const::kFlagsNotPrimaryMask) {
     flags |= 0x100;
   }
-  if (record.GetFlags() & core::gen_const::kFlagsSupplementaryMask) {
+  if (record.GetFlagsOfSegment(s) & core::gen_const::kFlagsSupplementaryMask) {
     flags |= 0x800;
   }
-  if (record.GetFlags() & core::gen_const::kFlagsQualityFailMask) {
+  if (record.GetFlagsOfSegment(s) & core::gen_const::kFlagsQualityFailMask) {
     flags |= 0x200;
   }
-  if (record.GetFlags() & core::gen_const::kFlagsPcrDuplicateMask) {
+  if (record.GetFlagsOfSegment(s) & core::gen_const::kFlagsPcrDuplicateMask) {
     flags |= 0x400;
   }
 

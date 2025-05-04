@@ -40,7 +40,8 @@ EncoderStub::EncodingState::EncodingState(const core::record::Chunk& data)
       max_pos(data.GetRef().GetGlobalEnd()),
       ref(data.GetData().front().GetAlignmentSharedData().GetSeqId()),
       read_num(0),
-      last_read_position(0) {}
+      last_read_position(0),
+      extended_alignment_(data.GetData().front().IsExtendedAlignment()) {}
 
 // -----------------------------------------------------------------------------
 
@@ -84,8 +85,8 @@ core::AccessUnit EncoderStub::Pack(const size_t id,
 
   core::parameter::ParameterSet ret(
       static_cast<uint8_t>(id), static_cast<uint8_t>(id), data_type,
-      core::AlphabetId::kAcgtn, read_length,
-      state.paired_end, false, qv_depth, 1, false, false);
+      core::AlphabetId::kAcgtn, read_length, state.paired_end, false, qv_depth,
+      1, false, false, state.extended_alignment_);
   ret.GetEncodingSet().AddClass(state.class_type, std::move(std::get<0>(qv)));
 
   raw_au.Get(core::GenDesc::kQv) = std::move(std::get<1>(qv));

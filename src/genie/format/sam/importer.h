@@ -143,6 +143,9 @@ class Importer final : public core::FormatImporter {
   /// Sorter for sam records
   SamSorter sorter_;
 
+  /// If the generated records are extended alignments
+  bool extended_alignment_;
+
   /**
    * Matches all possible sam records into pairs using the sam sorter
    * @param records Unmatched records
@@ -154,27 +157,12 @@ class Importer final : public core::FormatImporter {
   /**
    * @brief Build importer from file paths
    * @param block_size How many records to read in one pump() run
+   * @param extended_alignment
    * @param input Path to the input SAM file
    * @param ref Path to the reference FASTA file
    */
-  Importer(size_t block_size, std::string input, std::string ref);
-
-  /**
-   * @brief Execute phase 1 of the transcoding process which is the conversion
-   * to MGREC format. (phase 2 is sorting according to position)
-   * @param options Configuration parameters for the operation
-   * @param chunk_id Chunk counter
-   * @return List of reference names and their lengths
-   */
-  std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(
-      const Config& options, int& chunk_id);
-
-  /**
-   * @brief Load the chunk of records from the phase 1 transcoding and
-   prepare mergesort for phase 2
-   * @param num_chunks Number of chunks to load
-   */
-  void setup_merge(int num_chunks);
+  Importer(size_t block_size, bool extended_alignment, std::string input,
+           std::string ref);
 
   /**
    * @brief Load one chunk of records and pass to classifier

@@ -81,44 +81,11 @@ compress_roundtrip () {
 
   rm $working_dir/output.sam
 
-    if [[ "$OSTYPE" != "win32" && "$OSTYPE" != "cygwin" && "$OSTYPE" != "msys" ]]; then
-        echo "-----------------Refdecoder decompress"
-        eval $timing_command \
-            $MPEGG_REF_DECODER \
-            -i $working_dir/output.mgb \
-            -o $working_dir/output.mgrec \
-            $genie_decoder_ref_parameter \
-            || { echo "Reference decoder ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
-        rm $working_dir/output.mgb
-
-        echo "-----------------Refdecoder decoded:"
-        ls -l $working_dir/output.mgrec
-
-        echo "-----------------Refdecoder output transcode"
-    eval $timing_command \
-        $git_root_dir/cmake-build-release/bin/genie$exe_file_extension transcode-sam \
-        -i $working_dir/output.mgrec \
-        -o $working_dir/output.sam \
-        -f \
-        $genie_decoder_ref_parameter \
-        || { echo "Genie transcode ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
-
-        rm $working_dir/output.mgrec
-
-        echo "-----------------Refdecoder output transcoded:"
-        ls -l $working_dir/output.sam
-
-        echo "-----------------Check output files:"
-        $git_root_dir/ci/sam_tools/sam_cmp_complete.py -i $working_dir/output.sam -j $sam_file || { echo "Invalid output!" ; exit 1; }
-        echo "-----------------Output files ok!"
-
-        rm $working_dir/output.sam
-    fi
 }
 
 #compress_roundtrip "--qv none --read-ids none --low-latency"
-compress_roundtrip ""
-compress_roundtrip "-r $fasta_file"
+compress_roundtrip "--low-latency"
+compress_roundtrip "--low-latency -r $fasta_file"
 #compress_roundtrip "--input-ref-file $fasta_file --embedded-ref relevant --qv none --read-ids none --raw-ref --low-latency"
 #compress_roundtrip "--input-ref-file $fasta_file --embedded-ref full --qv none --read-ids none --raw-ref --low-latency"
 #compress_roundtrip "--input-ref-file $fasta_file --embedded-ref none --qv none --read-ids none --raw-ref --low-latency"

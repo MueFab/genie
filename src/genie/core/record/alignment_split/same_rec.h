@@ -45,9 +45,11 @@ class SameRec final : public AlignmentSplit {
   /**
    * @brief
    * @param as_depth
+   * @param extended_alignment
    * @param reader
    */
-  explicit SameRec(uint8_t as_depth, util::BitReader& reader);
+  explicit SameRec(uint8_t as_depth, bool extended_alignment,
+                   util::BitReader& reader);
 
   /**
    * @brief
@@ -72,6 +74,12 @@ class SameRec final : public AlignmentSplit {
    * @return
    */
   [[nodiscard]] std::unique_ptr<AlignmentSplit> clone() const override;
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::optional<bool> IsExtendedAlignment() const override;
 };
 
 // -----------------------------------------------------------------------------

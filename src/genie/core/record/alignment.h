@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -28,6 +29,7 @@ namespace genie::core::record {
 class Alignment final {
   std::string e_cigar_string_;          //!< @brief
   uint8_t reverse_comp_;                //!< @brief
+  std::optional<uint8_t> flags_;        //!< @brief
   std::vector<int32_t> mapping_score_;  //!< @brief
 
  public:
@@ -66,9 +68,10 @@ class Alignment final {
   /**
    * @brief
    * @param as_depth
+   * @param extended_alignment
    * @param reader
    */
-  Alignment(uint8_t as_depth, util::BitReader& reader);
+  Alignment(uint8_t as_depth, bool extended_alignment, util::BitReader& reader);
 
   /**
    * @brief
@@ -104,6 +107,18 @@ class Alignment final {
    * @param writer
    */
   void Write(util::BitWriter& writer) const;
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::optional<uint8_t> GetFlags() const;
+
+  /**
+   * @brief
+   * @param flags
+   */
+  void SetFlags(std::optional<uint8_t> flags);
 };
 
 // -----------------------------------------------------------------------------

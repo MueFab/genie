@@ -12,7 +12,9 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 
+#include "genie/core/record/alignment.h"
 #include "genie/core/record/alignment_split.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -27,14 +29,17 @@ namespace genie::core::record::alignment_split {
 class OtherRec final : public AlignmentSplit {
   uint64_t split_pos_;     //!< @brief
   uint16_t split_seq_id_;  //!< @brief
+  std::optional<Alignment> extended_alignment_;  //!< @brief
 
  public:
   /**
    * @brief
    * @param split_pos
    * @param split_seq_id
+   * @param extended_alignment
    */
-  OtherRec(uint64_t split_pos, uint16_t split_seq_id);
+  OtherRec(uint64_t split_pos, uint16_t split_seq_id,
+           const std::optional<Alignment>& extended_alignment);
 
   /**
    * @brief
@@ -50,9 +55,16 @@ class OtherRec final : public AlignmentSplit {
 
   /**
    * @brief
+   * @return
+   */
+  [[nodiscard]] std::optional<Alignment> GetExtendedAlignment() const;
+
+  /**
+   * @brief
+   * @param extended_alignment
    * @param reader
    */
-  explicit OtherRec(util::BitReader& reader);
+  explicit OtherRec(bool extended_alignment, util::BitReader& reader);
 
   /**
    * @brief
@@ -70,6 +82,12 @@ class OtherRec final : public AlignmentSplit {
    * @return
    */
   [[nodiscard]] std::unique_ptr<AlignmentSplit> clone() const override;
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::optional<bool> IsExtendedAlignment() const override;
 };
 
 // -----------------------------------------------------------------------------

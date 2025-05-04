@@ -213,6 +213,12 @@ class Encoder {
   [[nodiscard]] static const core::record::alignment_split::SameRec&
   ExtractPairedAlignment(const core::record::Record& rec);
 
+  /**
+   *
+   * @param flags
+   */
+  void EncodeFlags(uint8_t flags);
+
  public:
   /**
    * @brief Initializes the encoder with a starting mapping position.
@@ -232,7 +238,7 @@ class Encoder {
   /**
    * @brief Retrieves the read length.
    */
-  uint32_t GetReadLength() const;
+  [[nodiscard]] uint32_t GetReadLength() const;
 
   /**
    * @brief Moves the encoded access unit out of the encoder.

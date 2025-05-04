@@ -46,6 +46,7 @@ class ProgramOptions {
         help_(false),
         no_ref_(false),
         clean_(false),
+        no_extended_alignment_(false),
         num_threads_(std::thread::hardware_concurrency()) {}
 
   /**
@@ -62,6 +63,7 @@ class ProgramOptions {
   bool help_;                    //!< @brief
   bool no_ref_;                  //!< @brief
   bool clean_;                   //!< @brief
+  bool no_extended_alignment_;   //!< @brief
   uint32_t num_threads_;         //!< @brief
 
   [[nodiscard]] genie::format::sam::Config ToConfig() const;

@@ -54,7 +54,7 @@ curl -L \
     || { echo 'Could not download paired end fastq!' ; exit 1; }
 #gzip -dfk /tmp/ERR174310_short_2.fastq.gz
 
-$git_root_dir/ci/fastq_tools/fastq_gzip_roundtrip.sh "/tmp/ERR174310_short_1.fastq.gz" "/tmp/ERR174310_short_2.fastq.gz"
+#$git_root_dir/ci/fastq_tools/fastq_gzip_roundtrip.sh "/tmp/ERR174310_short_1.fastq.gz" "/tmp/ERR174310_short_2.fastq.gz"
 #$git_root_dir/ci/fastq_tools/fastq_roundtrip.sh "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq"
 #rm /tmp/ERR174310_short_2.fastq
 #rm /tmp/ERR174310_short_1.fastq

@@ -52,6 +52,17 @@ class EncodingSet {
     bool operator==(const SignatureCfg& cfg) const;
   };
 
+  /**
+ * @brief
+ */
+  [[nodiscard]] bool IsExtendedAlignment() const;
+
+  /**
+   * @brief
+   * @return
+   */
+  void SetExtendedAlignment(bool extended_alignment);
+
  private:
   DataUnit::DatasetType dataset_type_;                             //!< @brief
   AlphabetId alphabet_id_;                                         //!< @brief
@@ -66,6 +77,7 @@ class EncodingSet {
   std::vector<std::string> read_group_index_ds_;                   //!< @brief
   bool multiple_alignments_flag_;                                  //!< @brief
   bool spliced_reads_flag_;                                        //!< @brief
+  bool extended_alignment_flag_;                                   //!< @brief
   uint32_t reserved_{};                                            //!< @brief
   std::optional<SignatureCfg> signature_cfg_;                      //!< @brief
   std::vector<std::unique_ptr<QualityValues>> qv_coding_configs_;  //!< @brief
@@ -79,7 +91,12 @@ class EncodingSet {
   [[nodiscard]] bool QualityValueCmp(const EncodingSet& ps) const;
 
  public:
-  [[nodiscard]] AlphabetId GetAlphabetId() const { return alphabet_id_; }
+  /**
+   * @brief
+   * @param
+   * @return
+   */
+  [[nodiscard]] AlphabetId GetAlphabetId() const;
 
   /**
    * @brief
@@ -250,11 +267,12 @@ class EncodingSet {
    * @param as_depth
    * @param multiple_alignments_flag
    * @param spliced_reads_flag
+   * @param extended_alignment_flag
    */
   EncodingSet(DataUnit::DatasetType dataset_type, AlphabetId alphabet_id,
               uint32_t read_length, bool paired_end, bool pos_40_bits_flag,
               uint8_t qv_depth, uint8_t as_depth, bool multiple_alignments_flag,
-              bool spliced_reads_flag);
+              bool spliced_reads_flag, bool extended_alignment_flag);
 
   /**
    * @brief
@@ -293,12 +311,14 @@ class ParameterSet final : public DataUnit {
    * @param as_depth
    * @param multiple_alignments_flag
    * @param spliced_reads_flag
+   * @param extended_alignment_flag
    */
   ParameterSet(uint8_t parameter_set_id, uint8_t parent_parameter_set_id,
                DatasetType dataset_type, AlphabetId alphabet_id,
                uint32_t read_length, bool paired_end, bool pos_40_bits_flag,
                uint8_t qv_depth, uint8_t as_depth,
-               bool multiple_alignments_flag, bool spliced_reads_flag);
+               bool multiple_alignments_flag, bool spliced_reads_flag,
+               bool extended_alignment_flag);
 
   /**
    * @brief

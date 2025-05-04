@@ -73,6 +73,9 @@ class EncoderStub : public core::ReadEncoder {
     /// Last processed read position.
     uint64_t last_read_position;
 
+    /// If the extended alignment is used
+    bool extended_alignment_;
+
     /**
      * @brief Virtual destructor for the state structure.
      */

@@ -59,6 +59,28 @@ Encoder::Encoder(const uint64_t starting_mapping_pos)
 
 // -----------------------------------------------------------------------------
 
+void Encoder::EncodeFlags(const uint8_t flags) {
+  const auto flag_pcr = (flags & core::gen_const::kFlagsPcrDuplicateMask) >>
+                        core::gen_const::kFlagsPcrDuplicatePos;
+  container_.Push(core::gen_sub::kFlagsPcrDuplicate, flag_pcr);
+  const auto flag_quality = (flags & core::gen_const::kFlagsQualityFailMask) >>
+                            core::gen_const::kFlagsQualityFailPos;
+  container_.Push(core::gen_sub::kFlagsQualityFail, flag_quality);
+  const auto flag_pair = (flags & core::gen_const::kFlagsProperPairMask) >>
+                         core::gen_const::kFlagsProperPairPos;
+  container_.Push(core::gen_sub::kFlagsProperPair, flag_pair);
+  const auto flag_not_primary =
+      (flags & core::gen_const::kFlagsNotPrimaryMask) >>
+      core::gen_const::kFlagsNotPrimaryPos;
+  container_.Push(core::gen_sub::kFlagsNotPrimary, flag_not_primary);
+  const auto flag_supplementary =
+      (flags & core::gen_const::kFlagsSupplementaryMask) >>
+      core::gen_const::kFlagsSupplementaryPos;
+  container_.Push(core::gen_sub::kFlagsSupplementary, flag_supplementary);
+}
+
+// -----------------------------------------------------------------------------
+
 void Encoder::EncodeFirstSegment(const core::record::Record& rec) {
   // TODO(Fabian): Splices
   const auto& alignment =
@@ -81,26 +103,12 @@ void Encoder::EncodeFirstSegment(const core::record::Record& rec) {
   const auto reverse_comp = alignment.GetAlignment().GetRComp();
   container_.Push(core::gen_sub::kReverseComplement, reverse_comp);
 
-  const auto flag_pcr =
-      (rec.GetFlags() & core::gen_const::kFlagsPcrDuplicateMask) >>
-      core::gen_const::kFlagsPcrDuplicatePos;
-  container_.Push(core::gen_sub::kFlagsPcrDuplicate, flag_pcr);
-  const auto flag_quality =
-      (rec.GetFlags() & core::gen_const::kFlagsQualityFailMask) >>
-      core::gen_const::kFlagsQualityFailPos;
-  container_.Push(core::gen_sub::kFlagsQualityFail, flag_quality);
-  const auto flag_pair =
-      (rec.GetFlags() & core::gen_const::kFlagsProperPairMask) >>
-      core::gen_const::kFlagsProperPairPos;
-  container_.Push(core::gen_sub::kFlagsProperPair, flag_pair);
-  const auto flag_not_primary =
-      (rec.GetFlags() & core::gen_const::kFlagsNotPrimaryMask) >>
-      core::gen_const::kFlagsNotPrimaryPos;
-  container_.Push(core::gen_sub::kFlagsNotPrimary, flag_not_primary);
-  const auto flag_supplementary =
-      (rec.GetFlags() & core::gen_const::kFlagsSupplementaryMask) >>
-      core::gen_const::kFlagsSupplementaryPos;
-  container_.Push(core::gen_sub::kFlagsSupplementary, flag_supplementary);
+  if (!rec.IsExtendedAlignment() ||
+      rec.GetClassId() == core::record::ClassType::kClassU) {
+    EncodeFlags(rec.GetFlags().front());
+  } else if (rec.GetClassId() != core::record::ClassType::kClassU) {
+    EncodeFlags(rec.GetAlignments().front().GetAlignment().GetFlags().value());
+  }
 
   const auto mapping_score =
       alignment.GetAlignment().GetMappingScores().empty()
@@ -133,7 +141,6 @@ const core::record::alignment_split::SameRec& Encoder::ExtractPairedAlignment(
 void Encoder::EncodeAdditionalSegment(
     const core::record::alignment_split::SameRec& split_rec,
     const bool first1) {
-
   const auto reverse_comp = split_rec.GetAlignment().GetRComp();
   container_.Push(core::gen_sub::kReverseComplement, reverse_comp);
 
@@ -178,7 +185,7 @@ void Encoder::Add(const core::record::Record& rec, const std::string& ref1,
   if (rec.GetSegments().size() > 1) {
     if (rec.GetClassId() == core::record::ClassType::kClassHm) {
       container_.Push(core::gen_sub::kMismatchPosTerminator,
-                    core::gen_const::kMismatchPosTerminate);
+                      core::gen_const::kMismatchPosTerminate);
       const auto& sequence2 = rec.GetSegments()[1].GetSequence();
 
       const auto length_var_2 = rec.GetSegments()[1].GetSequence().length() - 1;
@@ -188,6 +195,9 @@ void Encoder::Add(const core::record::Record& rec, const std::string& ref1,
       container_.Push(core::gen_sub::kPairSameRec, !rec.IsRead1First());
       const std::string cigar2 = std::to_string(length_const_2) + "=";
       EncodeCigar(sequence2, cigar2, ref2, rec.GetClassId());
+      if (rec.IsExtendedAlignment()) {
+        EncodeFlags(rec.GetFlags().front());
+      }
     } else {
       // Same record
       const core::record::alignment_split::SameRec& split_rec =
@@ -208,6 +218,9 @@ void Encoder::Add(const core::record::Record& rec, const std::string& ref1,
       const auto length2 = sequence2.length() + clips.second.hard_clips[0] +
                            clips.second.hard_clips[1];
       container_.Push(core::gen_sub::kReadLength, length2);
+      if (rec.IsExtendedAlignment()) {
+        EncodeFlags(split_rec.GetAlignment().GetFlags().value());
+      }
     }
   } else if (rec.GetNumberOfTemplateSegments() > 1) {
     // Unpaired
@@ -249,6 +262,18 @@ void Encoder::Add(const core::record::Record& rec, const std::string& ref1,
                           core::gen_const::kPairR1Split);
           container_.Push(core::gen_sub::kPairR1Split, split.GetNextPos());
         }
+      }
+      if (rec.IsExtendedAlignment()) {
+        const auto other_alignment = *split.GetExtendedAlignment();
+        container_.Push(core::gen_sub::kReverseComplement,
+                        other_alignment.GetRComp());
+        for (const auto& score : other_alignment.GetMappingScores()) {
+          container_.Push(core::gen_sub::kMappingScore, score);
+        }
+        for (const auto& c : other_alignment.GetECigar()) {
+          container_.Push(core::gen_sub::kMultiSegmentAlignmentCabac0, c);
+        }
+        container_.Push(core::gen_sub::kMultiSegmentAlignmentCabac0, '\0');
       }
     }
   }
@@ -508,9 +533,7 @@ void Encoder::EncodeSplice(const CodingState& state) {
 
 // -----------------------------------------------------------------------------
 
-uint32_t Encoder::GetReadLength() const {
-  return length_.value_or(0);
-}
+uint32_t Encoder::GetReadLength() const { return length_.value_or(0); }
 
 // -----------------------------------------------------------------------------
 

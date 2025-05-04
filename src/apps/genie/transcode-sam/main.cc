@@ -126,7 +126,8 @@ void AttachImporter(T& flow, const ProgramOptions& p_opts,
                                                            // refactoring
                                                            // importer
     flow.AddImporter(std::make_unique<genie::format::sam::Importer>(
-        blocksize, p_opts.input_file_, p_opts.fasta_file_path_));
+        blocksize, !p_opts.no_extended_alignment_, p_opts.input_file_,
+        p_opts.fasta_file_path_));
   } else if (file_extension(p_opts.input_file_) == "mgrec") {
     auto tmp_file = p_opts.output_file_ + ".unsupported.mgrec";
     output_files.emplace_back(std::make_unique<std::ofstream>(tmp_file));

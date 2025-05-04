@@ -39,6 +39,12 @@ class Unpaired final : public AlignmentSplit {
    * @brief
    * @return
    */
+  [[nodiscard]] std::optional<bool> IsExtendedAlignment() const override;
+
+  /**
+   * @brief
+   * @return
+   */
   [[nodiscard]] std::unique_ptr<AlignmentSplit> clone() const override;
 };
 

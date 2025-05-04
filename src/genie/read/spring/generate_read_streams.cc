@@ -172,7 +172,7 @@ void process_block_task(size_t block_num,
                 std::to_string(num_reads_per_block.size()));
   params[block_num] = core::parameter::EncodingSet(
       core::parameter::ParameterSet::DatasetType::kNonAligned,
-      core::AlphabetId::kAcgtn, 0, false, false, 1, 0, false, false);
+      core::AlphabetId::kAcgtn, 0, false, false, 1, 0, false, false, false);
   params[block_num].SetComputedRef(core::parameter::ComputedRef(
       core::parameter::ComputedRef::Algorithm::kGlobalAssembly));
   core::AccessUnit au(std::move(params[block_num]), 0);
@@ -979,7 +979,7 @@ void process_block_task(size_t cur_block_num, const PeBlockData& block_data,
                 std::to_string(block_data.block_start.size()));
   params[cur_block_num] = core::parameter::EncodingSet(
       core::parameter::ParameterSet::DatasetType::kNonAligned,
-      core::AlphabetId::kAcgtn, 0, true, false, 1, 0, false, false);
+      core::AlphabetId::kAcgtn, 0, true, false, 1, 0, false, false, false);
   params[cur_block_num].SetComputedRef(core::parameter::ComputedRef(
       core::parameter::ComputedRef::Algorithm::kGlobalAssembly));
   core::AccessUnit au(std::move(params[cur_block_num]), 0);

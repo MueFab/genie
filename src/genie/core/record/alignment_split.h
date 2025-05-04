@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -50,10 +51,12 @@ class AlignmentSplit {
   /**
    * @brief
    * @param as_depth
+   * @param extended_alignment
    * @param reader
    * @return
    */
   static std::unique_ptr<AlignmentSplit> Factory(uint8_t as_depth,
+                                                 bool extended_alignment,
                                                  util::BitReader& reader);
 
   /**
@@ -67,6 +70,12 @@ class AlignmentSplit {
    * @return
    */
   [[nodiscard]] Type GetType() const;
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] virtual std::optional<bool> IsExtendedAlignment() const = 0;
 
  protected:
   Type split_alignment_;  //!< @brief
