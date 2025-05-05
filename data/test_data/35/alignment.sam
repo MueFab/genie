@@ -2,4 +2,4 @@
 @SQ	SN:ref1	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
 @SQ	SN:ref2	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
 mapped_mate_nearby	99	ref1	31	60	20M	=	71	60	GGGGGGGGGGGGGGGGGGGG	!!!!!!!!!!!!!!!!!!!!
-mapped_mate_nearby	147	ref1	71	60	20M	=	31	-60	TTTTTTTTTTTTTTTTTTTT	####################
+mapped_mate_nearby	1171	ref1	71	60	20M	=	31	-60	TTTTTTTTTTTTTTTTTTTT	####################

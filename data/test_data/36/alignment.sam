@@ -1,2 +1,5 @@
-@SQ	SN:large_ref	LN:2000000
-mapped_mate_far	97	large_ref	6	60	100M	=	1999896	1999990	NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+@HD	VN:1.6	SO:unsorted
+@SQ	SN:ref1	LN:7200000	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
+@SQ	SN:ref2	LN:7200000	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
+mapped_mate_nearby	99	ref1	31	60	20M	=	71	60	GGGGGGGGGGGGGGGGGGGG	!!!!!!!!!!!!!!!!!!!!
+mapped_mate_nearby	1171	ref1	7100000	60	20M	=	31	-60	TTTTTTTTTTTTTTTTTTTT	####################

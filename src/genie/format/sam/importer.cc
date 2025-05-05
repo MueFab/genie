@@ -386,13 +386,13 @@ core::record::Record ConvertPair(SamRecordPair&& pair,
                       extended_alignment);
   if (extended_alignment) {
     if (ret.GetClassId() == core::record::ClassType::kClassHm) {
-      ret.SetFlags(0, GetFlags(pair.second.value()).Get());
+      ret.SetFlags(0, GetFlags(corrected_pair.second.value()).Get());
     }
     if (ret.GetClassId() == core::record::ClassType::kClassU) {
       ret.SetExtendedAlignment(true);
-      ret.SetFlags(0, GetFlags(pair.first).Get());
-      if (pair.second.has_value()) {
-        ret.SetFlags(1, GetFlags(pair.second.value()).Get());
+      ret.SetFlags(0, GetFlags(corrected_pair.first).Get());
+      if (corrected_pair.second.has_value()) {
+        ret.SetFlags(1, GetFlags(corrected_pair.second.value()).Get());
       }
     }
   }

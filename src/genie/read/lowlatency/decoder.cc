@@ -27,6 +27,23 @@
 
 namespace genie::read::lowlatency {
 
+uint8_t DecodeFlags(core::AccessUnit& state) {
+  uint8_t flags = 0;
+
+  flags |= (state.Pull(core::gen_sub::kFlagsNotPrimary)
+            << core::gen_const::kFlagsNotPrimaryPos);
+  flags |= (state.Pull(core::gen_sub::kFlagsSupplementary)
+            << core::gen_const::kFlagsSupplementaryPos);
+  flags |= (state.Pull(core::gen_sub::kFlagsPcrDuplicate)
+            << core::gen_const::kFlagsPcrDuplicatePos);
+  flags |= (state.Pull(core::gen_sub::kFlagsProperPair)
+            << core::gen_const::kFlagsProperPairPos);
+  flags |= (state.Pull(core::gen_sub::kFlagsQualityFail)
+            << core::gen_const::kFlagsQualityFailPos);
+
+  return flags;
+}
+
 // -----------------------------------------------------------------------------
 
 core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) const {
@@ -41,8 +58,6 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) const {
   watch.Reset();
   std::vector<std::string> e_cigars;
   std::vector<uint64_t> positions;
-  // FIXME: loop condition is only correct if all records have the full number
-  // of reads
   size_t i = 0;
   size_t rec_i = 0;
   while (i < data.GetNumReads()) {
@@ -50,7 +65,7 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) const {
         static_cast<uint8_t>(data.GetParameters().GetNumberTemplateSegments()),
         core::record::ClassType::kClassU,
         std::get<0>(names).empty() ? "" : std::move(std::get<0>(names)[rec_i]),
-        "", 0);
+        "", DecodeFlags(data));
 
     size_t num_segments = 1;
     if (data.GetParameters().GetNumberTemplateSegments() > 1) {
@@ -79,6 +94,13 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) const {
 
       core::record::Segment seg(std::move(seq));
       rec.AddSegment(std::move(seg));
+    }
+
+    if (data.GetParameters().IsExtendedAlignment()) {
+      rec.SetExtendedAlignment(true);
+      if (num_segments == 2) {
+        rec.SetFlags(1, DecodeFlags(data));
+      }
     }
 
     ret.GetData().push_back(std::move(rec));

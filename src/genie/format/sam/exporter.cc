@@ -148,7 +148,7 @@ void ProcessSecondMappedSegment(const size_t s,
                 ? refinfo.GetMgr()->Id2Ref(
                       record.GetAlignmentSharedData().GetSeqId())
                 : std::to_string(record.GetAlignmentSharedData().GetSeqId());
-    if (record.GetAlignments()[0].GetAlignment().GetRComp()) {
+    if (s == 1 && record.GetAlignments()[0].GetAlignment().GetRComp()) {
       flags |= 0x20;
     }
   } else {
@@ -217,10 +217,12 @@ uint16_t ComputeSamFlags(const size_t s, const core::record::Record& record) {
   }
   // Secondary alignment
   if (record.GetFlagsOfSegment(s) & core::gen_const::kFlagsNotPrimaryMask) {
-    flags |= 0x100;
-  }
-  if (record.GetFlagsOfSegment(s) & core::gen_const::kFlagsSupplementaryMask) {
-    flags |= 0x800;
+    if (record.GetFlagsOfSegment(s) &
+        core::gen_const::kFlagsSupplementaryMask) {
+      flags |= 0x800;
+    } else {
+      flags |= 0x100;
+    }
   }
   if (record.GetFlagsOfSegment(s) & core::gen_const::kFlagsQualityFailMask) {
     flags |= 0x200;
@@ -304,9 +306,9 @@ void Exporter::SkipIn(const util::Section& id) {
 
 void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
   core::record::Chunk data = std::move(records);
-  GetStats().Add(data.GetStats());
   util::Watch watch;
   [[maybe_unused]] util::OrderedSection section(&lock_, id);
+  GetStats().Add(data.GetStats());
   size_t size_seq = 0;
   size_t size_qual = 0;
   size_t size_name = 0;
@@ -366,7 +368,8 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
           }
         }
 
-        if (other_mapped && record.GetNumberOfTemplateSegments() == 2) {
+        if ((other_mapped && record.GetNumberOfTemplateSegments() == 2) ||
+            record.GetClassId() == core::record::ClassType::kClassHm) {
           ProcessSecondMappedSegment(s, record, tlen, flags, pnext, rnext,
                                      refinf);
           // Use "=" shorthand

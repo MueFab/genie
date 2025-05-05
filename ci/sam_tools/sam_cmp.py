@@ -25,33 +25,7 @@ def sam_cmp(input_first, input_second):
                         # Flag comparison
                         f1 = int(split_1[index])
                         f2 = int(split_2[index])
-                        # Secondary / supplementary alignments encoded the same way
-                        sup_1 = ((f1 & 0x800) != 0) or ((f1 & 0x100) != 0)
-                        sup_2 = ((f2 & 0x800) != 0) or ((f2 & 0x100) != 0)
-                        f1 = f1 & ~0x800
-                        f1 = f1 & ~0x100
-                        f2 = f2 & ~0x800
-                        f2 = f2 & ~0x100
-
-                        # In rare cases, DUP flag can be set only in one segment in SAM, which is not encodable in MPEG-G
-                        f2 = f2 & ~0x400
-                        f1 = f1 & ~0x400
-
-                        # If split record, no information about reverse complement of pair available
-                        if (split_1[2] != split_1[6] and split_1[6] != "=") \
-                            or ((split_1[2] == split_1[6] or split_1[6] == "=") and abs(int(split_1[3]) - int(split_1[7])) > 32767):
-                            f1 = f1 & ~0x20
-                            f2 = f2 & ~0x20
-
-                        # If unpaired record, no information about reverse complement of pair available
-                        if ((split_1[7] == split_1[3] and (split_1[6] == "=" or split_1[2] == split_1[6])) or split_1[8] == "0" or split_2[8] == "0"):
-                            f1 = f1 & ~0x20
-                            f2 = f2 & ~0x20
-                        # If unmapped, no information about own reverse complement available
-                        if f1 & 0x4:
-                            f1 = f1 & ~0x10
-                            f2 = f2 & ~0x10
-                        if f1 != f2 or sup_1 != sup_2:
+                        if f1 != f2:
                             print("> " + line, end='')
                             print("< " + line2, end='')
                             raise RuntimeError("Cmp error " + str(index))

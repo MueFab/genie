@@ -333,8 +333,7 @@ void Decoder::DecodeAdditional(
   if (std::get<1>(state).GetClassId() == core::record::ClassType::kClassHm) {
     if (extended_alignment_) {
       const auto flags = DecodeFlags();
-      std::get<1>(state).SetFlags(std::get<1>(state).GetSegments().size() - 1,
-                                  flags);
+      std::get<1>(state).SetFlags(0, flags);
     }
   }
 }

@@ -1,4 +1,7 @@
 @HD	VN:1.6	SO:unsorted
 @SQ	SN:ref1	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
 @SQ	SN:ref2	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
-unmapped_with_mate_flags	13	*	0	0	*	*	1	0	AAAAAAAAAA	!!!!!!!!!!
+unmapped_pair_1	1101	*	0	0	*	*	0	0	AAAAAAAAAAAA	!!!!!!!!!!!!
+unmapped_pair_1	141	*	0	0	*	*	0	0	TTTTTTTTTTTT	############
+unmapped_pair_2	1165	*	0	0	*	*	0	0	GGGGGGGGGGGG	$$$$$$$$$$$$
+unmapped_pair_2	77	*	0	0	*	*	0	0	CCCCCCCCCCCC	%%%%%%%%%%%%

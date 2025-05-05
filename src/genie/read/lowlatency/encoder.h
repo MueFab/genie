@@ -35,6 +35,7 @@ namespace genie::read::lowlatency {
  * encoding operations in a low-latency environment.
  */
 class Encoder final : public core::ReadEncoder {
+ public:
   /**
    * @brief Internal state structure for managing the low-latency encoding
    * process.
@@ -56,7 +57,6 @@ class Encoder final : public core::ReadEncoder {
     bool extended_alignment{};
   };
 
- public:
   /**
    * @brief Processes an incoming chunk of records and encodes them into an
    * access unit.

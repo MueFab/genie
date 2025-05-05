@@ -1,7 +1,7 @@
 @HD	VN:1.6	SO:unsorted
 @SQ	SN:ref1	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
 @SQ	SN:ref2	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
-revcomp_half_1	105	ref1	21	60	15M	*	0	0	AAAAAAAAAAAAAAA	!!!!!!!!!!!!!!!
-revcomp_half_1	149	*	0	0	*	ref1	21	0	TTTTTTTTTTTTTTT	###############
-revcomp_half_2	89	ref1	61	60	15M	*	0	0	CCCCCCCCCCCCCCC	$$$$$$$$$$$$$$$
-revcomp_half_2	165	*	0	0	*	ref1	61	0	GGGGGGGGGGGGGGG	%%%%%%%%%%%%%%%
+revcomp_half_1	89	ref1	21	60	15M	=	21	0	AAAAAAAAAAAAAAA	!!!!!!!!!!!!!!!
+revcomp_half_1	165	ref1	21	0	*	=	21	0	TTTTTTTTTTTTTTT	###############
+revcomp_half_2	89	ref1	61	60	15M	=	61	0	CCCCCCCCCCCCCCC	$$$$$$$$$$$$$$$
+revcomp_half_2	165	ref1	61	0	*	=	61	0	GGGGGGGGGGGGGGG	%%%%%%%%%%%%%%%

@@ -28,6 +28,24 @@ namespace genie::read::lowlatency {
 
 // -----------------------------------------------------------------------------
 
+void EncodeFlags(const uint8_t flags, Encoder::LlState& state) {
+  state.streams.Push(core::gen_sub::kFlagsNotPrimary,
+                     (flags & core::gen_const::kFlagsNotPrimaryMask) >>
+                         core::gen_const::kFlagsNotPrimaryPos);
+  state.streams.Push(core::gen_sub::kFlagsSupplementary,
+                     (flags & core::gen_const::kFlagsSupplementaryMask) >>
+                         core::gen_const::kFlagsSupplementaryPos);
+  state.streams.Push(core::gen_sub::kFlagsPcrDuplicate,
+                     (flags & core::gen_const::kFlagsPcrDuplicateMask) >>
+                         core::gen_const::kFlagsPcrDuplicatePos);
+  state.streams.Push(core::gen_sub::kFlagsProperPair,
+                     (flags & core::gen_const::kFlagsProperPairMask) >>
+                         core::gen_const::kFlagsProperPairPos);
+  state.streams.Push(core::gen_sub::kFlagsQualityFail,
+                     (flags & core::gen_const::kFlagsQualityFailMask) >>
+                         core::gen_const::kFlagsQualityFailPos);
+}
+
 void Encoder::FlowIn(core::record::Chunk&& t, const util::Section& id) {
   util::Watch watch;
   core::record::Chunk data = std::move(t);
@@ -50,6 +68,13 @@ void Encoder::FlowIn(core::record::Chunk&& t, const util::Section& id) {
       data.IsReferenceOnly(), data.GetData().front().IsExtendedAlignment()};
   size_t num_reads = 0;
   for (auto& r : data.GetData()) {
+    if (!state.extended_alignment) {
+      EncodeFlags(r.GetFlags().front(), state);
+    } else {
+      for (size_t i = 0; i < r.GetSegments().size(); ++i) {
+        EncodeFlags(r.GetFlags()[i], state);
+      }
+    }
     for (auto& s : r.GetSegments()) {
       num_reads++;
       state.streams.Push(core::gen_sub::kReadLength,

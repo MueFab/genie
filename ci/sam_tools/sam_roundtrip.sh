@@ -52,7 +52,6 @@ compress_roundtrip () {
         -o $working_dir/output.mgb -f \
         -w $working_dir \
         $genie_encoder_parameters \
-        --entropy gabac \
         || { echo "Genie compress ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
     echo "-----------------Compressed:"
@@ -60,7 +59,7 @@ compress_roundtrip () {
     ls -l $fasta_file
     ls -l $working_dir/output.mgb
     
-    rm $working_dir/output.mgb.json
+   # rm $working_dir/output.mgb.json
     #rm $working_dir/output.mgb.unsupported.mgrec
 
     echo "-----------------Genie decompress"
@@ -79,7 +78,7 @@ compress_roundtrip () {
     $git_root_dir/ci/sam_tools/sam_cmp_complete.py -i $working_dir/output.sam -j $sam_file || { echo "Invalid output!" ; exit 1; }
     echo "-----------------Output files ok!"
 
-  rm $working_dir/output.sam
+#  rm $working_dir/output.sam
 
 }
 

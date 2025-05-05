@@ -2,8 +2,8 @@
 @SQ	SN:ref1	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
 @SQ	SN:ref2	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
 revcomp_pair_FR	99	ref1	11	60	20M	=	51	60	AAAAAAAAAAAAAAAAAAAA	!!!!!!!!!!!!!!!!!!!!
+revcomp_pair_FF	65	ref1	11	60	20M	=	51	0	NNNNNNNNNNNNNNNNNNNN	&&&&&&&&&&&&&&&&&&&&
 revcomp_pair_FR	147	ref1	51	60	20M	=	11	-60	TTTTTTTTTTTTTTTTTTTT	####################
+revcomp_pair_FF	129	ref1	51	60	20M	=	11	0	TTTTTTTTTTTTTTTTTTTT	''''''''''''''''''''
 revcomp_pair_RF	83	ref1	81	60	20M	=	121	60	CCCCCCCCCCCCCCCCCCCC	$$$$$$$$$$$$$$$$$$$$
 revcomp_pair_RF	163	ref1	121	60	20M	=	81	-60	GGGGGGGGGGGGGGGGGGGG	%%%%%%%%%%%%%%%%%%%%
-revcomp_pair_FF	65	ref1	11	60	20M	=	51	0	NNNNNNNNNNNNNNNNNNNN	&&&&&&&&&&&&&&&&&&&&
-revcomp_pair_FF	129	ref1	51	60	20M	=	11	0	YYYYYYYYYYYYYYYYYYYY	''''''''''''''''''''
