@@ -44,7 +44,9 @@ Decoder::Decoder(core::AccessUnit&& au, const size_t segments, const size_t pos)
       length_(container_.GetParameters().GetReadLength()),
       record_counter_(0),
       number_template_segments_(segments),
-      extended_alignment_(container_.GetParameters().IsExtendedAlignment()) {}
+      extended_alignment_(container_.GetParameters().IsExtendedAlignment()),
+      demultiplex_tag_decoder_(std::move(container_.Get(core::GenDesc::kTag))) {
+}
 
 // -----------------------------------------------------------------------------
 
@@ -69,12 +71,13 @@ core::record::Record Decoder::Pull(uint16_t ref, std::vector<std::string>&& vec,
     std::string e_cigar;
     auto c = container_.Pull(core::gen_sub::kMultiSegmentAlignmentCabac0);
     while (c != '\0') {
-      e_cigar += c;
+      e_cigar += static_cast<char>(c);
       c = container_.Pull(core::gen_sub::kMultiSegmentAlignmentCabac0);
     }
     bool is_reverse = container_.Pull(core::gen_sub::kReverseComplement);
     alg = core::record::Alignment(std::move(e_cigar), is_reverse);
-    alg->AddMappingScore(container_.Pull(core::gen_sub::kMappingScore));
+    alg->AddMappingScore(
+        static_cast<int32_t>(container_.Pull(core::gen_sub::kMappingScore)));
   }
   switch (meta.decoding_case) {
     case core::gen_const::kPairSameRecord:
@@ -130,6 +133,11 @@ core::record::Record Decoder::Pull(uint16_t ref, std::vector<std::string>&& vec,
   }
 
   std::get<1>(state).AddAlignment(ref, std::move(std::get<0>(state)));
+
+  for (size_t i = 0; i < meta.num_segments; ++i) {
+    std::get<1>(state).GetTags()[i] = demultiplex_tag_decoder_.DecodeTags();
+  }
+
   return std::get<1>(state);
 }
 
@@ -431,9 +439,8 @@ void Decoder::DecodeMismatches(const size_t clip_offset, std::string& sequence,
 
 Decoder::Clips Decoder::DecodeClips() {
   Clips ret;
-  const size_t num = record_counter_++;
-  std::tuple<size_t, size_t> softclip_offset{0, 0};
-  if (container_.IsEnd(core::gen_sub::kClipsRecordId) ||
+  if (const size_t num = record_counter_++;
+      container_.IsEnd(core::gen_sub::kClipsRecordId) ||
       num != container_.Peek(core::gen_sub::kClipsRecordId)) {
     return ret;
   }
@@ -497,8 +504,7 @@ std::tuple<size_t, size_t> Decoder::ApplyClips(
 
         if (seq_position == 0) {
           if (segment_no == 0) {
-            std::get<0>(softclip_offset) =
-                soft_clip.length();  // TODO(Fabian): not working for paired
+            std::get<0>(softclip_offset) = soft_clip.length();
           } else {
             std::get<1>(softclip_offset) = soft_clip.length();
           }

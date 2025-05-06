@@ -70,7 +70,12 @@ set(source_files
         meta/block_header/disabled.cc
         api.cc
         c_api.cc
-        payload.cc)
+        payload.cc
+        record/tag.h
+        record/tag.cc
+        record/tag_record.h
+        record/tag_record.cc
+        record/tag_value.h)
 
 add_library(genie-core ${source_files})
 

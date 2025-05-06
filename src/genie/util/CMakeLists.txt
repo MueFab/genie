@@ -17,6 +17,8 @@ set(source_files
         zlib/streambuffer.cc
         zlib/istream.cc
         zlib/ostream.cc
+        hex_string.h
+        hex_string.cc
 )
 
 add_library(genie-util ${source_files})

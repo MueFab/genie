@@ -77,7 +77,7 @@ std::string SamRecord::GetQualString(const bam1_t* sam_alignment) {
   const auto seq_len = sam_alignment->core.l_qseq;
   const auto qual_ptr = bam_get_qual(sam_alignment);
   if (*qual_ptr == 0xff) {
-    return std::string();
+    return {};
   }
   std::string tmp_qual(seq_len, ' ');
   for (auto i = 0; i < seq_len; i++) {
@@ -182,11 +182,17 @@ SamRecord::SamRecord(const bam1_t* sam_alignment)
       mate_rid_(sam_alignment->core.mtid),
       mate_pos_(static_cast<uint32_t>(sam_alignment->core.mpos)),
       //      tlen(sam_alignment->core.isize),
-      seq_(GetSeqString(sam_alignment)),   // Initialized with empty char due to
-                                           // conversion later
-      qual_(GetQualString(sam_alignment))  // Initialized with empty char due to
-                                           // conversion later
-{}
+      seq_(GetSeqString(sam_alignment)),
+      qual_(GetQualString(sam_alignment)) {
+  auto ptr = bam_aux_first(sam_alignment);
+  while (ptr != nullptr) {
+    kstring_t str = KS_INITIALIZE;
+    bam_aux_get_str(sam_alignment, bam_aux_tag(ptr), &str);
+    this->optional_fields_.emplace_back(ks_str(&str));
+    ks_free(&str);
+    ptr = bam_aux_next(sam_alignment, ptr);
+  }
+}
 
 // -----------------------------------------------------------------------------
 
@@ -367,8 +373,8 @@ void SamRecord::write(std::ostream& os) const {
      << static_cast<int>(mapq_) << '\t' << cigar_ << '\t' << mate_rid_ << '\t'
      << mate_pos_ << '\t' << seq_ << '\t' << qual_;
 
-  for (const auto& [tag, value] : optional_fields_) {
-    os << '\t' << tag << ':' << value;
+  for (const auto& tag : optional_fields_) {
+    os << '\t' << tag;
   }
 
   os << '\n';
@@ -378,13 +384,7 @@ void SamRecord::write(std::ostream& os) const {
 
 // Parse a single optional field and store it as a Tag
 void SamRecord::ParseOptionalField(const std::string& field) {
-  if (field.size() > 5 && field[2] == ':') {
-    const std::string key_with_type =
-        field.substr(0, 4);  // Extract the key with type (e.g., "NM:i")
-    const std::string value = field.substr(5);  // Extract the value
-
-    optional_fields_.emplace_back(Tag{key_with_type, value});
-  }
+  optional_fields_.emplace_back(field);
 }
 
 // -----------------------------------------------------------------------------

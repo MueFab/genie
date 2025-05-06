@@ -341,13 +341,12 @@ core::record::AlignmentBox AddSplitAlignment(
 
 core::record::AlignmentBox CreateFirstAlignment(
     const core::record::Record& rec, const SamRecordPair& corrected_pair,
-    const bool extended_alignment_) {
+    const bool extended_alignment) {
   auto alignment = CreateAlignment(corrected_pair.first,
                                    rec.GetSegments().front().GetSequence(),
-                                   extended_alignment_);
+                                   extended_alignment);
   alignment.AddMappingScore(corrected_pair.first.mapq_);
-  return core::record::AlignmentBox(corrected_pair.first.pos_,
-                                    std::move(alignment));
+  return {corrected_pair.first.pos_, std::move(alignment)};
 }
 
 // -----------------------------------------------------------------------------
@@ -369,6 +368,135 @@ core::record::Record AddAlignments(core::record::Record&& rec,
                         class_type, extended_alignment);
   rec.AddAlignment(corrected_pair.first.rid_, std::move(alignment_box));
   return std::move(rec);
+}
+
+core::record::Tag ParseSamAuxTag(const std::string& field) {
+  if (field.length() < 5 || field[2] != ':' || field[4] != ':') {
+    throw std::invalid_argument("Invalid SAM tag format: " + field);
+  }
+
+  const std::array<char, 2> key = {field[0], field[1]};
+  const char type = field[3];
+  const std::string_view value = std::string_view(field).substr(5);
+  core::record::TagData parsed_value;
+
+  switch (type) {
+    case 'A':
+      UTILS_DIE_IF(value.size() != 1,
+                   "Type A must be a single character: " + field);
+      UTILS_DIE_IF(!std::isprint(static_cast<unsigned char>(value[0])),
+                   "Type A must be a printable character: " + field);
+      parsed_value = std::string(1, value[0]);
+      break;
+    case 'c':
+      parsed_value = static_cast<char>(std::stoi(std::string(value)));
+      break;
+    case 'C':
+      parsed_value = static_cast<unsigned char>(std::stoi(std::string(value)));
+      break;
+    case 's':
+      parsed_value = static_cast<int16_t>(std::stoi(std::string(value)));
+      break;
+    case 'S':
+      parsed_value = static_cast<uint16_t>(std::stoi(std::string(value)));
+      break;
+    case 'i':
+      parsed_value = static_cast<int32_t>(std::stoi(std::string(value)));
+      break;
+    case 'I':
+      parsed_value = static_cast<uint32_t>(std::stoi(std::string(value)));
+      break;
+    case 'f':
+      parsed_value = std::stof(std::string(value));
+      break;
+    case 'Z':
+      parsed_value = std::string(value);
+      break;
+    case 'H':
+      parsed_value = util::HexString{std::string(value)};
+      break;
+    case 'B': {
+      UTILS_DIE_IF(value.size() < 3,
+                   "Type B must have at least 3 characters: " + field);
+      UTILS_DIE_IF(value[1] != ',',
+                   "Type B must have a comma after the type: " + field);
+      const char elem_type = value[0];
+      std::istringstream ss(std::string(value.substr(2)));
+      std::string tok;
+
+      switch (elem_type) {
+        case 'c': {
+          std::vector<int8_t> vec;
+          while (std::getline(ss, tok, ','))
+            vec.push_back(static_cast<int8_t>(std::stoi(tok)));
+          parsed_value = std::move(vec);
+          break;
+        }
+        case 'C': {
+          std::vector<uint8_t> vec;
+          while (std::getline(ss, tok, ','))
+            vec.push_back(static_cast<uint8_t>(std::stoul(tok)));
+          parsed_value = std::move(vec);
+          break;
+        }
+        case 's': {
+          std::vector<int16_t> vec;
+          while (std::getline(ss, tok, ','))
+            vec.push_back(static_cast<int16_t>(std::stoi(tok)));
+          parsed_value = std::move(vec);
+          break;
+        }
+        case 'S': {
+          std::vector<uint16_t> vec;
+          while (std::getline(ss, tok, ','))
+            vec.push_back(static_cast<uint16_t>(std::stoul(tok)));
+          parsed_value = std::move(vec);
+          break;
+        }
+        case 'i': {
+          std::vector<int32_t> vec;
+          while (std::getline(ss, tok, ',')) vec.push_back(std::stoi(tok));
+          parsed_value = std::move(vec);
+          break;
+        }
+        case 'I': {
+          std::vector<uint32_t> vec;
+          while (std::getline(ss, tok, ',')) vec.push_back(std::stoul(tok));
+          parsed_value = std::move(vec);
+          break;
+        }
+        case 'f': {
+          std::vector<float> vec;
+          while (std::getline(ss, tok, ',')) vec.push_back(std::stof(tok));
+          parsed_value = std::move(vec);
+          break;
+        }
+        default:
+          UTILS_DIE("Unsupported B array element type: " +
+                    std::string(1, elem_type));
+      }
+      break;
+    }
+    default:
+      UTILS_DIE("Unsupported SAM tag type: " + std::string(1, type));
+  }
+
+  return core::record::Tag{key, parsed_value};
+}
+
+// -----------------------------------------------------------------------------
+
+core::record::TagRecord ParseSamAuxFields(
+    const std::vector<std::string>& line) {
+  core::record::TagRecord record;
+  for (const auto& field : line) {
+    if (!field.empty()) {
+      core::record::Tag tag = ParseSamAuxTag(field);
+      record.Set(tag);
+    }
+  }
+
+  return record;
 }
 
 // -----------------------------------------------------------------------------
@@ -395,6 +523,11 @@ core::record::Record ConvertPair(SamRecordPair&& pair,
         ret.SetFlags(1, GetFlags(corrected_pair.second.value()).Get());
       }
     }
+  }
+  ret.GetTags()[0] = ParseSamAuxFields(corrected_pair.first.optional_fields_);
+  if (corrected_pair.second.has_value()) {
+    ret.GetTags()[1] =
+        ParseSamAuxFields(corrected_pair.second.value().optional_fields_);
   }
   return ret;
 }

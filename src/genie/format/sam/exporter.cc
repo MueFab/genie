@@ -16,6 +16,7 @@
 #include "genie/core/record/alignment_split/same_rec.h"
 #include "genie/core/record/record.h"
 #include "genie/format/sam/importer.h"
+#include "genie/format/sam/sam_tag.h"
 #include "genie/util/ordered_section.h"
 #include "genie/util/stop_watch.h"
 
@@ -304,6 +305,8 @@ void Exporter::SkipIn(const util::Section& id) {
   [[maybe_unused]] util::OrderedSection sec(&lock_, id);
 }
 
+// -----------------------------------------------------------------------------
+
 void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
   core::record::Chunk data = std::move(records);
   util::Watch watch;
@@ -396,10 +399,12 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
         sam_record += record.GetSegments()[s].GetSequence() + "\t";
         if (record.GetSegments()[s].GetQualities().empty() ||
             record.GetSegments()[s].GetQualities().front().empty()) {
-          sam_record += "*\n";
+          sam_record += "*";
         } else {
-          sam_record += record.GetSegments()[s].GetQualities()[0] + "\n";
+          sam_record += record.GetSegments()[s].GetQualities()[0];
         }
+
+        sam_record += "\t" + SerializeTagRecord(record.GetTags()[s]) + "\n";
 
         output_file_->write(sam_record.c_str(),
                             static_cast<std::streamsize>(sam_record.length()));

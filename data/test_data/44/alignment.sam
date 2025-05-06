@@ -1,4 +1,14 @@
-@HD	VN:1.6	SO:unsorted
-@SQ	SN:ref1	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
-@SQ	SN:ref2	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
-optional_tags_read	0	ref1	11	60	15M	*	0	0	GTACGNACGTACGTA	!!!!!!!!!!!!!!!	NM:i:1	MD:Z:5A9	AS:i:50	XS:i:40	RG:Z:readgroup1	BC:Z:ACGT	MI:Z:molecule1	ZZ:Z:custom_tag_value
+@HD	VN:1.6
+@SQ	SN:ref1	LN:200
+@SQ	SN:ref2	LN:200
+optional_tags_read	0	ref1	11	60	15M	*	0	0	GTACGNACGTACGTA	!!!!!!!!!!!!!!!	AS:i:50	BC:Z:ACGT	MD:Z:5A9	MI:Z:molecule1	NM:A:1	RG:Z:readgroup1	XS:i:40	ZZ:Z:custom_tag_value1	XY:B:f,1.1,2.2,3.3	XA:A:F	YY:B:C,10,20,30
+half_mapped_1	73	ref1	11	60	12M	=	11	0	AAAAAAAAAAAA	!!!!!!!!!!!!	AS:i:50	BC:Z:ACGT	MD:Z:5A9	MI:Z:molecule1	NM:A:1	RG:Z:readgroup1	XS:i:40	ZZ:Z:custom_tag_value2	XZ:B:s,1000,-2000	XA:i:-128
+half_mapped_1	133	ref1	11	0	*	=	11	0	TTTTTTTTTTTT	############	AS:i:50	BC:Z:ACGT	MD:Z:5A9	MI:Z:molecule1	NM:A:1	RG:Z:readgroup1	XS:i:40	ZZ:Z:custom_tag_value3	XX:B:i,1,-2,3	XC:f:-1.28352e-5	XL:B:I,1000,2000
+half_mapped_2	137	ref1	61	60	12M	=	61	0	GGGGGGGGGGGG	$$$$$$$$$$$$	AS:i:50	BC:Z:ACGT	MD:Z:5A9	MI:Z:molecule1	NM:A:1	RG:Z:readgroup1	XS:i:40	ZZ:Z:custom_tag value4	YY:B:c,-10,20,30	XH:H:DEADBEEF	XK:B:S,1000,2000
+half_mapped_2	69	ref1	61	0	*	=	61	0	CCCCCCCCCCCC	%%%%%%%%%%%%
+overlap_pair	99	ref1	62	60	40M	=	71	0	CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	AS:C:50	BC:Z:ACGT	MD:Z:5A9	MI:Z:molecule1	NM:C:1	RG:Z:readgroup1	XS:C:40	ZZ:Z:custom_tag_value6
+overlap_pair	147	ref1	71	60	40M	=	62	0	GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG	########################################	AS:C:50	BC:Z:ACGT	MD:Z:5A9	MI:Z:molecule1	NM:C:1	RG:Z:readgroup1	XS:C:40	ZZ:Z:custom_tag_value7
+unmapped_pair_1	77	*	0	0	*	*	0	0	AAAAAAAAAAAA	!!!!!!!!!!!!	AS:i:50	BC:Z:ACGT	MD:Z:5A9	MI:Z:molecule1	NM:A:1	RG:Z:readgroup1	XS:i:40	ZZ:Z:custom_tag value5	YY:B:c,-10,20,30	XH:H:DEADBEEF	XK:B:S,1000,2000
+unmapped_pair_1	141	*	0	0	*	*	0	0	TTTTTTTTTTTT	############	AS:i:50	BC:Z:ACGT	MD:Z:5A9	MI:Z:molecule1	NM:A:1	RG:Z:readgroup1	XS:i:40	ZZ:Z:custom_tag value6	YY:B:c,-10,20,30	XH:H:DEADBEEF	XK:B:S,1000,2000
+unmapped_pair_2	141	*	0	0	*	*	0	0	GGGGGGGGGGGG	$$$$$$$$$$$$	AS:i:50	BC:Z:ACGT	MD:Z:5A9	MI:Z:molecule1	NM:A:1	RG:Z:readgroup1	XS:i:40	ZZ:Z:custom_tag value7	YY:B:c,-10,20,30	XH:H:DEADBEEF	XK:B:S,1000,2000
+unmapped_pair_2	77	*	0	0	*	*	0	0	CCCCCCCCCCCC	%%%%%%%%%%%%	AS:i:50	BC:Z:ACGT	MD:Z:5A9	MI:Z:molecule1	NM:A:1	RG:Z:readgroup1	XS:i:40	ZZ:Z:custom_tag value8	YY:B:c,-10,20,30	XH:H:DEADBEEF	XK:B:S,1000,2000

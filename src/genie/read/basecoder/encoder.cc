@@ -117,6 +117,8 @@ void Encoder::EncodeFirstSegment(const core::record::Record& rec) {
                 .GetMappingScores()
                 .front();  // TODO(Fabian): Multiple mapping scores
   container_.Push(core::gen_sub::kMappingScore, mapping_score);
+
+  encoder_.EncodeTags(rec.GetTags().front());
 }
 
 // -----------------------------------------------------------------------------
@@ -199,6 +201,7 @@ void Encoder::Add(const core::record::Record& rec, const std::string& ref1,
         EncodeFlags(rec.GetFlags().front());
       }
     } else {
+      encoder_.EncodeTags(rec.GetTags()[1]);
       // Same record
       const core::record::alignment_split::SameRec& split_rec =
           ExtractPairedAlignment(rec);
@@ -471,7 +474,10 @@ Encoder::ClipInformation Encoder::EncodeCigar(
 
 // -----------------------------------------------------------------------------
 
-core::AccessUnit&& Encoder::MoveStreams() { return std::move(container_); }
+core::AccessUnit&& Encoder::MoveStreams() {
+  container_.Set(core::GenDesc::kTag, encoder_.MoveDescriptor());
+  return std::move(container_);
+}
 
 // -----------------------------------------------------------------------------
 

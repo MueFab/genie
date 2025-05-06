@@ -29,6 +29,8 @@
 #include "genie/core/access_unit.h"
 #include "genie/core/record/alignment_split/same_rec.h"
 #include "genie/core/record/record.h"
+#include "genie/read/demultiplextag/decoder.h"
+#include "genie/read/demultiplextag/encoder.h"
 
 // -----------------------------------------------------------------------------
 
@@ -54,6 +56,9 @@ class Encoder {
 
   /// Read length.
   std::optional<uint32_t> length_;
+
+  /// Encoder for tags.
+  demultiplex_tag::Encoder encoder_;
 
   void UpdateLength(uint32_t len) {
     if (length_ == std::nullopt) {

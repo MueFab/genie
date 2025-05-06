@@ -16,12 +16,12 @@
 #include <utility>
 #include <vector>
 
-#include "alignment_split/same_rec.h"
 #include "genie/core/record/alignment_box.h"
 #include "genie/core/record/alignment_external.h"
 #include "genie/core/record/alignment_shared_data.h"
 #include "genie/core/record/class_type.h"
 #include "genie/core/record/segment.h"
+#include "genie/core/record/tag_record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/runtime_exception.h"
@@ -83,6 +83,7 @@ class Record {
   std::vector<uint8_t> flags_{};               //!< @brief
 
   std::unique_ptr<AlignmentExternal> more_alignment_info_;  //!< @brief
+  std::vector<TagRecord> tags_;
 
   void ResizeFlags() {
     const size_t num_flags = !extended_alignment_              ? 1
@@ -338,6 +339,18 @@ class Record {
    */
   void SetMoreAlignmentInfo(
       std::unique_ptr<AlignmentExternal> more_alignment_info);
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::vector<TagRecord>& GetTags() { return tags_; }
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::vector<TagRecord>& GetTags() const { return tags_; }
 };
 
 // -----------------------------------------------------------------------------

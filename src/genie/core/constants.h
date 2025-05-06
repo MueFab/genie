@@ -74,7 +74,8 @@ enum class GenDesc : uint8_t {
   kReadName = 15,
   kRefTransPosition = 16,
   kRefTransTransform = 17,
-  kCount = 18
+  kTag = 18,
+  kCount = 19
 };
 
 /**
@@ -139,15 +140,29 @@ constexpr GenSubIndex kQvSteps7 = {GenDesc::kQv, 9_u16};
 constexpr GenSubIndex kReadNameCabac0 = {GenDesc::kReadName, 0_u16};
 constexpr GenSubIndex kReadNameCabac1 = {GenDesc::kReadName, 1_u16};
 constexpr GenSubIndex kRefTransPosition = {GenDesc::kRefTransPosition, 0_u16};
-constexpr GenSubIndex kRefTransTransform = {GenDesc::kRefTransTransform, 0_u16};
-};  // namespace gen_sub
+constexpr GenSubIndex kRefTransTransform = {GenDesc::kRefTransTransform, 1_u16};
+constexpr GenSubIndex kTagsNum = {GenDesc::kTag, 0_u16};
+constexpr GenSubIndex kTagsType = {GenDesc::kTag, 1_u16};
+constexpr GenSubIndex kTagsKey = {GenDesc::kTag, 2_u16};
+constexpr GenSubIndex kTagsLength = {GenDesc::kTag, 3_u16};
+constexpr GenSubIndex kTagsInt32 = {GenDesc::kTag, 4_u16};
+constexpr GenSubIndex kTagsChar = {GenDesc::kTag, 5_u16};
+constexpr GenSubIndex kTagsUInt8 = {GenDesc::kTag, 6_u16};
+constexpr GenSubIndex kTagsInt8 = {GenDesc::kTag, 7_u16};
+constexpr GenSubIndex kTagsUInt16 = {GenDesc::kTag, 8_u16};
+constexpr GenSubIndex kTagsInt16 = {GenDesc::kTag, 9_u16};
+constexpr GenSubIndex kTagsUInt32 = {GenDesc::kTag, 10_u16};
+constexpr GenSubIndex kTagsHex = {GenDesc::kTag, 11_u16};
+constexpr GenSubIndex kTagsFloat32 = {GenDesc::kTag, 12_u16};
+constexpr GenSubIndex kTagsFloat64 = {GenDesc::kTag, 13_u16};
+}  // namespace gen_sub
 
 /**
  * @brief
  */
 namespace gen_const {
 constexpr uint8_t kMismatchPositionPersist = 0;  // NOLINT
-constexpr uint8_t kMismatchPosTerminate = 1;    // NOLINT
+constexpr uint8_t kMismatchPosTerminate = 1;     // NOLINT
 constexpr uint8_t kFlagsPcrDuplicatePos = 0;
 constexpr uint8_t kFlagsPcrDuplicateMask = 1u << kFlagsPcrDuplicatePos;
 constexpr uint8_t kFlagsQualityFailPos = 1;
@@ -176,7 +191,7 @@ constexpr uint8_t kRtypeClassM = 3;
 constexpr uint8_t kRtypeClassI = 4;
 constexpr uint8_t kRtypeClassU = 5;
 constexpr uint8_t kRtypeClassHm = 6;
-};  // namespace gen_const
+}  // namespace gen_const
 
 /**
  * @brief

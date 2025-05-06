@@ -150,7 +150,7 @@ paramcabac::Subsequence GetEncoderConfigManual(const core::GenSubIndex& sub) {
 
           bin_id[0] = paramcabac::BinarizationParameters::BinarizationId::BI;
           break;
-      case 3:
+        case 3:
           trnsf_subseq_id = paramcabac::TransformedParameters::
               TransformIdSubseq::NO_TRANSFORM;
           output_symbol_size[0] = 1;
@@ -161,7 +161,7 @@ paramcabac::Subsequence GetEncoderConfigManual(const core::GenSubIndex& sub) {
 
           bin_id[0] = paramcabac::BinarizationParameters::BinarizationId::BI;
           break;
-      case 4:
+        case 4:
           trnsf_subseq_id = paramcabac::TransformedParameters::
               TransformIdSubseq::NO_TRANSFORM;
           output_symbol_size[0] = 1;
@@ -589,6 +589,40 @@ paramcabac::Subsequence GetEncoderConfigManual(const core::GenSubIndex& sub) {
       break;
     case core::GenDesc::kRefTransPosition:
     case core::GenDesc::kRefTransTransform:
+      break;
+    case core::GenDesc::kTag:
+      switch (subseq_id) {
+        case 0:
+          break;
+        case 1:
+          break;
+        case 2:
+          break;
+        case 3:
+          break;
+        case 4:
+          break;
+        case 5:
+          break;
+        case 6:
+          break;
+        case 7:
+          break;
+        case 8:
+          break;
+        case 9:
+          break;
+        case 10:
+          break;
+        case 11:
+          break;
+        case 12:
+          break;
+        case 13:
+          break;
+        default:
+          UTILS_DIE("Invalid genomic descriptor");
+      }
       break;
     default:
       UTILS_DIE("Invalid genomic descriptor");

@@ -360,6 +360,81 @@ const std::vector<GenomicDescriptorProperties>& GetDescriptors() {
          true,
          {std::numeric_limits<uint8_t>::min(),
           GetAlphabetProperties(AlphabetId::kAcgtn).lut.size() - 1}}}},
+      {
+          GenDesc::kTag,
+          "tags",  // NOLINT
+          false,
+          {{gen_sub::kTagsNum,
+            "num",  // NOLINT
+            false,
+            {std::numeric_limits<uint16_t>::min(),
+             std::numeric_limits<uint16_t>::max()}},
+           {gen_sub::kTagsType,
+            "type",  // NOLINT
+            false,
+            {std::numeric_limits<uint8_t>::min(),
+             std::numeric_limits<uint8_t>::max()}},
+           {gen_sub::kTagsKey,
+            "key",  // NOLINT
+            false,
+            {std::numeric_limits<uint16_t>::min(),
+             std::numeric_limits<uint16_t>::max()}},
+           {gen_sub::kTagsLength,
+            "length",  // NOLINT
+            false,
+            {std::numeric_limits<uint32_t>::min(),
+             std::numeric_limits<uint32_t>::max()}},
+           {gen_sub::kTagsInt32,
+            "int32",  // NOLINT
+            false,
+            {std::numeric_limits<uint32_t>::min(),
+             std::numeric_limits<uint32_t>::max()}},
+           {gen_sub::kTagsChar,
+            "char",  // NOLINT
+            false,
+            {std::numeric_limits<uint8_t>::min(),
+             std::numeric_limits<uint8_t>::max()}},
+           {gen_sub::kTagsUInt8,
+            "uint8",  // NOLINT
+            false,
+            {std::numeric_limits<uint8_t>::min(),
+             std::numeric_limits<uint8_t>::max()}},
+           {gen_sub::kTagsInt8,
+            "int8",  // NOLINT
+            false,
+            {std::numeric_limits<uint8_t>::min(),
+             std::numeric_limits<uint8_t>::max()}},
+           {gen_sub::kTagsUInt16,
+            "uint16",  // NOLINT
+            false,
+            {std::numeric_limits<uint16_t>::min(),
+             std::numeric_limits<uint16_t>::max()}},
+           {gen_sub::kTagsInt16,
+            "int16",  // NOLINT
+            false,
+            {std::numeric_limits<uint16_t>::min(),
+             std::numeric_limits<uint16_t>::max()}},
+           {gen_sub::kTagsUInt32,
+            "uint32",  // NOLINT
+            false,
+            {std::numeric_limits<uint32_t>::min(),
+             std::numeric_limits<uint32_t>::max()}},
+           {gen_sub::kTagsHex,
+            "hex",  // NOLINT
+            false,
+            {std::numeric_limits<uint8_t>::min(),
+             std::numeric_limits<uint8_t>::max()}},
+           {gen_sub::kTagsFloat32,
+            "f32",  // NOLINT
+            false,
+            {std::numeric_limits<uint32_t>::min(),
+             std::numeric_limits<uint32_t>::max()}},
+           {gen_sub::kTagsFloat64,
+            "f64",  // NOLINT
+            false,
+            {std::numeric_limits<uint64_t>::min(),
+             std::numeric_limits<uint64_t>::max()}}},
+      },
   };
 
   return prop;

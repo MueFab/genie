@@ -79,6 +79,7 @@ Record::Record(util::BitReader& reader)
   size_t index = 0;
   for (auto& r : reads_) {
     r = Segment(read_sizes[index], qv_depth_, reader);
+    tags_.emplace_back();
     ++index;
   }
   for (auto& a : alignment_info_) {
@@ -124,6 +125,7 @@ Record& Record::operator=(const Record& rec) {
   this->alignment_info_ = rec.alignment_info_;
   this->flags_ = rec.flags_;
   this->more_alignment_info_ = rec.more_alignment_info_->Clone();
+  this->tags_ = rec.tags_;
   return *this;
 }
 
@@ -143,6 +145,7 @@ Record& Record::operator=(Record&& rec) noexcept {
   this->alignment_info_ = std::move(rec.alignment_info_);
   this->flags_ = rec.flags_;
   this->more_alignment_info_ = std::move(rec.more_alignment_info_);
+  this->tags_ = std::move(rec.tags_);
   return *this;
 }
 
@@ -158,6 +161,7 @@ void Record::AddSegment(Segment&& rec) {
                "Incompatible qv depth");
   reads_.push_back(std::move(rec));
   ResizeFlags();
+  tags_.emplace_back();
 }
 
 // -----------------------------------------------------------------------------
@@ -203,6 +207,10 @@ void Record::SwapSegmentOrder() {
   auto s_tmp = std::move(reads_[0]);
   reads_[0] = std::move(reads_[1]);
   reads_[1] = std::move(s_tmp);
+
+  auto tag_tmp = std::move(tags_[0]);
+  tags_[0] = std::move(tags_[1]);
+  tags_[1] = std::move(tag_tmp);
 }
 
 // -----------------------------------------------------------------------------

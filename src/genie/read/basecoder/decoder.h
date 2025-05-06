@@ -31,6 +31,7 @@
 
 #include "genie/core/access_unit.h"
 #include "genie/core/record/record.h"
+#include "genie/read/demultiplextag/decoder.h"
 
 // -----------------------------------------------------------------------------
 
@@ -64,6 +65,9 @@ class Decoder {
 
   /// If the records are encoded in extended alignment format.
   bool extended_alignment_;
+
+  /// Decoder for auxiliary tags.
+  demultiplex_tag::Decoder demultiplex_tag_decoder_;
 
  public:
   /**

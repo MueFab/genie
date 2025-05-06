@@ -26,11 +26,6 @@ namespace genie::format::sam {
  */
 class SamRecord {
  public:
-  struct Tag {
-    std::string tag;    //!< @brief Tag name
-    std::string value;  //!< @brief Tag value
-  };
-
   std::string qname_;  //!< @brief Query template name
   uint16_t flag_;      //!< @brief Flag
   int32_t rid_;        //!< @brief Reference sequence ID
@@ -41,7 +36,7 @@ class SamRecord {
   uint32_t mate_pos_;  //!< @brief Mate position
   std::string seq_;    //!< @brief Read sequence
   std::string qual_;   //!< @brief
-  std::vector<Tag> optional_fields_;
+  std::vector<std::string> optional_fields_;
 
   /**
    * @brief
