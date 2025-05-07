@@ -48,6 +48,7 @@ def sam_cmp(input_first, input_second):
                         # If = or X was in the original cigar can't be encoded in MPEGG
                         c1 = split_1[index].replace("=", "M").replace("X", "M")
                         c1_splitted = ["".join(x) for _, x in itertools.groupby(c1, key=str.isdigit)]
+                        # check if any neighbouring occucerences of the same operation exist
                         if len(c1_splitted) > 2:
                             c1 = ""
                             ops = c1_splitted[1]
@@ -63,6 +64,7 @@ def sam_cmp(input_first, input_second):
 
                         c2 = split_2[index].replace("=", "M").replace("X", "M")
                         c2_splitted = ["".join(x) for _, x in itertools.groupby(c2, key=str.isdigit)]
+                        # check if any neighbouring occurences of the same operation exist
                         if len(c2_splitted) > 2:
                             c2 = ""
                             ops = c2_splitted[1]
@@ -75,9 +77,6 @@ def sam_cmp(input_first, input_second):
                                     ops = c2_splitted[i]
                                     count = int(c2_splitted[i-1])
                             c2 += str(count) + ops
-                        print(c1)
-                        print(c2)
-
                         if c1 != c2:
                             print("> " + line, end='')
                             print("< " + line2, end='')
