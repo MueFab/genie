@@ -16,8 +16,7 @@ function execute_fastq_roundtrip() {
 
 	echo "Executing test case ${1}:" >> "$result"
 
-	# get file names
-	
+	# get file names and set path for roundtrip
 	cd "${1}"
 	files=($(ls *.fastq 2>/dev/null))
 	path="ci/fastq_tools/fastq_roundtrip.sh"
@@ -37,12 +36,11 @@ function execute_fastq_roundtrip() {
 	# perform roundtrip
 	eval "$path" "$file_1" "$file_2" &>> "log.txt"
 		if [ $? -ne 0 ]; then
-    			echo "Roundtrip failed. Here are the last 20 lines of the output:" >> "$result"
-    			cat log.txt >> "$result"
+		  echo "Roundtrip failed. Here are the last 20 lines of the output:" >> "$result"
+		  cat log.txt >> "$result"
 			echo "$(basename ${1})	"
-
 		else
-    			echo "Roundtrip ended successfully." >> "$result"
+    	echo "Roundtrip ended successfully." >> "$result"
 			echo "$(basename ${1})    pass"
 		fi
 
@@ -57,7 +55,6 @@ function execute_fastq_roundtrip() {
 
 function execute_sam_roundtrip() {
 
-	cd ""
 	echo "Executing test case ${1}:" >> "$result"
 
 	# get file names
@@ -69,10 +66,10 @@ function execute_sam_roundtrip() {
 	  fasta_file="${1}/${files[1]}"
 	fi
 
+  path="ci/sam_tools/sam_roundtrip.sh"
+
 	cd "$git_root_dir"
 	touch "log.txt"
-
-	path="ci/sam_tools/sam_roundtrip.sh"
 
 	# perform roundtrip
 	eval "$path" "$file_1" "$fasta_file" &>> "log.txt"
@@ -86,7 +83,6 @@ function execute_sam_roundtrip() {
 		fi
 
 	rm "log.txt"
-	cd "${data_path}"
 
 	{
 	echo "___________________________________________________________________________________________"
@@ -94,14 +90,20 @@ function execute_sam_roundtrip() {
 	} >> "$result"
 }
 
-for i in $(seq -w 1 55); do
-  if [ ! -d "${data_path}/${i}" ]; then
-    continue
-  fi
-  if [ $i -le 12 ]; then
-    execute_fastq_roundtrip "${data_path}/${i}"
-  else
-    execute_sam_roundtrip "${data_path}/${i}"
-  fi
+echo "----- Fastq Tests Started -----" >> "$result"
+
+for file in "${data_path}/expected_to_pass/fastq"/*; do
+  execute_fastq_roundtrip $file
 done
+
+echo "----- Sam Tests Started -----" >> "$result"
+
+for file in "${data_path}/expected_to_pass/sam"/*; do
+  execute_sam_roundtrip $file
+  rm -f $file/*.sam_sorted 2>/dev/null
+done
+
+rm -rf ${git_root_dir}/tmp.* 2>/dev/null
+rm -f ${git_root_dir}/output* 2>/dev/null
+
 echo "----- All tests completed -----" >> "$result"
