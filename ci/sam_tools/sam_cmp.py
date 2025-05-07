@@ -3,6 +3,7 @@
 
 import subprocess
 import os
+import itertools
 
 def sam_cmp(input_first, input_second):
     """
@@ -46,7 +47,37 @@ def sam_cmp(input_first, input_second):
                             continue # Cigar does not matter with unmapped segments
                         # If = or X was in the original cigar can't be encoded in MPEGG
                         c1 = split_1[index].replace("=", "M").replace("X", "M")
+                        c1_splitted = ["".join(x) for _, x in itertools.groupby(c1, key=str.isdigit)]
+                        if len(c1_splitted) > 2:
+                            c1 = ""
+                            ops = c1_splitted[1]
+                            count = int(c1_splitted[0])
+                            for i in range(3, len(c1_splitted),2):
+                                if c1_splitted[i] == ops:
+                                    count += int(c1_splitted[i-1])
+                                else:
+                                    c1 += str(count) + ops
+                                    ops = c1_splitted[i]
+                                    count = int(c1_splitted[i-1])
+                            c1 += str(count) + ops
+
                         c2 = split_2[index].replace("=", "M").replace("X", "M")
+                        c2_splitted = ["".join(x) for _, x in itertools.groupby(c2, key=str.isdigit)]
+                        if len(c2_splitted) > 2:
+                            c2 = ""
+                            ops = c2_splitted[1]
+                            count = int(c2_splitted[0])
+                            for i in range(3, len(c2_splitted),2):
+                                if c2_splitted[i] == ops:
+                                    count += int(c2_splitted[i-1])
+                                else:
+                                    c2 += str(count) + ops
+                                    ops = c2_splitted[i]
+                                    count = int(c2_splitted[i-1])
+                            c2 += str(count) + ops
+                        print(c1)
+                        print(c2)
+
                         if c1 != c2:
                             print("> " + line, end='')
                             print("< " + line2, end='')
