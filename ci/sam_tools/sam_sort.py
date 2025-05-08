@@ -20,7 +20,7 @@ def _sam_unix_sort(input_path, output_path):
         if process.returncode:
             raise RuntimeError(bash_command + " failed")
 
-_permute_order = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+'''_permute_order = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 def _sam_permute(input_path, output_path):
     """
@@ -37,9 +37,8 @@ def _sam_permute(input_path, output_path):
                         file_out.write("\xff")
                     file_out.write(splitted[_permute_order[p]])
                 file_out.write("\n")
-                        
-
-def _sam_revert(input_path, output_path, _permute_order_reverse):
+'''
+'''def _sam_revert(input_path, output_path, _permute_order_reverse):
     """
     Sort a file using the unix sort command
     :param input_path: File to sort
@@ -54,9 +53,9 @@ def _sam_revert(input_path, output_path, _permute_order_reverse):
                         file_out.write("\t")
                     file_out.write(splitted[_permute_order_reverse[p]])
                 file_out.write("\n")
-
+'''
 def sam_sort(input_path, output_path):
-    _permute_order_reverse = []
+    '''_permute_order_reverse = []
     for i in range(len(_permute_order)):
        for j in range(len(_permute_order)):
            if _permute_order[j] == i:
@@ -67,8 +66,9 @@ def sam_sort(input_path, output_path):
     _sam_unix_sort(input_path + "_pos", input_path + "_inter_sorted")
     os.remove(input_path + "_pos")
     _sam_revert(input_path + "_inter_sorted", output_path, _permute_order_reverse)
-    os.remove(input_path + "_inter_sorted")
+    os.remove(input_path + "_inter_sorted")'''
 
+    _sam_unix_sort(input_path, output_path)
 
 if __name__ == "__main__":
     import argparse
