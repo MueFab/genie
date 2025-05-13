@@ -51,6 +51,8 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) const {
   core::record::Chunk ret;
   core::AccessUnit data = std::move(t);
   data = EntropyCodeAu(std::move(data), true);
+  demultiplex_tag::Decoder tag_decoder(
+      std::move(data.Get(core::GenDesc::kTag)));
   const auto& qv_param = data.GetParameters().GetQvConfig(data.GetClassType());
   auto qv_stream = std::move(data.Get(core::GenDesc::kQv));
   auto names = namecoder_->Process(data.Get(core::GenDesc::kReadName));
@@ -94,6 +96,7 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) const {
 
       core::record::Segment seg(std::move(seq));
       rec.AddSegment(std::move(seg));
+      rec.GetTags().back() = tag_decoder.DecodeTags();
     }
 
     if (data.GetParameters().IsExtendedAlignment()) {

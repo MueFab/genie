@@ -185,6 +185,7 @@ void Encoder::Add(const core::record::Record& rec, const std::string& ref1,
 
   // Check if record is paired
   if (rec.GetSegments().size() > 1) {
+    encoder_.EncodeTags(rec.GetTags()[1]);
     if (rec.GetClassId() == core::record::ClassType::kClassHm) {
       container_.Push(core::gen_sub::kMismatchPosTerminator,
                       core::gen_const::kMismatchPosTerminate);
@@ -201,7 +202,6 @@ void Encoder::Add(const core::record::Record& rec, const std::string& ref1,
         EncodeFlags(rec.GetFlags().front());
       }
     } else {
-      encoder_.EncodeTags(rec.GetTags()[1]);
       // Same record
       const core::record::alignment_split::SameRec& split_rec =
           ExtractPairedAlignment(rec);

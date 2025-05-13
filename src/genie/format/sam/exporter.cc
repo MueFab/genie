@@ -404,7 +404,10 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
           sam_record += record.GetSegments()[s].GetQualities()[0];
         }
 
-        sam_record += "\t" + SerializeTagRecord(record.GetTags()[s]) + "\n";
+        if (!record.GetTags()[s].All().empty()) {
+          sam_record += "\t" + SerializeTagRecord(record.GetTags()[s]);
+        }
+        sam_record += "\n";
 
         output_file_->write(sam_record.c_str(),
                             static_cast<std::streamsize>(sam_record.length()));

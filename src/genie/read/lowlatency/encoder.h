@@ -21,6 +21,8 @@
 #include <memory>
 
 #include "genie/core/read_encoder.h"
+#include "genie/read/demultiplextag/decoder.h"
+#include "genie/read/demultiplextag/encoder.h"
 
 // -----------------------------------------------------------------------------
 
@@ -55,6 +57,9 @@ class Encoder final : public core::ReadEncoder {
 
     /// If extended alignment is used.
     bool extended_alignment{};
+
+    /// Encoder for auxiliary tags.
+    demultiplex_tag::Encoder demultiplex_tag_encoder;
   };
 
   /**

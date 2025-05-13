@@ -54,17 +54,12 @@ core::record::TagRecord Decoder::DecodeTags() {
         break;
       }
       case core::record::TagDataType::kChar: {  // string or char
-        if (length == 1) {
-          value = static_cast<char>(
+        std::string str;
+        str.reserve(length);
+        for (size_t j = 0; j < length; ++j)
+          str += static_cast<char>(
               desc_.Get(core::gen_sub::kTagsChar.second).Pull());
-        } else {
-          std::string str;
-          str.reserve(length);
-          for (size_t j = 0; j < length; ++j)
-            str += static_cast<char>(
-                desc_.Get(core::gen_sub::kTagsChar.second).Pull());
-          value = std::move(str);
-        }
+        value = std::move(str);
         break;
       }
       case core::record::TagDataType::kUInt8: {
@@ -99,9 +94,10 @@ core::record::TagRecord Decoder::DecodeTags() {
               desc_.Get(core::gen_sub::kTagsUInt16.second).Pull());
         } else {
           std::vector<uint16_t> vec(length);
-          for (auto& x : vec)
+          for (auto& x : vec) {
             x = static_cast<uint16_t>(
                 desc_.Get(core::gen_sub::kTagsUInt16.second).Pull());
+          }
           value = std::move(vec);
         }
         break;
@@ -143,29 +139,40 @@ core::record::TagRecord Decoder::DecodeTags() {
       }
       case core::record::TagDataType::kFloat:
         if (length == 1) {
-          value = static_cast<float>(
+          auto tmp = static_cast<uint32_t>(
               desc_.Get(core::gen_sub::kTagsFloat32.second).Pull());
+          float tmp2 = 0;
+          std::memcpy(&tmp2, &tmp, sizeof(float));
+          value = tmp2;
         } else {
           std::vector<float> vec(length);
-          for (auto& x : vec)
-            x = static_cast<float>(
+          for (auto& x : vec) {
+            auto tmp = static_cast<uint32_t>(
                 desc_.Get(core::gen_sub::kTagsFloat32.second).Pull());
+            float tmp2 = 0;
+            std::memcpy(&tmp2, &tmp, sizeof(float));
+            x = tmp2;
+          }
           value = std::move(vec);
         }
         break;
-      case core::record::TagDataType::kDouble: {  // float or double
+      case core::record::TagDataType::kDouble:
         if (length == 1) {
-          value = static_cast<double>(
-              desc_.Get(core::gen_sub::kTagsFloat64.second).Pull());
+          auto tmp = desc_.Get(core::gen_sub::kTagsFloat64.second).Pull();
+          double tmp2 = 0;
+          std::memcpy(&tmp2, &tmp, sizeof(double));
+          value = tmp2;
         } else {
           std::vector<double> vec(length);
-          for (auto& x : vec)
-            x = static_cast<double>(
-                desc_.Get(core::gen_sub::kTagsFloat32.second).Pull());
+          for (auto& x : vec) {
+            auto tmp = desc_.Get(core::gen_sub::kTagsFloat64.second).Pull();
+            double tmp2 = 0;
+            std::memcpy(&tmp2, &tmp, sizeof(double));
+            x = tmp2;
+          }
           value = std::move(vec);
         }
         break;
-      }
       default:
         UTILS_DIE("Unsupported tag type index: " +
                   std::to_string(static_cast<uint8_t>(type)));

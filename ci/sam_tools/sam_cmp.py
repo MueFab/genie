@@ -100,8 +100,8 @@ def sam_cmp(input_first, input_second):
                     af1.sort()
                     af2.sort()
                     if af1 != af2:
-                        print("> " + line, end='')
-                        print("< " + line2, end='')
+                        print("> " + '\t'.join(af1))
+                        print("< " + '\t'.join(af2))
                         raise RuntimeError("Cmp error " + str(index))#
             if input_file_second.readline() != "":
                 raise RuntimeError("Number of records differ")

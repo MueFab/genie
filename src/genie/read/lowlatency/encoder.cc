@@ -65,7 +65,9 @@ void Encoder::FlowIn(core::record::Chunk&& t, const util::Section& id) {
       data.GetData().front().GetSegments().front().GetSequence().length(),
       data.GetData().front().GetNumberOfTemplateSegments() > 1,
       core::AccessUnit(std::move(set.GetEncodingSet()), data.GetData().size()),
-      data.IsReferenceOnly(), data.GetData().front().IsExtendedAlignment()};
+      data.IsReferenceOnly(),
+      data.GetData().front().IsExtendedAlignment(),
+      demultiplex_tag::Encoder()};
   size_t num_reads = 0;
   for (auto& r : data.GetData()) {
     if (!state.extended_alignment) {
@@ -89,9 +91,11 @@ void Encoder::FlowIn(core::record::Chunk&& t, const util::Section& id) {
             GetAlphabetProperties(core::AlphabetId::kAcgtn).inverse_lut[c]);
       }
     }
+    state.demultiplex_tag_encoder.EncodeTags(r.GetTags().front());
     if (r.GetSegments().size() > 1) {
       state.streams.Push(core::gen_sub::kPairDecodingCase,
                          core::gen_const::kPairSameRecord);
+      state.demultiplex_tag_encoder.EncodeTags(r.GetTags()[1]);
     } else if (r.GetNumberOfTemplateSegments() > 1) {
       if (r.GetRead1First()) {
         state.streams.Push(core::gen_sub::kPairDecodingCase,
@@ -118,6 +122,8 @@ void Encoder::FlowIn(core::record::Chunk&& t, const util::Section& id) {
     raw_au.Set(core::gen_sub::kReadLength,
                core::AccessUnit::Subsequence(core::gen_sub::kReadLength));
   }
+  raw_au.Set(core::GenDesc::kTag,
+    state.demultiplex_tag_encoder.MoveDescriptor());
 
   raw_au.SetStats(std::move(data.GetStats()));
   raw_au.GetStats().AddDouble("time-lowlatency", watch.Check());

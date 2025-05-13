@@ -51,9 +51,9 @@ void Encoder::EncodeTags(const core::record::TagRecord& tags) {
   desc_.Get(core::gen_sub::kTagsNum.second).Push(tags.All().size());
 
   for (const auto& tag : tags.All()) {
-    desc_.Get(core::gen_sub::kTagsType.second)
-        .Push(static_cast<uint8_t>(
-            std::visit(core::record::TagDataTypeVisitor{}, tag.value())));
+    const auto type = static_cast<uint8_t>(
+        std::visit(core::record::TagDataTypeVisitor{}, tag.value()));
+    desc_.Get(core::gen_sub::kTagsType.second).Push(type);
     desc_.Get(core::gen_sub::kTagsKey.second).Push(EncodeTagKey(tag.key()));
     desc_.Get(core::gen_sub::kTagsLength.second)
         .Push(std::visit(core::record::TagDataLengthVisitor{}, tag.value()));
@@ -88,48 +88,58 @@ void Encoder::EncodeTags(const core::record::TagRecord& tags) {
             for (const char c : val.str())
               desc_.Get(core::gen_sub::kTagsChar.second)
                   .Push(static_cast<uint64_t>(c));
-          else if constexpr (std::is_same_v<T, float>)
-            desc_.Get(core::gen_sub::kTagsFloat32.second)
-                .Push(static_cast<uint64_t>(val));
-          else if constexpr (std::is_same_v<T, double>)
-            desc_.Get(core::gen_sub::kTagsFloat64.second)
-                .Push(static_cast<uint64_t>(val));
-
-          // Vectors
-          else if constexpr (std::is_same_v<T, std::vector<int32_t>>)
+          else if constexpr (std::is_same_v<T, float>) {
+            const float tmp = val;
+            uint32_t tmp2 = 0;
+            std::memcpy(&tmp2, &tmp, sizeof(float));
+            desc_.Get(core::gen_sub::kTagsFloat32.second).Push(tmp2);
+          } else if constexpr (std::is_same_v<T, double>) {
+            const double tmp = val;
+            uint64_t tmp2 = 0;
+            std::memcpy(&tmp2, &tmp, sizeof(double));
+            desc_.Get(core::gen_sub::kTagsFloat64.second).Push(tmp2);
+          } else if constexpr (std::is_same_v<T, std::vector<int32_t>>) {
             for (auto x : val)
               desc_.Get(core::gen_sub::kTagsInt32.second)
                   .Push(static_cast<uint64_t>(x));
-          else if constexpr (std::is_same_v<T, std::vector<uint8_t>>)
+          } else if constexpr (std::is_same_v<T, std::vector<uint8_t>>) {
             for (auto x : val)
               desc_.Get(core::gen_sub::kTagsUInt8.second)
                   .Push(static_cast<uint64_t>(x));
-          else if constexpr (std::is_same_v<T, std::vector<int8_t>>)
+          } else if constexpr (std::is_same_v<T, std::vector<int8_t>>) {
             for (auto x : val)
               desc_.Get(core::gen_sub::kTagsInt8.second)
                   .Push(static_cast<uint64_t>(x));
-          else if constexpr (std::is_same_v<T, std::vector<uint16_t>>)
+          } else if constexpr (std::is_same_v<T, std::vector<uint16_t>>) {
             for (auto x : val)
               desc_.Get(core::gen_sub::kTagsUInt16.second)
                   .Push(static_cast<uint64_t>(x));
-          else if constexpr (std::is_same_v<T, std::vector<int16_t>>)
+          } else if constexpr (std::is_same_v<T, std::vector<int16_t>>) {
             for (auto x : val)
               desc_.Get(core::gen_sub::kTagsInt16.second)
                   .Push(static_cast<uint64_t>(x));
-          else if constexpr (std::is_same_v<T, std::vector<uint32_t>>)
-            for (auto x : val)
+          } else if constexpr (std::is_same_v<T, std::vector<uint32_t>>) {
+            for (auto x : val) {
               desc_.Get(core::gen_sub::kTagsUInt32.second)
                   .Push(static_cast<uint64_t>(x));
-          else if constexpr (std::is_same_v<T, std::vector<float>>)
-            for (auto x : val)
-              desc_.Get(core::gen_sub::kTagsFloat32.second)
-                  .Push(static_cast<uint64_t>(x));
-          else if constexpr (std::is_same_v<T, std::vector<double>>)
-            for (auto x : val)
-              desc_.Get(core::gen_sub::kTagsFloat64.second)
-                  .Push(static_cast<uint64_t>(x));
-          else
+            }
+          } else if constexpr (std::is_same_v<T, std::vector<float>>) {
+            for (auto x : val) {
+              const float tmp = x;
+              uint32_t tmp2 = 0;
+              std::memcpy(&tmp2, &tmp, sizeof(float));
+              desc_.Get(core::gen_sub::kTagsFloat32.second).Push(tmp2);
+            }
+          } else if constexpr (std::is_same_v<T, std::vector<double>>) {
+            for (auto x : val) {
+              const double tmp = x;
+              uint64_t tmp2 = 0;
+              std::memcpy(&tmp2, &tmp, sizeof(double));
+              desc_.Get(core::gen_sub::kTagsFloat64.second).Push(tmp2);
+            }
+          } else {
             static_assert(!sizeof(T), "Unsupported TagType in serialization");
+          }
         },
         tag.value());
   }
