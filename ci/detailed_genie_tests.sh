@@ -34,7 +34,7 @@ function execute_fastq_roundtrip() {
 	touch "log.txt"
 
 	# perform roundtrip
-	eval "$path" "$file_1" "$file_2" &>> "log.txt"
+	"$path" "$file_1" "$file_2" &>> "log.txt"
 		if [ $? -ne 0 ]; then
 		  echo "Roundtrip failed. Here are the last 20 lines of the output:" >> "$result"
 		  cat log.txt >> "$result"
@@ -61,6 +61,13 @@ function execute_sam_roundtrip() {
 	cd "${1}"
 	files=($(ls *.sam *.bam *.cram *.fa 2>/dev/null))
 	file_1="${1}/${files[0]}"
+	if [[ ${file_1##*.} == "bam" ]]; then
+	  flag="b"
+	elif [[ ${file_1##*.} == "cram" ]]; then
+	  flag="c"
+	else
+	  flag=""
+	fi
 	fasta_file=""
 	if [[ ${files[1]} != "" ]]; then
 	  fasta_file="${1}/${files[1]}"
@@ -72,7 +79,7 @@ function execute_sam_roundtrip() {
 	touch "log.txt"
 
 	# perform roundtrip
-	eval "$path" "$file_1" "$fasta_file" &>> "log.txt"
+	"$path" "$file_1" "$fasta_file" "" "$flag" &>> "log.txt"
 		if [ $? -ne 0 ]; then
     			echo "Roundtrip failed. Here are the last 20 lines of the output:" >> "$result"
     			cat log.txt >> "$result"

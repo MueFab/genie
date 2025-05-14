@@ -5,6 +5,7 @@ set -e
 sam_file="$1"
 fasta_file="$2"
 working_dir="${3:-"./"}"
+flag="$4"
 
 ############ Check prerequisites ###############
 
@@ -36,6 +37,11 @@ else
     fi
 fi
 
+if [[ ${flag} == "b" ]]; then
+  ext="bam"
+else
+  ext="sam"
+fi
 
 git_root_dir="$(git rev-parse --show-toplevel)"
 
@@ -65,20 +71,29 @@ compress_roundtrip () {
     echo "-----------------Genie decompress"
     eval $timing_command \
         $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
-        -o $working_dir/output.sam \
+        -o $working_dir/output.${ext} \
         -w $working_dir \
         $genie_decoder_ref_parameter \
         -i $working_dir/output.mgb -f \
         || { echo "Genie decompress ($sam_file; $genie_decoder_ref_parameter) failed!" ; exit 1; }
 
     echo "-----------------Decompressed:"
-    ls -l $working_dir/output.sam
+    ls -l $working_dir/output.${ext}
+
+    if [[ ${flag} != "" ]]; then
+      eval samtools view -h -T $fasta_file -o output.sam output.${ext}
+      eval samtools view -h -T $fasta_file -o ${sam_file%.*}.sam ${sam_file}
+    fi
 
     echo "-----------------Check output files:"
-    $git_root_dir/ci/sam_tools/sam_cmp_complete.py -i $working_dir/output.sam -j $sam_file || { echo "Invalid output!" ; exit 1; }
+    $git_root_dir/ci/sam_tools/sam_cmp_complete.py -i $working_dir/output.sam -j "${sam_file%.*}.sam" || { echo "Invalid output!" ; exit 1; }
     echo "-----------------Output files ok!"
 
-#  rm $working_dir/output.sam
+    if [[ ${flag} != "" ]]; then
+      rm "${sam_file%.*}.sam"
+    fi
+
+    rm $working_dir/output.sam
 
 }
 

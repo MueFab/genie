@@ -83,7 +83,7 @@ enum class FileType { UNKNOWN = 0, MPEG = 1, THIRD_PARTY = 2 };
 // -----------------------------------------------------------------------------
 
 FileType GetType(const std::string& ext) {
-  if (ext == "mgrec" || ext == "fasta" || ext == "fastq" || ext == "sam") {
+  if (ext == "mgrec" || ext == "fasta" || ext == "fastq" || ext == "sam" || ext == "bam") {
     return FileType::THIRD_PARTY;
   }
   if (ext == "mgb") {
@@ -153,7 +153,7 @@ void AttachExporter(T& flow, const ProgramOptions& p_opts,
     }
   } else if (file_extension(p_opts.output_file_) == "mgrec") {
     flow.AddExporter(std::make_unique<genie::format::mgrec::Exporter>(*file1));
-  } else if (file_extension(p_opts.output_file_) == "sam") {
+  } else if (file_extension(p_opts.output_file_) == "sam" || file_extension(p_opts.output_file_) == "bam") {
     flow.AddExporter(std::make_unique<genie::format::sam::Exporter>(
         p_opts.input_ref_file_, p_opts.output_file_));
   } else if (file_extension(p_opts.output_file_) == "fasta") {
@@ -331,7 +331,7 @@ std::unique_ptr<genie::core::FlowGraph> BuildEncoder(
   if (file_extension(p_opts.input_file_) == "fastq") {
     AttachImporterFastq(*flow, p_opts, input_files,
                         is_compressed(p_opts.input_file_));
-  } else if (file_extension(p_opts.input_file_) == "sam") {
+  } else if (file_extension(p_opts.input_file_) == "sam" || file_extension(p_opts.input_file_) == "bam") {
     AttachImporterSam(*flow, p_opts, input_files);
   } else {
     AttachImporterMgrec(*flow, p_opts, input_files, output_files);
