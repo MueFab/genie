@@ -64,17 +64,19 @@ void Encoder::EncodeFirstSegment(const core::record::Record& rec) {
   const auto& alignment =
       rec.GetAlignments().front();  // TODO(Fabian): Multiple alignments.
                                     // Currently only 1 supported
-  const auto& record = rec.GetSegments()[0];  // First segment
 
-  container_.Push(core::gen_sub::kRtype,
-                  static_cast<uint8_t>(rec.GetClassId()));
+  if (rec.GetClassId() == core::record::ClassType::kClassHm) {
+    container_.Push(core::gen_sub::kRtype, 6);
+  } else if (rec.GetClassId() == core::record::ClassType::kClassU) {
+    container_.Push(core::gen_sub::kRtype, 5);
+  } else {
+    container_.Push(core::gen_sub::kRtype,
+                    static_cast<uint8_t>(rec.GetClassId()));
+  }
 
   const auto position = alignment.GetPosition() - pos_;
   pos_ = alignment.GetPosition();
   container_.Push(core::gen_sub::kPositionFirst, position);
-
-  const auto length = record.GetSequence().length() - 1;
-  container_.Push(core::gen_sub::kReadLength, length);
 
   const auto reverse_comp = alignment.GetAlignment().GetRComp();
   container_.Push(core::gen_sub::kReverseComplement, reverse_comp);
@@ -91,6 +93,14 @@ void Encoder::EncodeFirstSegment(const core::record::Record& rec) {
       (rec.GetFlags() & core::gen_const::kFlagsProperPairMask) >>
       core::gen_const::kFlagsProperPairPos;
   container_.Push(core::gen_sub::kFlagsProperPair, flag_pair);
+  const auto flag_not_primary =
+      (rec.GetFlags() & core::gen_const::kFlagsNotPrimaryMask) >>
+      core::gen_const::kFlagsNotPrimaryPos;
+  container_.Push(core::gen_sub::kFlagsNotPrimary, flag_not_primary);
+  const auto flag_supplementary =
+      (rec.GetFlags() & core::gen_const::kFlagsSupplementaryMask) >>
+      core::gen_const::kFlagsNotPrimaryPos;
+  container_.Push(core::gen_sub::kFlagsSupplementary, flag_supplementary);
 
   const auto mapping_score =
       alignment.GetAlignment().GetMappingScores().empty()
@@ -121,11 +131,8 @@ const core::record::alignment_split::SameRec& Encoder::ExtractPairedAlignment(
 // -----------------------------------------------------------------------------
 
 void Encoder::EncodeAdditionalSegment(
-    const size_t length,
     const core::record::alignment_split::SameRec& split_rec,
     const bool first1) {
-  const auto local_length = length - 1;
-  container_.Push(core::gen_sub::kReadLength, local_length);
 
   const auto reverse_comp = split_rec.GetAlignment().GetRComp();
   container_.Push(core::gen_sub::kReverseComplement, reverse_comp);
@@ -161,26 +168,46 @@ void Encoder::Add(const core::record::Record& rec, const std::string& ref1,
                           .GetECigar();  // TODO(Fabian): Multi-alignments
   clips.first = EncodeCigar(sequence, cigar, ref1, rec.GetClassId());
 
+  const auto length_var_1 = rec.GetSegments()[0].GetSequence().length() - 1;
+  const auto length_const_1 =
+      length_var_1 + 1 + clips.first.hard_clips[0] + clips.first.hard_clips[1];
+  UpdateLength(length_const_1);
+  container_.Push(core::gen_sub::kReadLength, length_var_1);
+
   // Check if record is paired
   if (rec.GetSegments().size() > 1) {
     if (rec.GetClassId() == core::record::ClassType::kClassHm) {
+      container_.Push(core::gen_sub::kMismatchPosTerminator,
+                    core::gen_const::kMismatchPosTerminate);
       const auto& sequence2 = rec.GetSegments()[1].GetSequence();
-      const auto length2 = sequence2.length();
-      container_.Push(core::gen_sub::kReadLength,
-                      length2 - 1);
+
+      const auto length_var_2 = rec.GetSegments()[1].GetSequence().length() - 1;
+      const auto length_const_2 = length_var_2 + 1;
+      UpdateLength(length_const_2);
+      container_.Push(core::gen_sub::kReadLength, length_var_2);
       container_.Push(core::gen_sub::kPairSameRec, !rec.IsRead1First());
-      const std::string cigar2 = std::to_string(length2) + "=";
+      const std::string cigar2 = std::to_string(length_const_2) + "=";
       EncodeCigar(sequence2, cigar2, ref2, rec.GetClassId());
     } else {
       // Same record
       const core::record::alignment_split::SameRec& split_rec =
           ExtractPairedAlignment(rec);
       const auto& sequence2 = rec.GetSegments()[1].GetSequence();
-      const auto length2 = sequence2.length();
-      EncodeAdditionalSegment(length2, split_rec, rec.IsRead1First());
+      EncodeAdditionalSegment(split_rec, rec.IsRead1First());
 
       const auto& cigar2 = split_rec.GetAlignment().GetECigar();
       clips.second = EncodeCigar(sequence2, cigar2, ref2, rec.GetClassId());
+
+      const auto length_var_2 = rec.GetSegments()[1].GetSequence().length() - 1;
+      const auto length_const_2 = length_var_2 + 1 +
+                                  clips.second.hard_clips[0] +
+                                  clips.second.hard_clips[1];
+      UpdateLength(length_const_2);
+      container_.Push(core::gen_sub::kReadLength, length_var_2);
+
+      const auto length2 = sequence2.length() + clips.second.hard_clips[0] +
+                           clips.second.hard_clips[1];
+      container_.Push(core::gen_sub::kReadLength, length2);
     }
   } else if (rec.GetNumberOfTemplateSegments() > 1) {
     // Unpaired
@@ -409,7 +436,8 @@ Encoder::ClipInformation Encoder::EncodeCigar(
     UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
   }
 
-  if (type > core::record::ClassType::kClassP) {
+  if (type > core::record::ClassType::kClassP &&
+      type != core::record::ClassType::kClassHm) {
     container_.Push(core::gen_sub::kMismatchPosTerminator,
                     core::gen_const::kMismatchPosTerminate);
   }
@@ -476,6 +504,12 @@ void Encoder::EncodeClips(
 void Encoder::EncodeSplice(const CodingState& state) {
   (void)state;
   UTILS_DIE("Splicing is currently not supported");
+}
+
+// -----------------------------------------------------------------------------
+
+uint32_t Encoder::GetReadLength() const {
+  return length_.value_or(0);
 }
 
 // -----------------------------------------------------------------------------

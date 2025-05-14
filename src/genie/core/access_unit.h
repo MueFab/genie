@@ -44,6 +44,8 @@ class AccessUnit {
     std::unique_ptr<MismatchDecoder> mm_decoder_;  //!< @brief
 
    public:
+    bool tmp_rtype_issue_flag_ = false;  //!< @brief
+
     /**
      * @brief
      * @param sub

@@ -150,6 +150,28 @@ paramcabac::Subsequence GetEncoderConfigManual(const core::GenSubIndex& sub) {
 
           bin_id[0] = paramcabac::BinarizationParameters::BinarizationId::BI;
           break;
+      case 3:
+          trnsf_subseq_id = paramcabac::TransformedParameters::
+              TransformIdSubseq::NO_TRANSFORM;
+          output_symbol_size[0] = 1;
+          coding_sub_sym_size[0] = 1;
+          coding_order[0] = 0;
+          trnsf_subsym_id[0] =
+              paramcabac::SupportValues::TransformIdSubsym::NO_TRANSFORM;
+
+          bin_id[0] = paramcabac::BinarizationParameters::BinarizationId::BI;
+          break;
+      case 4:
+          trnsf_subseq_id = paramcabac::TransformedParameters::
+              TransformIdSubseq::NO_TRANSFORM;
+          output_symbol_size[0] = 1;
+          coding_sub_sym_size[0] = 1;
+          coding_order[0] = 0;
+          trnsf_subsym_id[0] =
+              paramcabac::SupportValues::TransformIdSubsym::NO_TRANSFORM;
+
+          bin_id[0] = paramcabac::BinarizationParameters::BinarizationId::BI;
+          break;
         default:
           found = false;
       }

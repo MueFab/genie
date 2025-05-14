@@ -90,6 +90,18 @@ class Encoder final : public basecoder::EncoderStub {
   [[nodiscard]] std::unique_ptr<EncodingState> CreateState(
       const core::record::Chunk& data) const override;
 
+  /**
+   *
+   * @param id
+   * @param qv
+   * @param read_name
+   * @param state
+   * @return
+   */
+  core::AccessUnit Pack(size_t id, core::QvEncoder::qv_coded qv,
+                               core::AccessUnit::Descriptor read_name,
+                               EncodingState& state) override;
+
  public:
   /**
    * @brief Constructs the `Encoder` object with the specified configuration.

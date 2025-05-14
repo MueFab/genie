@@ -108,6 +108,20 @@ core::AccessUnit::Subsequence Encoder::Compress(
 
 core::EntropyEncoder::entropy_coded Encoder::Process(
     core::AccessUnit::Descriptor& desc) {
+
+  // ----------------- Broken Standard Workaround ----------------------
+
+  if (desc.GetId() == core::GenDesc::kRtype && !desc.IsEmpty() &&
+      !desc.Get(0).IsEmpty() && desc.Get(0).tmp_rtype_issue_flag_) {
+    for (size_t i = 0; i < desc.Get(0).GetNumSymbols(); ++i) {
+      UTILS_DIE_IF(desc.Get(0).GetData().Get(i) == 6,
+                   "Local Assembly + class HM reads + gabac is broken in the "
+                   "ISO standard.");
+    }
+  }
+
+  // -------------------------------------------------------------------
+
   entropy_coded ret;
   const util::Watch watch;
   std::get<1>(ret) = std::move(desc);

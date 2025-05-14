@@ -35,8 +35,6 @@ namespace genie::read::basecoder {
 EncoderStub::EncodingState::EncodingState(const core::record::Chunk& data)
     : read_coder(data.GetData().front().GetAlignments().front().GetPosition()),
       paired_end(data.GetData().front().GetNumberOfTemplateSegments() > 1),
-      read_length(
-          data.GetData().front().GetSegments().front().GetSequence().length()),
       class_type(data.GetData().front().GetClassId()),
       min_pos(data.GetRef().GetGlobalStart()),
       max_pos(data.GetRef().GetGlobalEnd()),
@@ -57,13 +55,6 @@ void EncoderStub::EncodeSeq(core::record::Chunk& data, EncodingState& state) {
 
     state.last_read_position = cur_pos;
 
-    // Check if length constant
-    for (const auto& s : r.GetSegments()) {
-      if (s.GetSequence().length() != state.read_length) {
-        state.read_length = 0;
-      }
-    }
-
     UTILS_DIE_IF(r.GetAlignmentSharedData().GetSeqId() != state.ref,
                  "Records belonging to different reference sequences in "
                  "one access unit");
@@ -82,13 +73,20 @@ core::AccessUnit EncoderStub::Pack(const size_t id,
                                    EncodingState& state) {
   constexpr auto data_type = core::parameter::DataUnit::DatasetType::kAligned;
   const auto qv_depth = static_cast<uint8_t>(std::get<1>(qv).IsEmpty() ? 0 : 1);
-  core::parameter::ParameterSet ret(
-      static_cast<uint8_t>(id), static_cast<uint8_t>(id), data_type,
-      core::AlphabetId::kAcgtn, static_cast<uint32_t>(state.read_length),
-      state.paired_end, false, qv_depth, 1, false, false);
-  ret.GetEncodingSet().AddClass(state.class_type, std::move(std::get<0>(qv)));
 
   auto raw_au = state.read_coder.MoveStreams();
+  const auto read_length = state.read_coder.GetReadLength();
+
+  // Constant read length means we don't have to store it
+  if (read_length != 0) {
+    raw_au.Get(core::GenDesc::kReadLength).Get(0).GetData().Clear();
+  }
+
+  core::parameter::ParameterSet ret(
+      static_cast<uint8_t>(id), static_cast<uint8_t>(id), data_type,
+      core::AlphabetId::kAcgtn, read_length,
+      state.paired_end, false, qv_depth, 1, false, false);
+  ret.GetEncodingSet().AddClass(state.class_type, std::move(std::get<0>(qv)));
 
   raw_au.Get(core::GenDesc::kQv) = std::move(std::get<1>(qv));
   raw_au.Get(core::GenDesc::kReadName) = std::move(read_name);
