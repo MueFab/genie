@@ -124,7 +124,9 @@ Decoder::SegmentMeta Decoder::ReadSegmentMeta() {
   meta.num_segments = 1;
   if (number_template_segments_ == 2) {
     meta.decoding_case =
-        static_cast<uint8_t>(container_.Pull(core::gen_sub::kPairDecodingCase));
+        container_.GetClassType() == core::record::ClassType::kClassHm
+            ? core::gen_const::kPairSameRecord
+            : container_.Pull(core::gen_sub::kPairDecodingCase);
     if (meta.decoding_case == core::gen_const::kPairSameRecord) {
       meta.num_segments = 2;
       const auto same_rec_data =
@@ -248,20 +250,21 @@ void Decoder::DecodeAdditional(
     std::tuple<core::record::AlignmentBox, core::record::Record>& state) {
   auto sequence = std::move(seq);
 
-  const auto reverse_comp =
-      static_cast<uint8_t>(container_.Pull(core::gen_sub::kReverseComplement));
-  const auto mapping_score =
-      static_cast<int32_t>(container_.Pull(core::gen_sub::kMappingScore));
-
   std::string e_cigar = std::move(cigar);
   DecodeMismatches(softclip_offset, sequence, e_cigar);
 
-  core::record::Alignment alignment(ContractECigar(e_cigar), reverse_comp);
-  alignment.AddMappingScore(mapping_score);
-  std::get<0>(state).AddAlignmentSplit(
-      std::make_unique<core::record::alignment_split::SameRec>(delta_pos,
-                                                               alignment));
+  if (std::get<1>(state).GetClassId() != core::record::ClassType::kClassHm) {
+    const auto reverse_comp = static_cast<uint8_t>(
+        container_.Pull(core::gen_sub::kReverseComplement));
+    const auto mapping_score =
+        static_cast<int32_t>(container_.Pull(core::gen_sub::kMappingScore));
 
+    core::record::Alignment alignment(ContractECigar(e_cigar), reverse_comp);
+    alignment.AddMappingScore(mapping_score);
+    std::get<0>(state).AddAlignmentSplit(
+        std::make_unique<core::record::alignment_split::SameRec>(delta_pos,
+                                                                 alignment));
+  }
   core::record::Segment segment(std::move(sequence));
   std::get<1>(state).AddSegment(std::move(segment));
 }

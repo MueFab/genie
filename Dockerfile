@@ -38,6 +38,7 @@ RUN git clone https://github.com/samtools/htslib.git \
 # Install and build libbsc
 RUN git clone https://github.com/IlyaGrebnov/libbsc.git \
     && cd libbsc \
+    && git checkout tags/v3.3.4 \
     && sed -i 's/clang++/g++/g' makefile \
     && if [ "$(uname -m)" != "x86_64" ]; then sed -i '/CFLAGS += -mavx2/s/^/#/' makefile; fi \
     && make -j \

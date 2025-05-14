@@ -73,6 +73,9 @@ class Decoder final : public basecoder::DecoderStub {
     /// Reference excerpt for managing sequence reconstruction.
     core::ReferenceManager::ReferenceExcerpt ref_excerpt;
 
+    /// Type of records
+    core::record::ClassType class_type;
+
     /**
      * @brief Constructs the state from the provided access unit.
      *
