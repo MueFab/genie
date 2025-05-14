@@ -142,7 +142,7 @@ std::string SamRecord::ConvertCigar2ECigar(const std::string& cigar,
     }
     if (a == 'X') {
       const size_t end = std::stoi(digits) + seq_pos;
-      UTILS_DIE_IF(end >= seq.length(), "CIGAR not valid for seq");
+      UTILS_DIE_IF(end > seq.length(), "CIGAR not valid for seq");
       for (; seq_pos < end; ++seq_pos) {
         ecigar += static_cast<char>(std::toupper(seq[seq_pos]));
       }

@@ -1,0 +1,9 @@
+@HD	VN:1.6	SO:unsorted
+@SQ	SN:ref1	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
+@SQ	SN:ref2	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
+unmapped_pair_1	77	*	0	0	*	*	0	0	AAAAAAAAAAAA	!!!!!!!!!!!!
+unmapped_pair_1	141	*	0	0	*	*	0	0	TTTTTTTTTTTT	############
+unmapped_pair_2	141	*	0	0	*	*	0	0	GGGGGGGGGGGG	$$$$$$$$$$$$
+unmapped_pair_2	77	*	0	0	*	*	0	0	CCCCCCCCCCCC	%%%%%%%%%%%%
+unmapped_pair_3	77	*	0	0	*	*	0	0	ACGTACGTACGT	&&&&&&&&&&&&
+unmapped_pair_3	141	*	0	0	*	*	0	0	TGCATGCATGCA	************

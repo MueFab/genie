@@ -1,0 +1,7 @@
+@HD	VN:1.6	SO:unsorted
+@SQ	SN:ref1	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
+@SQ	SN:ref2	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
+pcr_dup_1_not_dup	0	ref1	11	60	10M	*	0	0	AAAAAAAAAA	!!!!!!!!!!
+pcr_dup_2_is_dup	1024	ref1	31	60	10M	*	0	0	CCCCCCCCCC	##########
+pcr_dup_3_mixed_pair	1123	ref1	51	60	10M	=	81	40	GGGGGGGGGG	$$$$$$$$$$
+pcr_dup_3_mixed_pair	147	ref1	81	60	10M	=	51	-40	TTTTTTTTTT	%%%%%%%%%%

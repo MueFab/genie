@@ -41,7 +41,7 @@ namespace genie::read::basecoder {
 Decoder::Decoder(core::AccessUnit&& au, const size_t segments, const size_t pos)
     : container_(std::move(au)),
       position_(pos),
-      length_(0),
+      length_(container_.GetParameters().GetReadLength()),
       record_counter_(0),
       number_template_segments_(segments) {}
 
@@ -55,7 +55,7 @@ core::record::Record Decoder::Pull(uint16_t ref, std::vector<std::string>&& vec,
   for (auto& sequence : sequences) {
     cigars.emplace_back(sequence.size(), '=');
   }
-  const auto clip_offset = DecodeClips(sequences, cigars);
+  const auto clip_offset = ApplyClips(meta.clips, sequences, cigars);
 
   auto state = Decode(std::get<0>(clip_offset), std::move(sequences.front()),
                       std::move(cigars.front()));
@@ -138,11 +138,17 @@ Decoder::SegmentMeta Decoder::ReadSegmentMeta() {
     }
   }
 
+  meta.clips = DecodeClips();
+
   const auto deletions = NumberDeletions(meta.num_segments);
   for (size_t i = 0; i < meta.num_segments; ++i) {
-    meta.length[i] =
-        (length_ ? length_ : container_.Pull(core::gen_sub::kReadLength) + 1) +
-        deletions[i];
+    if (length_ > 0) {
+      meta.length[i] = length_ - meta.clips.hard_clips[i][0] -
+                       meta.clips.hard_clips[i][1] + deletions[i];
+    } else {
+      meta.length[i] =
+          container_.Pull(core::gen_sub::kReadLength) + 1 + deletions[i];
+    }
   }
   return meta;
 }
@@ -153,7 +159,17 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::Decode(
     size_t clip_offset, std::string&& seq, std::string&& cigar) {
   auto sequence = std::move(seq);
 
-  const auto rtype = container_.Pull(core::gen_sub::kRtype);
+  uint8_t rtype = 0;
+  if (container_.IsEnd(core::gen_sub::kRtype)) {
+    rtype = static_cast<uint8_t> (this->container_.GetClassType());
+  } else {
+    rtype = container_.Pull(core::gen_sub::kRtype);
+    if (rtype == 5) {
+      rtype = 6;
+    } else if (rtype == 6) {
+      rtype = 5;
+    }
+  }
 
   const auto reverse_comp =
       static_cast<uint8_t>(container_.Pull(core::gen_sub::kReverseComplement));
@@ -171,7 +187,19 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::Decode(
                              ? 0
                              : container_.Pull(core::gen_sub::kFlagsProperPair)
                                    << core::gen_const::kFlagsProperPairPos;
-  const auto flags = static_cast<uint8_t>(flag_pcr | flag_quality | flag_pair);
+  const auto flag_not_primary =
+      container_.IsEnd(core::gen_sub::kFlagsNotPrimary)
+          ? 0
+          : container_.Pull(core::gen_sub::kFlagsNotPrimary)
+                << core::gen_const::kFlagsNotPrimaryPos;
+  const auto flag_supplementary =
+      container_.IsEnd(core::gen_sub::kFlagsSupplementary)
+          ? 0
+          : container_.Pull(core::gen_sub::kFlagsSupplementary)
+                << core::gen_const::kFlagsSupplementaryPos;
+  const auto flags =
+      static_cast<uint8_t>(flag_pcr | flag_quality | flag_pair |
+                           flag_not_primary | flag_supplementary);
 
   const auto mapping_score =
       static_cast<uint32_t>(container_.Pull(core::gen_sub::kMappingScore));
@@ -250,10 +278,9 @@ void Decoder::DecodeAdditional(
     std::tuple<core::record::AlignmentBox, core::record::Record>& state) {
   auto sequence = std::move(seq);
 
-  std::string e_cigar = std::move(cigar);
-  DecodeMismatches(softclip_offset, sequence, e_cigar);
-
   if (std::get<1>(state).GetClassId() != core::record::ClassType::kClassHm) {
+    std::string e_cigar = std::move(cigar);
+    DecodeMismatches(softclip_offset, sequence, e_cigar);
     const auto reverse_comp = static_cast<uint8_t>(
         container_.Pull(core::gen_sub::kReverseComplement));
     const auto mapping_score =
@@ -264,6 +291,13 @@ void Decoder::DecodeAdditional(
     std::get<0>(state).AddAlignmentSplit(
         std::make_unique<core::record::alignment_split::SameRec>(delta_pos,
                                                                  alignment));
+  } else {
+    for (auto& c : sequence) {
+      if (c == 0) {
+        c = GetAlphabetProperties(core::AlphabetId::kAcgtn)
+                .lut[container_.Pull(core::gen_sub::kUnalignedReads)];
+      }
+    }
   }
   core::record::Segment segment(std::move(sequence));
   std::get<1>(state).AddSegment(std::move(segment));
@@ -360,26 +394,24 @@ void Decoder::DecodeMismatches(const size_t clip_offset, std::string& sequence,
 
 // -----------------------------------------------------------------------------
 
-std::tuple<size_t, size_t> Decoder::DecodeClips(
-    std::vector<std::string>& sequences,
-    std::vector<std::string>& cigar_extended) {
+Decoder::Clips Decoder::DecodeClips() {
+  Clips ret;
   const size_t num = record_counter_++;
   std::tuple<size_t, size_t> softclip_offset{0, 0};
   if (container_.IsEnd(core::gen_sub::kClipsRecordId) ||
       num != container_.Peek(core::gen_sub::kClipsRecordId)) {
-    return softclip_offset;
+    return ret;
   }
   container_.Pull(core::gen_sub::kClipsRecordId);
   auto clip_type = container_.Pull(core::gen_sub::kClipsType);
   while (clip_type != core::gen_const::kClipsRecordEnd) {
     const bool hardclip = clip_type & 4u;
-    const size_t record_no = clip_type & 2u ? sequences.size() - 1 : 0;
+    const size_t record_no = clip_type & 2u ? 1 : 0;
     const bool end = clip_type & 1u;
 
     if (hardclip) {
       const auto hardclip_size = container_.Pull(core::gen_sub::kClipsHardClip);
-      const size_t cigar_position = end ? cigar_extended[record_no].size() : 0;
-      cigar_extended[record_no].insert(cigar_position, hardclip_size, ']');
+      ret.hard_clips[record_no][end] = hardclip_size;
     } else {
       std::string soft_clip;
       auto symbol = container_.Pull(core::gen_sub::kClipsSoftClip);
@@ -390,28 +422,54 @@ std::tuple<size_t, size_t> Decoder::DecodeClips(
         symbol = container_.Pull(core::gen_sub::kClipsSoftClip);
       }
 
-      sequences[record_no].erase(sequences[record_no].length() -
-                                 soft_clip.length());
-      size_t cigar_position =
-          end ? cigar_extended[record_no].find_last_not_of(']') + 1 -
-                    soft_clip.size()
-              : cigar_extended[record_no].find_first_not_of(']');
-      const size_t seq_position = end ? sequences[record_no].length() : 0;
-      sequences[record_no].insert(seq_position, soft_clip);
-      for (size_t i = 0; i < soft_clip.size(); ++i) {
-        cigar_extended[record_no][cigar_position++] = ')';
-      }
+      ret.soft_clips[record_no][end] = soft_clip;
+    }
+    clip_type = container_.Pull(core::gen_sub::kClipsType);
+  }
 
-      if (seq_position == 0) {
-        if (record_no == 0) {
-          std::get<0>(softclip_offset) =
-              soft_clip.length();  // TODO(Fabian): not working for paired
-        } else {
-          std::get<1>(softclip_offset) = soft_clip.length();
+  return ret;
+}
+
+// -----------------------------------------------------------------------------
+
+std::tuple<size_t, size_t> Decoder::ApplyClips(
+    const Clips& clips, std::vector<std::string>& sequences,
+    std::vector<std::string>& cigar_extended) {
+  std::tuple<size_t, size_t> softclip_offset{0, 0};
+
+  for (size_t segment_no = 0; segment_no < 2; ++segment_no) {
+    for (size_t end = 0; end < 2; ++end) {
+      if (clips.hard_clips[segment_no][end] != 0) {
+        const size_t cigar_position =
+            end ? cigar_extended[segment_no].size() : 0;
+        cigar_extended[segment_no].insert(
+            cigar_position, clips.hard_clips[segment_no][end], ']');
+      }
+      if (!clips.soft_clips[segment_no][end].empty()) {
+        std::string soft_clip = clips.soft_clips[segment_no][end];
+
+        sequences[segment_no].erase(sequences[segment_no].length() -
+                                    soft_clip.length());
+        size_t cigar_position =
+            end ? cigar_extended[segment_no].find_last_not_of(']') + 1 -
+                      soft_clip.size()
+                : cigar_extended[segment_no].find_first_not_of(']');
+        const size_t seq_position = end ? sequences[segment_no].length() : 0;
+        sequences[segment_no].insert(seq_position, soft_clip);
+        for (size_t i = 0; i < soft_clip.size(); ++i) {
+          cigar_extended[segment_no][cigar_position++] = ')';
+        }
+
+        if (seq_position == 0) {
+          if (segment_no == 0) {
+            std::get<0>(softclip_offset) =
+                soft_clip.length();  // TODO(Fabian): not working for paired
+          } else {
+            std::get<1>(softclip_offset) = soft_clip.length();
+          }
         }
       }
     }
-    clip_type = container_.Pull(core::gen_sub::kClipsType);
   }
 
   return softclip_offset;

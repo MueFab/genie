@@ -52,6 +52,17 @@ class Encoder {
   /// Counter for the number of processed reads.
   uint32_t read_counter_;
 
+  /// Read length.
+  std::optional<uint32_t> length_;
+
+  void UpdateLength(uint32_t len) {
+    if (length_ == std::nullopt) {
+      length_ = len;
+    } else if (length_ != len) {
+      length_ = 0;
+    }
+  }
+
   /**
    * @brief Encodes the first segment of a record.
    * @param rec The record to encode.
@@ -60,13 +71,11 @@ class Encoder {
 
   /**
    * @brief Encodes additional segments of a record.
-   * @param length Length of the additional segment.
    * @param split_rec Reference to the record split segment.
    * @param first1 Flag indicating if this is the first additional segment.
    */
   void EncodeAdditionalSegment(
-      size_t length, const core::record::alignment_split::SameRec& split_rec,
-      bool first1);
+      const core::record::alignment_split::SameRec& split_rec, bool first1);
 
   /**
    * @brief Structure to hold clipping information.
@@ -219,6 +228,11 @@ class Encoder {
    */
   void Add(const core::record::Record& rec, const std::string& ref1,
            const std::string& ref2);
+
+  /**
+   * @brief Retrieves the read length.
+   */
+  uint32_t GetReadLength() const;
 
   /**
    * @brief Moves the encoded access unit out of the encoder.
