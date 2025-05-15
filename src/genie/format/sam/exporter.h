@@ -13,7 +13,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-
+#include <htslib/sam.h>
 #include "genie/core/format_exporter.h"
 #include "genie/core/record/chunk.h"
 #include "genie/util/drain.h"
@@ -33,6 +33,10 @@ class Exporter final : public core::FormatExporter {
   std::optional<std::ofstream> output_stream_;
   std::ostream* output_file_ = &std::cout;
   bool output_set_ = false;
+  std::string output_format;
+  sam_hdr_t* sam_hdr_;
+  samFile* sam_file_;
+
 
  public:
   /**
@@ -40,7 +44,9 @@ class Exporter final : public core::FormatExporter {
    * @param ref_file
    * @param output_file
    */
-  explicit Exporter(std::string ref_file, std::string output_file);
+  explicit Exporter(std::string ref_file, std::string output_file, std::string format);
+
+ ~Exporter();
 
   /**
    * @brief

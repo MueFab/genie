@@ -78,22 +78,24 @@ template <class T>
 void AttachExporter(T& flow, const ProgramOptions& p_opts,
                     std::vector<std::unique_ptr<std::ofstream>>& output_files) {
   std::ostream* file1 = &std::cout;
-  if (file_extension(p_opts.output_file_) == "sam" ||
-      file_extension(p_opts.output_file_) == "bam") {
+  if (file_extension(p_opts.output_file_) == "sam") {
     UTILS_DIE_IF(
         p_opts.output_file_ == "-.sam",
         "Sam output to stdout currently not supported.");  // TODO(renzDef)
-                                                           // add after
-                                                           // refactoring
-                                                           // importer
     UTILS_DIE_IF(
         p_opts.output_file_ == "-.bam",
         "Bam output to stdout currently not supported.");  // TODO(renzDef)
-                                                           // add after
-                                                           // refactoring
-                                                           // importer
     flow.AddExporter(std::make_unique<genie::format::sam::Exporter>(
-        p_opts.fasta_file_path_, p_opts.output_file_));
+        p_opts.fasta_file_path_, p_opts.output_file_, "sam"));
+  } else if (file_extension(p_opts.output_file_) == "bam") {
+    UTILS_DIE_IF(
+        p_opts.output_file_ == "-.sam",
+        "Sam output to stdout currently not supported.");  // TODO(renzDef)
+    UTILS_DIE_IF(
+        p_opts.output_file_ == "-.bam",
+        "Bam output to stdout currently not supported.");  // TODO(renzDef)
+    flow.AddExporter(std::make_unique<genie::format::sam::Exporter>(
+        p_opts.fasta_file_path_, p_opts.output_file_, "bam"));
   } else if (file_extension(p_opts.output_file_) == "mgrec") {
     if (p_opts.output_file_.substr(0, 2) != "-.") {
       output_files.emplace_back(

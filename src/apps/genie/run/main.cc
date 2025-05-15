@@ -153,9 +153,15 @@ void AttachExporter(T& flow, const ProgramOptions& p_opts,
     }
   } else if (file_extension(p_opts.output_file_) == "mgrec") {
     flow.AddExporter(std::make_unique<genie::format::mgrec::Exporter>(*file1));
-  } else if (file_extension(p_opts.output_file_) == "sam" || file_extension(p_opts.output_file_) == "bam") {
+  } else if (file_extension(p_opts.output_file_) == "sam") {
     flow.AddExporter(std::make_unique<genie::format::sam::Exporter>(
-        p_opts.input_ref_file_, p_opts.output_file_));
+        p_opts.input_ref_file_, p_opts.output_file_, "sam"));
+  } else if (file_extension(p_opts.output_file_) == "bam") {
+    flow.AddExporter(std::make_unique<genie::format::sam::Exporter>(
+        p_opts.input_ref_file_, p_opts.output_file_, "bam"));
+  } else if (file_extension(p_opts.output_file_) == "cram") {
+    flow.AddExporter(std::make_unique<genie::format::sam::Exporter>(
+        p_opts.input_ref_file_, p_opts.output_file_, "cram"));
   } else if (file_extension(p_opts.output_file_) == "fasta") {
     flow.AddExporter(std::make_unique<genie::format::fasta::Exporter>(
         &flow.GetRefMgr(), file1, p_opts.number_of_threads_));

@@ -79,7 +79,6 @@ bool SamReader::IsReady() {
   if (!sam_header) {
     return false;
   }
-
   return true;
 }
 

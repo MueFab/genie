@@ -81,7 +81,7 @@ compress_roundtrip () {
     ls -l $working_dir/output.${ext}
 
     if [[ ${flag} != "" ]]; then
-      eval samtools view -h -T $fasta_file -o output.sam output.${ext}
+      eval samtools view -h -T $fasta_file -o $working_dir/output.sam $working_dir/output.${ext}
       eval samtools view -h -T $fasta_file -o ${sam_file%.*}.sam ${sam_file}
     fi
 
