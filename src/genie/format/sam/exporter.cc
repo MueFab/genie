@@ -26,10 +26,12 @@ namespace genie::format::sam {
 
 // -----------------------------------------------------------------------------
 
-Exporter::Exporter(std::string ref_file, std::string output_file, std::string format)
+Exporter::Exporter(std::string ref_file, std::string output_file,
+                   std::string format)
     : fasta_file_path_(std::move(ref_file)),
       output_file_path_(std::move(output_file)),
-      output_format(std::move(format)) {}
+      output_format(std::move(format)),
+      bam1(bam_init1()) {}
 
 // -----------------------------------------------------------------------------
 
@@ -328,24 +330,18 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
 
     header += "@HD\tVN:1.6\n";
     for (const auto& s : refinf.GetMgr()->GetSequences()) {
-      header += "@SQ\tSN:" + s
-                    + "\tLN:" + std::to_string(refinf.GetMgr()->GetLength(s)) + "\n";
-    }
-    // create file with right format
-    if (output_format == "bam") {
-      sam_file_ = sam_open(output_file_path_.c_str(), "wb");
-    } else if (output_format == "cram") {
-      sam_file_ = sam_open(output_file_path_.c_str(), "wc");
-    } else {
-      sam_file_ = sam_open(output_file_path_.c_str(), "w");
+      header += "@SQ\tSN:" + s +
+                "\tLN:" + std::to_string(refinf.GetMgr()->GetLength(s)) + "\n";
     }
 
+    sam_file_ = sam_open(output_file_path_.c_str(), "w");
     UTILS_DIE_IF(!sam_file_, "output file could not be created.");
 
     // write header
-    sam_hdr_ = sam_hdr_parse(header.length(),header.c_str());
+    sam_hdr_ = sam_hdr_parse(header.length(), header.c_str());
     UTILS_DIE_IF(!sam_hdr_, "output file header could not be parsed.");
-    UTILS_DIE_IF(sam_hdr_write(sam_file_, sam_hdr_) < 0, "output file header could not be written.");
+    UTILS_DIE_IF(sam_hdr_write(sam_file_, sam_hdr_) < 0,
+                 "output file header could not be written.");
 
     output_set_ = true;
   }
@@ -426,21 +422,22 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
           sam_record += "\t" + SerializeTagRecord(record.GetTags()[s]);
         }
 
-          // initializing htslib stuff
-          kstring_t record_buffer = {0, 0, nullptr};
-          bam1_t *bam1 = bam_init1();
+        // initializing htslib stuff
+        kstring_t record_buffer = {0, 0, nullptr};
 
-          // write record to htslib type string
-          kputsn(sam_record.c_str(), sam_record.length(), &record_buffer);
 
-          // parse record from kstring
-          UTILS_DIE_IF(sam_parse1(&record_buffer, sam_hdr_, bam1) < 0, "record could not be parsed.");
+        // write record to htslib type string
+        kputsn(sam_record.c_str(), sam_record.length(), &record_buffer);
 
-          // write parsed record from bam1 object to bam file
-          UTILS_DIE_IF(sam_write1(sam_file_, sam_hdr_, bam1) < 0, "record could not be written.");
+        // parse record from kstring
+        UTILS_DIE_IF(sam_parse1(&record_buffer, sam_hdr_, bam1) < 0,
+                     "record could not be parsed.");
 
-          // destroying bam1 object as it's a tmp container for the record
-          bam_destroy1(bam1);
+        // write parsed record from bam1 object to bam file
+        UTILS_DIE_IF(sam_write1(sam_file_, sam_hdr_, bam1) < 0,
+                     "record could not be written.");
+
+
       }
     }
   }
@@ -451,15 +448,13 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
   GetStats().AddInteger("size-sam-total",
                         static_cast<int64_t>(size_qual + size_name + size_seq));
   GetStats().AddDouble("time-sam-export", watch.Check());
-
-  std::cout << "end of expoerter" << std::endl;
 }
 
- Exporter::~Exporter() {
+Exporter::~Exporter() {
   bam_hdr_destroy(sam_hdr_);
   sam_close(sam_file_);
+  bam_destroy1(bam1);
 }
-
 
 // -----------------------------------------------------------------------------
 

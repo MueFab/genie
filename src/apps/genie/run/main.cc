@@ -83,7 +83,7 @@ enum class FileType { UNKNOWN = 0, MPEG = 1, THIRD_PARTY = 2 };
 // -----------------------------------------------------------------------------
 
 FileType GetType(const std::string& ext) {
-  if (ext == "mgrec" || ext == "fasta" || ext == "fastq" || ext == "sam" || ext == "bam") {
+  if (ext == "mgrec" || ext == "fasta" || ext == "fastq" || ext == "sam" || ext == "bam" || ext == "cram") {
     return FileType::THIRD_PARTY;
   }
   if (ext == "mgb") {
@@ -337,7 +337,7 @@ std::unique_ptr<genie::core::FlowGraph> BuildEncoder(
   if (file_extension(p_opts.input_file_) == "fastq") {
     AttachImporterFastq(*flow, p_opts, input_files,
                         is_compressed(p_opts.input_file_));
-  } else if (file_extension(p_opts.input_file_) == "sam" || file_extension(p_opts.input_file_) == "bam") {
+  } else if (file_extension(p_opts.input_file_) == "sam" || file_extension(p_opts.input_file_) == "bam" || file_extension(p_opts.input_file_) == "cram") {
     AttachImporterSam(*flow, p_opts, input_files);
   } else {
     AttachImporterMgrec(*flow, p_opts, input_files, output_files);

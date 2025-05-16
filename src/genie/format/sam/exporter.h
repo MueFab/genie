@@ -36,6 +36,7 @@ class Exporter final : public core::FormatExporter {
   std::string output_format;
   sam_hdr_t* sam_hdr_;
   samFile* sam_file_;
+  bam1_t* bam1;
 
 
  public:

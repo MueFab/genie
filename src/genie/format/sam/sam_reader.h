@@ -41,7 +41,7 @@ class SamReader {
    * @brief
    * @param fpath
    */
-  explicit SamReader(const std::string& fpath);
+  explicit SamReader(const std::string& fpath, const std::string& rpath);
 
   /**
    * @brief

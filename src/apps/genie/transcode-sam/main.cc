@@ -82,20 +82,20 @@ void AttachExporter(T& flow, const ProgramOptions& p_opts,
     UTILS_DIE_IF(
         p_opts.output_file_ == "-.sam",
         "Sam output to stdout currently not supported.");  // TODO(renzDef)
-    UTILS_DIE_IF(
-        p_opts.output_file_ == "-.bam",
-        "Bam output to stdout currently not supported.");  // TODO(renzDef)
     flow.AddExporter(std::make_unique<genie::format::sam::Exporter>(
         p_opts.fasta_file_path_, p_opts.output_file_, "sam"));
   } else if (file_extension(p_opts.output_file_) == "bam") {
-    UTILS_DIE_IF(
-        p_opts.output_file_ == "-.sam",
-        "Sam output to stdout currently not supported.");  // TODO(renzDef)
     UTILS_DIE_IF(
         p_opts.output_file_ == "-.bam",
         "Bam output to stdout currently not supported.");  // TODO(renzDef)
     flow.AddExporter(std::make_unique<genie::format::sam::Exporter>(
         p_opts.fasta_file_path_, p_opts.output_file_, "bam"));
+  } else if (file_extension(p_opts.output_file_) == "cram") {
+    UTILS_DIE_IF(
+        p_opts.output_file_ == "-.cram",
+        "Bam output to stdout currently not supported.");  // TODO(renzDef)
+    flow.AddExporter(std::make_unique<genie::format::sam::Exporter>(
+        p_opts.fasta_file_path_, p_opts.output_file_, "cram"));
   } else if (file_extension(p_opts.output_file_) == "mgrec") {
     if (p_opts.output_file_.substr(0, 2) != "-.") {
       output_files.emplace_back(

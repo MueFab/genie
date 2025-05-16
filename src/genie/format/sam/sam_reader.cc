@@ -30,7 +30,7 @@ void SamReader::InternalRead() {
   }
 }
 
-SamReader::SamReader(const std::string& fpath)
+SamReader::SamReader(const std::string& fpath, const std::string& rpath)
     : sam_file_(nullptr),           // open bam file
       sam_header(nullptr),          // read header
       sam_alignment_(bam_init1()),  // initialize an alignment
@@ -39,6 +39,11 @@ SamReader::SamReader(const std::string& fpath)
     sam_file_ = hts_open("-", "r");
   } else {
     sam_file_ = hts_open(fpath.c_str(), "r");
+  }
+
+  if (!rpath.empty()) {
+    // set reference in case ur field in header is wrong (needed for cram)
+    UTILS_DIE_IF(hts_set_fai_filename(sam_file_, rpath.c_str()) < 0, "could not set reference file");
   }
   UTILS_DIE_IF(!sam_file_, "Could not open file: " + fpath);
   sam_header = sam_hdr_read(sam_file_);

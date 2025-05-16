@@ -258,7 +258,7 @@ Importer::Importer(const size_t block_size, const bool extended_alignment,
       phase1_complete_(false),
       refinf_(input_ref_file_),
       eof_(false),
-      sam_reader_(this->input_sam_file_),
+      sam_reader_(this->input_sam_file_, this->input_ref_file_),
       sorter_(100000),
       extended_alignment_(extended_alignment) {
   refs_ = sam_reader_.GetRefs();
