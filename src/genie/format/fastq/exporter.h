@@ -18,6 +18,7 @@
 // -----------------------------------------------------------------------------
 
 #include <vector>
+#include <libdeflate.h>
 
 #include "genie/core/format_exporter.h"
 #include "genie/core/record/chunk.h"
@@ -42,6 +43,7 @@ class Exporter final : public core::FormatExporter {
                                      //!< for single-end, 2 for paired-end).
   util::OrderedLock lock_;  //!< @brief Lock to ensure ordered execution in a
                             //!< multithreaded setup.
+  bool compress = false;
 
  public:
   /**
@@ -53,7 +55,7 @@ class Exporter final : public core::FormatExporter {
    *
    * @param file_1 Output stream for unpaired reads.
    */
-  explicit Exporter(std::ostream& file_1);
+  explicit Exporter(std::ostream& file_1, bool compression = false);
 
   /**
    * @brief Constructor for paired FASTQ export.
@@ -67,7 +69,7 @@ class Exporter final : public core::FormatExporter {
    * @param file_2 Output stream for the second read in a paired-end read
    * (typically named `R2`).
    */
-  Exporter(std::ostream& file_1, std::ostream& file_2);
+  Exporter(std::ostream& file_1, std::ostream& file_2, bool compression = false);
 
   /**
    * @brief Skip a specific section during FASTQ export.
@@ -95,7 +97,10 @@ class Exporter final : public core::FormatExporter {
    * contexts.
    */
   void FlowIn(core::record::Chunk&& records, const util::Section& id) override;
+
+  static void deflate_and_write(const char* s, std::streamsize n, std::ostream** file_ptr);
 };
+
 
 // -----------------------------------------------------------------------------
 

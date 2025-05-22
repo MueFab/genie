@@ -122,34 +122,33 @@ void AttachExporter(T& flow, const ProgramOptions& p_opts,
                     std::vector<std::unique_ptr<std::ostream>>& output_files) {
   std::ostream* file1 = &std::cout;
   if (p_opts.output_file_.substr(0, 2) != "-.") {
-    if (is_compressed(p_opts.output_file_)) {
-      output_files.emplace_back(
-          std::make_unique<genie::util::zlib::OutputStream>(
-              std::make_unique<genie::util::zlib::StreamBuffer>(
-                  p_opts.output_file_, true)));
-    } else {
-      output_files.emplace_back(
+    output_files.emplace_back(
           std::make_unique<std::ofstream>(p_opts.output_file_));
-    }
     file1 = output_files.back().get();
   }
   if (file_extension(p_opts.output_file_) == "fastq") {
     if (file_extension(p_opts.output_sup_file_) == "fastq") {
-      if (is_compressed(p_opts.output_sup_file_)) {
-        output_files.emplace_back(
-            std::make_unique<genie::util::zlib::OutputStream>(
-                std::make_unique<genie::util::zlib::StreamBuffer>(
-                    p_opts.output_sup_file_, true)));
-      } else {
-        output_files.emplace_back(
+      output_files.emplace_back(
             std::make_unique<std::ofstream>(p_opts.output_sup_file_));
-      }
       std::ostream* file2 = output_files.back().get();
-      flow.AddExporter(
+
+      if (is_compressed(p_opts.output_sup_file_) and is_compressed(p_opts.output_file_)) {
+        flow.AddExporter(
+          std::make_unique<genie::format::fastq::Exporter>(*file1, *file2, true));
+      } else {
+        flow.AddExporter(
           std::make_unique<genie::format::fastq::Exporter>(*file1, *file2));
+      }
+
     } else {
-      flow.AddExporter(
+      if (is_compressed(p_opts.output_file_)) {
+        flow.AddExporter(
+          std::make_unique<genie::format::fastq::Exporter>(*file1, true));
+      } else {
+        flow.AddExporter(
           std::make_unique<genie::format::fastq::Exporter>(*file1));
+      }
+
     }
   } else if (file_extension(p_opts.output_file_) == "mgrec") {
     flow.AddExporter(std::make_unique<genie::format::mgrec::Exporter>(*file1));

@@ -54,6 +54,10 @@ if (${GENIE_SAM_SUPPORT})
     target_link_libraries(genie ${BZIP2_LIBRARIES})
     target_link_libraries(genie ${ZLIB_LIBRARIES})
 
+    find_library(LIBDEFLATE_LIBRARIES NAMES deflate libdeflate REQUIRED)
+    target_link_libraries(genie PRIVATE ${LIBDEFLATE_LIBRARIES})
+
+
     find_package(HTSlib REQUIRED)  # NOLINT
     target_include_directories(genie PRIVATE ${HTSlib_INCLUDE_DIRS})
     target_link_libraries(genie PRIVATE ${HTSlib_LIBRARIES})
