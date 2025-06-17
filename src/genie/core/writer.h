@@ -152,6 +152,13 @@ class Writer {
      */
     std::ostream* getStreamObj() { return logwriter; }
 
+    /**
+     * @brief Use for implicit conversion where BitWriter is expected. (Temp fix!)
+     */
+    operator util::BitWriter&() {
+        return binwriter;
+    }
+
 };
 }  // namespace core
 }  // namespace genie
