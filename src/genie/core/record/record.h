@@ -1,40 +1,71 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_RECORD_RECORD_H_
 #define SRC_GENIE_CORE_RECORD_RECORD_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include "alignment_box.h"
-#include "alignment_external.h"
-#include "alignment_shared_data.h"
-#include "class_type.h"
-#include "genie/core/constants.h"
-#include "genie/core/record/alignment_split/same_rec.h"
-#include "genie/core/stats/perf_stats.h"
+
+#include "genie/core/record/alignment_box.h"
+#include "genie/core/record/alignment_external.h"
+#include "genie/core/record/alignment_shared_data.h"
+#include "genie/core/record/class_type.h"
+#include "genie/core/record/segment.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "segment.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::core::record {
 
 /**
- * @brief Class representing a genomic record
- *
- * Contains segments, alignments, and metadata for one or more template segments.
+ *  @brief
  */
 class Record {
+ public:
+  struct Flags {
+    bool duplicate : 1;
+    bool quality_check_fail : 1;
+    bool proper_mapped_pair : 1;
+    bool not_primary_alignment : 1;
+    bool supplementary_alignment : 1;
+
+    Flags()
+        : duplicate(false),
+          quality_check_fail(false),
+          proper_mapped_pair(false),
+          not_primary_alignment(false),
+          supplementary_alignment(false) {}
+
+    explicit Flags(const uint8_t flags) {
+      duplicate = (flags & 0x01) != 0;
+      quality_check_fail = (flags & 0x02) != 0;
+      proper_mapped_pair = (flags & 0x04) != 0;
+      not_primary_alignment = (flags & 0x08) != 0;
+      supplementary_alignment = (flags & 0x10) != 0;
+    }
+
+    [[nodiscard]] uint8_t Get() const {
+      uint8_t flags = 0;
+      flags |= duplicate ? 0x01 : 0;
+      flags |= quality_check_fail ? 0x02 : 0;
+      flags |= proper_mapped_pair ? 0x04 : 0;
+      flags |= not_primary_alignment ? 0x08 : 0;
+      flags |= supplementary_alignment ? 0x10 : 0;
+      return flags;
+    }
+  };
+
  private:
   uint8_t number_of_template_segments_{};      //!< @brief
   std::vector<Segment> reads_;                 //!< @brief
@@ -53,7 +84,7 @@ class Record {
   /**
    * @brief
    */
-  void PatchRefID(size_t refID);
+  void PatchRefId(size_t ref_id);
 
   /**
    * @brief
@@ -62,15 +93,16 @@ class Record {
 
   /**
    * @brief
-   * @param _number_of_template_segments
-   * @param _auTypeCfg
-   * @param _read_name
-   * @param _read_group
-   * @param _flags
-   * @param _is_read_1_first
+   * @param number_of_template_segments
+   * @param au_type_cfg
+   * @param read_name
+   * @param read_group
+   * @param flags
+   * @param is_read_1_first
    */
-  Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string&& _read_name,
-         std::string&& _read_group, uint8_t _flags, bool _is_read_1_first = true);
+  Record(uint8_t number_of_template_segments, ClassType au_type_cfg,
+         std::string&& read_name, std::string&& read_group, uint8_t flags,
+         bool is_read_1_first = true);
 
   /**
    * @brief
@@ -117,10 +149,10 @@ class Record {
 
   /**
    * @brief
-   * @param _seq_id
+   * @param seq_id
    * @param rec
    */
-  void AddAlignment(uint16_t _seq_id, AlignmentBox&& rec);
+  void AddAlignment(uint16_t seq_id, AlignmentBox&& rec);
 
   /**
    * @brief
@@ -177,15 +209,15 @@ class Record {
 
   /**
    * @brief
-   * @param _name
+   * @param name
    */
-  void SetName(const std::string& _name);
+  void SetName(const std::string& name);
 
   /**
    * @brief
    * @param depth
    */
-  void SetQVDepth(uint8_t depth);
+  void SetQvDepth(uint8_t depth);
 
   /**
    * @brief
@@ -267,18 +299,18 @@ class Record {
 
   /**
    * @brief
-   * @return
    */
-  void SetMoreAlignmentInfo(std::unique_ptr<AlignmentExternal> _more_alignment_info);
+  void SetMoreAlignmentInfo(
+      std::unique_ptr<AlignmentExternal> more_alignment_info);
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::record
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_RECORD_RECORD_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

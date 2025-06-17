@@ -1,13 +1,14 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_H_
 #define SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <cstdint>
 #include <memory>
@@ -15,7 +16,7 @@
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::core::record {
 
@@ -52,7 +53,8 @@ class AlignmentSplit {
    * @param reader
    * @return
    */
-  static std::unique_ptr<AlignmentSplit> Factory(uint8_t as_depth, util::BitReader& reader);
+  static std::unique_ptr<AlignmentSplit> Factory(uint8_t as_depth,
+                                                 util::BitReader& reader);
 
   /**
    * @brief
@@ -70,13 +72,13 @@ class AlignmentSplit {
   Type split_alignment_;  //!< @brief
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::record
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

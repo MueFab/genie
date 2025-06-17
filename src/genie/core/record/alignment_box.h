@@ -1,138 +1,137 @@
 /**
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_BOX_H_
 #define SRC_GENIE_CORE_RECORD_ALIGNMENT_BOX_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include "alignment.h"
-#include "alignment_split.h"
-#include "class_type.h"
+
+#include "genie/core/record/alignment.h"
+#include "genie/core/record/alignment_split.h"
+#include "genie/core/record/class_type.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::core::record {
 
 /**
- * @brief Class representing an external alignment box
- *
- * Contains alignment information and optional split alignment data.
+ * @brief ExternalAlignment
  */
 class AlignmentBox {
- private:
-  uint64_t mapping_pos_{};                                             //!< @brief
-  Alignment alignment_;                                                //!< @brief
-  std::vector<std::unique_ptr<AlignmentSplit>> split_alignment_info_;  //!< @brief
+  uint64_t mapping_pos_{};  //!< @brief
+  Alignment alignment_;     //!< @brief
+  std::vector<std::unique_ptr<AlignmentSplit>>
+      split_alignment_info_;  //!< @brief
 
  public:
   /**
-   * @brief Default constructor
+   * @brief
+   * @param writer
    */
   void Write(util::BitWriter& writer) const;
 
   /**
-   * @brief Constructs an alignment box by reading from a bit stream
-   * @param type The class type
-   * @param as_depth The alignment split depth
-   * @param number_of_template_segments The number of template segments
-   * @param reader The bit reader to read from
+   * @brief
+   * @param type
+   * @param as_depth
+   * @param number_of_template_segments
+   * @param reader
    */
-  explicit AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_template_segments,
+  explicit AlignmentBox(ClassType type, uint8_t as_depth,
+                        uint8_t number_of_template_segments,
                         util::BitReader& reader);
 
   /**
-   * @brief Constructs an alignment box with specified parameters
-   * @param mapping_pos The mapping position
-   * @param alignment The alignment information
+   * @brief
+   * @param mapping_pos
+   * @param alignment
    */
   AlignmentBox(uint64_t mapping_pos, Alignment&& alignment);
 
   /**
-   * @brief Copy constructor
-   * @param container The alignment box to copy from
+   * @brief
+   * @param container
    */
   AlignmentBox(const AlignmentBox& container);
 
   /**
-   * @brief Move constructor
-   * @param container The alignment box to move from
+   * @brief
+   * @param container
    */
   AlignmentBox(AlignmentBox&& container) noexcept;
 
   /**
-   * @brief Default destructor
+   * @brief
    */
   ~AlignmentBox() = default;
 
   /**
-   * @brief Copy assignment operator
-   * @param container The alignment box to copy from
-   * @return Reference to this alignment box
+   * @brief
+   * @param container
+   * @return
    */
   AlignmentBox& operator=(const AlignmentBox& container);
 
   /**
-   * @brief Move assignment operator
-   * @param container The alignment box to move from
-   * @return Reference to this alignment box
+   * @brief
+   * @param container
+   * @return
    */
   AlignmentBox& operator=(AlignmentBox&& container) noexcept;
 
   /**
-   * @brief Adds a split alignment to this alignment box
-   * @param alignment The split alignment to add
+   * @brief
+   * @param alignment
    */
   void AddAlignmentSplit(std::unique_ptr<AlignmentSplit> alignment);
 
   /**
-   * @brief Gets the mapping position
-   * @return The mapping position
+   * @brief
    */
   AlignmentBox();
 
   /**
-   * @brief Gets the mapping position
-   * @return The mapping position
+   * @brief
+   * @return
    */
   [[nodiscard]] uint64_t GetPosition() const;
 
   /**
-   * @brief Gets the alignment information
-   * @return Constant reference to the alignment
+   * @brief
+   * @return
    */
   [[nodiscard]] const Alignment& GetAlignment() const;
 
   /**
-   * @brief Gets the split alignment information
-   * @return Constant reference to the split alignments
+   * @brief
+   * @return
    */
-  [[nodiscard]] const std::vector<std::unique_ptr<AlignmentSplit>>& GetAlignmentSplits() const;
+  [[nodiscard]] const std::vector<std::unique_ptr<AlignmentSplit>>&
+  GetAlignmentSplits() const;
 
   /**
-   * @brief Gets the number of template segments
-   * @return The number of template segments
+   * @brief
+   * @return
    */
   [[nodiscard]] uint8_t GetNumberOfTemplateSegments() const;
 };
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::record
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_BOX_H_
 
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

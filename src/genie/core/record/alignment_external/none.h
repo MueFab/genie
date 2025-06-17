@@ -1,5 +1,5 @@
 /**
-* Copyright 2018-2024 The Genie Authors.
+ * Copyright 2018-2024 The Genie Authors.
  * @file
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
@@ -8,7 +8,7 @@
 #ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_EXTERNAL_NONE_H_
 #define SRC_GENIE_CORE_RECORD_ALIGNMENT_EXTERNAL_NONE_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <memory>
 
@@ -16,7 +16,7 @@
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::core::record::alignment_external {
 
@@ -34,7 +34,7 @@ class None final : public AlignmentExternal {
    * @brief
    * @param writer
    */
-  void Write(util::BitWriter &writer) const override;
+  void Write(util::BitWriter& writer) const override;
 
   /**
    * @brief
@@ -43,13 +43,13 @@ class None final : public AlignmentExternal {
   [[nodiscard]] std::unique_ptr<AlignmentExternal> Clone() const override;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::record::alignment_external
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_EXTERNAL_NONE_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
