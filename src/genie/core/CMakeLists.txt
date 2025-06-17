@@ -37,7 +37,7 @@ set(source_files
         record/linked_record/linked_record.h
         record/linked_record/linked_record.cc
 
-        record/contact_record/record.cc
+        contact_record/record.cc
 
         record/data_unit_record/record.cc
 
