@@ -53,7 +53,7 @@ void Encoder::printDebug(const LAEncodingState& state, const std::string& ref1, 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnit Encoder::pack(size_t id, core::QVEncoder::QVCoded qv, core::AccessUnit::Descriptor rname,
+core::AccessUnit Encoder::pack(size_t id, core::QvEncoder::qv_coded qv, core::AccessUnit::Descriptor rname,
                                EncodingState& state) {
     auto ret = basecoder::EncoderStub::pack(id, std::move(qv), std::move(rname), state);
 

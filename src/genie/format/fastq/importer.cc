@@ -27,7 +27,7 @@ Importer::Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Importer::pumpRetrieve(core::Classifier *_classifier) {
+bool Importer::PumpRetrieve(core::Classifier *_classifier) {
     util::Watch watch;
     core::record::Chunk chunk;
     size_t size_seq = 0;

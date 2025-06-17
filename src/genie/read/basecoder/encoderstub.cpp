@@ -57,7 +57,7 @@ void EncoderStub::encodeSeq(core::record::Chunk& data, EncodingState& state) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnit EncoderStub::pack(size_t id, core::QVEncoder::QVCoded qv, core::AccessUnit::Descriptor rname,
+core::AccessUnit EncoderStub::pack(size_t id, core::QvEncoder::qv_coded qv, core::AccessUnit::Descriptor rname,
                                    EncodingState& state) {
     core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::ALIGNED;
     auto qv_depth = static_cast<uint8_t>(std::get<1>(qv).isEmpty() ? 0 : 1);
@@ -104,7 +104,7 @@ void EncoderStub::removeRedundantDescriptors(core::AccessUnit& rawAU) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::QVEncoder::QVCoded EncoderStub::encodeQVs(QvSelector* qvcoder, core::record::Chunk& data) {
+core::QvEncoder::qv_coded EncoderStub::encodeQVs(QvSelector* qvcoder, core::record::Chunk& data) {
     util::Watch watch;
     auto qv = qvcoder->process(data);
     data.getStats().addDouble("time-quality", watch.check());

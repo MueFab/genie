@@ -77,7 +77,7 @@ bool Importer::isRecordSupported(const core::record::Record& rec) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Importer::pumpRetrieve(core::Classifier* _classifier) {
+bool Importer::PumpRetrieve(core::Classifier* _classifier) {
     util::Watch watch;
     core::record::Chunk chunk;
     bool seqid_valid = false;

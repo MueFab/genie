@@ -61,7 +61,7 @@ class Encoder : public basecoder::EncoderStub {
      * @param state Encoding state
      * @return Access unit with parameters
      */
-    core::AccessUnit pack(size_t id, core::QVEncoder::QVCoded qv, core::AccessUnit::Descriptor rname,
+    core::AccessUnit pack(size_t id, core::QvEncoder::qv_coded qv, core::AccessUnit::Descriptor rname,
                           EncodingState& state) override;
 
     /**
