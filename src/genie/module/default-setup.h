@@ -12,9 +12,9 @@
 #include <memory>
 #include <string>
 #include "genie/core/classifier_regroup.h"
-#include "genie/core/flowgraph_convert.h"
-#include "genie/core/flowgraph_decode.h"
-#include "genie/core/flowgraph_encode.h"
+#include "genie/core/flow_graph_convert.h"
+#include "genie/core/flow_graph_decode.h"
+#include "genie/core/flow_graph_encode.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
