@@ -34,8 +34,8 @@ set(source_files
         variant_genotype_record/format_field.cc
         variant_genotype_record/format_field.h
 
-        record/linked_record/linked_record.h
-        record/linked_record/linked_record.cc
+        linked_record/linked_record.h
+        linked_record/linked_record.cc
 
         contact_record/record.cc
 
