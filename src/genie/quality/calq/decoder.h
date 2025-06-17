@@ -27,7 +27,7 @@ namespace calq {
 /**
  * @brief
  */
-class Decoder : public core::QVDecoder {
+class Decoder : public core::QvDecoder {
  private:
     bool isAligned(const core::AccessUnit::Descriptor& desc);
     std::vector<std::string> decodeAligned(const quality::paramqv1::QualityValues1& param,
@@ -47,7 +47,7 @@ class Decoder : public core::QVDecoder {
      * @param desc
      * @return
      */
-    std::tuple<std::vector<std::string>, core::stats::PerfStats> process(const core::parameter::QualityValues& param,
+    std::tuple<std::vector<std::string>, core::stats::PerfStats> Process(const core::parameter::QualityValues& param,
                                                                          const std::vector<std::string>& ecigar_vec,
                                                                          const std::vector<uint64_t>& positions,
                                                                          core::AccessUnit::Descriptor& desc) override;

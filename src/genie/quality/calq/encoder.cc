@@ -180,7 +180,7 @@ void Encoder::encodeUnaligned(const core::record::Chunk& chunk, paramqv1::Qualit
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
+core::QvEncoder::qv_coded Encoder::process(const core::record::Chunk& chunk) {
     util::Watch watch;
     auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
     core::AccessUnit::Descriptor desc(core::GenDesc::kQv);

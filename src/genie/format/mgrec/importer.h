@@ -59,7 +59,7 @@ class Importer : public core::FormatImporter {
      * @param _classifier
      * @return
      */
-    bool pumpRetrieve(core::Classifier* _classifier) override;
+    bool PumpRetrieve(core::Classifier* _classifier) override;
 
     /**
      * @brief

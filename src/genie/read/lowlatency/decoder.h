@@ -31,7 +31,7 @@ class Decoder : public core::ReadDecoder, public core::RefDecoder {
      * @param t
      * @return
      */
-    std::string decode(core::AccessUnit&& t) override;
+    std::string Decode(core::AccessUnit&& t) override;
 
     /**
      * @brief

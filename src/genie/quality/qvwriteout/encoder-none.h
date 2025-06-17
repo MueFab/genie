@@ -20,13 +20,13 @@ namespace qvwriteout {
 /**
  * @brief
  */
-class NoneEncoder : public core::QVEncoder {
+class NoneEncoder : public core::QvEncoder {
  public:
     /**
      * @brief
      * @return
      */
-    QVCoded process(const core::record::Chunk&) override;
+    qv_coded process(const core::record::Chunk&) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

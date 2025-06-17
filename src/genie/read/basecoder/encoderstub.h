@@ -79,7 +79,7 @@ class EncoderStub : public core::ReadEncoder {
      * @param state Encoding state
      * @return Assembled access unit with parameters
      */
-    virtual core::AccessUnit pack(size_t id, core::QVEncoder::QVCoded qv, core::AccessUnit::Descriptor rname,
+    virtual core::AccessUnit pack(size_t id, core::QvEncoder::qv_coded qv, core::AccessUnit::Descriptor rname,
                                   EncodingState& state);
 
     /**
@@ -94,7 +94,7 @@ class EncoderStub : public core::ReadEncoder {
      * @param data Chunk of data
      * @return Encoded quality values
      */
-    static core::QVEncoder::QVCoded encodeQVs(QvSelector* qvcoder, core::record::Chunk& data);
+    static core::QvEncoder::qv_coded encodeQVs(qv_selector* qvcoder, core::record::Chunk& data);
 
     /**
      * @brief Encode read names in a chunk of data
@@ -102,7 +102,7 @@ class EncoderStub : public core::ReadEncoder {
      * @param data Chunk to encode
      * @return Encoded read names
      */
-    static core::AccessUnit::Descriptor encodeNames(NameSelector* namecoder, core::record::Chunk& data);
+    static core::AccessUnit::Descriptor encodeNames(name_selector* namecoder, core::record::Chunk& data);
 
  public:
     /**

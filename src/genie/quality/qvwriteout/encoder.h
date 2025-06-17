@@ -24,7 +24,7 @@ namespace qvwriteout {
 /**
  * @brief
  */
-class Encoder : public core::QVEncoder {
+class Encoder : public core::QvEncoder {
  private:
     /**
      * @brief
@@ -57,7 +57,7 @@ class Encoder : public core::QVEncoder {
      * @param rec
      * @return
      */
-    core::QVEncoder::QVCoded process(const core::record::Chunk& rec) override;
+    core::QvEncoder::qv_coded Process(const core::record::Chunk& rec) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

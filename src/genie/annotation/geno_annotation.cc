@@ -269,10 +269,10 @@ void GenoAnnotation::sort_format(
       std::min(genotype_opt.block_size, static_cast<uint32_t>(recs.size()));
   // fill all attribute data
   for (const auto& format : recs.at(0).GetFormat()) {
-    const auto& formatName = format.getFormat();
+    const auto& formatName = format.GetFormat();
     core::record::annotation_parameter_set::AttributeData attrData(
-        formatName.size(), formatName, format.getType(),
-        format.getArrayLength(), AttributeID);
+        formatName.size(), formatName, format.GetType(),
+        format.GetArrayLength(), AttributeID);
     attrInfo[formatName] = attrData;
     AttributeID++;
   }
@@ -281,9 +281,9 @@ void GenoAnnotation::sort_format(
   for (auto i_rec = 0u; i_rec < genotypeBlockSize; i_rec++) {
     auto& rec = recs[i_rec];
     for (const auto& format : rec.GetFormat()) {
-      auto formatName = format.getFormat();
+      auto formatName = format.GetFormat();
       attrValues[formatName].resize(genotypeBlockSize);
-      std::vector<std::vector<AttrType>> formatValue = format.getValue();
+      std::vector<std::vector<AttrType>> formatValue = format.GetValue();
       attrValues[formatName].at(i_rec) = formatValue;
     }
   }
