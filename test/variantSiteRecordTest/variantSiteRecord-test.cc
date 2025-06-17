@@ -19,7 +19,7 @@
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/core/record/data_unit_record//record.h"
+#include "genie/core/data_unit_record/record.h"
 #include "genie/core/variant_site_record/record.h"
 #include "genie/variantsite/accessunit_composer.h"
 #include "genie/variantsite/parameterset_composer.h"

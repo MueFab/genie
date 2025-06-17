@@ -12,7 +12,7 @@
 #include "genie/util/make_unique.h"
 #include "genie/util/runtime_exception.h"
 
-#include "genie/core/record/data_unit_record/record.h"
+#include "genie/core/data_unit_record/record.h"
 
 // -------------------------------------------------------------------------------------------------
 

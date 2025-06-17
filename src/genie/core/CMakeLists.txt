@@ -39,7 +39,7 @@ set(source_files
 
         contact_record/record.cc
 
-        record/data_unit_record/record.cc
+        data_unit_record/record.cc
 
         record/annotation_access_unit/record.cc
         record/annotation_access_unit/block.cc
