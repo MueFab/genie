@@ -7,7 +7,7 @@
 #include <gtest/gtest.h>
 #include <cmath>
 #include <fstream>
-#include "genie/core/record/contact_record/record.h"
+#include "genie/core/contact_record/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "helpers.h"

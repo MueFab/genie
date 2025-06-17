@@ -6,7 +6,7 @@
 
 #include "contact_coder.h"
 #include <codecs/include/mpegg-codecs.h>
-#include <genie/core/record/contact_record/record.h>
+#include <genie/core/contact_record/record.h>
 #include <genie/util/runtime_exception.h>
 #include <cstdint>
 #include <cstring>
