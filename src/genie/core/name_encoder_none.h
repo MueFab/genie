@@ -1,43 +1,44 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_NAME_ENCODER_NONE_H_
 #define SRC_GENIE_CORE_NAME_ENCODER_NONE_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <tuple>
 #include <vector>
+
 #include "genie/core/name_encoder.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief
  */
-class NameEncoderNone : public NameEncoder {
+class NameEncoderNone final : public NameEncoder {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    std::tuple<AccessUnit::Descriptor, core::stats::PerfStats> process(const record::Chunk&) override;
+  /**
+   * @brief
+   * @return
+   */
+  std::tuple<AccessUnit::Descriptor, stats::PerfStats> Process(
+      const record::Chunk&) override;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_NAME_ENCODER_NONE_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

@@ -1,27 +1,29 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
-#include <tuple>
 #include "genie/core/name_encoder_none.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include <tuple>
 
-namespace genie {
-namespace core {
+// -----------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------------------------------------------
+namespace genie::core {
 
-std::tuple<AccessUnit::Descriptor, core::stats::PerfStats> NameEncoderNone::process(const record::Chunk&) {
-    return std::make_tuple(AccessUnit::Descriptor(GenDesc::kReadName), core::stats::PerfStats());
+// -----------------------------------------------------------------------------
+
+std::tuple<AccessUnit::Descriptor, stats::PerfStats> NameEncoderNone::Process(
+    const record::Chunk&) {
+  return std::make_tuple(AccessUnit::Descriptor(GenDesc::kReadName),
+                         stats::PerfStats());
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
