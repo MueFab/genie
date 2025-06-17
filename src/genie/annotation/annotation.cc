@@ -66,7 +66,8 @@ void Annotation::writeToFile(std::string& outputFileName) {
     std::ofstream testfile;
     std::string filename = outputFileName;
     testfile.open(filename + ".bin", std::ios::binary | std::ios::out);
-    genie::core::Writer testwriter(&testfile);
+    //genie::core::Writer testwriter(&testfile);
+    genie::util::BitWriter testwriter(&testfile);
     std::ofstream txtfile;
     txtfile.open(filename + ".txt", std::ios::out);
     genie::core::Writer txtwriter(&txtfile, true);
@@ -75,7 +76,7 @@ void Annotation::writeToFile(std::string& outputFileName) {
     for (auto& pars : annotationParameterSet) {
         genie::core::record::data_unit::Record APS_dataUnit(pars);
         sizeSofar = APS_dataUnit.Write(testwriter);
-        APS_dataUnit.write(txtwriter, sizeSofar);
+        APS_dataUnit.Write(txtwriter, sizeSofar);
     }
     for (auto& aau : annotationAccessUnit) {
       genie::core::record::data_unit::Record AAU_dataUnit(aau);
