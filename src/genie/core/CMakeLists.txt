@@ -68,10 +68,10 @@ set(source_files
         classifier_bypass.cc
         classifier_regroup.cc
         constants.cc
-        flowgraph.cc
-        flowgraph_convert.cc
-        flowgraph_decode.cc
-        flowgraph_encode.cc
+        flow_graph.cc
+        flow_graph_convert.cc
+        flow_graph_decode.cc
+        flow_graph_encode.cc
         format_importer.cc
         format_importer_null.cc
         format_exporter.cc

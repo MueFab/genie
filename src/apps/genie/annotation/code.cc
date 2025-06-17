@@ -18,8 +18,8 @@
 #include <vector>
 
 #include "filesystem/filesystem.hpp"
-#include "genie/core/record/data_unit/record.h"
-#include "genie/core/record/variant_genotype/record.h"
+#include "genie/core/record/data_unit_record/record.h"
+#include "genie/core/variant_genotype_record/record.h"
 #include "genie/core/writer.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
@@ -161,10 +161,10 @@ void encodeVariantSite(const std::string& _inputFileName,
 
   if (outputFile.is_open()) {
     genie::core::Writer dataUnitWriter(&outputFile);
-    APS_dataUnit.write(dataUnitWriter);
+    APS_dataUnit.Write(dataUnitWriter);
     for (auto& aau : annotationAccessUnit) {
       genie::core::record::data_unit::Record AAU_dataUnit(aau);
-      AAU_dataUnit.write(dataUnitWriter);
+      AAU_dataUnit.Write(dataUnitWriter);
     }
     std::cerr << "bytes written: "
               << std::to_string(dataUnitWriter.GetBitsWritten() / 8)
@@ -172,10 +172,10 @@ void encodeVariantSite(const std::string& _inputFileName,
     outputFile.close();
     if (testOutput) {
       genie::core::Writer txtWriter(&txtFile, true);
-      APS_dataUnit.write(txtWriter);
+      APS_dataUnit.Write(txtWriter);
       for (auto& aau : annotationAccessUnit) {
         genie::core::record::data_unit::Record AAU_dataUnit(aau);
-        AAU_dataUnit.write(txtWriter);
+        AAU_dataUnit.Write(txtWriter);
       }
       txtWriter.Flush();
       txtFile.close();
@@ -298,8 +298,8 @@ void encodeVariantGenotype(const std::string& _input_fpath,
 
   if (outputFile.is_open()) {
     genie::core::Writer dataUnitWriter(&outputFile);
-    APS_dataUnit.write(dataUnitWriter);
-    AAU_dataUnit.write(dataUnitWriter);
+    APS_dataUnit.Write(dataUnitWriter);
+    AAU_dataUnit.Write(dataUnitWriter);
 
     std::cerr << "bytes written: "
               << std::to_string(dataUnitWriter.GetBitsWritten() / 8)

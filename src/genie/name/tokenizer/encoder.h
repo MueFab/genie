@@ -35,7 +35,7 @@ class Encoder : public core::NameEncoder {
      * @param recs
      * @return
      */
-    std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(const core::record::Chunk& recs) override;
+    std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Process(const core::record::Chunk& recs) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -98,9 +98,9 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //        out_ptr = outputFiles.back().Get();
 //    }
 //    if (file_extension(pOpts.outputFile) == "mgrec") {
-//        flow.addExporter(genie::util::make_unique<genie::format::mgrec::Exporter>(*out_ptr));
+//        flow.AddExporter(genie::util::make_unique<genie::format::mgrec::Exporter>(*out_ptr));
 //    } else if (file_extension(pOpts.outputFile) == "fasta") {
-//        flow.addExporter(genie::util::make_unique<genie::format::fasta::Exporter>(&flow.getRefMgr(), out_ptr,
+//        flow.AddExporter(genie::util::make_unique<genie::format::fasta::Exporter>(&flow.GetRefMgr(), out_ptr,
 //                                                                                  pOpts.numberOfThreads));
 //    }
 //}
@@ -129,8 +129,8 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //    inputFiles.push_back(std::Move(fasta_file));
 //    inputFiles.push_back(std::Move(fai_file));
 //    inputFiles.push_back(std::Move(sha_file));
-//    flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
-//        **(inputFiles.rbegin() + 2), **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr(),
+//    flow->AddReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
+//        **(inputFiles.rbegin() + 2), **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->GetRefMgr(),
 //        fastaFile));
 //}
 
@@ -147,10 +147,10 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //    }
 //    if (file_extension(pOpts.inputFile) == "mgrec") {
 //        outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile + ".unsupported.mgrec"));
-//        flow.addImporter(
+//        flow.AddImporter(
 //            genie::util::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *in_ptr, *outputFiles.back()));
 //    } else if (file_extension(pOpts.inputFile) == "fasta") {
-//        flow.addImporter(genie::util::make_unique<genie::core::NullImporter>());
+//        flow.AddImporter(genie::util::make_unique<genie::core::NullImporter>());
 //    }
 //}
 
@@ -187,20 +187,20 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //        outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile, std::ios::binary));
 //        out_ptr = outputFiles.back().Get();
 //    }
-//    flow->addExporter(genie::util::make_unique<genie::format::mgb::Exporter>(out_ptr));
+//    flow->AddExporter(genie::util::make_unique<genie::format::mgb::Exporter>(out_ptr));
 //    attachImporter(*flow, pOpts, inputFiles, outputFiles);
 //    if (pOpts.qvMode == "none") {
-//        flow->setQVCoder(genie::util::make_unique<genie::quality::qvwriteout::NoneEncoder>(), 0);
+//        flow->SetQvCoder(genie::util::make_unique<genie::quality::qvwriteout::NoneEncoder>(), 0);
 //    }
 //    if (pOpts.qvMode == "calq") {
-//        flow->setQVCoder(genie::util::make_unique<genie::quality::calq::Encoder>(), 0);
+//        flow->SetQvCoder(genie::util::make_unique<genie::quality::calq::Encoder>(), 0);
 //    }
 //    if (pOpts.readNameMode == "none") {
-//        flow->setNameCoder(genie::util::make_unique<genie::core::NameEncoderNone>(), 0);
+//        flow->SetNameCoder(genie::util::make_unique<genie::core::NameEncoderNone>(), 0);
 //    }
 //    if (pOpts.lowLatency) {
-//        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(pOpts.rawStreams), 3);
-//        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(pOpts.rawStreams), 4);
+//        flow->SetReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(pOpts.rawStreams), 3);
+//        flow->SetReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(pOpts.rawStreams), 4);
 //    }
 //    return flow;
 //}
@@ -254,13 +254,13 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //            inputFiles.push_back(std::Move(fasta_file));
 //            inputFiles.push_back(std::Move(fai_file));
 //            inputFiles.push_back(std::Move(sha_file));
-//            flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
-//                **(inputFiles.rbegin() + 2), **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr(),
+//            flow->AddReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
+//                **(inputFiles.rbegin() + 2), **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->GetRefMgr(),
 //                json_uri_path));
 //        } else if (file_extension(json_uri_path) == "mgb") {
 //            inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(json_uri_path));
-//            flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(
-//                *inputFiles.back(), &flow->getRefMgr(), flow->getRefDecoder(), true));
+//            flow->AddImporter(genie::util::make_unique<genie::format::mgb::Importer>(
+//                *inputFiles.back(), &flow->GetRefMgr(), flow->GetRefDecoder(), true));
 //        }
 //    }
 //    std::istream* in_ptr = &std::cin;
@@ -268,8 +268,8 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //        inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile, std::ios::binary));
 //        in_ptr = inputFiles.back().Get();
 //    }
-//    flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(
-//        *in_ptr, &flow->getRefMgr(), flow->getRefDecoder(), file_extension(pOpts.outputFile) == "fasta"));
+//    flow->AddImporter(genie::util::make_unique<genie::format::mgb::Importer>(
+//        *in_ptr, &flow->GetRefMgr(), flow->GetRefDecoder(), file_extension(pOpts.outputFile) == "fasta"));
 //    attachExporter(*flow, pOpts, outputFiles);
 //    return flow;
 //}
@@ -302,11 +302,11 @@ int main(int argc, char* argv[]) {
             break;
     }
 
-    // flowGraph->run();
+    // flowGraph->Run();
 
 //    if (getOperation(pOpts.inputFile, pOpts.outputFile) == OperationCase::ENCODE) {
 //        std::ofstream jsonfile(pOpts.outputFile + ".json");
-//        auto jsonstring = flowGraph->getMeta().ToJson().dump(4);
+//        auto jsonstring = flowGraph->GetMeta().ToJson().dump(4);
 //        jsonfile.Write(jsonstring.data_(), jsonstring.length());
 //    }
 
@@ -319,7 +319,7 @@ int main(int argc, char* argv[]) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace run
+}  // namespace Run
 }  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------

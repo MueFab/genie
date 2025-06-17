@@ -2,6 +2,7 @@ project("genie-bsc")
 
 set(source_files
     encoder.cc
+        ../paramcabac/decoder.h
 )
 add_library(genie-bsc ${source_files})
 
