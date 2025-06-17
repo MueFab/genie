@@ -181,11 +181,11 @@ void ContactMatrixParameters::write(util::BitWriter& writer) const {
     writer.WriteReserved(8);
     writer.WriteBits(chr_length[i], 64);
   }
-  writer.WriteBits(interval, 32);
+  writer.WriteBits(bin_size, 32);
   writer.WriteBits(tile_size, 32);
-  writer.WriteBits(num_interval_multipliers, 8);
-  for (auto i = 0; i < num_interval_multipliers; ++i)
-    writer.WriteBits(interval_multiplier[i], 32);
+  writer.WriteBits(num_bin_size_multipliers, 8);
+  for (auto i = 0; i < num_bin_size_multipliers; ++i)
+    writer.WriteBits(bin_size_multiplier[i], 32);
 
   writer.WriteBits(num_norm_methods, 8);
   for (auto i = 0; i < num_norm_methods; ++i) {
