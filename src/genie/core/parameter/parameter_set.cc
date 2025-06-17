@@ -306,8 +306,7 @@ ParameterSet::DatasetType EncodingSet::GetDatasetType() const {
 // -----------------------------------------------------------------------------
 
 uint8_t EncodingSet::GetPosSize() const {
-  //return pos_40_bits_flag_ ? 40_u8 : 32_u8;
-  return pos_40_bits_flag_ ? uint8_t(40) : uint8_t(32);
+  return pos_40_bits_flag_ ? 40_u8 : 32_u8;
 }
 
 // -----------------------------------------------------------------------------

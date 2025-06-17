@@ -1,5 +1,5 @@
 /**
-* Copyright 2018-2024 The Genie Authors.
+ * Copyright 2018-2024 The Genie Authors.
  * @file
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
@@ -22,40 +22,40 @@ namespace genie::core::parameter {
  * @brief
  */
 class ComputedRefExtended final {
- uint8_t cr_pad_size_;       //!< @brief
- uint32_t cr_buf_max_size_;  //!< @brief
+  uint8_t cr_pad_size_;       //!< @brief
+  uint32_t cr_buf_max_size_;  //!< @brief
 
-public:
- /**
-  * @brief
-  * @param ext
-  * @return
-  */
- bool operator==(const ComputedRefExtended& ext) const;
+ public:
+  /**
+   * @brief
+   * @param ext
+   * @return
+   */
+  bool operator==(const ComputedRefExtended& ext) const;
 
- /**
-  * @brief
-  * @param cr_pad_size
-  * @param cr_buf_max_size
-  */
- ComputedRefExtended(uint8_t cr_pad_size, uint32_t cr_buf_max_size);
+  /**
+   * @brief
+   * @param cr_pad_size
+   * @param cr_buf_max_size
+   */
+  ComputedRefExtended(uint8_t cr_pad_size, uint32_t cr_buf_max_size);
 
- /**
-  * @brief
-  */
- ~ComputedRefExtended() = default;
+  /**
+   * @brief
+   */
+  ~ComputedRefExtended() = default;
 
- /**
-  * @brief
-  * @return
-  */
- [[nodiscard]] uint32_t GetBufMaxSize() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint32_t GetBufMaxSize() const;
 
- /**
-  * @brief
-  * @param writer
-  */
- void Write(util::BitWriter& writer) const;
+  /**
+   * @brief
+   * @param writer
+   */
+  void Write(util::BitWriter& writer) const;
 };
 
 // -----------------------------------------------------------------------------

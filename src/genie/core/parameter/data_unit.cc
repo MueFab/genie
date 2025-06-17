@@ -1,5 +1,5 @@
 /**
-* Copyright 2018-2024 The Genie Authors.
+ * Copyright 2018-2024 The Genie Authors.
  * @file
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
@@ -34,13 +34,13 @@ void DataUnit::PrintDebug(std::ostream& output, uint8_t, uint8_t) const {
   switch (data_unit_type_) {
     case DataUnitType::kRawReference:
       output << "raw reference";
-    break;
+      break;
     case DataUnitType::kParameterSet:
       output << "parameter set";
-    break;
+      break;
     case DataUnitType::kAccessUnit:
       output << "access unit";
-    break;
+      break;
   }
   output << std::endl;
 }
