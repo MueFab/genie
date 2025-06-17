@@ -8,7 +8,7 @@
 #ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_SAME_REC_H_
 #define SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_SAME_REC_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <cstdint>
 #include <memory>
@@ -18,7 +18,7 @@
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::core::record::alignment_split {
 
@@ -26,62 +26,61 @@ namespace genie::core::record::alignment_split {
  * @brief
  */
 class SameRec final : public AlignmentSplit {
- private:
-    int64_t delta_;        //!< @brief
-    Alignment alignment_;  //!< @brief
+  int64_t delta_;        //!< @brief
+  Alignment alignment_;  //!< @brief
 
  public:
-    /**
-     * @brief
-     */
-    SameRec();
+  /**
+   * @brief
+   */
+  SameRec();
 
-    /**
-     * @brief
-     * @param delta
-     * @param alignment
-     */
-    SameRec(int64_t delta, Alignment alignment);
+  /**
+   * @brief
+   * @param delta
+   * @param alignment
+   */
+  SameRec(int64_t delta, Alignment alignment);
 
-    /**
-     * @brief
-     * @param as_depth
-     * @param reader
-     */
-    explicit SameRec(uint8_t as_depth, util::BitReader& reader);
+  /**
+   * @brief
+   * @param as_depth
+   * @param reader
+   */
+  explicit SameRec(uint8_t as_depth, util::BitReader& reader);
 
-    /**
-     * @brief
-     * @param writer
-     */
-    void Write(util::BitWriter& writer) const override;
+  /**
+   * @brief
+   * @param writer
+   */
+  void Write(util::BitWriter& writer) const override;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const Alignment& GetAlignment() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const Alignment& GetAlignment() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]]  int64_t GetDelta() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] int64_t GetDelta() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::unique_ptr<AlignmentSplit> clone() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::unique_ptr<AlignmentSplit> clone() const override;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::record::alignment_split
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_SAME_REC_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

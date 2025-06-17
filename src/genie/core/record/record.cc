@@ -1,78 +1,72 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
-#include "record.h"
+#include "genie/core/record/record.h"
+
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <utility>
-#include "alignment_box.h"
-#include "alignment_shared_data.h"
+#include <vector>
+
+#include "genie/core/constants.h"
+#include "genie/core/record/alignment_box.h"
 #include "genie/core/record/alignment_external/none.h"
-#include "genie/core/record/data_unit_record/record.h"
+#include "genie/core/record/alignment_shared_data.h"
+#include "genie/core/record/alignment_split/same_rec.h"
+#include "genie/core/record/segment.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
 #include "genie/util/runtime_exception.h"
-#include "segment.h"
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::core::record {
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Record::PatchRefID(size_t refID) {
-  shared_alignment_info_ =
-      AlignmentSharedData(static_cast<uint16_t>(refID), shared_alignment_info_.GetAsDepth());
+void Record::PatchRefId(const size_t ref_id) {
+  shared_alignment_info_ = AlignmentSharedData(
+      static_cast<uint16_t>(ref_id), shared_alignment_info_.GetAsDepth());
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Record::Record()
-    : number_of_template_segments_(0),
-      reads_(),
+Record::Record() : alignment_info_(0), more_alignment_info_(nullptr) {}
+
+// -----------------------------------------------------------------------------
+
+Record::Record(const uint8_t number_of_template_segments,
+               const ClassType au_type_cfg, std::string&& read_name,
+               std::string&& read_group, const uint8_t flags,
+               const bool is_read_1_first)
+    : number_of_template_segments_(number_of_template_segments),
       alignment_info_(0),
-      class_id_(ClassType::kNone),
-      read_group_(),
-      read_1_first_(false),
-      shared_alignment_info_(),
-      qv_depth_(0),
-      read_name_(),
-      flags_(0),
-      more_alignment_info_(nullptr) {}
+      class_id_(au_type_cfg),
+      read_group_(std::move(read_group)),
+      read_1_first_(is_read_1_first),
+      read_name_(std::move(read_name)),
+      flags_(flags),
+      more_alignment_info_(std::make_unique<alignment_external::None>()) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Record::Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string &&_read_name,
-               std::string &&_read_group, uint8_t _flags, bool _is_read_1_first)
-    : number_of_template_segments_(_number_of_template_segments),
-      reads_(),
-      alignment_info_(0),
-      class_id_(_auTypeCfg),
-      read_group_(std::move(_read_group)),
-      read_1_first_(_is_read_1_first),
-      shared_alignment_info_(),
-      qv_depth_(0),
-      read_name_(std::move(_read_name)),
-      flags_(_flags),
-      more_alignment_info_(util::make_unique<alignment_external::None>()) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Record::Record(util::BitReader &reader)
+Record::Record(util::BitReader& reader)
     : number_of_template_segments_(reader.ReadAlignedInt<uint8_t>()),
       reads_(reader.ReadAlignedInt<uint8_t>()),
       alignment_info_(reader.ReadAlignedInt<uint16_t>()),
       class_id_(reader.ReadAlignedInt<ClassType>()),
       read_group_(reader.ReadAlignedInt<uint8_t>(), 0),
       read_1_first_(reader.ReadAlignedInt<uint8_t>()),
-      shared_alignment_info_(!alignment_info_.empty() ? AlignmentSharedData(reader)
-                                                      : AlignmentSharedData()) {
-  std::vector<uint32_t> readSizes(reads_.size());
-  for (auto &s : readSizes) {
+      shared_alignment_info_(!alignment_info_.empty()
+                                 ? AlignmentSharedData(reader)
+                                 : AlignmentSharedData()) {
+  std::vector<uint32_t> read_sizes(reads_.size());
+  for (auto& s : read_sizes) {
     s = reader.ReadAlignedInt<uint32_t, 3>();
   }
   qv_depth_ = reader.ReadAlignedInt<uint8_t>();
@@ -81,33 +75,29 @@ Record::Record(util::BitReader &reader)
   reader.ReadAlignedBytes(&read_group_[0], read_group_.size());
 
   size_t index = 0;
-  for (auto &r : reads_) {
-    r = Segment(readSizes[index], qv_depth_, reader);
+  for (auto& r : reads_) {
+    r = Segment(read_sizes[index], qv_depth_, reader);
     ++index;
   }
-  for (auto &a : alignment_info_) {
+  for (auto& a : alignment_info_) {
     a = AlignmentBox(class_id_, shared_alignment_info_.GetAsDepth(),
-                     uint8_t(number_of_template_segments_), reader);
+                     number_of_template_segments_, reader);
   }
   flags_ = reader.ReadAlignedInt<uint8_t>();
   more_alignment_info_ = AlignmentExternal::Factory(reader);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Record::Record(const Record &rec) {
-  *this = rec;
-}
+Record::Record(const Record& rec) { *this = rec; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Record::Record(Record &&rec) noexcept {
-  *this = std::move(rec);
-}
+Record::Record(Record&& rec) noexcept { *this = std::move(rec); }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Record &Record::operator=(const Record &rec) {
+Record& Record::operator=(const Record& rec) {
   if (this == &rec) {
     return *this;
   }
@@ -125,9 +115,9 @@ Record &Record::operator=(const Record &rec) {
   return *this;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Record &Record::operator=(Record &&rec) noexcept {
+Record& Record::operator=(Record&& rec) noexcept {
   this->number_of_template_segments_ = rec.number_of_template_segments_;
   this->class_id_ = rec.class_id_;
   this->read_1_first_ = rec.read_1_first_;
@@ -142,47 +132,48 @@ Record &Record::operator=(Record &&rec) noexcept {
   return *this;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Record::AddSegment(Segment &&rec) {
-  UTILS_DIE_IF(reads_.size() == number_of_template_segments_, "Record already full");
+void Record::AddSegment(Segment&& rec) {
+  UTILS_DIE_IF(reads_.size() == number_of_template_segments_,
+               "Record already full");
   if (reads_.empty()) {
-    qv_depth_ = uint8_t(rec.GetQualities().size());
+    qv_depth_ = static_cast<uint8_t>(rec.GetQualities().size());
   }
-  UTILS_DIE_IF(!reads_.empty() && rec.GetQualities().size() != qv_depth_, "Incompatible qv depth");
+  UTILS_DIE_IF(!reads_.empty() && rec.GetQualities().size() != qv_depth_,
+               "Incompatible qv depth");
   reads_.push_back(std::move(rec));
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Record::AddAlignment(uint16_t _seq_id, AlignmentBox &&rec) {
+void Record::AddAlignment(const uint16_t seq_id, AlignmentBox&& rec) {
   if (alignment_info_.empty()) {
-    shared_alignment_info_ =
-        AlignmentSharedData(_seq_id, uint8_t(rec.GetAlignment().GetMappingScores().size()));
+    shared_alignment_info_ = AlignmentSharedData(
+        seq_id,
+        static_cast<uint8_t>(rec.GetAlignment().GetMappingScores().size()));
   } else {
+    UTILS_DIE_IF(rec.GetAlignment().GetMappingScores().size() !=
+                     shared_alignment_info_.GetAsDepth(),
+                 "Incompatible AS depth");
     UTILS_DIE_IF(
-        rec.GetAlignment().GetMappingScores().size() != shared_alignment_info_.GetAsDepth(),
-        "Incompatible AS depth");
-    UTILS_DIE_IF(rec.GetNumberOfTemplateSegments() != number_of_template_segments_,
-                 "Incompatible number_of_template_segments");
-    UTILS_DIE_IF(_seq_id != shared_alignment_info_.GetSeqId(), "Incompatible seq id");
+        rec.GetNumberOfTemplateSegments() != number_of_template_segments_,
+        "Incompatible number_of_template_segments");
+    UTILS_DIE_IF(seq_id != shared_alignment_info_.GetSeqId(),
+                 "Incompatible seq id");
   }
   alignment_info_.push_back(std::move(rec));
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const std::vector<Segment> &Record::GetSegments() const {
-  return reads_;
-}
+const std::vector<Segment>& Record::GetSegments() const { return reads_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::vector<Segment> &Record::GetSegments() {
-  return reads_;
-}
+std::vector<Segment>& Record::GetSegments() { return reads_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void Record::SwapSegmentOrder() {
   if (reads_.size() != 2) {
@@ -193,19 +184,19 @@ void Record::SwapSegmentOrder() {
   reads_[1] = std::move(s_tmp);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 size_t Record::GetNumberOfTemplateSegments() const {
   return number_of_template_segments_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const std::vector<AlignmentBox> &Record::GetAlignments() const {
+const std::vector<AlignmentBox>& Record::GetAlignments() const {
   return alignment_info_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void Record::Write(util::BitWriter &writer) const {
   writer.WriteBypassBE(number_of_template_segments_);
@@ -234,89 +225,69 @@ void Record::Write(util::BitWriter &writer) const {
   more_alignment_info_->Write(writer);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint8_t Record::GetFlags() const {
-  return flags_;
-}
+uint8_t Record::GetFlags() const { return flags_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-ClassType Record::GetClassId() const {
-  return class_id_;
-}
+ClassType Record::GetClassId() const { return class_id_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const std::string &Record::GetName() const {
-  return read_name_;
-}
+const std::string& Record::GetName() const { return read_name_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool Record::GetRead1First() const {
-  return read_1_first_;
-}
+bool Record::GetRead1First() const { return read_1_first_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const std::string &Record::GetGroup() const {
-  return read_group_;
-}
+const std::string& Record::GetGroup() const { return read_group_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const AlignmentSharedData &Record::GetAlignmentSharedData() const {
+const AlignmentSharedData& Record::GetAlignmentSharedData() const {
   return shared_alignment_info_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const AlignmentExternal &Record::GetAlignmentExternal() const {
+const AlignmentExternal& Record::GetAlignmentExternal() const {
   return *more_alignment_info_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Record::SetQVDepth(uint8_t depth) {
-  qv_depth_ = depth;
-}
+void Record::SetQvDepth(const uint8_t depth) { qv_depth_ = depth; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Record::SetRead1First(bool val) {
-  this->read_1_first_ = val;
-}
+void Record::SetRead1First(const bool val) { this->read_1_first_ = val; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Record::SetName(const std::string &_name) {
-  read_name_ = _name;
-}
+void Record::SetName(const std::string& name) { read_name_ = name; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Record::SetClassType(ClassType type) {
-  this->class_id_ = type;
-}
+void Record::SetClassType(const ClassType type) { this->class_id_ = type; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool Record::IsRead1First() const {
-  return read_1_first_;
-}
+bool Record::IsRead1First() const { return read_1_first_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint64_t Record::GetLengthOfCigar(const std::string &cigar) {
+uint64_t Record::GetLengthOfCigar(const std::string& cigar) {
   std::string digits;
   size_t length = 0;
-  for (const auto &c : cigar) {
+  for (const auto& c : cigar) {
     if (isdigit(c)) {
       digits += c;
       continue;
     }
-    if (GetAlphabetProperties(core::AlphabetId::kAcgtn).IsIncluded(c)) {
+    if (GetAlphabetProperties(AlphabetId::kAcgtn).IsIncluded(c)) {
       length++;
       digits.clear();
       continue;
@@ -331,29 +302,32 @@ uint64_t Record::GetLengthOfCigar(const std::string &cigar) {
   return length;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-size_t Record::GetMappedLength(size_t alignment, size_t split) const {
+size_t Record::GetMappedLength(const size_t alignment,
+                               const size_t split) const {
   if (split == 0) {
-    return static_cast<size_t>(
-        GetLengthOfCigar(GetAlignments()[alignment].GetAlignment().GetECigar()));
+    return GetLengthOfCigar(
+        GetAlignments()[alignment].GetAlignment().GetECigar());
   }
-  auto &s2 = dynamic_cast<record::alignment_split::SameRec &>(
+  const auto& s2 = dynamic_cast<alignment_split::SameRec&>(
       *GetAlignments()[alignment].GetAlignmentSplits()[split - 1]);
-  return static_cast<size_t>(GetLengthOfCigar(s2.GetAlignment().GetECigar()));
+  return GetLengthOfCigar(s2.GetAlignment().GetECigar());
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Record::SetAlignment(size_t id, AlignmentBox &&b) {
+void Record::SetAlignment(const size_t id, AlignmentBox&& b) {
   this->alignment_info_[id] = std::move(b);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 std::pair<size_t, size_t> Record::GetTemplatePosition() const {
-  std::pair<size_t, size_t> ret = {GetPosition(0, 0), GetPosition(0, 0) + GetMappedLength(0, 0)};
-  for (size_t i = 0; i < GetAlignments().front().GetAlignmentSplits().size(); ++i) {
+  std::pair ret = {GetPosition(0, 0),
+                   GetPosition(0, 0) + GetMappedLength(0, 0)};
+  for (size_t i = 0; i < GetAlignments().front().GetAlignmentSplits().size();
+       ++i) {
     auto pos = GetPosition(0, i);
     ret.first = std::min(ret.first, pos);
     ret.second = std::max(ret.second, pos + GetMappedLength(0, i));
@@ -361,26 +335,27 @@ std::pair<size_t, size_t> Record::GetTemplatePosition() const {
   return ret;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-size_t Record::GetPosition(size_t alignment, size_t split) const {
+size_t Record::GetPosition(const size_t alignment, const size_t split) const {
   if (split == 0) {
-    return static_cast<size_t>(GetAlignments()[alignment].GetPosition());
+    return GetAlignments()[alignment].GetPosition();
   }
-  auto &s2 = dynamic_cast<record::alignment_split::SameRec &>(
+  const auto& s2 = dynamic_cast<alignment_split::SameRec&>(
       *GetAlignments()[alignment].GetAlignmentSplits()[split - 1]);
-  return static_cast<size_t>(GetAlignments()[alignment].GetPosition() + s2.GetDelta());
+  return GetAlignments()[alignment].GetPosition() + s2.GetDelta();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Record::SetMoreAlignmentInfo(std::unique_ptr<AlignmentExternal> _more_alignment_info) {
-  more_alignment_info_ = std::move(_more_alignment_info);
+void Record::SetMoreAlignmentInfo(
+    std::unique_ptr<AlignmentExternal> more_alignment_info) {
+  more_alignment_info_ = std::move(more_alignment_info);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::record
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

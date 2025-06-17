@@ -14,26 +14,27 @@
 #include "genie/core/record/alignment_split/unpaired.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
 #include "genie/util/runtime_exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::core::record {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-AlignmentSplit::AlignmentSplit(const Type split_alignment) : split_alignment_(split_alignment) {}
+AlignmentSplit::AlignmentSplit(const Type split_alignment)
+    : split_alignment_(split_alignment) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void AlignmentSplit::Write(util::BitWriter& writer) const {
   writer.WriteBypassBE(split_alignment_);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::unique_ptr<AlignmentSplit> AlignmentSplit::Factory(uint8_t as_depth, util::BitReader& reader) {
+std::unique_ptr<AlignmentSplit> AlignmentSplit::Factory(
+    uint8_t as_depth, util::BitReader& reader) {
   switch (reader.ReadAlignedInt<Type>()) {
     case Type::kSameRec:
       return std::make_unique<alignment_split::SameRec>(as_depth, reader);
@@ -46,15 +47,15 @@ std::unique_ptr<AlignmentSplit> AlignmentSplit::Factory(uint8_t as_depth, util::
   }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 AlignmentSplit::Type AlignmentSplit::GetType() const {
   return split_alignment_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::record
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
