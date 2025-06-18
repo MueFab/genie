@@ -54,11 +54,13 @@ compress_roundtrip () {
 
     if [[ "$paired_fastq_file" == "" ]]; then
         paired_fastq_parameter=""
+        paired_fastq_output_parameters=""
         fastq_cmp_input_parameters="-i $primary_fastq_file_unzipped -p $working_dir/output_1.fastq"
     else
         paired_fastq_file_unzipped="${paired_fastq_file::-3}"
         eval gzip -k -d -f $paired_fastq_file
         paired_fastq_parameter="--input-suppl-file $paired_fastq_file"
+        paired_fastq_output_parameters="--output-suppl-file $working_dir/output_2.fastq.gz -f"
         fastq_cmp_input_parameters="-i $primary_fastq_file_unzipped -j $paired_fastq_file_unzipped -p $working_dir/output_1.fastq -q $working_dir/output_2.fastq"
         if [[ "$genie_encoder_parameters" != *"--low-latency"* ]] && [[ "$genie_encoder_parameters" != *"--read-ids none"* ]]; then
             genie_decoder_recombine="--combine-pairs"
@@ -89,7 +91,7 @@ compress_roundtrip () {
     eval $timing_command \
         $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
         -o $working_dir/output_1.fastq.gz \
-        --output-suppl-file $working_dir/output_2.fastq.gz -f \
+        $paired_fastq_output_parameters \
         -w $working_dir \
         -i $working_dir/output.mgb -f \
         $genie_decoder_recombine \
@@ -103,7 +105,9 @@ compress_roundtrip () {
     fi
 
     ls -l $working_dir/output_1.fastq
-    ls -l $working_dir/output_2.fastq
+    if [[ "$paired_fastq_file" != "" ]]; then
+      ls -l $working_dir/output_2.fastq
+    fi
 
     echo "-----------------Check output files:"
     $git_root_dir/ci/fastq_tools/fastq_cmp_complete.py $fastq_cmp_input_parameters $fastq_cmp_error_parameters || { echo "Invalid output!" ; exit 1; }
