@@ -8,7 +8,7 @@
 #define GENIE_CONTACT_CONTACT_MATRIX_PARAMETERS_H
 
 #include <genie/core/constants.h>
-#include <genie/core/writer.h>
+//#include <genie/core/writer.h>
 #include <genie/util/bit_reader.h>
 #include <genie/util/bit_writer.h>
 #include <cstdint>
@@ -431,15 +431,6 @@ class ContactMatrixParameters {
      * @return The size of the object when written to the writer.
      */
     size_t GetSize() const;
-
-    /**
-     * @brief Writes the object to a writer.
-     *
-     * This function writes the object to a writer.
-     *
-     * @param writer The writer to write to.
-     */
-    void Write(core::Writer& writer) const;
 
     /**
      * @brief Writes the object to a writer.
