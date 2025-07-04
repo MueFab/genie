@@ -217,12 +217,6 @@ void SortedBinMatPayload::Write(util::BitWriter& writer) const {
 
 // -----------------------------------------------------------------------------
 
-void SortedBinMatPayload::Write(core::Writer& writer) const {
-
-}
-
-// -----------------------------------------------------------------------------
-
 }  // namespace genie::genotype
 
 // -----------------------------------------------------------------------------

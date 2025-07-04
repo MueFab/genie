@@ -18,7 +18,6 @@
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "genie/core/writer.h"
 #include "genie/genotype/amax_payload.h"
 #include "genie/genotype/row_col_ids_payload.h"
 #include "genie/genotype/sorted_bin_mat_payload.h"
@@ -117,7 +116,6 @@ class GenotypePayload {
 
   // Function to write to writer
   void Write(util::BitWriter& writer) const;
-  void Write(core::Writer& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
