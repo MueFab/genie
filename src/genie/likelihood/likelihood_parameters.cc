@@ -39,13 +39,6 @@ void LikelihoodParameters::read(util::BitReader& reader) {
     transform_flag = static_cast<bool>(reader.ReadBits(1));
     if (transform_flag) dtype_id = static_cast<genie::core::DataType>(reader.ReadBits(8));
 }
-// ---------------------------------------------------------------------------------------------------------------------
-
-void LikelihoodParameters::write(genie::core::Writer& writer) const {
-  writer.Write(num_gl_per_sample, 8);
-    writer.Write(transform_flag, 1);
-    if (transform_flag) writer.Write(static_cast<uint8_t>(dtype_id), 8);
-}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

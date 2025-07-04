@@ -870,7 +870,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
             {
                 std::ofstream tmp_writer(out_path + "case01-cm_param.bin", std::ios::binary);
                 genie::util::BitWriter tmp_bitwriter(&tmp_writer);
-                scm_payload.Write(tmp_bitwriter);
+                cm_param.Write(tmp_bitwriter);
             }
         }
 
@@ -3000,7 +3000,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             {
                 std::ofstream tmp_writer(out_path + "case01-cm_param.bin", std::ios::binary);
                 genie::util::BitWriter tmp_bitwriter(&tmp_writer);
-                scm_param.Write(tmp_bitwriter);
+                cm_param.Write(tmp_bitwriter);
             }
         }
 
