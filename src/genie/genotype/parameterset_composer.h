@@ -16,7 +16,6 @@
 
 #include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 
 #include "genie/core/record/annotation_parameter_set/record.h"
@@ -31,6 +30,7 @@
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/genotype/genotype_payload.h"
 #include "genie/likelihood/likelihood_parameters.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

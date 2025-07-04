@@ -250,19 +250,6 @@ size_t BinMatPayload::GetSize() const {
 
   return size;
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void BinMatPayload::Write(core::Writer& writer) const {
-  if (codec_ID_ != genie::core::AlgoID::JBIG) {
-    writer.Write(GetNRows(), 32);
-    writer.Write(GetNCols(), 32);
-  }
-  for (auto byte : payload_){
-    writer.Write(byte, 8);
-  }
-}
-
 // -----------------------------------------------------------------------------
 
 void BinMatPayload::Write(util::BitWriter writer) const {

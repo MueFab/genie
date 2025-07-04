@@ -160,17 +160,6 @@ void RowColIdsPayload::Write(util::BitWriter writer) const {
 
 // -----------------------------------------------------------------------------
 
-void RowColIdsPayload::Write(core::Writer& writer) const {
-  auto nbits_per_elem = GetNbitsPerElem();
-  for (auto i = 0u; i< GetNelements(); i++){
-    writer.Write(row_col_ids_elements_[i], nbits_per_elem);
-  }
-
-  writer.Flush();
-}
-
-// -----------------------------------------------------------------------------
-
 // Static method implementation
 uint8_t RowColIdsPayload::ComputeNBitsPerElem(size_t num_elements) {
   UTILS_DIE_IF(num_elements == 0, "num_elements cannot be 0!");

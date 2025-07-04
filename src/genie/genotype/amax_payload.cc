@@ -164,22 +164,6 @@ void AmaxPayload::Write(util::BitWriter& writer) const {
 
 // -----------------------------------------------------------------------------
 
-void AmaxPayload::Write(core::Writer& writer) const {
-  writer.Write(GetNElems(), 32);
-  writer.Write(GetNBitsPerElem(), 8);
-  for (auto amax_element : GetAmaxElements()) {
-    auto is_one_flag = amax_element > 1;
-    writer.Write(is_one_flag, 1);
-    if (is_one_flag) {
-      writer.Write(amax_element-2, GetNBitsPerElem());
-    }
-  }
-
-  writer.Flush();
-}
-
-// -----------------------------------------------------------------------------
-
 uint8_t AmaxPayload::ComputeNbitsPerElement(const std::vector<uint64_t>& amax_elements) {
     UTILS_DIE_IF(amax_elements.empty(), "amax_elements is empty!");
     uint64_t max_val = *std::max_element(amax_elements.begin(), amax_elements.end());

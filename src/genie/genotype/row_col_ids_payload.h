@@ -19,7 +19,6 @@
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "genie/core/writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -81,7 +80,7 @@ class RowColIdsPayload {
  
    // Function to write to writer
    void Write(util::BitWriter writer) const;
-   void Write(core::Writer& writer) const;
+
  };
 
 // ---------------------------------------------------------------------------------------------------------------------
