@@ -373,10 +373,15 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixParameter){
         ASSERT_EQ(ORIG_CM_PARAM.GetSampleName(SAMPLE1_ID), SAMPLE1_NAME);
         ASSERT_EQ(ORIG_CM_PARAM.GetSampleName(SAMPLE2_ID), SAMPLE2_NAME);
 
-        std::stringstream obj_payload;
+//        std::stringstream obj_payload;
+//        std::ostream& writer = obj_payload;
+//        auto CMWriter = genie::core::Writer(&writer);
+//        ORIG_CM_PARAM.Write(CMWriter);
+
+        auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
-        auto CMWriter = genie::core::Writer(&writer);
-        ORIG_CM_PARAM.Write(CMWriter);
+        auto bitwriter = genie::util::BitWriter(&writer);
+        ORIG_CM_PARAM.Write(bitwriter);
 
         ASSERT_EQ(obj_payload.str().size(), ORIG_CM_PARAM.GetSize());
 

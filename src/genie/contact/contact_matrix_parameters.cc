@@ -472,50 +472,6 @@ size_t ContactMatrixParameters::GetSize() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//TODO(yeremia): use util::Bitwriter instead of core::Writer
-void ContactMatrixParameters::Write(core::Writer& writer) const {
-  writer.Write(static_cast<uint16_t>(sample_infos_.size()), 16);
-    for(const auto& sample_info : sample_infos_) {
-      writer.Write(sample_info.second.ID, 16);
-        writer.Write(static_cast<uint16_t>(sample_info.second.name.size()), 8);
-        writer.Write(sample_info.second.name);
-    }
-
-    writer.Write(static_cast<uint8_t>(chr_infos_.size()), 8);
-    for(const auto& chr_info : chr_infos_) {
-      writer.Write(chr_info.second.ID, 8);
-        writer.Write(static_cast<uint16_t>(chr_info.second.name.size()), 8);
-        writer.Write(chr_info.second.name);
-        writer.Write(chr_info.second.length, 64);
-    }
-
-    writer.Write(bin_size_, 32);
-    writer.Write(tile_size_, 32);
-
-    writer.Write(static_cast<uint8_t>(bin_size_multipliers_.size()), 8);
-    for(const auto& bin_size_multiplier : bin_size_multipliers_) {
-      writer.Write(bin_size_multiplier, 32);
-    }
-
-    writer.Write(static_cast<uint8_t>(norm_method_infos_.size()), 8);
-    for(const auto& method_info : norm_method_infos_) {
-      writer.Write(method_info.second.ID, 8);
-        writer.Write(static_cast<uint16_t>(method_info.second.name.size()), 8);
-        writer.Write(method_info.second.name);
-        writer.WriteReserved(7);
-        writer.Write(method_info.second.mult_flag, 1);
-    }
-
-    writer.Write(static_cast<uint8_t>(norm_mat_infos_.size()), 8);
-    for(const auto& mat_info : norm_mat_infos_) {
-      writer.Write(mat_info.second.ID, 8);
-        writer.Write(static_cast<uint16_t>(mat_info.second.name.size()), 8);
-        writer.Write(mat_info.second.name);
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void ContactMatrixParameters::Write(util::BitWriter& writer) const {
   writer.WriteBits(static_cast<uint16_t>(sample_infos_.size()), 16);
   for(const auto& sample_info : sample_infos_) {
