@@ -41,10 +41,29 @@ void LikelihoodParameters::read(util::BitReader& reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+size_t LikelihoodParameters::GetSize() const {
+  size_t size = 0;
+
+  size += sizeof(num_gl_per_sample);
+  size += sizeof(uint8_t);
+
+  if (transform_flag){
+    size += sizeof(uint8_t);
+  }
+
+  return size;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void LikelihoodParameters::write(genie::util::BitWriter& writer) const {
-  writer.WriteBits(num_gl_per_sample, 8);
-  writer.WriteBits(transform_flag, 1);
-  if (transform_flag) writer.WriteBits(static_cast<uint8_t>(dtype_id), 8);
+//  writer.WriteBits(num_gl_per_sample, 8);
+//  writer.WriteBits(transform_flag, 1);
+  writer.WriteBypassBE(num_gl_per_sample);
+  writer.WriteBypassBE(static_cast<uint8_t>(transform_flag));
+  if (transform_flag) writer.WriteBypassBE(static_cast<uint8_t>(dtype_id));
+
+  writer.FlushBits();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

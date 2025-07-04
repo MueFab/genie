@@ -35,6 +35,7 @@ class LikelihoodParameters {
 
     void write(genie::util::BitWriter& writer) const;
     void read(util::BitReader& reader);
+    [[nodiscard]] size_t GetSize() const;
 
     uint8_t getNumGlPerSample() const;
     bool getTransformFlag() const;
