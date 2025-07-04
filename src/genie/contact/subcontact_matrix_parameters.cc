@@ -367,36 +367,6 @@ void SubcontactMatrixParameters::Write(util::BitWriter& writer) const {
 
 // -----------------------------------------------------------------------------
 
-//void SubcontactMatrixParameters::Write(core::Writer& writer) const {
-//  writer.Write(parameter_set_ID_, 8);
-//    writer.Write(chr1_ID_, 8);
-//    writer.Write(chr2_ID_, 8);
-//
-//    writer.WriteReserved(3);
-//    uint8_t flags = 0u;
-//    flags |= (static_cast<uint8_t>(codec_ID_) & 0x1F);
-//    writer.Write(flags, 5);
-//
-//    // Write the tile_parameters_
-//    for (size_t i = 0; i < GetNTilesInRow(); ++i) {
-//        for (size_t j = 0; j < GetNTilesInCol(); ++j) {
-//            if (IsIntraSCM() && i > j) {
-//                continue;
-//            }
-//            auto& tile_param = tile_parameters_[i][j];
-//            writer.WriteReserved(3);
-//            writer.Write(static_cast<uint8_t>(tile_param.diag_tranform_mode),
-//                         3);
-//            writer.Write(static_cast<uint8_t>(tile_param.binarization_mode), 2);
-//        }
-//    }
-//    writer.WriteReserved(6);
-//    writer.Write(row_mask_exists_flag_, 1);
-//    writer.Write(col_mask_exists_flag_, 1);
-//}
-
-// -----------------------------------------------------------------------------
-
 }  // namespace genie::contact
 
 // -----------------------------------------------------------------------------
