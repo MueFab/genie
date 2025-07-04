@@ -8,8 +8,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace likelihood {
+namespace genie::likelihood {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -47,15 +46,9 @@ void LikelihoodParameters::write(genie::util::BitWriter& writer) const {
   writer.WriteBits(transform_flag, 1);
   if (transform_flag) writer.WriteBits(static_cast<uint8_t>(dtype_id), 8);
 }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t LikelihoodParameters::getSize(core::Writer& writesize) const {
-    write(writesize);
-    return writesize.GetBitsWritten();
-}
-// ---------------------------------------------------------------------------------------------------------------------
-
-}  // namespace likelihood
-}  // namespace genie
+}  // namespace genie::
 
 // ---------------------------------------------------------------------------------------------------------------------

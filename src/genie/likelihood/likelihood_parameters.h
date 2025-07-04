@@ -19,8 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace likelihood {
+namespace genie::likelihood {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,10 +33,8 @@ class LikelihoodParameters {
     LikelihoodParameters();
     LikelihoodParameters(uint8_t _num_gl_per_sample, bool _transform_flag, core::DataType _dtype_id);
 
-    void write(core::Writer& writer) const;
     void write(genie::util::BitWriter& writer) const;
     void read(util::BitReader& reader);
-    size_t getSize(core::Writer& writesize) const;
 
     uint8_t getNumGlPerSample() const;
     bool getTransformFlag() const;
@@ -46,8 +43,7 @@ class LikelihoodParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace likelihood
-}  // namespace genie
+}  // namespace genie::likelihood
 
 // ---------------------------------------------------------------------------------------------------------------------
 
