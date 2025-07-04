@@ -70,13 +70,15 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
     std::stringstream outputfile;
     genie::core::Writer strwriter(&outputfile);
     genie::util::BitReader strreader(outputfile);
-    likelihoodParameters.write(strwriter);
+    likelihoodParameters.Write(strwriter);
     strwriter.Flush();
     likelihoodParametersCheck.read(strreader);
 
-//    EXPECT_EQ(likelihoodParameters.getDtypeID(), likelihoodParametersCheck.getDtypeID());
-    EXPECT_EQ(likelihoodParameters.getNumGlPerSample(), likelihoodParametersCheck.getNumGlPerSample());
-    EXPECT_EQ(likelihoodParameters.getTransformFlag(), likelihoodParametersCheck.getTransformFlag());
+//    EXPECT_EQ(likelihoodParameters.getDtypeID(), likelihoodParametersCheck.GetDtypeId());
+    EXPECT_EQ(likelihoodParameters.GetNumGlPerSample(),
+              likelihoodParametersCheck.GetNumGlPerSample());
+    EXPECT_EQ(likelihoodParameters.GetTransformFlag(),
+              likelihoodParametersCheck.GetTransformFlag());
     genie::core::Writer writeSize;
     auto size = likelihoodParameters.getSize(writeSize);
     if (size % 8 != 0) size += (8 - size % 8);
@@ -111,10 +113,10 @@ TEST_F(LikelihoodTests, LikelihoodConstructZeros) {  // NOLINT(cert-err58-cpp)
     // when continuing after failure doesn't make sense.
     genie::likelihood::LikelihoodParameters likelihoodParameters;
 
-    EXPECT_FALSE(likelihoodParameters.getTransformFlag());
-    EXPECT_EQ(static_cast<uint8_t>(likelihoodParameters.getDtypeID()),
+    EXPECT_FALSE(likelihoodParameters.GetTransformFlag());
+    EXPECT_EQ(static_cast<uint8_t>(likelihoodParameters.GetDtypeId()),
               static_cast<uint8_t>(genie::core::DataType::STRING));
-    EXPECT_EQ(likelihoodParameters.getNumGlPerSample(), 0);
+    EXPECT_EQ(likelihoodParameters.GetNumGlPerSample(), 0);
 }
 
 TEST_F(LikelihoodTests, LikelihoodConstructValues) {  // NOLINT(cert-err58-cpp)
@@ -123,8 +125,8 @@ TEST_F(LikelihoodTests, LikelihoodConstructValues) {  // NOLINT(cert-err58-cpp)
     // when continuing after failure doesn't make sense.
     genie::likelihood::LikelihoodParameters likelihoodParameters(128, true, genie::core::DataType::DOUBLE);
 
-    EXPECT_TRUE(likelihoodParameters.getTransformFlag());
-    EXPECT_EQ(static_cast<uint8_t>(likelihoodParameters.getDtypeID()),
+    EXPECT_TRUE(likelihoodParameters.GetTransformFlag());
+    EXPECT_EQ(static_cast<uint8_t>(likelihoodParameters.GetDtypeId()),
               static_cast<uint8_t>(genie::core::DataType::DOUBLE));
-    EXPECT_EQ(likelihoodParameters.getNumGlPerSample(), 128);
+    EXPECT_EQ(likelihoodParameters.GetNumGlPerSample(), 128);
 }

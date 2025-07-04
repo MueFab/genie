@@ -297,12 +297,6 @@ class SubcontactMatrixParameters {
      * @param writer The BitWriter to write to.
      */
     void Write(util::BitWriter& writer) const;
-
-    /**
-     *
-     * @param writer
-     */
-//    void Write(core::Writer& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

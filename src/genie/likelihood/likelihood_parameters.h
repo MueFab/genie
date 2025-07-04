@@ -34,13 +34,13 @@ class LikelihoodParameters {
     LikelihoodParameters(uint8_t _num_gl_per_sample, bool _transform_flag, core::DataType _dtype_id);
     LikelihoodParameters(util::BitReader& reader);
 
-    void write(genie::util::BitWriter& writer) const;
+    void Write(genie::util::BitWriter& writer) const;
     void read(util::BitReader& reader);
     [[nodiscard]] size_t GetSize() const;
 
-    uint8_t getNumGlPerSample() const;
-    bool getTransformFlag() const;
-    core::DataType getDtypeID() const;
+    uint8_t GetNumGlPerSample() const;
+    bool GetTransformFlag() const;
+    core::DataType GetDtypeId() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
