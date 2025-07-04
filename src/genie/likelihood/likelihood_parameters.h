@@ -32,6 +32,7 @@ class LikelihoodParameters {
  public:
     LikelihoodParameters();
     LikelihoodParameters(uint8_t _num_gl_per_sample, bool _transform_flag, core::DataType _dtype_id);
+    LikelihoodParameters(util::BitReader& reader);
 
     void write(genie::util::BitWriter& writer) const;
     void read(util::BitReader& reader);
