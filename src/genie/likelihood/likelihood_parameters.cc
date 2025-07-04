@@ -34,15 +34,15 @@ LikelihoodParameters::LikelihoodParameters(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t LikelihoodParameters::getNumGlPerSample() const { return num_gl_per_sample; }
+uint8_t LikelihoodParameters::GetNumGlPerSample() const { return num_gl_per_sample; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool LikelihoodParameters::getTransformFlag() const { return transform_flag; }
+bool LikelihoodParameters::GetTransformFlag() const { return transform_flag; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::DataType LikelihoodParameters::getDtypeID() const { return dtype_id; }
+core::DataType LikelihoodParameters::GetDtypeId() const { return dtype_id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ size_t LikelihoodParameters::GetSize() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LikelihoodParameters::write(genie::util::BitWriter& writer) const {
+void LikelihoodParameters::Write(genie::util::BitWriter& writer) const {
 //  writer.WriteBits(num_gl_per_sample, 8);
 //  writer.WriteBits(transform_flag, 1);
   writer.WriteBypassBE(num_gl_per_sample);

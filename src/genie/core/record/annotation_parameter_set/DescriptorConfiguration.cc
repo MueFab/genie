@@ -75,7 +75,7 @@ void DescriptorConfiguration::write(core::Writer& writer) const {
     if (descriptor_ID == AnnotDesc::GENOTYPE) {
       genotype_parameters.Write(writer);
     } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
-        likelihood_parameters.write(writer);
+        likelihood_parameters.Write(writer);
     } else if (descriptor_ID == AnnotDesc::CONTACT) {
       contact_matrix_parameters.Write(writer);
         writer.Write(subcontract_matrix_parameters.size(), 16);
@@ -92,7 +92,7 @@ void DescriptorConfiguration::write(util::BitWriter& writer) const {
   if (descriptor_ID == AnnotDesc::GENOTYPE) {
     genotype_parameters.Write(writer);
   } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
-    likelihood_parameters.write(writer);
+    likelihood_parameters.Write(writer);
   } else if (descriptor_ID == AnnotDesc::CONTACT) {
     contact_matrix_parameters.Write(writer);
     writer.WriteBits(subcontract_matrix_parameters.size(), 16);

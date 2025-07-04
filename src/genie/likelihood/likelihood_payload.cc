@@ -40,7 +40,7 @@ LikelihoodPayload::LikelihoodPayload(genie::likelihood::EncodingBlock& block) {
 LikelihoodPayload::LikelihoodPayload(genie::likelihood::LikelihoodParameters parameters, genie::likelihood::EncodingBlock& data)
     : LikelihoodPayload(data)
 {
-    transform_flag = parameters.getTransformFlag();
+    transform_flag = parameters.GetTransformFlag();
     if (transform_flag) {
         additionalPayloadStream << data.serialized_arr.rdbuf();
     }

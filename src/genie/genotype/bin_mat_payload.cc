@@ -262,46 +262,6 @@ void BinMatPayload::Write(util::BitWriter writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//TODO: Move to somewhere else
-//void BinMatPayload::WriteCompressed(core::Writer& writer) const {
-//  std::stringstream payloadStream;
-//  for (auto byte : payload_) payloadStream.Write((char*)&byte, 1);
-//
-//  std::stringstream compressedStream;
-//  if (codec_ID_ != genie::core::AlgoID::JBIG) {
-//    writer.Write(GetNRows(), 32);
-//    writer.Write(GetNCols(), 32);
-//  }
-//
-//  switch (codec_ID_) {
-//    case genie::core::AlgoID::LZMA: {
-//      genie::entropy::lzma::LZMAEncoder encoder;
-//      encoder.encode(payloadStream, compressedStream);
-//      writer.Write(&compressedStream);
-//    } break;
-//    case genie::core::AlgoID::ZSTD: {
-//      genie::entropy::zstd::ZSTDEncoder encoder;
-//      encoder.encode(payloadStream, compressedStream);
-//      writer.Write(&compressedStream);
-//    } break;
-//    case genie::core::AlgoID::BSC: {
-//      genie::entropy::bsc::BSCEncoder encoder;
-//      encoder.encode(payloadStream, compressedStream);
-//      writer.Write(&compressedStream);
-//    } break;
-//    case genie::core::AlgoID::JBIG: {
-//      genie::entropy::jbig::JBIGEncoder encoder;
-//      encoder.encode(payloadStream, compressedStream, GetNCols(), GetNRows());
-//      writer.Write(&compressedStream);
-//    } break;
-//    default:
-//      writer.Write(&payloadStream);
-//      break;
-//  }
-//}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 }  // namespace genie::genotype
 
 // ---------------------------------------------------------------------------------------------------------------------
