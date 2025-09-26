@@ -18,7 +18,7 @@
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-
+#include "genie/core/writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::genotype {
@@ -118,6 +118,7 @@ class GenotypeParameters {
 
   static size_t GetSize() ;
   void Write(util::BitWriter& writer) const;
+  void Write(core::Writer& writer) const;
 
   //TODO: Why we have read function here instead of a constructor?
   void read(util::BitReader& reader);
