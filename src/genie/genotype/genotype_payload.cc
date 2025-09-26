@@ -359,7 +359,8 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
   }
 
   if (IsAmaxPayloadExist()) {
-    writer.WriteBypassBE(static_cast<uint32_t>(GetVariantsAmaxPayload()->GetSize()));
+    auto amax_payload_size = static_cast<uint32_t>(GetVariantsAmaxPayload()->GetSize());
+    writer.WriteBypassBE(amax_payload_size);
     GetVariantsAmaxPayload()->Write(writer);
   }
 
@@ -392,7 +393,7 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
 //      auto nBitsPerElem = static_cast<uint32_t>(std::ceil(std::log2(nrows)));
 //
 //      std::vector<uint64_t> payloadVec(alleleRowIDs.begin(), alleleRowIDs.end());
-//      sort_variants_row_ids_payloads_.emplace_back(std::Move(payloadVec));
+//      sort_variants_row_ids_payloads_.emplace_back(std::move(payloadVec));
 //    }
 //
 //    // Initialize column IDs payloads
@@ -403,7 +404,7 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
 //      auto nBitsPerElem = static_cast<uint32_t>(std::ceil(std::log2(ncols)));
 //
 //      std::vector<uint64_t> payloadVec(alleleColIDs.begin(), alleleColIDs.end());
-//      sort_variants_col_ids_payloads_.emplace_back(std::Move(payloadVec));
+//      sort_variants_col_ids_payloads_.emplace_back(std::move(payloadVec));
 //    }
 //
 //    // Initialize amax payload if binarization is ROW_BIN
@@ -413,55 +414,54 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
 //        amax_elements.push_back(amax);
 //      }
 //
-//      variants_amax_payload_ = AmaxPayload(std::Move(amax_elements));
+//      variants_amax_payload_ = AmaxPayload(std::move(amax_elements));
 //    }
 //}
-// -----------------------------------------------------------------------------
 
-//GenotypePayload::GenotypePayload(EncodingBlock& datablock, GenotypeParameters& genotypeParameters)
-//    : genotype_parameters_(genotypeParameters) {
+// ---------------------------------------------------------------------------------------------------------------------
+
+//void genie::genotype::GenotypePayload::Write(core::Writer& writer) const {
+//    size_t indecRowIds = 0;
+//    size_t indecColIds = 0;
+//    uint8_t num_variants_payloads =
+//        genotype_parameters_.GetBinarizationID() == BinarizationID::BIT_PLANE &&
+//        genotype_parameters_.GetConcatAxis() == ConcatAxis::DO_NOT_CONCAT
+//        ? genotype_parameters_.GetNumBitPlanes()
+//        : 1;
 //
-//    // Initialize phases payload
-//    phases_payload_ = BinMatPayload(datablock.phasing_mat, genotypeParameters.GetPhasesCodecID());
-//
-//    // Initialize variants payloads
-//    for (auto & allele_bin_mat : datablock.allele_bin_mat_vect) {
-//      variants_payloads_.emplace_back(
-//            allele_bin_mat,
-//            genotypeParameters.GetAllelesCodecID()
-//        );
+//    for (auto i = 0; i < num_variants_payloads; ++i) {
+//        std::stringstream tempstream;
+//        core::Writer writesize(&tempstream);
+//        variants_payloads_[i].WriteCompressed(writesize);
+//        auto variantssize = tempstream.str().size();
+//        writer.Write(variantssize, 32);
+//        variants_payloads_[i].WriteCompressed(writer);
+//        auto variantsPayloadsParams =
+//            genotype_parameters_.GsetVariantsPayloadParams();
+//        if (variantsPayloadsParams[i].sort_rows_flag) {
+//            uint32_t size = sort_variants_row_ids_payload[indecRowIds].GetSize();
+//            writer.Write(size, 32);
+//            sort_variants_row_ids_payload[indecRowIds].Write(writer);
+//            ++indecRowIds;
+//        }
+//        if (variantsPayloadsParams[i].sort_cols_flag) {
+//            auto size = sort_variants_col_ids_payload[indecColIds].GetSize();
+//            writer.Write(size, 32);
+//            sort_variants_col_ids_payload[indecColIds].Write(writer);
+//            ++indecColIds;
+//        }
+//        if (genotype_parameters_.GetBinarizationID() == BinarizationID::ROW_BIN) {
+//          writer.Write(variants_amax_payload_.GetSize(), 32);
+//          variants_amax_payload_.Write(writer);
+//        }
 //    }
-//
-//    // Initialize row IDs payloads
-//    for (size_t i = 0; i < datablock.allele_row_ids_vect.size(); ++i) {
-//      auto& alleleRowIDs = datablock.allele_row_ids_vect[i];
-//      auto shape = datablock.allele_bin_mat_vect[i].shape();
-//      auto nrows = static_cast<uint32_t>(shape[0]);
-//      auto nBitsPerElem = static_cast<uint32_t>(std::ceil(std::log2(nrows)));
-//
-//      std::vector<uint64_t> payloadVec(alleleRowIDs.begin(), alleleRowIDs.end());
-//      sort_variants_row_ids_payloads_.emplace_back(std::Move(payloadVec));
-//    }
-//
-//    // Initialize column IDs payloads
-//    for (size_t i = 0; i < datablock.allele_col_ids_vect.size(); ++i) {
-//      auto& alleleColIDs = datablock.allele_col_ids_vect[i];
-//      auto shape = datablock.allele_bin_mat_vect[i].shape();
-//      auto ncols = static_cast<uint32_t>(shape[1]);
-//      auto nBitsPerElem = static_cast<uint32_t>(std::ceil(std::log2(ncols)));
-//
-//      std::vector<uint64_t> payloadVec(alleleColIDs.begin(), alleleColIDs.end());
-//      sort_variants_col_ids_payloads_.emplace_back(std::Move(payloadVec));
-//    }
-//
-//    // Initialize amax payload if binarization is ROW_BIN
-//    if (genotypeParameters.GetBinarizationID() == BinarizationID::ROW_BIN) {
-//      std::vector<uint64_t> amax_elements;
-//      for (auto amax : datablock.amax_vec) {
-//        amax_elements.push_back(amax);
-//      }
-//
-//      variants_amax_payload_ = AmaxPayload(std::Move(amax_elements));
+//    if (genotype_parameters_.IsPhaseEncoded()) {
+//        std::stringstream tempstream;
+//        core::Writer writesize(&tempstream);
+//        phases_payload_.WriteCompressed(writesize);
+//        auto phasesSize = tempstream.str().size();
+//        writer.Write(phasesSize, 32);
+//        phases_payload_.WriteCompressed(writer);
 //    }
 //}
 
