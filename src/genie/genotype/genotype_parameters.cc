@@ -289,7 +289,6 @@ void GenotypeParameters::Write(core::Writer& writer) const {
   writer.Write(GetSortPhasesColsFlag(), 1);
   writer.Write(GetTransposePhasesMatFlag(), 1);
   writer.Write(static_cast<uint64_t>(GetPhasesCodecID()), 3);
-  writer.Flush();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

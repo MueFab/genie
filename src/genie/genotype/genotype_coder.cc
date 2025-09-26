@@ -38,6 +38,7 @@ void decompose(
 
   uint32_t i_rec = 0;
   // Precompute max ploidy do avoid resizing during process
+  max_ploidy = 0;
   for (i_rec = 0; i_rec < block_size; i_rec++) {
     auto& rec = recs[i_rec];
 
@@ -827,14 +828,14 @@ void encode_genotype(
     auto tmp_params = GenotypeParameters(
         binarization_ID,
         concat_axis,
-        transpose_mat,
         sort_row_method != SortingAlgoID::NO_SORTING,
         sort_col_method != SortingAlgoID::NO_SORTING,
+        transpose_mat,
         codec_ID,
         true, // Encode Phase data
-        transpose_mat,
         sort_row_method != SortingAlgoID::NO_SORTING,
         sort_col_method != SortingAlgoID::NO_SORTING,
+        transpose_mat,
         codec_ID
     );
 
@@ -857,6 +858,9 @@ void encode_genotype(
             block_size
         );
 
+        tmp_payload.SetMaxPloidy(max_ploidy);
+        //if (max_ploidy > 1) tmp_payload.SetPhasesValue(phasing_mat(0,0));  // TODO(Ronald): Is this correct???
+
         transform_max_value(
             allele_mat,
             dot_flag,
@@ -876,6 +880,8 @@ void encode_genotype(
             tmp_params.GetBinarizationID(),
             tmp_params.GetConcatAxis()
         );
+
+        tmp_payload.SetNumBitPlanes(num_bit_planes);
 
         if (tmp_params.GetBinarizationID() == BinarizationID::ROW_BIN){
             std::vector<uint64_t> amax_elements(amax_vec.begin(), amax_vec.end());
@@ -909,7 +915,7 @@ void encode_genotype(
       );
     }
 
-    {
+    if (tmp_params.GetEncodePhasesDataFlag()) {
       genie::genotype::SortedBinMatPayload sorted_bin_mat_payload;
 
       encode_and_sort_bin_mat(
@@ -920,7 +926,7 @@ void encode_genotype(
         codec_ID
       );
 
-      tmp_payload.AddVariantsPayload(
+      tmp_payload.SetPhasesPayload(
           std::move(sorted_bin_mat_payload)
       );
     }

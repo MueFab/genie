@@ -77,15 +77,15 @@ bool AmaxPayload::operator==(const AmaxPayload& other) noexcept {
 
 AmaxPayload::AmaxPayload(genie::util::BitReader& reader) {
   auto nelems = reader.Read<uint32_t>();
-  nbits_per_elem_ = reader.Read<uint8_t>();
+  nbits_per_elem_ = static_cast<uint8_t>(reader.ReadBits(4));
 
   amax_elements_.resize(nelems);
   for (size_t i = 0; i < nelems; ++i) {
     auto is_one_flag = reader.Read<bool>(1);
     if (is_one_flag) {
-      amax_elements_[i] = reader.Read<uint64_t>(nbits_per_elem_) + 2;
-    } else {
       amax_elements_[i] = 1;
+    } else {
+      amax_elements_[i] = reader.Read<uint64_t>(nbits_per_elem_) + 1;
     }
   }
 
@@ -149,33 +149,17 @@ size_t AmaxPayload::GetSize() const {
 void AmaxPayload::Write(util::BitWriter& writer) const {
   UTILS_DIE_IF(!writer.IsByteAligned(), "Byte is not aligned!");
   writer.WriteBypassBE(static_cast<uint32_t>(GetNElems()));
-  writer.WriteBypassBE(static_cast<uint8_t>(GetNBitsPerElem()));
+  writer.WriteBits(GetNBitsPerElem(), 4);
 
   for (auto amax_element : GetAmaxElements()) {
-    auto is_one_flag = amax_element > 1;
+    auto is_one_flag = amax_element == 1;
     writer.WriteBits(is_one_flag, 1);
-    if (is_one_flag) {
-      writer.WriteBits(amax_element-2, GetNBitsPerElem());
+    if (!is_one_flag) {
+      writer.WriteBits(amax_element-1, GetNBitsPerElem());
     }
   }
 
   writer.FlushBits();
-}
-
-// -----------------------------------------------------------------------------
-
-void AmaxPayload::Write(core::Writer& writer) const {
-  writer.Write(GetNElems(), 32);
-  writer.Write(GetNBitsPerElem(), 8);
-  for (auto amax_element : GetAmaxElements()) {
-    auto is_one_flag = amax_element > 1;
-    writer.Write(is_one_flag, 1);
-    if (is_one_flag) {
-      writer.Write(amax_element-2, GetNBitsPerElem());
-    }
-  }
-
-  writer.Flush();
 }
 
 // -----------------------------------------------------------------------------
@@ -191,7 +175,7 @@ uint8_t AmaxPayload::ComputeNbitsPerElement(const std::vector<uint64_t>& amax_el
     if (max_val == 1){
         return 0;
     }
-    uint64_t adjusted_max = max_val - 2;
+    uint64_t adjusted_max = max_val - 1;
 
     // Compute bit length
     auto nbits = static_cast<uint8_t>(std::ceil(std::log2(adjusted_max + 1)));

@@ -186,7 +186,7 @@ GenotypePayload::GenotypePayload(
 
 // -----------------------------------------------------------------------------
 
-[[maybe_unused]] [[maybe_unused]] [[maybe_unused]] uint8_t GenotypePayload::GetMaxPloidy() const {
+[[maybe_unused]] uint8_t GenotypePayload::GetMaxPloidy() const {
   return max_ploidy_;
 }
 
@@ -359,40 +359,8 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
   }
 
   if (IsAmaxPayloadExist()) {
-    writer.WriteBypassBE(static_cast<uint32_t>(GetVariantsAmaxPayload()->GetSize()));
-    GetVariantsAmaxPayload()->Write(writer);
-  }
-
-  if (EncodePhaseValues()) {
-    GetPhasesPayload()->Write(writer);
-  }
-}
-
-// -----------------------------------------------------------------------------
-
-void GenotypePayload::Write(core::Writer& writer) const {
-  writer.Write(GetMaxPloidy(),8);
-
-  uint8_t flag = 0;
-  if (GetNoReferenceFlag()){
-    flag |= static_cast<uint8_t>(GenotypePayloadFlags::NO_REFERENCE_BIT);
-  }
-  if (GetNotAvailableFlag()){
-    flag |= static_cast<uint8_t>(GenotypePayloadFlags::NOT_AVAILABLE_BIT);
-  }
-  if (GetPhasesValue()){
-    flag |= static_cast<uint8_t>(GenotypePayloadFlags::PHASE_VALUES_BIT);
-  }
-  writer.Write(flag,8);
-
-  writer.Write(GetNumBitPlanes(),8);
-  for (const auto& variant_payload : GetVariantsPayloads()) {
-    variant_payload.Write(writer);
-  }
-
-  if (IsAmaxPayloadExist()) {
-    writer.Write(
-        static_cast<uint32_t>(GetVariantsAmaxPayload()->GetSize()),32);
+    auto amax_payload_size = static_cast<uint32_t>(GetVariantsAmaxPayload()->GetSize());
+    writer.WriteBypassBE(amax_payload_size);
     GetVariantsAmaxPayload()->Write(writer);
   }
 
