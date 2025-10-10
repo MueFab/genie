@@ -859,7 +859,6 @@ void encode_genotype(
         );
 
         tmp_payload.SetMaxPloidy(max_ploidy);
-        //if (max_ploidy > 1) tmp_payload.SetPhasesValue(phasing_mat(0,0));  // TODO(Ronald): Is this correct???
 
         transform_max_value(
             allele_mat,
@@ -929,6 +928,8 @@ void encode_genotype(
       tmp_payload.SetPhasesPayload(
           std::move(sorted_bin_mat_payload)
       );
+    } else {
+      tmp_payload.SetPhasesValue(true);
     }
 
     params = std::move(tmp_params);

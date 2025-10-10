@@ -16,7 +16,6 @@
 
 #include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 
 #include "genie/core/record/annotation_parameter_set/record.h"
@@ -31,6 +30,7 @@
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/genotype/genotype_payload.h"
 #include "genie/likelihood/likelihood_parameters.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -44,10 +44,10 @@ class ParameterSetComposer {
 
  
     void setGenotypeParameters(genie::genotype::GenotypeParameters _parameters) { genotypeParameters = _parameters; }
-    [[maybe_unused]] void setContactParameters(genie::contact::ContactMatrixParameters _parameters) {
+    void setContactParameters(genie::contact::ContactMatrixParameters _parameters) {
         contactMatrixParameters = _parameters;
     }
-    [[maybe_unused]] void SetSubContactParameters(genie::contact::SubcontactMatrixParameters _parameters) {
+    void SetSubContactParameters(genie::contact::SubcontactMatrixParameters _parameters) {
         subContactMatrixParameters = _parameters;
     }
     void setLikelihoodParameters(genie::likelihood::LikelihoodParameters _parameters) {
@@ -57,7 +57,7 @@ class ParameterSetComposer {
         contactMatrixParameters = _parameters;
     }
     */
-    [[maybe_unused]] void setCompressors(genie::annotation::Compressor _compressors) {
+    void setCompressors(genie::annotation::Compressor _compressors) {
         compressors = _compressors;
         useCompressors = true;
     }

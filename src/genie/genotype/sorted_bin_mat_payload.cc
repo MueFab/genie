@@ -5,6 +5,7 @@
  */
 
 #include "sorted_bin_mat_payload.h"
+#include <optional>
 #include <genie/util/runtime_exception.h>
 
 // -----------------------------------------------------------------------------
@@ -212,12 +213,6 @@ void SortedBinMatPayload::Write(util::BitWriter& writer) const {
   }
 
   UTILS_DIE_IF(!writer.IsByteAligned(), "Byte is not aligned!");
-}
-
-// -----------------------------------------------------------------------------
-
-void SortedBinMatPayload::Write(core::Writer& writer) const {
-
 }
 
 // -----------------------------------------------------------------------------

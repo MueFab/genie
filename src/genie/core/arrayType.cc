@@ -141,7 +141,7 @@ std::vector<uint8_t> ArrayType::toArray(DataType type, util::BitReader& reader) 
             break;
         case DataType::INT8: {
             uint8_t readValue = static_cast<uint8_t>(reader.ReadBits(8));
-             byteArray.resize(1);
+            byteArray.resize(1);
             memcpy(&byteArray[0], &readValue, 1);
             break;
         }

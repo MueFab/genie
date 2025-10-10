@@ -173,12 +173,12 @@ void AttributeParameterSet::write(core::Writer& writer) const {
     writer.Write(static_cast<uint8_t>(attribute_type), 8);
     writer.Write(attribute_num_array_dims, 2);
     for (auto attribute_dim : attribute_array_dims)
-      writer.Write(attribute_dim, 8);
+        writer.Write(attribute_dim, 8);
     curType.toFile(attribute_type, attribute_default_val, writer);
 
     writer.Write(attribute_miss_val_flag, 1);
     if (attribute_miss_val_flag) {
-      writer.Write(attribute_miss_default_flag, 1);
+        writer.Write(attribute_miss_default_flag, 1);
         if (!attribute_miss_default_flag) curType.toFile(attribute_type, attribute_miss_val, writer);
         writer.Write(attribute_miss_str);
         writer.WriteReserved(8);
