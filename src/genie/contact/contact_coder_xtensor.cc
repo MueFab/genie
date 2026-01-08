@@ -1,0 +1,1377 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+#include "contact_coder_xtensor.h"
+#include "contact_types.h"
+#include <codecs/include/mpegg-codecs.h>
+#include <genie/core/contact_record/record.h>
+#include <genie/util/runtime_exception.h>
+#include <cstdint>
+#include <cstring>
+#include <xtensor/xadapt.hpp>
+#include <xtensor/xarray.hpp>
+#include <xtensor/xio.hpp>
+#include <xtensor/xsort.hpp>
+#include "contact_matrix_parameters.h"
+#include "contact_matrix_tile_payload.h"
+#include "subcontact_matrix_parameters.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+namespace genie::contact::detail::xtensor {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void compute_mask(
+    // input
+    UInt64VecDtype& ids,
+    size_t nelems,
+    // Output
+    BinVecDtype& mask
+){
+//    auto nelems = xt::amax(ids)(0)+1;
+    mask = xt::zeros<bool>({nelems});
+
+    UInt64VecDtype unique_ids = xt::unique(ids);
+    for (auto id: unique_ids){
+        mask(id) = true;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void compute_masks(
+    // Inputs
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    size_t nrows,
+    size_t ncols,
+    const bool is_intra_scm,
+    // Outputs:
+    BinVecDtype& row_mask,
+    BinVecDtype& col_mask
+){
+    UTILS_DIE_IF(row_ids.shape(0) != col_ids.shape(0),
+                 "The size of row_ids and col_ids must be same!");
+
+    if (is_intra_scm){
+        UTILS_DIE_IF(nrows != ncols,
+            "Both nentries must be the same for intra SCM!"
+        );
+
+        BinVecDtype mask;
+
+        // Handle the symmetry of intra SCM
+        UInt64VecDtype ids = xt::concatenate(xt::xtuple(row_ids, col_ids));
+        ids = xt::unique(ids);
+
+        compute_mask(ids, nrows, mask);
+
+        row_mask.resize(mask.shape());
+        row_mask = BinVecDtype(mask);
+        col_mask.resize(mask.shape());
+        col_mask = BinVecDtype(std::move(mask));
+    } else {
+        compute_mask(row_ids, nrows, row_mask);
+        compute_mask(col_ids, ncols, col_mask);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void decode_scm_masks(
+    // Inputs
+    ContactMatrixParameters& cm_param,
+    SubcontactMatrixParameters& scm_param,
+    const SubcontactMatrixPayload& scm_payload,
+    // Outputs
+    BinVecDtype& row_mask,
+    BinVecDtype& col_mask
+){
+    auto row_nentries = cm_param.GetNumBinEntries(scm_param.GetChr1ID());
+    auto col_nentries = cm_param.GetNumBinEntries(scm_param.GetChr2ID());
+
+    if (scm_param.GetRowMaskExistsFlag()){
+        decode_scm_mask_payload(scm_payload.GetRowMaskPayload(), row_nentries, row_mask);
+    } else {
+        row_mask = xt::ones<bool>({row_nentries});
+    }
+
+    if (scm_param.IsIntraSCM()){
+        col_mask = row_mask;
+    } else if (scm_param.GetColMaskExistsFlag()){
+        decode_scm_mask_payload(scm_payload.GetColMaskPayload(), col_nentries, col_mask);
+    } else {
+        col_mask = xt::ones<bool>({col_nentries});
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void decode_scm_mask_payload(
+    // Inputs
+    const SubcontactMatrixMaskPayload& mask_payload,
+    size_t num_entries,
+    // Outputs
+    BinVecDtype& mask
+) {
+    auto transform_ID = mask_payload.GetTransformID();
+    if (transform_ID == TransformID::ID_0){
+        auto& mask_array = mask_payload.GetMaskArray();
+        UTILS_DIE_IF(
+            num_entries != mask_array.size(),
+            "num_entries and the size of mask_array_ differ!"
+        );
+        mask = xt::adapt(mask_array, {mask_array.size()});
+    } else {
+        mask.resize({num_entries});
+
+        bool first_val = mask_payload.GetFirstVal();
+        auto& rl_entries = mask_payload.GetRlEntries();
+
+        size_t start_idx = 0;
+        size_t end_idx = 0;
+        for (const auto& rl_entry: rl_entries){
+            end_idx += rl_entry;
+            // This is the for-loop for assigning the values based on run-lenght
+            xt::view(mask, xt::range(start_idx, end_idx)) = first_val;
+            start_idx = end_idx;
+            first_val = !first_val;
+        }
+        UTILS_DIE_IF(
+            start_idx > num_entries,
+            "start_idx value must be smaller than num_entries!"
+        );
+        // This is the for-loop for assigning the remaining values
+        xt::view(mask, xt::range(start_idx, num_entries)) = first_val;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void remove_unaligned(
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    bool is_intra_tile,
+    const BinVecDtype& row_mask,
+    const BinVecDtype& col_mask
+){
+    UTILS_DIE_IF(row_ids.shape(0) != col_ids.shape(0),
+                 "The size of row_ids and col_ids must be same!");
+
+
+    if (is_intra_tile){
+        //TODO(yeremia): to be deleted!
+        UTILS_DIE_IF(row_mask != col_mask, "row_mask and col_mask are different!");
+
+        auto num_entries = row_ids.shape(0);
+        auto& mask = row_mask; // Note: Does not matter either row_mask or col_mask
+        auto mapping_len = mask.shape(0);
+        UInt64VecDtype mapping = xt::empty<uint64_t>({mapping_len});
+        uint64_t new_id = 0u;
+        for (auto i = 0u; i<mapping_len; i++){
+            mapping(i) = new_id;
+            auto v = mask(i);
+            if (v){
+                new_id++;
+            }
+        }
+
+        for (auto i = 0u; i<num_entries; i++){
+            auto old_row_id = row_ids(i);
+            auto new_row_id = mapping(old_row_id);
+            row_ids(i) = new_row_id;
+        }
+        for (auto i = 0u; i<num_entries; i++){
+            auto old_col_id = col_ids(i);
+            auto new_col_id = mapping(old_col_id);
+            col_ids(i) = new_col_id;
+        }
+    } else {
+        auto row_mapping_len = row_mask.shape(0);
+        auto row_mapping = xt::empty<uint64_t>({row_mapping_len});
+        {
+            uint64_t new_id = 0u;
+            for (auto i = 0u; i<row_mapping_len; i++){
+                row_mapping(i) = new_id;
+                auto v = row_mask(i);
+                if (v){
+                    new_id++;
+                }
+            }
+        }
+        auto num_entries = row_ids.shape(0);
+        for (auto i = 0u; i<num_entries; i++){
+            auto old_row_id = row_ids(i);
+            auto new_row_id = row_mapping(old_row_id);
+            row_ids(i) = new_row_id;
+        }
+
+        auto col_mapping_len = col_mask.shape(0);
+        auto col_mapping = xt::empty<uint64_t>({col_mapping_len});
+        {
+            uint64_t new_id = 0u;
+            for (auto i = 0u; i<col_mapping_len; i++){
+                col_mapping(i) = new_id;
+                auto v = col_mask(i);
+                if (v){
+                    new_id++;
+                }
+            }
+        }
+        num_entries = col_ids.shape(0);
+        for (auto i = 0u; i<num_entries; i++){
+            auto old_col_id = col_ids(i);
+            auto new_col_id = col_mapping(old_col_id);
+            col_ids(i) = new_col_id;
+        }
+    }
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void insert_unaligned(
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    bool is_intra_tile,
+    BinVecDtype& row_mask,
+    BinVecDtype& col_mask
+){
+    UTILS_DIE_IF(row_ids.shape(0) != col_ids.shape(0),
+                 "The size of row_ids and col_ids must be same!");
+
+
+    if (is_intra_tile){
+        //TODO(yeremia): to be deleted!
+        UTILS_DIE_IF(row_mask != col_mask, "row_mask and col_mask are different!");
+
+        auto num_entries = row_ids.shape(0);
+        auto& mask = row_mask; // Note: Does not matter either row_mask or col_mask
+
+        auto argwhere_vec = xt::argwhere(mask);
+        auto mapping_len = xt::sum(xt::cast<uint64_t>(mask))(0);
+        auto mapping = xt::empty<uint64_t>({mapping_len});
+
+        auto k = 0u;
+        for (auto v : argwhere_vec){
+            auto value = v[0];
+            mapping(k++) = value;
+        }
+
+        for (auto i = 0u; i<num_entries; i++){
+            row_ids(i) = mapping(row_ids(i));
+            col_ids(i) = mapping(col_ids(i));
+        }
+
+    } else {
+        // Handle row_mask
+        {
+            auto num_entries = row_ids.shape(0);
+            auto argwhere_vec = xt::argwhere(row_mask);
+            auto mapping_len = xt::sum(xt::cast<uint64_t>(row_mask))(0);
+            auto mapping = xt::empty<uint64_t>({mapping_len});
+
+            auto k = 0u;
+            for (auto v : argwhere_vec){
+                auto value = v[0];
+                mapping(k++) = value;
+            }
+
+            for (auto i = 0u; i<num_entries; i++){
+                row_ids(i) = mapping(row_ids(i));
+            }
+        }
+
+        // Handle col_mask
+        {
+            auto num_entries = col_ids.shape(0);
+            auto argwhere_vec = xt::argwhere(col_mask);
+            auto mapping_len = xt::sum(xt::cast<uint64_t>(col_mask))(0);
+            auto mapping = xt::empty<uint64_t>({mapping_len});
+
+            auto k = 0u;
+            for (auto v : argwhere_vec){
+                auto value = v[0];
+                mapping(k++) = value;
+            }
+
+            for (auto i = 0u; i<num_entries; i++){
+                col_ids(i) = mapping(col_ids(i));
+            }
+        }
+
+
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void sparse_to_dense(
+    // Inputs
+    const UInt64VecDtype& row_ids,
+    const UInt64VecDtype& col_ids,
+    const UIntVecDtype& counts,
+    size_t nrows,
+    size_t ncols,
+    // Outputs
+    UIntMatDtype& mat
+){
+    // TODO(yeremia): Moves this check somewhere else
+    {
+        UTILS_DIE_IF(xt::amax(row_ids)(0) >= nrows, "Invalid nrows or row_ids!");
+        UTILS_DIE_IF(xt::amax(col_ids)(0) >= ncols, "Invalid ncols or col_ids!");
+        UTILS_DIE_IF(xt::any(xt::equal(counts, 0)), "Count with value 0 is found!");
+    }
+    mat = xt::zeros<uint32_t>({nrows, ncols});
+
+    auto num_entries = counts.shape(0);
+    for (auto i = 0u; i< num_entries; i++){
+        auto count = counts(i);
+        auto row_id = row_ids(i);
+        auto col_id = col_ids(i);
+
+        mat(row_id, col_id) = count;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void dense_to_sparse(
+    // Inputs
+    const UIntMatDtype& mat,
+    // Outputs
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    UIntVecDtype& counts
+){
+    BinMatDtype mask = mat > 0u;
+
+    auto ids = xt::argwhere(mask);
+    auto num_entries = ids.size();
+
+    row_ids.resize({num_entries});
+    col_ids.resize({num_entries});
+    counts.resize({num_entries});
+
+    for (auto k = 0u; k<num_entries; k++){
+        auto i = ids[k][0];
+        auto j = ids[k][1];
+        auto c = mat(i,j);
+
+        row_ids[k] = i;
+        col_ids[k] = j;
+        counts[k] = c;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] void sort_by_row_ids(
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    UIntVecDtype& counts
+){
+    auto num_entries = row_ids.size();
+
+    UInt64VecDtype sort_ids = xt::argsort(row_ids);
+    UInt64VecDtype tmp_row_ids = row_ids;
+    UInt64VecDtype tmp_col_ids = col_ids;
+    UIntVecDtype tmp_counts = counts;
+
+    for (auto k = 0u; k< num_entries; k++){
+        tmp_row_ids(k) = row_ids(sort_ids(k));
+        tmp_col_ids(k) = col_ids(sort_ids(k));
+        tmp_counts(k) = counts(sort_ids(k));
+    }
+
+    row_ids = tmp_row_ids;
+    col_ids = tmp_col_ids;
+    counts = tmp_counts;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void inverse_diag_transform(
+    UIntMatDtype& mat,
+    DiagonalTransformMode mode
+){
+    UIntMatDtype trans_mat;
+//    auto k = 0u;
+//    auto l = 0u;
+
+    if (mode == DiagonalTransformMode::NONE) {
+        return;  // Do nothing
+    } else {
+        if (mode == DiagonalTransformMode::MODE_0) {
+//            auto nrows = mat.shape(0);
+            auto ncols = mat.shape(1);
+            auto target_nrows = ncols;
+
+            // Initailze trans_mat with zeros
+            trans_mat = xt::zeros<uint32_t>({target_nrows, ncols});
+
+            auto o = 0u;
+            for (size_t k_diag = 0u; k_diag < ncols; k_diag++) {
+                for (size_t target_i = 0u; target_i < (target_nrows - k_diag); target_i++) {
+                    size_t target_j = target_i + k_diag;
+
+                    size_t i = o / target_nrows;
+                    size_t j = o % target_nrows;
+
+                    auto v = mat(i, j);
+                    trans_mat(target_i, target_j) = v;
+
+                    o++;
+                }
+            }
+            mat.resize(trans_mat.shape());
+            mat = trans_mat;
+        } else {
+            auto nrows = static_cast<int64_t>(mat.shape(0));
+            auto ncols = static_cast<int64_t>(mat.shape(1));
+            trans_mat = xt::empty<uint32_t>({nrows, ncols});
+
+            Int64VecDtype diag_ids = xt::empty<int64_t>({nrows+ncols-1});
+            size_t k_elem;
+
+            if (mode == DiagonalTransformMode::MODE_1){
+                diag_ids(0) = 0;
+                k_elem = 1u;
+                auto ndiags = std::max(nrows, ncols);
+                for (auto diag_id = 1; diag_id<ndiags; diag_id++){
+                    if (diag_id < static_cast<int64_t>(ncols)){
+                        diag_ids(k_elem++) = diag_id;
+                    }
+                    if (diag_id < static_cast<int64_t>(nrows)){
+                        diag_ids(k_elem++) = -diag_id;
+                    }
+                }
+            } else if (mode == DiagonalTransformMode::MODE_2){
+                //            k_elem = 0u;
+                //            for (int64_t diag_id = -nrows+1; diag_id < ncols; diag_id++){
+                //                diag_ids(k_elem++) = diag_id;
+                //            }
+                diag_ids = xt::arange(-nrows+1, ncols, 1);
+            } else if (mode == DiagonalTransformMode::MODE_3){
+                //            k_elem = 0u;
+                //            for (int64_t diag_id = ncols-1; diag_id > -nrows; diag_id--){
+                //                diag_ids(k_elem++) = diag_id;
+                //            }
+                diag_ids = xt::arange<int64_t>(ncols-1, -nrows, -1);
+            }
+
+            int64_t target_i, target_j;
+            int64_t i_offset, j_offset;
+            int64_t nelems_in_diag;
+            auto o = 0u;
+            for (auto diag_id : diag_ids){
+                if (diag_id >= 0) {
+                    nelems_in_diag = std::max(nrows, ncols) - diag_id;
+                    i_offset = 0;
+                    j_offset = diag_id;
+                } else {
+                    nelems_in_diag = std::max(nrows, ncols) + diag_id;
+                    i_offset = -diag_id;
+                    j_offset = 0;
+                }
+                for (auto k_diag = 0; k_diag<nelems_in_diag; k_diag++){
+                    target_i = k_diag + i_offset;
+                    target_j = k_diag + j_offset;
+                    if (target_i >= nrows)
+                        break;
+                    if (target_j >= ncols)
+                        break;
+
+                    size_t i = o / mat.shape(1);
+                    size_t j = o % mat.shape(1);
+                    trans_mat(target_i, target_j) = mat(i, j);
+
+                    o++;
+                }
+            }
+            mat = std::move(trans_mat);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void diag_transform(
+    UIntMatDtype& mat,
+    DiagonalTransformMode mode
+){
+    UIntMatDtype trans_mat;
+
+    if (mode == DiagonalTransformMode::NONE){
+        return ; // Do nothing
+    } else if (mode == DiagonalTransformMode::MODE_0) {
+        UTILS_DIE_IF(
+            mat.shape(0) != mat.shape(1),
+            "Matrix must be a square!"
+        );
+
+        auto nrows = mat.shape(0);
+        auto new_nrows = nrows / 2 + 1;
+        trans_mat = xt::zeros<uint32_t>({new_nrows, nrows});
+
+        auto o = 0u;
+        for (size_t k_diag = 0u; k_diag < nrows; k_diag++) {
+            for (size_t i = 0u; i < (nrows - k_diag); i++) {
+                size_t j = i + k_diag;
+
+                auto v = mat(i, j);
+                if (v != 0) {
+                    size_t target_i = o / nrows;
+                    size_t target_j = o % nrows;
+                    trans_mat(target_i, target_j) = v;
+                }
+                o++;
+            }
+        }
+        mat.resize(trans_mat.shape());
+        mat = trans_mat;
+
+    } else {
+        auto nrows = static_cast<int64_t>(mat.shape(0));
+        auto ncols = static_cast<int64_t>(mat.shape(1));
+        trans_mat = xt::empty<uint32_t>({nrows, ncols});
+
+        Int64VecDtype diag_ids = xt::empty<int64_t>({nrows+ncols-1});
+        size_t k_elem;
+
+        if (mode == DiagonalTransformMode::MODE_1){
+            diag_ids(0) = 0;
+            k_elem = 1u;
+            auto ndiags = std::max(nrows, ncols);
+            for (auto diag_id = 1; diag_id<ndiags; diag_id++){
+                if (diag_id < static_cast<int64_t>(ncols))
+                    diag_ids(k_elem++) = diag_id;
+                if (diag_id < static_cast<int64_t>(nrows))
+                    diag_ids(k_elem++) = -diag_id;
+            }
+        } else if (mode == DiagonalTransformMode::MODE_2){
+//            k_elem = 0u;
+//            for (int64_t diag_id = -nrows+1; diag_id < ncols; diag_id++){
+//                diag_ids(k_elem++) = diag_id;
+//            }
+            diag_ids = xt::arange(-nrows+1, ncols, 1);
+        } else if (mode == DiagonalTransformMode::MODE_3){
+//            k_elem = 0u;
+//            for (int64_t diag_id = ncols-1; diag_id > -nrows; diag_id--){
+//                diag_ids(k_elem++) = diag_id;
+//            }
+            diag_ids = xt::arange<int64_t>(ncols-1, -nrows, -1);
+        }
+
+        int64_t i, j;
+        int64_t i_offset, j_offset;
+        int64_t nelems_in_diag;
+        auto o = 0u;
+        for (auto diag_id : diag_ids){
+            if (diag_id >= 0) {
+                nelems_in_diag = std::max(nrows, ncols) - diag_id;
+                i_offset = 0;
+                j_offset = diag_id;
+            } else {
+                nelems_in_diag = std::max(nrows, ncols) + diag_id;
+                i_offset = -diag_id;
+                j_offset = 0;
+            }
+            for (auto k_diag = 0; k_diag<nelems_in_diag; k_diag++){
+                i = k_diag + i_offset;
+                j = k_diag + j_offset;
+                if (i >= nrows)
+                    break;
+                if (j >= ncols)
+                    break;
+
+                auto v = mat(i, j);
+                size_t new_i = o / mat.shape(1);
+                size_t new_j = o % mat.shape(1);
+                trans_mat(new_i, new_j) = v;
+//                if (v != 0) {
+//                    size_t new_i = o / mat.shape(1);
+//                    size_t new_j = o % mat.shape(1);
+//                    trans_mat(new_i, new_j) = v;
+//                }
+                o++;
+            }
+        }
+        mat = std::move(trans_mat);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void inverse_transform_row_bin(
+    // Inputs
+    const BinMatDtype& bin_mat,
+    // Outputs
+    UIntMatDtype& mat
+){
+    size_t bin_mat_nrows = bin_mat.shape(0);
+    size_t bin_mat_ncols = bin_mat.shape(1);
+
+    UTILS_DIE_IF(bin_mat_nrows == 0, "Invalid mat_nrows!");
+    UTILS_DIE_IF(bin_mat_ncols == 0, "Invalid mat_ncols!");
+
+    size_t mat_ncols = bin_mat_ncols-1;
+
+    UIntVecDtype first_col = xt::cast<uint32_t>(xt::view(bin_mat, xt::all(), 0u));
+    size_t mat_nrows = xt::sum(first_col)(0);
+
+    UTILS_DIE_IF(mat_nrows == 0, "Invalid mat_nrows!");
+    UTILS_DIE_IF(mat_ncols == 0, "Invalid mat_ncols!");
+
+    mat = xt::zeros<uint32_t>({mat_nrows, mat_ncols});
+
+    size_t target_i = 0;
+    uint8_t bit_pos = 0;
+    auto target_js = xt::range(1u, bin_mat_ncols);
+    for (auto i = 0u; i<bin_mat_nrows; i++){
+        xt::view(mat, target_i, xt::all()) |= xt::cast<uint32_t>(xt::view(bin_mat, i, target_js)) << bit_pos;
+        bool sentinel_flag = bin_mat(i, 0);
+
+        if (sentinel_flag){
+            target_i++;
+            bit_pos = 0;
+        } else{
+            bit_pos++;
+        }
+    }
+
+    UTILS_DIE_IF(target_i != mat_nrows, "Not all of the mat rows are processed!");
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void transform_row_bin(
+    // Inputs
+    const UIntMatDtype& mat,
+    // Outputs
+    BinMatDtype& bin_mat
+) {
+    auto nrows = mat.shape(0);
+    auto ncols = mat.shape(1);
+
+    UInt8VecDtype nbits_per_row = xt::cast<uint8_t>(xt::ceil(
+        xt::log2(xt::amax(mat, {1}) + 1u)
+    ));
+    // Handle the case where maximum value is 0 -> log2(1) = 0 bits
+    xt::filter(nbits_per_row, xt::equal(nbits_per_row, 0u)) = 1;
+
+    uint64_t bin_mat_nrows = static_cast<uint64_t>(xt::sum(nbits_per_row)(0));
+    uint64_t bin_mat_ncols = ncols + 1;
+
+    bin_mat = xt::zeros<bool>({bin_mat_nrows, bin_mat_ncols});
+
+    size_t target_i = 0;
+    auto target_js = xt::range(1u, bin_mat_ncols);
+    for (size_t i = 0; i < nrows; i++) {
+        auto bitlength = nbits_per_row[i];
+        for (size_t i_bit = 0; i_bit < bitlength; i_bit++) {
+            xt::view(bin_mat, target_i++, target_js) = xt::cast<bool>(xt::view(mat, i, xt::all()) & (1u << i_bit));
+        }
+
+        // Set the sentinel flag
+        // Add offset due to "++" operation in the for-loop
+        bin_mat(target_i - 1, 0) = true;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void comp_start_end_ids(
+    // Inputs
+    size_t num_entries,
+    size_t tile_size,
+    size_t tile_idx,
+    // Outputs
+    size_t& start_idx,
+    size_t& end_idx
+){
+    start_idx = tile_idx * tile_size;
+    end_idx = std::min(start_idx + tile_size, num_entries);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// TODO(yeremia): This should be part of LCC?
+void bin_mat_to_bytes(
+    // Inputs
+    const BinMatDtype& bin_mat,
+    // Outputs
+    uint8_t** payload,
+    size_t& payload_len
+) {
+    auto nrows = static_cast<size_t>(bin_mat.shape(0));
+    auto ncols = static_cast<size_t>(bin_mat.shape(1));
+
+    auto bpl = (ncols >> 3u) + ((ncols & 7u) > 0u);  // Ceil div operation
+    payload_len = bpl * nrows;
+    *payload = (unsigned char*) calloc (payload_len, sizeof(unsigned char));
+
+    for (auto i = 0u; i < nrows; i++) {
+        size_t row_offset = i * bpl;
+        for (auto j = 0u; j < ncols; j++) {
+            auto byte_offset = row_offset + (j >> 3u);
+            uint8_t shift = (7u - (j & 7u));
+            auto val = static_cast<uint8_t>(bin_mat(i, j));
+            val = static_cast<uint8_t>(val << shift);
+            *(*payload + byte_offset) |= val;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// TODO(yeremia): This should be part of LCC?
+void bin_mat_from_bytes(
+    // Inputs
+    const uint8_t* payload,
+    size_t payload_len,
+    size_t nrows,
+    size_t ncols,
+    // Outputs
+    BinMatDtype& bin_mat
+) {
+
+    auto bpl = (ncols >> 3u) + ((ncols & 7u) > 0u);  // bytes per line with ceil operation
+    UTILS_DIE_IF(payload_len != static_cast<size_t>(nrows * bpl), "Invalid payload_len / nrows / ncols!");
+
+    MatShapeDtype bin_mat_shape = {nrows, ncols};
+    bin_mat.resize(bin_mat_shape);
+    xt::view(bin_mat, xt::all(), xt::all()) = false;  // Initialize value with 0
+
+    for (auto i = 0u; i < nrows; i++) {
+        size_t row_offset = i * bpl;
+        for (auto j = 0u; j < ncols; j++) {
+            auto byte_offset = row_offset + (j >> 3u);
+            uint8_t shift = (7u - (j & 7u));
+            bin_mat(i, j) = (*(payload + byte_offset) >> shift) & 1u;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void decode_cm_tile(
+    // Inputs
+    const genie::contact::ContactMatrixTilePayload& tile_payload,
+    core::AlgoID codec_ID,
+    // Outputs
+    BinMatDtype& bin_mat
+){
+    uint8_t* raw_data;
+    size_t raw_data_len;
+    uint8_t* compressed_data;
+    size_t compressed_data_len;
+
+    unsigned long tile_nrows;
+    unsigned long tile_ncols;
+
+    if (codec_ID == core::AlgoID::JBIG){
+        compressed_data_len = tile_payload.GetPayloadSize();
+        auto& payload = tile_payload.GetPayload();
+
+        compressed_data = (uint8_t*)malloc(compressed_data_len * sizeof(uint8_t));
+        memcpy(compressed_data, payload.data(), compressed_data_len);
+
+        mpegg_jbig_decompress_default(
+            &raw_data,
+            &raw_data_len,
+            compressed_data,
+            compressed_data_len,
+            &tile_nrows,
+            &tile_ncols
+        );
+
+        free(compressed_data);
+
+        bin_mat_from_bytes(
+            raw_data,
+            raw_data_len,
+            static_cast<size_t>(tile_nrows),
+            static_cast<size_t>(tile_ncols),
+            bin_mat
+        );
+
+        free(raw_data);
+
+    } else {
+
+        tile_nrows = tile_payload.GetTileNRows();
+        tile_ncols = tile_payload.GetTileNCols();
+
+        UTILS_DIE("Not yet implemented");
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void encode_cm_tile(
+    // Inputs
+    const BinMatDtype& bin_mat,
+    const core::AlgoID codec_ID,
+    // Outputs
+    genie::contact::ContactMatrixTilePayload& tile_payload
+) {
+    uint8_t* payload;
+    size_t payload_len;
+    uint8_t* compressed_payload;
+    size_t compressed_payload_len;
+
+    auto tile_nrows = static_cast<uint32_t>(bin_mat.shape(0));
+    auto tile_ncols = static_cast<uint32_t>(bin_mat.shape(1));
+
+    if (codec_ID == genie::core::AlgoID::JBIG) {
+
+        bin_mat_to_bytes(bin_mat, &payload, payload_len);
+
+        mpegg_jbig_compress_default(
+            &compressed_payload,
+            &compressed_payload_len,
+            payload,
+            payload_len,
+            tile_nrows,
+            tile_ncols
+        );
+
+        free(payload);
+
+    } else {
+        UTILS_DIE("Not yet implemented for other codec!");
+    }
+
+    auto _tile_payload = ContactMatrixTilePayload(
+        codec_ID,
+        tile_nrows,
+        tile_ncols,
+        &compressed_payload,
+        compressed_payload_len
+    );
+
+    tile_payload = std::move(_tile_payload);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void conv_noop_on_sparse_mat(
+    // Inputs and Outputs
+    UInt64VecDtype& tile_row_ids,
+    UInt64VecDtype& tile_col_ids,
+    UIntVecDtype& tile_counts,
+    uint32_t bin_size_mult,
+    // Options
+    bool sort_output
+){
+
+    size_t num_entries = tile_counts.shape(0);
+
+    std::map<std::pair<uint64_t, uint64_t>, uint32_t> lr_sparse_tile;
+    for (auto i = 0u; i<num_entries; i++){
+        auto lr_row_id = tile_row_ids(i) / bin_size_mult;
+        auto lr_col_id = tile_col_ids(i) / bin_size_mult;
+        auto count = tile_counts(i);
+
+        auto row_col_id_pair = std::pair<uint64_t, uint64_t>(lr_row_id, lr_col_id);
+
+        auto it = lr_sparse_tile.find(row_col_id_pair);
+        if (it != lr_sparse_tile.end()){
+            it->second += count;
+        } else{
+            lr_sparse_tile.emplace(row_col_id_pair, count);
+        }
+    }
+
+    size_t lr_num_entries = lr_sparse_tile.size();
+
+    UInt64VecDtype lr_tile_row_ids = xt::empty<uint64_t>({lr_num_entries});
+    UInt64VecDtype lr_tile_col_ids = xt::empty<uint64_t>({lr_num_entries});
+    UIntVecDtype lr_tile_counts = xt::empty<uint32_t>({lr_num_entries});
+
+    auto i_entry = 0u;
+    for (const auto & it : lr_sparse_tile){
+        lr_tile_row_ids(i_entry) = (it.first).first;
+        lr_tile_col_ids(i_entry) = (it.first).second;
+        lr_tile_counts(i_entry) = it.second;
+        i_entry++;
+    }
+
+    lr_sparse_tile.clear();
+
+    // Sort the tile_row_ids, tile_col_ids, and tile_counts
+    //      according to tile_row_ids and tile_col_ids
+    if (sort_output){
+        sort_sparse_mat_inplace(
+            lr_tile_row_ids,
+            lr_tile_col_ids,
+            lr_tile_counts
+        );
+    }
+
+    tile_row_ids = std::move(lr_tile_row_ids);
+    tile_col_ids = std::move(lr_tile_col_ids);
+    tile_counts = std::move(lr_tile_counts);
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void sort_sparse_mat_inplace(
+    // Inputs and Outputs
+    UInt64VecDtype& tile_row_ids,
+    UInt64VecDtype& tile_col_ids,
+    UIntVecDtype& tile_counts
+){
+    size_t num_entries = tile_counts.shape(0);
+
+    // Assert that all input vectors have the same size
+    assert(tile_row_ids.size() == num_entries);
+    assert(tile_col_ids.size() == num_entries);
+
+    std::vector<size_t> sort_ids(num_entries);
+    std::iota(sort_ids.begin(), sort_ids.end(), 0);
+
+    std::stable_sort(
+        sort_ids.begin(),
+        sort_ids.end(),
+        [&tile_row_ids, &tile_col_ids](size_t i1, size_t i2) {
+            return std::tie(tile_row_ids[i1], tile_col_ids[i1]) < std::tie(tile_row_ids[i2], tile_col_ids[i2]);
+        }
+    );
+
+    if (std::is_sorted(sort_ids.begin(), sort_ids.end())) {
+        return;
+    }
+
+    // Only reorder the ids and counts if the original order is not sorted
+    UInt64VecDtype sorted_tile_row_ids = xt::empty<uint64_t>({num_entries});
+    UInt64VecDtype sorted_tile_col_ids = xt::empty<uint64_t>({num_entries});
+    UIntVecDtype sorted_tile_counts = xt::empty<uint32_t>({num_entries});
+
+    for (auto i_entry = 0u; i_entry < num_entries; i_entry++){
+        sorted_tile_row_ids(i_entry) = tile_row_ids(sort_ids[i_entry]);
+        sorted_tile_col_ids(i_entry) = tile_col_ids(sort_ids[i_entry]);
+        sorted_tile_counts(i_entry) = tile_counts(sort_ids[i_entry]);
+    }
+
+    tile_row_ids = std::move(sorted_tile_row_ids);
+    tile_col_ids = std::move(sorted_tile_col_ids);
+    tile_counts = std::move(sorted_tile_counts);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void set_rle_information_from_mask(
+    RunLengthEncodingData& rleData,
+    const BinVecDtype& scm_mask
+)   {
+    bool prevValue;
+    uint32_t count = 1;
+    size_t index = 0;
+    prevValue = scm_mask(0);
+    rleData.firstVal = scm_mask(0);
+
+    // init counts from maximum possible size (then resize later)
+    rleData.rl_entries = xt::xtensor<uint32_t, 1>::from_shape({scm_mask.size()});
+
+    for(size_t i = 1; i < scm_mask.size(); i++) {
+        if (scm_mask(i) == prevValue) {
+            count++;
+        } else {
+            rleData.rl_entries(index++) = count;
+            prevValue = !prevValue;
+            count = 1;
+        }
+    }
+    rleData.rl_entries(index++) = count; // add the last entry
+
+    rleData.rl_entries = xt::view(rleData.rl_entries, xt::range(0, index)); // resize
+
+    rleData.maxCount = xt::amax(rleData.rl_entries)();
+    if (rleData.maxCount <= UINT8_MAX) {
+        rleData.transformID = TransformID::ID_1;
+    } else if (rleData.maxCount <= UINT16_MAX) {
+        rleData.transformID = TransformID::ID_2;
+    } else if (rleData.maxCount <= UINT32_MAX) {
+        rleData.transformID = TransformID::ID_3;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void decode_scm(
+    ContactMatrixParameters& cm_param,
+    SubcontactMatrixParameters& scm_param,
+    SubcontactMatrixPayload& scm_payload,
+    core::record::ContactRecord& rec,
+    uint32_t bin_size_mult
+){
+    BinVecDtype row_mask;
+    BinVecDtype col_mask;
+    std::vector<uint64_t> start1_vec;
+    std::vector<uint64_t> end1_vec;
+    std::vector<uint64_t> start2_vec;
+    std::vector<uint64_t> end2_vec;
+    std::vector<uint32_t> counts_vec;
+
+    auto bin_size = cm_param.GetBinSize();
+    auto target_bin_size = bin_size * bin_size_mult;
+    auto tile_size = cm_param.GetTileSize();
+
+    UTILS_DIE_IF(
+        !cm_param.IsBinSizeMultiplierValid(bin_size_mult),
+        "Bin size multiplier is invalid!"
+    );
+
+    auto chr1_ID = scm_param.GetChr1ID();
+    auto chr2_ID = scm_param.GetChr2ID();
+    auto is_intra_scm = scm_param.IsIntraSCM();
+
+    auto codec_ID = scm_param.GetCodecID();
+    auto row_mask_exists = scm_param.GetRowMaskExistsFlag();
+    auto col_mask_exists = scm_param.GetColMaskExistsFlag();
+
+    auto chr1_len = cm_param.GetChromosomeLength(chr1_ID);
+    auto chr1_num_bin_entries = cm_param.GetNumBinEntries(chr1_ID);
+    auto chr2_len = cm_param.GetChromosomeLength(chr2_ID);
+    auto chr2_num_bin_entries = cm_param.GetNumBinEntries(chr2_ID);
+    auto ntiles_in_row = cm_param.GetNumTiles(chr1_ID);
+    auto ntiles_in_col = cm_param.GetNumTiles(chr2_ID);
+
+    if (row_mask_exists || col_mask_exists){
+        decode_scm_masks(
+            cm_param,
+            scm_param,
+            scm_payload,
+            row_mask,
+            col_mask
+        );
+    }
+
+    for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++) {
+        for (size_t j_tile = 0u; j_tile < ntiles_in_col; j_tile++) {
+            if (i_tile > j_tile && is_intra_scm){
+                continue;
+            }
+
+            UIntMatDtype tile_mat;
+            size_t start1_idx, end1_idx, start2_idx, end2_idx;
+            UInt64VecDtype tile_row_ids;
+            UInt64VecDtype tile_col_ids;
+            UIntVecDtype tile_counts;
+
+            auto& tile_param = scm_param.GetTileParameter(i_tile, j_tile);
+            auto& tile_payload = scm_payload.GetTilePayload(i_tile, j_tile);
+            auto binarization_mode = tile_param.binarization_mode;
+            auto diag_transform_mode = tile_param.diag_tranform_mode;
+            bool is_intra_tile = is_intra_scm && (i_tile == j_tile);
+
+            if (tile_payload.GetPayloadSize() == 0){
+                continue;
+            }
+
+            if (binarization_mode == BinarizationMode::ROW_BINARIZATION){
+                BinMatDtype bin_mat;
+
+                decode_cm_tile(
+                    tile_payload,
+                    codec_ID,
+                    bin_mat
+                );
+
+                inverse_transform_row_bin(
+                    bin_mat,
+                    tile_mat
+                );
+
+            } else {
+                UTILS_DIE("no binarization is not supported yet!");
+            }
+
+            inverse_diag_transform(
+                tile_mat,
+                diag_transform_mode
+            );
+
+            comp_start_end_ids(
+                chr1_num_bin_entries,
+                tile_size,
+                i_tile,
+                start1_idx,
+                end1_idx
+            );
+
+            comp_start_end_ids(
+                chr2_num_bin_entries,
+                tile_size,
+                j_tile,
+                start2_idx,
+                end2_idx
+            );
+
+            dense_to_sparse(
+                tile_mat,
+                tile_row_ids,
+                tile_col_ids,
+                tile_counts
+            );
+
+            if (row_mask_exists || col_mask_exists){
+                BinVecDtype tile_row_mask = xt::view(row_mask, xt::range(start1_idx, end1_idx));
+                BinVecDtype tile_col_mask = xt::view(col_mask, xt::range(start2_idx, end2_idx));
+
+                insert_unaligned(
+                    tile_row_ids,
+                    tile_col_ids,
+                    is_intra_tile,
+                    tile_row_mask,
+                    tile_col_mask
+                );
+            }
+
+            tile_row_ids += start1_idx;
+            tile_col_ids += start2_idx;
+
+            if (bin_size_mult != 1){
+                conv_noop_on_sparse_mat(
+                    tile_row_ids,
+                    tile_col_ids,
+                    tile_counts,
+                    bin_size_mult
+                );
+            }
+
+            // Append to std::vectors for Record (which expects std::vector)
+            // Need to convert xtensor to std::vector
+            std::vector<uint64_t> row_vec(tile_row_ids.begin(), tile_row_ids.end());
+            std::vector<uint64_t> col_vec(tile_col_ids.begin(), tile_col_ids.end());
+            std::vector<uint32_t> count_vec(tile_counts.begin(), tile_counts.end());
+            
+            start1_vec.insert(start1_vec.end(), row_vec.begin(), row_vec.end());
+            start2_vec.insert(start2_vec.end(), col_vec.begin(), col_vec.end());
+            counts_vec.insert(counts_vec.end(), count_vec.begin(), count_vec.end());
+        }
+    }
+
+    auto sample_ID = scm_payload.GetSampleID();
+    rec.SetSampleId(sample_ID);
+    auto sample_name = std::string(cm_param.GetSampleName(sample_ID));
+    rec.SetSampleName(std::move(sample_name));
+    rec.SetChr1ID(chr1_ID);
+    rec.SetChr2ID(chr2_ID);
+    rec.SetBinSize(bin_size);
+    
+    end1_vec.resize(start1_vec.size());
+    end2_vec.resize(start2_vec.size());
+
+    for(size_t i=0; i<start1_vec.size(); ++i) {
+        start1_vec[i] *= target_bin_size;
+        end1_vec[i] = std::min(start1_vec[i] + target_bin_size, chr1_len);
+        start2_vec[i] *= target_bin_size;
+        end2_vec[i] = std::min(start2_vec[i] + target_bin_size, chr2_len);
+    }
+    
+    rec.SetCMValues(
+        std::move(start1_vec),
+        std::move(end1_vec),
+        std::move(start2_vec),
+        std::move(end2_vec),
+        std::move(counts_vec)
+    );
+}
+
+void encode_scm(
+    ContactMatrixParameters& cm_param,
+    core::record::ContactRecord& rec,
+    SubcontactMatrixParameters& scm_param,
+    genie::contact::SubcontactMatrixPayload& scm_payload,
+    bool remove_unaligned_region,
+    bool transform_mask,
+    bool ena_diag_transform,
+    bool ena_binarization,
+    bool norm_as_weight,
+    bool multiplicative_norm,
+    core::AlgoID codec_ID
+) {
+
+  UTILS_DIE_IF(!ena_binarization, "Binarization must be activated!");
+
+  BinVecDtype row_mask;
+  BinVecDtype col_mask;
+
+  auto interval = cm_param.GetBinSize();
+  auto tile_size = cm_param.GetTileSize();
+  auto chr1_ID = rec.GetChr1ID();
+  auto chr1_num_bin_entries = cm_param.GetNumBinEntries(chr1_ID);
+  auto ntiles_in_row = cm_param.GetNumTiles(chr1_ID);
+  auto chr2_ID = rec.GetChr2ID();
+  auto chr2_num_bin_entries = cm_param.GetNumBinEntries(chr2_ID);
+  auto ntiles_in_col = cm_param.GetNumTiles(chr2_ID);
+
+  cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+  scm_payload.SetSampleID(rec.GetSampleID());
+
+  scm_param.SetChr1ID(chr1_ID);
+  scm_payload.SetChr1ID(chr1_ID);
+
+  scm_param.SetChr2ID(chr2_ID);
+  scm_payload.SetChr2ID(chr2_ID);
+
+  auto is_intra_scm = scm_param.IsIntraSCM();
+
+  scm_param.SetCodecID(codec_ID);
+
+  scm_param.SetNumTiles(ntiles_in_row, ntiles_in_col);
+  scm_payload.SetNumTiles(ntiles_in_row, ntiles_in_col);
+
+  // Convert std::vector from record to xtensor
+  UInt64VecDtype row_ids = xt::adapt(rec.GetStartPos1());
+  row_ids /= interval; 
+
+  UInt64VecDtype col_ids = xt::adapt(rec.GetStartPos2());
+  col_ids /= interval;
+
+  UIntVecDtype counts = xt::adapt(rec.GetCounts());
+
+  if (remove_unaligned_region){
+      compute_masks(
+          row_ids,
+          col_ids,
+          chr1_num_bin_entries,
+          chr2_num_bin_entries,
+          is_intra_scm,
+          row_mask,
+          col_mask
+      );
+
+      if (transform_mask){
+          RunLengthEncodingData rowRLEData;
+          set_rle_information_from_mask(rowRLEData, row_mask);
+          
+          if(is_intra_scm) {
+            scm_payload.SetRowMaskPayload(SubcontactMatrixMaskPayload(
+                rowRLEData.transformID,
+                rowRLEData.firstVal,
+                rowRLEData.rl_entries
+            ));
+            scm_param.SetRowMaskExistsFlag(true);
+            scm_param.SetColMaskExistsFlag(false);
+          } else {
+            RunLengthEncodingData colRLEData;
+            set_rle_information_from_mask(colRLEData, col_mask);
+            scm_payload.SetRowMaskPayload(SubcontactMatrixMaskPayload(
+                rowRLEData.transformID,
+                rowRLEData.firstVal,
+                rowRLEData.rl_entries
+            ));
+            scm_param.SetRowMaskExistsFlag(true);
+            scm_payload.SetColMaskPayload(SubcontactMatrixMaskPayload(
+                colRLEData.transformID,
+                colRLEData.firstVal,
+                colRLEData.rl_entries
+            ));
+            scm_param.SetColMaskExistsFlag(true);
+          }
+
+      } else {
+        // Direct mask storage, no RLE
+        scm_payload.SetRowMaskPayload(SubcontactMatrixMaskPayload(std::move(row_mask)));
+        scm_param.SetRowMaskExistsFlag(true);
+        if (!is_intra_scm){
+          scm_payload.SetColMaskPayload(SubcontactMatrixMaskPayload(std::move(col_mask)));
+          scm_param.SetColMaskExistsFlag(true);
+        }
+      }
+
+      remove_unaligned(
+          row_ids,
+          col_ids,
+          is_intra_scm,
+          row_mask,
+          col_mask
+      );
+  } else {
+      scm_param.SetRowMaskExistsFlag(false);
+      scm_param.SetColMaskExistsFlag(false);
+  }
+
+  for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++) {
+      for (size_t j_tile = 0u; j_tile < ntiles_in_col; j_tile++) {
+          if (i_tile > j_tile && is_intra_scm) {
+              continue;
+          }
+
+          size_t start1_idx, end1_idx, start2_idx, end2_idx;
+          comp_start_end_ids(chr1_num_bin_entries, tile_size, i_tile, start1_idx, end1_idx);
+          comp_start_end_ids(chr2_num_bin_entries, tile_size, j_tile, start2_idx, end2_idx);
+
+          // Filtering
+          auto filter_mask = (row_ids >= start1_idx) & (row_ids < end1_idx) & (col_ids >= start2_idx) & (col_ids < end2_idx);
+          
+          if (!xt::any(filter_mask)) {
+              scm_payload.SetTilePayload(
+                  i_tile,
+                  j_tile,
+                  ContactMatrixTilePayload(codec_ID, 0, 0, nullptr, 0)
+              );
+              scm_param.SetTileParameter(
+                  i_tile,
+                  j_tile,
+                  {DiagonalTransformMode::NONE, BinarizationMode::ROW_BINARIZATION}
+              );
+              continue;
+          }
+          
+          UInt64VecDtype tile_row_ids = xt::filter(row_ids, filter_mask);
+          UInt64VecDtype tile_col_ids = xt::filter(col_ids, filter_mask);
+          UIntVecDtype tile_counts = xt::filter(counts, filter_mask);
+          
+          tile_row_ids -= start1_idx;
+          tile_col_ids -= start2_idx;
+
+          sort_sparse_mat_inplace(tile_row_ids, tile_col_ids, tile_counts);
+
+          UIntMatDtype tile_mat;
+          sparse_to_dense(
+              tile_row_ids,
+              tile_col_ids,
+              tile_counts,
+              tile_size,
+              tile_size,
+              tile_mat
+          );
+
+          if (ena_diag_transform) {
+              diag_transform(tile_mat, DiagonalTransformMode::MODE_0);
+          }
+          
+          BinMatDtype bin_mat;
+          if (ena_binarization) {
+              transform_row_bin(tile_mat, bin_mat);
+          } else {
+              UTILS_DIE("Non-binarized encoding not supported for xtensor!");
+          }
+
+          genie::contact::ContactMatrixTilePayload cm_tile_payload;
+          encode_cm_tile(bin_mat, codec_ID, cm_tile_payload);
+
+          scm_param.SetTileParameter(
+              i_tile,
+              j_tile,
+              {
+                  ena_diag_transform ? DiagonalTransformMode::MODE_0 : DiagonalTransformMode::NONE,
+                  BinarizationMode::ROW_BINARIZATION
+              }
+          );
+          scm_payload.SetTilePayload(i_tile, j_tile, std::move(cm_tile_payload));
+      }
+  }
+}
+
+} // namespace genie::contact::detail::xtensor

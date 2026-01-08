@@ -8,6 +8,7 @@
 #define GENIE_CONTACT_SUBCONTACT_MATRIX_MASK_PAYLOAD_H
 
 #include "consts.h"
+#include "contact_types.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
@@ -23,13 +24,6 @@ namespace genie::contact {
 #define NUM_RL_ENTRIES_BLEN 32
 
 // ---------------------------------------------------------------------------------------------------------------------
-
-enum class TransformID : uint8_t {
-    ID_0 = 0,
-    ID_1 = 1,
-    ID_2 = 2,
-    ID_3 = 3,
-};
 
 // ---------------------------------------------------------------------------------------------------------------------
 

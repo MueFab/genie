@@ -235,7 +235,7 @@ bool SubcontactMatrixParameters::GetRowMaskExistsFlag() const { return row_mask_
 
 // -----------------------------------------------------------------------------
 
-void SubcontactMatrixParameters::SetRowMaskESetRowMaskExistsFlag(bool flag) {
+void SubcontactMatrixParameters::SetRowMaskExistsFlag(bool flag) {
   row_mask_exists_flag_ = flag; }
 
 // -----------------------------------------------------------------------------

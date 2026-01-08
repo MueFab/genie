@@ -18,7 +18,7 @@ if(NOT WIN32)
   # ORIGINAL CODE
 #  set (CMAKE_C_FLAGS                "-fPIC -Wc++11-extensions -Wc++11-long-long -Wall ${CMAKE_C_FLAGS}")
   set (CMAKE_C_FLAGS          "-fPIC -Wno-long-long -fms-extensions -Wall ${CMAKE_C_FLAGS}")
-  set (CMAKE_C_FLAGS_RELEASE        "-Werror ${CMAKE_C_FLAGS_RELEASE}")
+  # set (CMAKE_C_FLAGS_RELEASE        "-Werror ${CMAKE_C_FLAGS_RELEASE}")
   set (CMAKE_C_FLAGS_RELWITHDEBINFO "-Werror ${CMAKE_C_FLAGS_RELWITHDEBINFO}")
 else()
   set (CMAKE_C_FLAGS          "/D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_WARNINGS /wd4018 /wd4028 /wd4244 /wd4267 /wd4100 /wd4133 /wd4189 /wd4996 /WX- ${CMAKE_C_FLAGS}")

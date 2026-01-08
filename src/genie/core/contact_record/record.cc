@@ -217,14 +217,13 @@ void ContactRecord::TransposeCM() {
   chr2_name_ = std::move(chr_name);
   chr2_length_ = chr_length;
 
-  std::vector<uint64_t> start_pos = std::move(start_pos1_);
-  std::vector<uint64_t> end_pos = std::move(end_pos1_);
-  start_pos1_ = std::move(start_pos2_);
-  end_pos1_ = std::move(end_pos2_);
-  start_pos2_ = std::move(start_pos1_);
-  end_pos2_ = std::move(end_pos1_);
-}
-
+      std::vector<uint64_t> start_pos = std::move(start_pos1);
+      std::vector<uint64_t> end_pos = std::move(end_pos1);
+      start_pos1 = std::move(start_pos2);
+      end_pos1 = std::move(end_pos2);
+      start_pos2 = std::move(start_pos);
+      end_pos2 = std::move(end_pos);
+  }
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint16_t ContactRecord::GetSampleID() const {

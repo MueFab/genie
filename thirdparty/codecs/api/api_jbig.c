@@ -223,7 +223,7 @@ int mpegg_jbig_decompress(
         exit(1);
     }
 
-    *dest_len = src_len * 30; // Expect worst case 30x source size
+    *dest_len = src_len * 500; // Expect worst case 500x source size
     *dest = (unsigned char *) calloc (*dest_len, sizeof(unsigned  char));
 #if defined(_WIN32) || defined(_WIN64)
     fout = fmemopen_windows(*dest, *dest_len * sizeof(unsigned  char), "wb");

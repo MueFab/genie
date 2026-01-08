@@ -200,7 +200,7 @@ class SubcontactMatrixParameters {
      *
      *  @param flag The new row mask exists flag.
      */
-    void SetRowMaskESetRowMaskExistsFlag(bool flag);
+    void SetRowMaskExistsFlag(bool flag);
 
     /**
      * @brief Set the column mask exists flag.

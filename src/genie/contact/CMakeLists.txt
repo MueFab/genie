@@ -14,10 +14,25 @@ set(source_files
         contact_matrix_parameters.cc
         contact_matrix_tile_payload.cc
         contact_matrix_bin_payload.cc
-        contact_coder.cc
 )
 
+if(GENIE_CONTACT_BACKEND STREQUAL "xtensor")
+    list(APPEND source_files contact_coder_xtensor.cc)
+elseif(GENIE_CONTACT_BACKEND STREQUAL "eigen")
+    find_package(Eigen REQUIRED)
+    list(APPEND source_files contact_coder_eigen.cc)
+else()
+    list(APPEND source_files contact_coder_std.cc)
+endif()
+
 add_library(${PROJECT_NAME} ${source_files})
+
+if(GENIE_CONTACT_BACKEND STREQUAL "xtensor")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC GENIE_CONTACT_BACKEND_XTENSOR)
+elseif(GENIE_CONTACT_BACKEND STREQUAL "eigen")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC GENIE_CONTACT_BACKEND_EIGEN)
+    target_link_libraries(${PROJECT_NAME} PUBLIC eigen)
+endif()
 
 if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
