@@ -511,7 +511,105 @@ TEST(Genotype, RoundTrip_File_Integration) {
         uint8_t max_ploidy;
         genie::genotype::decompose(recs, max_ploidy, expected_allele_mat, expected_phasing_mat, 512);
 
-        ASSERT_TRUE(genie::genotype::equal(expected_allele_mat, decoded_allele_mat));
-        ASSERT_TRUE(genie::genotype::equal(expected_phasing_mat, decoded_phasing_mat));
+        ASSERT_TRUE(expected_allele_mat == decoded_allele_mat) << "Allele Matrix Mismatch for file: " << file;
+        ASSERT_TRUE(expected_phasing_mat == decoded_phasing_mat) << "Phasing Matrix Mismatch for file: " << file;
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(Genotype, DISABLED_GenerateGoldenMaster) {
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string inputFile = "/data/records/variant/1.3.5.header100.gt_only.vcf.geno";
+    std::string outputFile = gitRootDir + "/test/gold/genotype/ref_payload.bin";
+
+    std::ifstream reader(gitRootDir + inputFile, std::ios::binary);
+    ASSERT_FALSE(reader.fail()) << "Could not open input file: " << inputFile;
+
+    std::vector<genie::core::record::VariantGenotype> recs;
+    genie::util::BitReader bitreader(reader);
+    while (bitreader.IsStreamGood()) {
+        recs.emplace_back(bitreader);
+    }
+    recs.pop_back();
+
+    if (recs.empty()) return;
+
+    genie::genotype::GenotypeParameters params;
+    genie::genotype::GenotypePayload payload;
+    
+    // Fixed parameters for Golden Master
+    genie::genotype::encode_genotype(
+        recs,
+        params,
+        payload,
+        512, // block size
+        genie::genotype::BinarizationID::BIT_PLANE,
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT,
+        false,
+        genie::genotype::SortingAlgoID::NO_SORTING,
+        genie::genotype::SortingAlgoID::NO_SORTING,
+        genie::core::AlgoID::JBIG
+    );
+
+    std::ofstream writer(outputFile, std::ios::binary);
+    genie::util::BitWriter bitwriter(&writer);
+    payload.Write(bitwriter);
+    bitwriter.FlushBits();
+    writer.close();
+    
+    std::cout << "Generated Golden Master at: " << outputFile << std::endl;
+}
+
+TEST(Genotype, CrossBackend_GoldenMaster) {
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string inputFile = "/data/records/variant/1.3.5.header100.gt_only.vcf.geno";
+    std::string goldenFile = gitRootDir + "/test/gold/genotype/ref_payload.bin";
+
+    // Read Golden Master
+    std::ifstream goldenReader(goldenFile, std::ios::binary);
+    ASSERT_FALSE(goldenReader.fail()) << "Could not open golden file: " << goldenFile;
+    std::vector<uint8_t> goldenBytes((std::istreambuf_iterator<char>(goldenReader)), std::istreambuf_iterator<char>());
+
+    // Read Input Records
+    std::ifstream reader(gitRootDir + inputFile, std::ios::binary);
+    ASSERT_FALSE(reader.fail()) << "Could not open input file: " << inputFile;
+
+    std::vector<genie::core::record::VariantGenotype> recs;
+    genie::util::BitReader bitreader(reader);
+    while (bitreader.IsStreamGood()) {
+        recs.emplace_back(bitreader);
+    }
+    recs.pop_back();
+
+    if (recs.empty()) return;
+
+    genie::genotype::GenotypeParameters params;
+    genie::genotype::GenotypePayload payload;
+    
+    // Encode with CURRENT backend
+    genie::genotype::encode_genotype(
+        recs,
+        params,
+        payload,
+        512, // block size
+        genie::genotype::BinarizationID::BIT_PLANE,
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT,
+        false,
+        genie::genotype::SortingAlgoID::NO_SORTING,
+        genie::genotype::SortingAlgoID::NO_SORTING,
+        genie::core::AlgoID::JBIG
+    );
+
+    // Write to buffer
+    std::stringstream buffer;
+    genie::util::BitWriter bitwriter(&buffer);
+    payload.Write(bitwriter);
+    bitwriter.FlushBits();
+
+    std::string generatedStr = buffer.str();
+    std::vector<uint8_t> generatedBytes(generatedStr.begin(), generatedStr.end());
+
+    ASSERT_EQ(goldenBytes.size(), generatedBytes.size()) << "Payload size mismatch!";
+    ASSERT_EQ(goldenBytes, generatedBytes) << "Payload content mismatch!";
 }
