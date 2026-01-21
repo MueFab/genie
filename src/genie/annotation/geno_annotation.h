@@ -66,7 +66,7 @@ class GenoAnnotation {
                         std::vector<std::vector<std::vector<AttrType>>>>>
         attributes;
     // genie::genotype::EncodingBlock genotypeDatablock;
-    genie::likelihood::EncodingBlock likelihoodDatablock;
+    genie::likelihood::LikelihoodPayload likelihoodPayload;
     uint32_t numSamples;
     uint8_t formatCount;
 
@@ -76,7 +76,7 @@ class GenoAnnotation {
         std::tuple<genie::genotype::GenotypeParameters,
                    genie::genotype::GenotypePayload>
             _genotypeData,
-        genie::likelihood::EncodingBlock _likelihoodDatablock,
+        genie::likelihood::LikelihoodPayload _likelihoodPayload,
         uint32_t _numSamples, uint8_t _formatCount,
         std::map<
             std::string,
@@ -91,7 +91,7 @@ class GenoAnnotation {
         std::tuple<genie::genotype::GenotypeParameters,
                    genie::genotype::GenotypePayload>
             _genotypeData,
-        genie::likelihood::EncodingBlock _likelihoodDatablock,
+        genie::likelihood::LikelihoodPayload _likelihoodPayload,
         uint32_t _numSamples, uint8_t _formatCount,
         std::map<
             std::string,

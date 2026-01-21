@@ -28,6 +28,8 @@
 namespace genie {
 namespace likelihood {
 
+class LikelihoodPayload;
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 using UInt32ArrDtype = xt::xtensor<uint32_t, 1, xt::layout_type::row_major>;
@@ -127,8 +129,21 @@ void serialize_arr(UInt32ArrDtype arr, uint32_t nelems, std::stringstream& paylo
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingBlock> encode_block(
-    genie::likelihood::EncodingOptions opt, std::vector<genie::core::record::VariantGenotype> recs);
+void encode_likelihood(
+    // Inputs
+    std::vector<core::record::VariantGenotype>& recs,
+    // Outputs
+    LikelihoodParameters& params, LikelihoodPayload& payload,
+    // Options
+    size_t block_size = 512, bool transform_flag = true);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void decode_likelihood(
+    // Inputs
+    const LikelihoodParameters& params, LikelihoodPayload& payload,
+    // Outputs
+    std::vector<core::record::VariantGenotype>& recs);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

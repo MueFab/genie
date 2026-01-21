@@ -38,6 +38,11 @@ uint8_t LinkRecord::GetReferenceBoxId() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool operator==(const LinkRecord& lhs, const LinkRecord& rhs) {
+    return lhs.GetLinkName() == rhs.GetLinkName() &&
+           lhs.GetReferenceBoxId() == rhs.GetReferenceBoxId();
+}
+
 }  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------

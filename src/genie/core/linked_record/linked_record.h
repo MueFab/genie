@@ -59,6 +59,16 @@ class LinkRecord {
   [[nodiscard]] uint8_t GetReferenceBoxId() const;
 };
 
+/**
+ * @brief
+ *
+ * @param lhs
+ * @param rhs
+ * @return true
+ * @return false
+ */
+bool operator==(const LinkRecord& lhs, const LinkRecord& rhs);
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace genie::core::record

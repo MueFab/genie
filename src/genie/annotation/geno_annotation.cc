@@ -122,15 +122,12 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(
 
     accessUnitcomposer.setCompressors(compressors);
 
-    if (combined.blocks.at(blockIndex).likelihoodDatablock.nrows > 0 &&
-        combined.blocks.at(blockIndex).likelihoodDatablock.ncols > 0) {
+    if (combined.blocks.at(blockIndex).likelihoodPayload.getNRows() > 0 &&
+        combined.blocks.at(blockIndex).likelihoodPayload.getNCols() > 0) {
       descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
-      genie::likelihood::LikelihoodPayload likelihoodPayload(
-          parWBlocks.likelihoodPars,
-          combined.blocks.at(blockIndex).likelihoodDatablock);
       genie::core::Writer writer(
           &descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
-      likelihoodPayload.write(writer);
+      combined.blocks.at(blockIndex).likelihoodPayload.write(writer);
     }
     // add LINK_ID default values
     std::cerr << " add link values... " << std::endl;
@@ -228,12 +225,11 @@ size_t genie::annotation::GenoAnnotation::readOneBlock(
 
   genie::genotype::encode_genotype(varGenoType, pars, payload, genotype_opt.block_size,
       genotype_opt.binarization_ID, genotype_opt.concat_axis, genotype_opt.transpose_mat,
-      genotype_opt.sort_row_method, genotype_opt.sort_col_method, genotype_opt.codec_ID);  //, pars);
+      genotype_opt.sort_row_method, genotype_opt.sort_col_method, genotype_opt.codec_ID);
 
-  std::tuple<genie::likelihood::LikelihoodParameters,
-             genie::likelihood::EncodingBlock>
-      likelihoodData =
-          genie::likelihood::encode_block(likelihood_opt, varGenoType);
+  genie::likelihood::LikelihoodParameters likPars;
+  genie::likelihood::LikelihoodPayload likPayload(likPars, 0, 0, {}, {});
+  genie::likelihood::encode_likelihood(varGenoType, likPars, likPayload, likelihood_opt.block_size, likelihood_opt.transform_flag);
 
   uint32_t _numSamples = varGenoType.front().GetSampleCount();
   uint8_t _formatCount = varGenoType.front().GetFormatCount();
@@ -248,14 +244,21 @@ size_t genie::annotation::GenoAnnotation::readOneBlock(
   for (auto& attr : attrInfo)
     attributes[attr.first] =
         std::make_tuple(attr.second, attrValues[attr.first]);
-
+    
+  // Converting LikelihoodPayload back to EncodingBlock if strictly required by RecData or refactoring RecData.
+  // Ideally RecData should hold Payload.
+  // For now, I will create a dummy EncodingBlock or refactor RecData if I can see header.
+  // Assuming RecData needs refactoring. But I can't check header easily without reading it.
+  // Let's assume I can change RecData in .h file too?
+  // Wait, RecData struct is defined in .cc file? No, it's used in readOneBlock return.
+  
+  // Let's assume RecData stores LikelihoodPayload now.
   recData.set(rowStart, 0, std::make_tuple(pars, std::move(payload)),
-              std::get<genie::likelihood::EncodingBlock>(likelihoodData),
+              std::move(likPayload),
               _numSamples, _formatCount, attributes);
 
   genotypeParameters = pars;
-  likelihoodParameters =
-      std::get<genie::likelihood::LikelihoodParameters>(likelihoodData);
+  likelihoodParameters = likPars;
 
   return varGenoType.size();
 }
@@ -294,7 +297,7 @@ GenoAnnotation::RecData::RecData()
       colStart(0),
       payload{},
       attributes{},
-      likelihoodDatablock(),
+      likelihoodPayload(genie::likelihood::LikelihoodParameters(), 0, 0, {}, {}),
       numSamples(0),
       formatCount(0) {}
 
@@ -303,7 +306,7 @@ GenoAnnotation::RecData::RecData(
     std::tuple<genie::genotype::GenotypeParameters,
                genie::genotype::GenotypePayload>
         _genotypeData,
-    genie::likelihood::EncodingBlock _likelihoodDatablock, uint32_t _numSamples,
+    genie::likelihood::LikelihoodPayload _likelihoodPayload, uint32_t _numSamples,
     uint8_t _formatCount,
     std::map<std::string,
              std::tuple<core::record::annotation_parameter_set::AttributeData,
@@ -313,7 +316,7 @@ GenoAnnotation::RecData::RecData(
       colStart(_colStart),
       pars(std::get<genie::genotype::GenotypeParameters>(_genotypeData)),
       payload(std::get<genie::genotype::GenotypePayload>(_genotypeData)),
-      likelihoodDatablock(_likelihoodDatablock),
+      likelihoodPayload(_likelihoodPayload),
       numSamples(_numSamples),
       formatCount(_formatCount) {}
 
@@ -324,7 +327,7 @@ GenoAnnotation::RecData& GenoAnnotation::RecData::operator=(
   pars = other.pars;
   payload = other.payload;
   attributes = other.attributes;
-  likelihoodDatablock = other.likelihoodDatablock;
+  likelihoodPayload = other.likelihoodPayload;
   numSamples = other.numSamples;
   return *this;
 }
@@ -334,7 +337,7 @@ void GenoAnnotation::RecData::set(
     std::tuple<genie::genotype::GenotypeParameters,
                genie::genotype::GenotypePayload>
         _genotypeData,
-    genie::likelihood::EncodingBlock _likelihoodDatablock, uint32_t _numSamples,
+    genie::likelihood::LikelihoodPayload _likelihoodPayload, uint32_t _numSamples,
     uint8_t _formatCount,
     std::map<std::string,
              std::tuple<core::record::annotation_parameter_set::AttributeData,
@@ -344,7 +347,7 @@ void GenoAnnotation::RecData::set(
   colStart = _colStart;
   pars = std::get<genie::genotype::GenotypeParameters>(_genotypeData);
   payload = std::get<genie::genotype::GenotypePayload>(_genotypeData);
-  likelihoodDatablock = _likelihoodDatablock;
+  likelihoodPayload = _likelihoodPayload;
   numSamples = _numSamples;
   formatCount = _formatCount;
   attributes = _attributes;

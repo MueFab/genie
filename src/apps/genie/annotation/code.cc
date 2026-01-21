@@ -216,25 +216,39 @@ void encodeVariantGenotype(const std::string& _input_fpath,
       genie::core::AlgoID::JBIG                    // codec_ID_;
   };
 
-  // auto genotypeData = genie::genotype::encode_block(genotype_opt, recs);
-  auto likelihoodData = genie::likelihood::encode_block(likelihood_opt, recs);
+  genie::genotype::GenotypeParameters genotypeParameters;
+  genie::genotype::GenotypePayload genotypePayload;
+  genie::genotype::encode_genotype(
+      recs, genotypeParameters, genotypePayload,
+      genotype_opt.block_size,
+      genotype_opt.binarization_ID,
+      genotype_opt.concat_axis,
+      genotype_opt.transpose_mat,
+      genotype_opt.sort_row_method,
+      genotype_opt.sort_col_method,
+      genotype_opt.codec_ID
+  );
+
+  genie::likelihood::LikelihoodParameters likelihoodParameters;
+  genie::likelihood::LikelihoodPayload likelihoodPayload(likelihoodParameters, 0, 0, {}, {});
+  genie::likelihood::encode_likelihood(
+      recs, likelihoodParameters, likelihoodPayload,
+      likelihood_opt.block_size, likelihood_opt.transform_flag
+  );
 
   //--------------------------------------------------
   uint8_t AT_ID = 1;
   uint8_t AG_class = 0;
-  genie::genotype::GenotypeParameters genotypeParameters; /* =
-      std::get<genie::genotype::GenotypeParameters>(genotypeData);
-  auto datablock = std::get<genie::genotype::EncodingBlock>(genotypeData); */
+
   std::map<std::string,
            genie::core::record::annotation_parameter_set::AttributeData>
       info;
   genie::genotype::ParameterSetComposer genotypeParameterSet;
   genotypeParameterSet.setGenotypeParameters(genotypeParameters);
-  genotypeParameterSet.setLikelihoodParameters(
-      std::get<genie::likelihood::LikelihoodParameters>(likelihoodData));
+  genotypeParameterSet.setLikelihoodParameters(likelihoodParameters);
   genie::core::record::annotation_parameter_set::Record annotationParameterSet =
       genotypeParameterSet.Build(AT_ID, info,
-                                 {recs.size(), 3000});
+                                 {static_cast<uint32_t>(recs.size()), 3000});
 
   genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
 
@@ -261,21 +275,16 @@ void encodeVariantGenotype(const std::string& _input_fpath,
   std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
   descriptorStream[genie::core::AnnotDesc::GENOTYPE];
   {
-    /* genie::genotype::GenotypePayload genotypePayload(datablock,
-                                                     genotypeParameters);
     genie::core::Writer writer(
         &descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
-    genotypePayload.Write(writer);*/
+    genotypePayload.Write(writer);
   }
 
   descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
   {
-    genie::likelihood::LikelihoodPayload payload(
-        std::get<genie::likelihood::LikelihoodParameters>(likelihoodData),
-        std::get<genie::likelihood::EncodingBlock>(likelihoodData));
     genie::core::Writer writer(
         &descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
-    payload.write(writer);
+    likelihoodPayload.write(writer);
   }
 
   // add LINK_ID default values

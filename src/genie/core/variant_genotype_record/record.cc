@@ -258,9 +258,6 @@ void VariantGenotype::SetPhasings(std::vector<std::vector<uint8_t>>&& value) { p
 
 void VariantGenotype::SetLikelihoods(std::vector<std::vector<uint32_t>> value) { likelihoods_ = std::move(value); }
 
-// -----------------------------------------------------------------------------
-
-void VariantGenotype::SetLikelihoods(std::vector<std::vector<uint32_t>>&& value) { likelihoods_ = std::move(value); }
 
 // -----------------------------------------------------------------------------
 
@@ -354,6 +351,24 @@ FormatField::FormatField(util::BitReader& bitreader, uint32_t _sample_count) : s
     }
 }
 // ---------------------------------------------------------------------------------------------------------------------
+bool operator==(const FormatField& lhs, const FormatField& rhs) {
+    return lhs.GetFormat() == rhs.GetFormat() &&
+           lhs.GetType() == rhs.GetType() &&
+           lhs.GetSampleCount() == rhs.GetSampleCount() &&
+           lhs.GetValue() == rhs.GetValue() &&
+           lhs.GetArrayLength() == rhs.GetArrayLength();
+}
+
+bool operator==(const VariantGenotype& lhs, const VariantGenotype& rhs) {
+    return lhs.GetVariantIndex() == rhs.GetVariantIndex() &&
+           lhs.GetSampleIndexFrom() == rhs.GetSampleIndexFrom() &&
+           lhs.GetSampleCount() == rhs.GetSampleCount() &&
+           lhs.GetFormat() == rhs.GetFormat() &&
+           lhs.GetAlleles() == rhs.GetAlleles() &&
+           lhs.GetPhasing() == rhs.GetPhasing() &&
+           lhs.GetLikelihoods() == rhs.GetLikelihoods() &&
+           lhs.GetLinkRecord() == rhs.GetLinkRecord();
+}
 
 } // namespace genie::core::record
 

@@ -139,6 +139,16 @@ class FormatField {
 };
 
 /**
+ * @brief
+ *
+ * @param lhs
+ * @param rhs
+ * @return true
+ * @return false
+ */
+bool operator==(const FormatField& lhs, const FormatField& rhs);
+
+/**
  * @brief Class representing genotype information for a specific variant
  *
  * Contains information about samples, alleles, phasings, likelihoods and format fields
@@ -339,10 +349,6 @@ class VariantGenotype {
    */
   void SetLikelihoods(std::vector<std::vector<uint32_t>> value);
 
- /**
-   * @brief Set the likelihood information
-   */
- void SetLikelihoods(std::vector<std::vector<uint32_t>>&& value);
 
  /**
    * @brief Set the link record information
@@ -385,6 +391,16 @@ class VariantGenotype {
  */
   size_t GetSize() const;
 };
+
+/**
+ * @brief
+ *
+ * @param lhs
+ * @param rhs
+ * @return true
+ * @return false
+ */
+bool operator==(const VariantGenotype& lhs, const VariantGenotype& rhs);
 
 }  // namespace genie::core::record
 
