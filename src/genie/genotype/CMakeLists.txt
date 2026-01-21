@@ -9,7 +9,6 @@ find_package(xtensor REQUIRED)
 set(source_files
         amax_payload.cc
         bin_mat_payload.cc
-        genotype_coder.cc
         genotype_parameters.cc
         genotype_payload.cc
         parameterset_composer.cc
@@ -17,7 +16,25 @@ set(source_files
         sorted_bin_mat_payload.cc
 )
 
+if(GENIE_GENOTYPE_BACKEND STREQUAL "xtensor")
+    list(APPEND source_files genotype_coder_xtensor.cc)
+elseif(GENIE_GENOTYPE_BACKEND STREQUAL "eigen")
+    find_package(Eigen REQUIRED)
+    list(APPEND source_files genotype_coder_eigen.cc)
+else()
+    list(APPEND source_files genotype_coder_std.cc)
+endif()
+
 add_library(${PROJECT_NAME} ${source_files})
+
+if(GENIE_GENOTYPE_BACKEND STREQUAL "xtensor")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC GENIE_GENOTYPE_BACKEND_XTENSOR)
+elseif(GENIE_GENOTYPE_BACKEND STREQUAL "eigen")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC GENIE_GENOTYPE_BACKEND_EIGEN)
+    target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
+else()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC GENIE_GENOTYPE_BACKEND_STD)
+endif()
 
 if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)

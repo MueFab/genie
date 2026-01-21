@@ -1,7 +1,12 @@
 #ifndef GENIE_CONTACT_CONTACT_CODER_XTENSOR_H
 #define GENIE_CONTACT_CONTACT_CODER_XTENSOR_H
 
-#include "contact_coder.h"
+#include "contact_matrix_parameters.h"
+#include "subcontact_matrix_parameters.h"
+#include "subcontact_matrix_payload.h"
+#include "contact_matrix_tile_payload.h"
+#include "subcontact_matrix_mask_payload.h"
+#include "genie/core/contact_record/record.h"
 #include "contact_types.h"
 #include <xtensor/xarray.hpp>
 #include <xtensor/xtensor.hpp>

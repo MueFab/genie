@@ -19,6 +19,7 @@
 #include "genie/util/bit_reader.h"
 
 #include "genie/core/record/annotation_parameter_set/record.h"
+#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/jbig/encoder.h"
 #include "genie/entropy/lzma/encoder.h"

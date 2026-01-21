@@ -42,6 +42,16 @@ enum class ConcatAxis : uint8_t {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+enum class SortingAlgoID : uint8_t {
+    NO_SORTING = 0,
+    RANDOM_SORT = 1,
+    NEAREST_NEIGHBOR = 2,
+    LIN_KERNIGHAN_HEURISTIC = 3,
+    UNDEFINED = 4
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 class GenotypeParameters {
  private:
   BinarizationID binarization_ID_;
