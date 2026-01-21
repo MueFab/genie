@@ -11,6 +11,7 @@ message(STATUS "xtensor: ${xtensor_INCLUDE_DIRS}")
 set(source_files
         site-conformance-test.cc
         geno-conformance-test.cc
+        gene-expression-conformance-test.cc
         helpers.cc
         main.cc
 )

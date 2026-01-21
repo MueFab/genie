@@ -49,7 +49,17 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
         auto dataunits = siteAnnotation.parseSite(inputfile);
         annotationParameterSet.push_back(dataunits.annotationParameterSet);
         annotationAccessUnit = dataunits.annotationAccessUnit;
-    } else {  // contact matrix
+    } else if (recType == RecType::GENE_EXPRESSION) { // gene expression
+        geneExpressionAnnotation.setCompressors(compressors);
+        geneExpressionAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
+        auto dataunits = geneExpressionAnnotation.parseGeneExpression(inputfile);
+        for (auto& dataunit : dataunits) {
+          annotationParameterSet.push_back(dataunit.annotationParameterSet);
+          annotationAccessUnit.insert(annotationAccessUnit.end(),
+                                      dataunit.annotationAccessUnit.begin(),
+                                      dataunit.annotationAccessUnit.end());
+        }
+    } else { // contact matrix
         cmAnnotation.setCompressors(compressors);
         cmAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
         auto dataunits = cmAnnotation.parseContact(inputfile);

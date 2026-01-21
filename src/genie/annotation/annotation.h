@@ -22,13 +22,14 @@
 #include "genie/core/data_unit_record/record.h"
 #include "genie/annotation/geno_annotation.h"
 #include "genie/annotation/site_annotation.h"
+#include "genie/annotation/gene_expression_annotation.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum class RecType { SITE_FILE = 0, GENO_FILE, CM_FILE };
+enum class RecType { SITE_FILE = 0, GENO_FILE, GENE_EXPRESSION, CM_FILE };
 
 
 
@@ -75,6 +76,7 @@ class Annotation {
 
   GenoAnnotation genoAnnotation;
   SiteAnnotation siteAnnotation;
+  GeneExpressionAnnotation geneExpressionAnnotation;
   CMAnnotation cmAnnotation;
 
   uint32_t defaultTileSizeHeight{0};

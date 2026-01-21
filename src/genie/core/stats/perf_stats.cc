@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <map>
 #include <ostream>
+#include <sstream>
 #include <string>
 
 #include "genie/util/log.h"

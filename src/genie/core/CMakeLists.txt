@@ -30,6 +30,8 @@ set(source_files
 
         variant_site_record/record.cc
 
+        gene_expression_record/record.cc
+
         variant_genotype_record/record.cc
         variant_genotype_record/format_field.cc
         variant_genotype_record/format_field.h
