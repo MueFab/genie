@@ -23,6 +23,7 @@
 #include "genie/util/bit_reader.h"
 
 #include "genie/core/variant_site_record/record.h"
+#include "genie/core/feature_record/record.h"
 
 #include "genie/core/record/annotation_access_unit/TypedData.h"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -93,6 +94,7 @@ class Attributes {
 
     void add(std::vector<genie::core::record::variant_site::InfoFields::Field> fields);  // std::vector<genie::core::record::variant_site::Info_tag> tags, std::vector<std::vector<std::vector<uint8_t>>> infoValues);
     void add(std::map<std::string, genie::core::record::variant_site::Info_tag> tags, std::map<std::string, std::vector<std::vector<uint8_t>>> infoValues);
+    void add(std::vector<genie::core::record::feature::FeatureFields::Field> fields);
 
     std::map<std::string, AttributeTile>& getTiles() { return attributeTiles; }
     std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& getInfo() { return info; }

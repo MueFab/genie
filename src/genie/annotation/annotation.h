@@ -23,13 +23,14 @@
 #include "genie/annotation/geno_annotation.h"
 #include "genie/annotation/site_annotation.h"
 #include "genie/annotation/gene_expression_annotation.h"
+#include "genie/annotation/feature_annotation.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum class RecType { SITE_FILE = 0, GENO_FILE, GENE_EXPRESSION, CM_FILE };
+enum class RecType { SITE_FILE = 0, GENO_FILE, FEATURE_FILE, GENE_EXPRESSION_FILE, CM_FILE };
 
 
 
@@ -46,6 +47,8 @@ class Annotation {
     defaultTileSizeWidth = _defaultTileSizeWidth;
     genoAnnotation.setTileSize(_defaultTileSizeHeight, defaultTileSizeWidth);
     siteAnnotation.setTileSize(_defaultTileSizeHeight);
+    geneExpressionAnnotation.setTileSize(_defaultTileSizeHeight, defaultTileSizeWidth);
+    featureAnnotation.setTileSize(_defaultTileSizeHeight);
   }
 
   void startStream(RecType recType, std::string recordInputFileName,
@@ -77,6 +80,7 @@ class Annotation {
   GenoAnnotation genoAnnotation;
   SiteAnnotation siteAnnotation;
   GeneExpressionAnnotation geneExpressionAnnotation;
+  FeatureAnnotation featureAnnotation;
   CMAnnotation cmAnnotation;
 
   uint32_t defaultTileSizeHeight{0};

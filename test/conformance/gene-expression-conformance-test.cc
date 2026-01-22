@@ -44,7 +44,7 @@ TEST_P(GeneExpressionConformanceTest, GeneExpressionConformanceTests) {
     annotationGenerator.setCompressorConfig(config);
     annotationGenerator.setTileSize(BLOCK_SIZE, 3000);
 
-    annotationGenerator.startStream(genie::annotation::RecType::GENE_EXPRESSION, filepath, filepath + "_output");
+    annotationGenerator.startStream(genie::annotation::RecType::GENE_EXPRESSION_FILE, filepath, filepath + "_output");
 }
 
 INSTANTIATE_TEST_SUITE_P(

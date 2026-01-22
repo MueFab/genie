@@ -12,6 +12,7 @@ set(source_files
         site-conformance-test.cc
         geno-conformance-test.cc
         gene-expression-conformance-test.cc
+        feature-conformance-test.cc
         helpers.cc
         main.cc
 )
@@ -43,6 +44,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE genie-annotation)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-genotype)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-feature)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
 
 install(TARGETS ${PROJECT_NAME}

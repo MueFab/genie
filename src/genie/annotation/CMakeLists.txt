@@ -7,6 +7,7 @@ set(source_files
 		geno_annotation.cc
 		site_annotation.cc
 		gene_expression_annotation.cc
+		feature_annotation.cc
 		contact_annotation.cc
         compressors.cc
 		parameterset_composer.cc
