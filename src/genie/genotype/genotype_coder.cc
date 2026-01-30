@@ -4,12 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genotype_coder.h"
+#include "genie/genotype/genotype_coder.h"
 
 #include <codecs/include/mpegg-codecs.h>
 
 #include <cmath>
 #include <fstream>
+#include <utility>
+#include <vector>
 #include <xtensor/xindex_view.hpp>
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xsort.hpp>
@@ -221,7 +223,6 @@ void binarize_row_bin(
 //    uint8_t& num_bit_planes,
     UIntVecDtype& amax_vec
 ) {
-
     auto nrows = allele_mat.shape(0);
     auto ncols = allele_mat.shape(1);
 
@@ -286,15 +287,13 @@ void binarize_allele_mat(
     BinarizationID binarization_ID,
     ConcatAxis concat_axis
 ) {
-
   switch (binarization_ID) {
       case genie::genotype::BinarizationID::BIT_PLANE: {
           binarize_bit_plane(
               allele_mat,
               bin_mats,
               num_bit_planes,
-              concat_axis
-          );
+              concat_axis);
           break;
       }
       case genie::genotype::BinarizationID::ROW_BIN: {
@@ -304,8 +303,7 @@ void binarize_allele_mat(
               allele_mat,
               bin_mats,
 //                num_bit_planes,
-              amax_vec
-          );
+              amax_vec);
           break;
       }
       default:
@@ -327,9 +325,7 @@ void inverse_binarize_allele_mat(
     UIntVecDtype& amax_vec,
     // Output
     Int8MatDtype& allele_mat
-){
-
-}
+) {}
 
 // -----------------------------------------------------------------------------
 
@@ -531,7 +527,7 @@ void bin_mat_from_bytes(
 }
 
 // -----------------------------------------------------------------------------
-// TODO (Yeremia,Stefanie): Move and refactor this function to the parsing
+// TODO(Yeremia,Stefanie): Move and refactor this function to the parsing
 // funciton
 
 // void sort_format(const std::vector<core::record::VariantGenotype>& recs,
@@ -580,16 +576,15 @@ void entropy_encode_bin_mat(
 
     switch (codec_ID) {
       case genie::core::AlgoID::JBIG: {
-        auto nrows = static_cast<unsigned long>(bin_mat.shape(0));
-        auto ncols = static_cast<unsigned long>(bin_mat.shape(1));
+        auto nrows = static_cast<unsigned long>(bin_mat.shape(0));  // NOLINT(runtime/int)
+        auto ncols = static_cast<unsigned long>(bin_mat.shape(1));  // NOLINT(runtime/int)
         mpegg_jbig_compress_default(
             &compressed_data,
             &compressed_data_len,
             raw_data,
             raw_data_len,
             nrows,
-            ncols
-        );
+            ncols);
       } break;
       case genie::core::AlgoID::ZSTD: {
         mpegg_zstd_compress(
@@ -597,8 +592,7 @@ void entropy_encode_bin_mat(
             &compressed_data_len,
             raw_data,
             raw_data_len,
-            3
-        );
+            3);
       } break;
       case genie::core::AlgoID::BSC: {
         mpegg_bsc_compress(
@@ -606,11 +600,10 @@ void entropy_encode_bin_mat(
             &compressed_data_len,
             raw_data,
             raw_data_len,
-            20, // lzpHashSize
-            8,  // lzpMinLen
-            1, // LIBBSC_BLOCKSORTER_BWT
-            1
-        );
+            20,  // lzpHashSize
+            8,   // lzpMinLen
+            1,   // LIBBSC_BLOCKSORTER_BWT
+            1);
       } break;
       case genie::core::AlgoID::LZMA: {
         UTILS_DIE("Not yet implemented!");
@@ -633,7 +626,7 @@ void entropy_decode_bin_mat(
     size_t ncols,
     // Outputs
     BinMatDtype& bin_mat
-){
+) {
   uint8_t* raw_data;
   size_t raw_data_len;
 //  uint8_t* compressed_data;
@@ -648,9 +641,8 @@ void entropy_decode_bin_mat(
           &raw_data_len,
           payload.data(),  // Use payload.data() as compressed_data
           payload.size(),  // Use payload.size() as compressed_data_len
-          (unsigned long*) & nrows, 
-          (unsigned long*)&ncols
-      );
+          (unsigned long*)&nrows,   // NOLINT(runtime/int)
+          (unsigned long*)&ncols);  // NOLINT(runtime/int)
     } break;
     case genie::core::AlgoID::ZSTD: {
 //      mpegg_zstd_compress(
@@ -688,11 +680,9 @@ void entropy_decode_bin_mat(
     raw_data_len,
     nrows,
     ncols,
-    bin_mat
-  );
+    bin_mat);
   free(raw_data);
-
-};
+}
 
 // -----------------------------------------------------------------------------
 
@@ -705,8 +695,7 @@ void encode_and_sort_bin_mat(
     SortingAlgoID sort_row_method,
     SortingAlgoID sort_col_method,
     genie::core::AlgoID codec_ID
-){
-
+) {
   auto sort_rows_flag = sort_row_method != SortingAlgoID::NO_SORTING;
   auto sort_cols_flag = sort_col_method != SortingAlgoID::NO_SORTING;
 
@@ -718,8 +707,7 @@ void encode_and_sort_bin_mat(
       row_ids,
       col_ids,
       sort_row_method,
-      sort_col_method
-  );
+      sort_col_method);
 
   if (sort_rows_flag) {
     std::vector<uint32_t> row_ids_vec(row_ids.begin(), row_ids.end());
@@ -727,8 +715,7 @@ void encode_and_sort_bin_mat(
     RowColIdsPayload row_ids_payload(std::move(row_ids_vec));
 
     sorted_bin_mat_payload.SetRowIdsPayload(
-        std::move(row_ids_payload)
-    );
+        std::move(row_ids_payload));
   }
 
   if (sort_cols_flag) {
@@ -737,8 +724,7 @@ void encode_and_sort_bin_mat(
     RowColIdsPayload col_ids_payload(std::move(col_ids_vec));
 
     sorted_bin_mat_payload.SetColIdsPayload(
-        std::move(col_ids_payload)
-    );
+        std::move(col_ids_payload));
   }
 
   // Handle entropy coding
@@ -750,19 +736,16 @@ void encode_and_sort_bin_mat(
     entropy_encode_bin_mat(
         bin_mat,
         codec_ID,
-        payload
-    );
+        payload);
 
     BinMatPayload bin_mat_payload(
         codec_ID,
         std::move(payload),
         nrows,
-        ncols
-    );
+        ncols);
 
     sorted_bin_mat_payload.SetBinMatPayload(
-        std::move(bin_mat_payload)
-    );
+        std::move(bin_mat_payload));
   }
 }
 
@@ -777,8 +760,7 @@ void decode_and_inverse_sort_bin_mat(
   genie::core::AlgoID codec_ID,
   bool sort_rows_flag,
   bool sort_cols_flag
-){
-
+) {
   auto& bin_mat_payload = sorted_bin_mat_payload.GetBinMatPayload();
 
   entropy_decode_bin_mat(
@@ -786,8 +768,7 @@ void decode_and_inverse_sort_bin_mat(
     codec_ID,
     static_cast<size_t>(bin_mat_payload.GetNRows()),
     static_cast<size_t>(bin_mat_payload.GetNCols()),
-    bin_mat
-  );
+    bin_mat);
 
   if (sort_rows_flag) {
     auto row_ids_vec = sorted_bin_mat_payload.GetRowIdsPayload()->GetRowColIdsElements();
@@ -832,12 +813,11 @@ void encode_genotype(
         sort_col_method != SortingAlgoID::NO_SORTING,
         transpose_mat,
         codec_ID,
-        true, // Encode Phase data
+        true,  // Encode Phase data
         sort_row_method != SortingAlgoID::NO_SORTING,
         sort_col_method != SortingAlgoID::NO_SORTING,
         transpose_mat,
-        codec_ID
-    );
+        codec_ID);
 
     uint8_t max_ploidy;
     bool dot_flag;
@@ -855,17 +835,14 @@ void encode_genotype(
             max_ploidy,
             allele_mat,
             phasing_mat,
-            block_size
-        );
+            block_size);
 
         tmp_payload.SetMaxPloidy(max_ploidy);
-        //if (max_ploidy > 1) tmp_payload.SetPhasesValue(phasing_mat(0,0));  // TODO(Ronald): Is this correct???
 
         transform_max_value(
             allele_mat,
             dot_flag,
-            na_flag
-        );
+            na_flag);
 
         tmp_payload.SetNoReferenceFlag(dot_flag);
         tmp_payload.SetNotAvailableFlag(na_flag);
@@ -878,12 +855,11 @@ void encode_genotype(
             num_bit_planes,
             amax_vec,
             tmp_params.GetBinarizationID(),
-            tmp_params.GetConcatAxis()
-        );
+            tmp_params.GetConcatAxis());
 
         tmp_payload.SetNumBitPlanes(num_bit_planes);
 
-        if (tmp_params.GetBinarizationID() == BinarizationID::ROW_BIN){
+        if (tmp_params.GetBinarizationID() == BinarizationID::ROW_BIN) {
             std::vector<uint64_t> amax_elements(amax_vec.begin(), amax_vec.end());
             AmaxPayload amax_payload(std::move(amax_elements));
             tmp_payload.SetVariantsAmaxPayload(std::move(amax_payload));
@@ -892,7 +868,7 @@ void encode_genotype(
 
     auto num_variants_payloads = 1;
     // Special case for num_variants_payloads
-    if (tmp_params.GetBinarizationID() == BinarizationID::BIT_PLANE && tmp_params.GetConcatAxis() == ConcatAxis::DO_NOT_CONCAT){
+    if (tmp_params.GetBinarizationID() == BinarizationID::BIT_PLANE && tmp_params.GetConcatAxis() == ConcatAxis::DO_NOT_CONCAT) {
       num_variants_payloads = num_bit_planes;
     }
 
@@ -907,12 +883,10 @@ void encode_genotype(
         // Options
         sort_row_method,
         sort_col_method,
-        codec_ID
-      );
+        codec_ID);
 
       tmp_payload.AddVariantsPayload(
-        std::move(sorted_bin_mat_payload)
-      );
+        std::move(sorted_bin_mat_payload));
     }
 
     if (tmp_params.GetEncodePhasesDataFlag()) {
@@ -923,12 +897,12 @@ void encode_genotype(
         sorted_bin_mat_payload,
         sort_row_method,
         sort_col_method,
-        codec_ID
-      );
+        codec_ID);
 
       tmp_payload.SetPhasesPayload(
-          std::move(sorted_bin_mat_payload)
-      );
+          std::move(sorted_bin_mat_payload));
+    } else {
+      tmp_payload.SetPhasesValue(true);
     }
 
     params = std::move(tmp_params);
@@ -946,7 +920,6 @@ void decode_genotype(
     Int8MatDtype& allele_mat,
     BinMatDtype& phasing_mat
 ) {
-
 //  auto num_bin_mats = payload.GetNumBitPlanes();
 //  auto num_allele_payloads = payload.GetNumVariantsPayloads();
 //  std::vector<BinMatDtype> bin_mats;

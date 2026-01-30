@@ -9,17 +9,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
 #include <vector>
-#include "genie/core/constants.h"
-#include "genie/core/writer.h"
+
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
 #include "AlgorithmParameters.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -57,11 +53,10 @@ class CompressorParameterSet {
 
     void addCompressorStep(compressorStep stepParameters);
 
-    void read(util::BitReader& reader);
-    void write(core::Writer& writer) const;
-    void write(util::BitWriter& writer) const;
+    void Read(util::BitReader& reader);
+    void Write(util::BitWriter& writer) const;
 
-    size_t getSize(core::Writer& writesize) const;
+    size_t GetSize(util::BitWriter& writesize) const;
 
     uint8_t getCompressorID() const { return compressor_ID; }
     uint8_t getNumberOfCompressorSteps() const { return static_cast<uint8_t>(compressorSteps.size()); }

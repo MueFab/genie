@@ -19,13 +19,14 @@
 
 #include "genie/core/constants.h"
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 #include "genie/core/variant_site_record/record.h"
 #include "genie/core/feature_record/record.h"
 
 #include "genie/core/record/annotation_access_unit/TypedData.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -59,14 +60,14 @@ class AttributeTile {
 
     std::stringstream& getTile(uint64_t tilenr) {
         if (tilenr == tiles.size() - 1) {
-          writers.back().Flush();
+          writers.back().FlushBits();
         }
         return tiles.at(tilenr);
     }
 
     void write(std::vector<std::vector<uint8_t>> value);
 
-    uint64_t getCurrentsize() const {return writers.back().GetBitsWritten(); }
+    uint64_t getCurrentsize() const {return writers.back().GetTotalBitsWritten(); }
     void writeMissing();
 
     std::vector<std::stringstream> convertTilesToTypedData();
@@ -76,7 +77,7 @@ class AttributeTile {
     genie::core::record::annotation_parameter_set::AttributeData info;
     std::vector< genie::core::record::annotation_access_unit::TypedData> typedTiles;
     std::vector<std::stringstream> tiles;
-    std::vector<genie::core::Writer> writers;
+    std::vector<util::BitWriter> writers;
     uint64_t rowInTile;
 
     void AddFirst();

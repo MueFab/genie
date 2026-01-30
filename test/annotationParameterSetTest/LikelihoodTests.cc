@@ -5,11 +5,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
-#include <fstream>
-#include <iostream>
+#include <string>
 
 #include "RandomRecordFillIn.h"
-#include "genie/core/writer.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 #define GENERATE_TEST_FILES false
 
@@ -68,22 +67,22 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
     likelihoodParameters = randomLikelihood.randomLikelihood();
 
     std::stringstream outputfile;
-
-    genie::util::BitWriter strwriter(&outputfile);
     genie::util::BitReader strreader(outputfile);
+    genie::util::BitWriter strwriter(&outputfile);
     likelihoodParameters.Write(strwriter);
     strwriter.FlushBits();
-    likelihoodParametersCheck.read(strreader);
+    likelihoodParametersCheck.Read(strreader);
 
 //    EXPECT_EQ(likelihoodParameters.getDtypeID(), likelihoodParametersCheck.GetDtypeId());
     EXPECT_EQ(likelihoodParameters.GetNumGlPerSample(),
               likelihoodParametersCheck.GetNumGlPerSample());
     EXPECT_EQ(likelihoodParameters.GetTransformFlag(),
               likelihoodParametersCheck.GetTransformFlag());
-
-    auto size = likelihoodParameters.GetSize();
-
-    EXPECT_EQ(outputfile.str().size(), size);
+    std::stringstream sizefile;
+    genie::util::BitWriter writeSize(&sizefile);
+    auto size = likelihoodParameters.GetSize(writeSize);
+    if (size % 8 != 0) size += (8 - size % 8);
+    EXPECT_EQ(outputfile.str().size(), size / 8);
 
 #if GENERATE_TEST_FILES
     std::string name = "TestFiles/LikelihoodParameters_seed_";
@@ -92,19 +91,11 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
     std::ofstream testfile;
     testfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (testfile.is_open()) {
-        genie::core::Writer writer(&testfile);
-        likelihoodParameters.write(writer);
-        writer.flush();
-        testfile.close();
+        genie::util::BitWriter writer(&testfile);
+        likelihoodParameters.Write(writer);
+        writer.FlushBits();
+        testfile.Close();
     }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile, true);
-        likelihoodParameters.write(txtWriter);
-        txtfile.close();
-    }
-
 #endif
 }
 

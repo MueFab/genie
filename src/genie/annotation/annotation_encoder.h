@@ -16,7 +16,7 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
+#include "genie/util/bit_writer.h"
 
 #include "genie/annotation/compressors.h"
 #include "genie/core/record/annotation_parameter_set/AnnotationEncodingParameters.h"
@@ -39,23 +39,23 @@ class AnnotationEncoder {
  public:
     core::record::annotation_parameter_set::AnnotationEncodingParameters Compose();
 
-    void setDescriptorParameters(genie::core::AnnotDesc ID, genie::core::AlgoID encoding) {
-        genie::core::record::annotation_parameter_set::AlgorithmParameters algpars;
+    void setDescriptorParameters(core::AnnotDesc ID, core::AlgoID encoding) {
+        core::record::annotation_parameter_set::AlgorithmParameters algpars;
         switch (encoding) {
-            case genie::core::AlgoID::LZMA: {
-                genie::entropy::lzma::LZMAParameters lzmaParameters;
+            case core::AlgoID::LZMA: {
+                entropy::lzma::LZMAParameters lzmaParameters;
                 algpars = lzmaParameters.convertToAlgorithmParameters();
             } break;
-            case genie::core::AlgoID::ZSTD: {
-                genie::entropy::zstd::ZSTDParameters zstdParameters;
+            case core::AlgoID::ZSTD: {
+                entropy::zstd::ZSTDParameters zstdParameters;
                 algpars = zstdParameters.convertToAlgorithmParameters();
             } break;
-            case genie::core::AlgoID::BSC: {
-                genie::entropy::bsc::BSCParameters bscParameters;
+            case core::AlgoID::BSC: {
+                entropy::bsc::BSCParameters bscParameters;
                 algpars = bscParameters.convertToAlgorithmParameters();
             } break;
-            case genie::core::AlgoID::JBIG: {
-                genie::entropy::jbig::JBIGparameters jbigParameters;
+            case core::AlgoID::JBIG: {
+                entropy::jbig::JBIGparameters jbigParameters;
                 algpars = jbigParameters.convertToAlgorithmParameters();
             }
                 break;
@@ -66,14 +66,14 @@ class AnnotationEncoder {
         descriptorConfigurations.emplace_back(ID, encoding, algpars);
     }
 
-    void setDescriptorParameters(genie::core::AnnotDesc ID, genie::core::AlgoID encoding,
-                                 genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmPars) {
+    void setDescriptorParameters(core::AnnotDesc ID, core::AlgoID encoding,
+                                 core::record::annotation_parameter_set::AlgorithmParameters algorithmPars) {
         descriptorConfigurations.emplace_back(ID, encoding, algorithmPars);
     }
 
     void setDescriptors(std::vector<core::AnnotDesc> _descrList) {
         for (auto descr : _descrList) {
-            setDescriptorParameters(descr, genie::core::AlgoID::BSC);
+            setDescriptorParameters(descr, core::AlgoID::BSC);
         }
     }
 
@@ -95,8 +95,8 @@ class AnnotationEncoder {
     }
 
  private:
-    std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptorConfigurations;
-    std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressorParameters;
+    std::vector<core::record::annotation_parameter_set::DescriptorConfiguration> descriptorConfigurations;
+    std::vector<core::record::annotation_parameter_set::CompressorParameterSet> compressorParameters;
     std::vector<core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set;
 };
 

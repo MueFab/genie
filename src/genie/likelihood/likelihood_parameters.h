@@ -4,15 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_LIKELIHOOD_PARAMETERS_H
-#define GENIE_LIKELIHOOD_PARAMETERS_H
+#ifndef SRC_GENIE_LIKELIHOOD_LIKELIHOOD_PARAMETERS_H_
+#define SRC_GENIE_LIKELIHOOD_LIKELIHOOD_PARAMETERS_H_
 
-#include <boost/optional/optional.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+#include <boost/optional/optional.hpp>
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -32,11 +32,12 @@ class LikelihoodParameters {
  public:
     LikelihoodParameters();
     LikelihoodParameters(uint8_t _num_gl_per_sample, bool _transform_flag, core::DataType _dtype_id);
-    LikelihoodParameters(util::BitReader& reader);
+    explicit LikelihoodParameters(util::BitReader& reader);
 
-    void Write(genie::util::BitWriter& writer) const;
-    void read(util::BitReader& reader);
+    void Read(util::BitReader& reader);
+    void Write(util::BitWriter& writer) const;
     [[nodiscard]] size_t GetSize() const;
+    size_t GetSize(util::BitWriter& writesize) const;
 
     uint8_t GetNumGlPerSample() const;
     bool GetTransformFlag() const;
@@ -49,6 +50,6 @@ class LikelihoodParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_LIKELIHOOD_PARAMETERS_H
+#endif  // SRC_GENIE_LIKELIHOOD_LIKELIHOOD_PARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------

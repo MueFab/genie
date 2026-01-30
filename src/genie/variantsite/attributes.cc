@@ -5,6 +5,7 @@
  */
 
 #include <algorithm>
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>
@@ -12,6 +13,7 @@
 #include "genie/variantsite/attributes.h"
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -32,7 +34,7 @@ void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
         typedTiles.back().setArrayDim0(static_cast<uint32_t>(rowInTile));
     } else {
         typedTiles.back().setArrayDim0(static_cast<uint32_t>(rowInTile + 1));
-        writers.back().Flush();
+        writers.back().FlushBits();
 
         std::vector<uint32_t> arrayDims;
         arrayDims.push_back(static_cast<uint32_t>(rowInTile+1));
@@ -68,8 +70,8 @@ std::vector<std::stringstream> AttributeTile::convertTilesToTypedData() {
         util::BitReader reader(tile);
         typedData.convertToTypedData(reader);
         TypedTiles.emplace_back("");
-        core::Writer writer(&TypedTiles.back());
-        typedData.write(writer);
+        util::BitWriter writer(&TypedTiles.back());
+        typedData.Write(writer);
     }
 
     return TypedTiles;
@@ -110,8 +112,7 @@ void AttributeTile::setCompressedData(uint64_t tilenr, std::stringstream& compre
     (void)compressedData;
 }
 
-void Attributes::add(std::vector<genie::core::record::variant_site::InfoFields::Field> tags)  // , std::vector<std::vector<std::vector<uint8_t>>> infoValues) {
-{
+void Attributes::add(std::vector<genie::core::record::variant_site::InfoFields::Field> tags) {  // , std::vector<std::vector<std::vector<uint8_t>>> infoValues) {
     size_t index = 0;
     for (const auto& tag : tags) {
         attributeTiles[tag.tag].write(tag.values);  // infoValues.at(index));

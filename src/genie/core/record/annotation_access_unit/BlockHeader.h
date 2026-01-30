@@ -9,21 +9,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-
 #include "genie/core/constants.h"
-#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
-#include "genie/core/writer.h"
-#include "genie/genotype/genotype_parameters.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -44,15 +33,14 @@ class BlockHeader {
     BlockHeader(bool attribute_contiguity, AnnotDesc descriptor_ID,
                 uint16_t attribute_ID, bool indexed, uint32_t block_payload_size);
 
-    void read(genie::util::BitReader& reader);
-    void write(core::Writer& writer) const;
-    void write(util::BitWriter& writer) const;
+    void Read(util::BitReader& reader);
+    void Write(util::BitWriter& writer) const;
 
     AnnotDesc getDescriptorID() const { return descriptor_ID; }
     uint16_t getAttributeID() const { return attribute_ID; }
     bool isIndexed() const { return indexed; }
     uint32_t getBlockPayloadSize() const { return block_payload_size; }
-    size_t getSize(core::Writer& writesize) const;
+    size_t GetSize(util::BitWriter& writesize) const;
 };
 
 

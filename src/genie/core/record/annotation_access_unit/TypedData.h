@@ -9,21 +9,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <fstream>
-#include <iostream>
-#include <memory>
 #include <sstream>
-#include <string>
-#include <utility>
 #include <vector>
 
-#include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
-#include "genie/genotype/genotype_parameters.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -93,7 +85,7 @@ class TypedData {
     std::stringstream& getDataStream() { return dataStream; }
 
     std::stringstream& getdata() {
-      writer.Flush();
+        writer.FlushBits();
         return dataStream;
     }
     std::stringstream& getCompresseddata() { return compressedDataStream; }
@@ -101,17 +93,17 @@ class TypedData {
     void setCompressedData(std::stringstream& _compressed_data_block) {
         compressedDataStream.str("");
         compressedDataStream.clear();
-        genie::core::Writer compressedWriter(const_cast<std::stringstream*>(&compressedDataStream));
+        util::BitWriter compressedWriter(const_cast<std::stringstream*>(&compressedDataStream));
         compressedWriter.Write(&_compressed_data_block);
     }
 
     void setCompressedData(std::vector<uint8_t>& _compressed_data_block) {
-        genie::core::Writer compressedWriter(&compressedDataStream);
+        util::BitWriter compressedWriter(&compressedDataStream);
         for (auto byte : _compressed_data_block)
-          compressedWriter.Write(byte, 8);
+          compressedWriter.WriteBits(byte, 8);
     }
 
-    void write(core::Writer& writer) const;
+    void Write(util::BitWriter& writer) const;
 
  private:
     core::DataType data_type_ID;
@@ -119,7 +111,7 @@ class TypedData {
     std::vector<uint32_t> array_dims;
     std::vector<CustomType> data_block;
     std::stringstream dataStream;
-    genie::core::Writer writer{&dataStream};
+    util::BitWriter writer{&dataStream};
     std::stringstream compressedDataStream;
 };
 

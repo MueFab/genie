@@ -9,18 +9,14 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
 #include <vector>
 
-#include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 #include "AnnotationAccessUnitHeader.h"
 #include "genie/core/record/annotation_access_unit/block.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -64,14 +60,13 @@ class Record {
            bool twoDimensional, bool columnMajorTileOrder, uint8_t ATCoordSize, bool variable_size_tiles,
            uint64_t n_blocks, uint8_t numChrs);
 
-    void read(util::BitReader& reader);
-    void read(util::BitReader& reader, bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
+    void Read(util::BitReader& reader);
+    void Read(util::BitReader& reader, bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
               uint8_t ATCoordSize, uint8_t numChrs);
 
-    void write(core::Writer& writer) const;
-    void write(util::BitWriter& writer) const;
-    size_t getSize() const;
-    size_t getSize(core::Writer& writesize) const;
+    void Write(util::BitWriter& writer) const;
+    size_t GetSize() const;
+    size_t GetSize(util::BitWriter& writesize) const;
 
     Record& operator=(const Record& rec);
 };

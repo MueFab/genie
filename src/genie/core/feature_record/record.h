@@ -5,8 +5,8 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_FEATURE_RECORD_H_
-#define SRC_GENIE_CORE_RECORD_FEATURE_RECORD_H_
+#ifndef SRC_GENIE_CORE_FEATURE_RECORD_RECORD_H_
+#define SRC_GENIE_CORE_FEATURE_RECORD_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -17,7 +17,6 @@
 
 #include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/bit_writer.impl.h"
@@ -41,7 +40,7 @@ class FeatureFields {
    */
   struct Field {
     std::string attr;
-    genie::core::DataType attr_type;
+    DataType attr_type;
     std::vector<CustomType> attr_values;
   };
 
@@ -50,7 +49,7 @@ class FeatureFields {
    * @param reader The bit reader to read from
    * @return
    */
-  void Read(genie::util::BitReader& reader) {
+  void Read(util::BitReader& reader) {
     auto attr_count = static_cast<uint8_t>(reader.ReadBits(8));
     fields_.reserve(attr_count * 16);
     for (auto i = 0; i < attr_count; ++i) {
@@ -58,7 +57,7 @@ class FeatureFields {
       std::string attr(attr_len, 0);
       for (auto& ch : attr)
         ch = reader.ReadAlignedInt<uint8_t>();
-      auto attr_type = static_cast<genie::core::DataType>(reader.ReadAlignedInt<uint8_t>());
+      auto attr_type = static_cast<DataType>(reader.ReadAlignedInt<uint8_t>());
       auto attr_array_len = reader.ReadAlignedInt<uint8_t>();
       ArrayType arrayType;
       std::vector<CustomType> values;
@@ -74,7 +73,7 @@ class FeatureFields {
         } else {
           value = arrayType.toArray(attr_type, reader);
         }
-            
+
         values.push_back(value);
       }
       if (attr_type == DataType::CHAR) {
@@ -110,7 +109,7 @@ class FeatureFields {
 struct Info_tag {
   uint8_t info_tag_len;
   std::string info_tag;
-  genie::core::DataType info_type;
+  DataType info_type;
   uint8_t info_array_len;
   std::vector<std::vector<uint8_t>> infoValue;
 };
@@ -173,26 +172,26 @@ class Record {
    * @brief Constructor from a bit reader
    * @param reader The bit reader to read from
    */
-  explicit Record(genie::util::BitReader& reader);
+  explicit Record(util::BitReader& reader);
   /**
    * @brief
    */
-  //  Record(genie::util::BitReader& reader, std::vector<Info_tag> infoTag) :
+  //  Record(util::BitReader& reader, std::vector<Info_tag> infoTag) :
   //  info_tag(infoTag) { read(reader); }
-  //   Record(genie::util::BitReader& reader) { read(reader); }
+  //   Record(util::BitReader& reader) { read(reader); }
 
   /**
    * @brief Reads record data from a bit reader
    * @param reader The bit reader to read from
    * @return True if read was successful, false otherwise
    */
-  bool Read(genie::util::BitReader& reader);
+  bool Read(util::BitReader& reader);
 
   /**
    * @brief Writes record data to a writer
    * @param writer The writer to write to
    */
-  void Write(genie::util::BitWriter& writer);
+  void Write(util::BitWriter& writer);
 
   /**
    * @brief Gets the feature index
@@ -241,7 +240,7 @@ class Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_FEATURE_RECORD_H_
+#endif  // SRC_GENIE_CORE_FEATURE_RECORD_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

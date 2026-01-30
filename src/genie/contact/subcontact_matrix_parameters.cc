@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "subcontact_matrix_parameters.h"
+#include "genie/contact/subcontact_matrix_parameters.h"
+#include <utility>
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
@@ -52,12 +53,10 @@ SubcontactMatrixParameters::SubcontactMatrixParameters(
       codec_ID_(other.codec_ID_),
       tile_parameters_(other.tile_parameters_),
       row_mask_exists_flag_(other.row_mask_exists_flag_),
-      col_mask_exists_flag_(other.col_mask_exists_flag_)
-{
+      col_mask_exists_flag_(other.col_mask_exists_flag_) {
   SetNumTiles(
       other.GetNTilesInRow(),
-      other.GetNTilesInCol()
-  );
+      other.GetNTilesInCol());
 
   // Deep copy for TileParameters if needed
   for (size_t i = 0; i < other.GetNTilesInRow(); ++i) {
@@ -117,10 +116,9 @@ SubcontactMatrixParameters& SubcontactMatrixParameters::operator=(
 SubcontactMatrixParameters::SubcontactMatrixParameters(
     util::BitReader& reader,
     ContactMatrixParameters& cm_params
-): parameter_set_ID_(reader.ReadAlignedInt<uint8_t>()),
+) : parameter_set_ID_(reader.ReadAlignedInt<uint8_t>()),
    chr1_ID_(reader.ReadAlignedInt<uint8_t>()),
    chr2_ID_(reader.ReadAlignedInt<uint8_t>()) {
-
     auto flags = reader.ReadAlignedInt<uint8_t>();
     codec_ID_ = static_cast<core::AlgoID>(flags & 0x1F);
 
@@ -331,13 +329,14 @@ size_t SubcontactMatrixParameters::GetSize() const {
 // -----------------------------------------------------------------------------
 
 void SubcontactMatrixParameters::Write(util::BitWriter& writer) const {
-    writer.WriteBypassBE(parameter_set_ID_);
-    writer.WriteBypassBE(chr1_ID_);
-    writer.WriteBypassBE(chr2_ID_);
+    writer.WriteBits(parameter_set_ID_, 8);
+    writer.WriteBits(chr1_ID_, 8);
+    writer.WriteBits(chr2_ID_, 8);
 
+    writer.WriteBits(0, 3);  // reserved
     uint8_t flags = 0u;
     flags |= (static_cast<uint8_t>(codec_ID_) & 0x1F);
-    writer.WriteBypassBE(flags);
+    writer.WriteBits(flags, 5);
 
     auto num_tiles_in_row = GetNTilesInRow();
     auto num_tiles_in_col = GetNTilesInCol();
@@ -349,20 +348,14 @@ void SubcontactMatrixParameters::Write(util::BitWriter& writer) const {
                 continue;
             }
             auto& tile_param = tile_parameters_[i][j];
-
-            flags = 0u;
-            flags |= static_cast<uint8_t>((static_cast<uint8_t>(tile_param.diag_tranform_mode) << 2));
-            flags |= static_cast<uint8_t>(tile_param.binarization_mode);
-            writer.WriteBypassBE(flags);
+            writer.WriteBits(0, 3);  // reserved
+            writer.WriteBits(static_cast<uint8_t>(tile_param.diag_tranform_mode), 3);
+            writer.WriteBits(static_cast<uint8_t>(tile_param.binarization_mode), 2);
         }
     }
-
-    flags = 0u;
-    flags |= static_cast<uint8_t>((static_cast<uint8_t>(row_mask_exists_flag_) << 1));
-    flags |= static_cast<uint8_t>(col_mask_exists_flag_);
-    writer.WriteBypassBE(flags);
-
-    writer.FlushBits();
+    writer.WriteBits(0, 6);  // reserved
+    writer.WriteBits(static_cast<uint8_t>(row_mask_exists_flag_), 1);
+    writer.WriteBits(static_cast<uint8_t>(col_mask_exists_flag_), 1);
 }
 
 // -----------------------------------------------------------------------------

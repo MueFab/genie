@@ -22,8 +22,8 @@
 namespace genie {
 namespace annotation {
 
-void genie::annotation::Annotation::startStream(RecType recType, std::string recordInputFileName,
-                                                std::string outputFileName) {
+void Annotation::startStream(RecType recType, std::string recordInputFileName,
+                             std::string outputFileName) {
     std::ifstream inputfile;
     inputfile.open(recordInputFileName, std::ios::in | std::ios::binary);
 
@@ -49,7 +49,7 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
         auto dataunits = siteAnnotation.parseSite(inputfile);
         annotationParameterSet.push_back(dataunits.annotationParameterSet);
         annotationAccessUnit = dataunits.annotationAccessUnit;
-    } else if (recType == RecType::GENE_EXPRESSION_FILE) { // gene expression
+    } else if (recType == RecType::GENE_EXPRESSION_FILE) {  // gene expression
         geneExpressionAnnotation.setCompressors(compressors);
         geneExpressionAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
         auto dataunits = geneExpressionAnnotation.parseGeneExpression(inputfile);
@@ -78,29 +78,22 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
 }
 
 void Annotation::writeToFile(std::string& outputFileName) {
-  std::cerr << " start of writeToFile... " << std::endl;
+    std::cerr << " start of writeToFile... " << std::endl;
     std::ofstream testfile;
     std::string filename = outputFileName;
     testfile.open(filename + ".bin", std::ios::binary | std::ios::out);
-    //genie::core::Writer testwriter(&testfile);
-    genie::util::BitWriter testwriter(&testfile);
-    std::ofstream txtfile;
-    txtfile.open(filename + ".txt", std::ios::out);
-    genie::core::Writer txtwriter(&txtfile, true);
+    util::BitWriter testwriter(&testfile);
     uint64_t sizeSofar = 0;
 
     for (auto& pars : annotationParameterSet) {
-        genie::core::record::data_unit::Record APS_dataUnit(pars);
+        core::record::data_unit::Record APS_dataUnit(pars);
         sizeSofar = APS_dataUnit.Write(testwriter);
-        APS_dataUnit.Write(txtwriter, sizeSofar);
     }
     for (auto& aau : annotationAccessUnit) {
-      genie::core::record::data_unit::Record AAU_dataUnit(aau);
+        core::record::data_unit::Record AAU_dataUnit(aau);
         sizeSofar = AAU_dataUnit.Write(testwriter);
-        AAU_dataUnit.Write(txtwriter, sizeSofar);
     }
     testfile.close();
-    txtfile.close();
 }
 
 }  // namespace annotation

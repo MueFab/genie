@@ -6,16 +6,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
-#include "genie/core/constants.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-
 #include "TileStructure.h"
+
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -50,7 +43,7 @@ TileStructure::TileStructure()
 
 TileStructure::TileStructure(util::BitReader& reader, uint8_t ATCoordSize, bool two_dimensional)
     : ATCoordSize(ATCoordSize), two_dimensional(two_dimensional) {
-    read(reader);
+    Read(reader);
 }
 
 TileStructure::TileStructure(uint8_t ATCoordSize, uint64_t defaultTileSize)
@@ -88,13 +81,13 @@ TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional, bool var
     }
 }
 
-void TileStructure::read(util::BitReader& reader, uint8_t AT_coordsize, bool twoDimensional) {
+void TileStructure::Read(util::BitReader& reader, uint8_t AT_coordsize, bool twoDimensional) {
     this->ATCoordSize = AT_coordsize;
     this->two_dimensional = twoDimensional;
-    read(reader);
+    Read(reader);
 }
 
-void TileStructure::read(util::BitReader& reader) {
+void TileStructure::Read(util::BitReader& reader) {
     reader.ReadBits(7);
     variable_size_tiles = static_cast<bool>(reader.ReadBits(1));
     n_tiles = static_cast<uint64_t>(reader.ReadBits(coordSizeInBits(ATCoordSize)));
@@ -118,46 +111,27 @@ void TileStructure::read(util::BitReader& reader) {
     }
 }
 
-void TileStructure::write(core::Writer& writer) const {
-  writer.WriteReserved(7);
-    writer.Write(variable_size_tiles, 1);
-    writer.Write(n_tiles, coordSizeInBits(ATCoordSize));
+void TileStructure::Write(util::BitWriter& writer) const {
+    writer.WriteBits(0, 7);
+    writer.WriteBits(variable_size_tiles, 1);
+    writer.WriteBits(n_tiles, coordSizeInBits(ATCoordSize));
 
     auto dimensions = two_dimensional ? 2 : 1;
     if (variable_size_tiles) {
         for (uint64_t i = 0; i < n_tiles; ++i)
             for (auto j = 0; j < dimensions; ++j) {
-              writer.Write(start_index[i][j], coordSizeInBits(ATCoordSize));
-                writer.Write(end_index[i][j], coordSizeInBits(ATCoordSize));
+                writer.WriteBits(start_index[i][j], coordSizeInBits(ATCoordSize));
+                writer.WriteBits(end_index[i][j], coordSizeInBits(ATCoordSize));
             }
     } else {
         for (auto j = 0; j < dimensions; ++j)
-          writer.Write(tile_size[j], coordSizeInBits(ATCoordSize));
+            writer.WriteBits(tile_size[j], coordSizeInBits(ATCoordSize));
     }
 }
 
-void TileStructure::write(util::BitWriter& writer) const {
-  writer.WriteReserved(7);
-  writer.WriteBits(variable_size_tiles, 1);
-  writer.WriteBits(n_tiles, coordSizeInBits(ATCoordSize));
-
-  auto dimensions = two_dimensional ? 2 : 1;
-  if (variable_size_tiles) {
-    for (uint64_t i = 0; i < n_tiles; ++i)
-      for (auto j = 0; j < dimensions; ++j) {
-        writer.WriteBits(start_index[i][j], coordSizeInBits(ATCoordSize));
-        writer.WriteBits(end_index[i][j], coordSizeInBits(ATCoordSize));
-      }
-  } else {
-    for (auto j = 0; j < dimensions; ++j)
-      writer.WriteBits(tile_size[j], coordSizeInBits(ATCoordSize));
-  }
-}
-
-
-size_t TileStructure::getSize(core::Writer& writesize) const {
-    write(writesize);
-    return writesize.GetBitsWritten();
+size_t TileStructure::GetSize(util::BitWriter& writesize) const {
+    Write(writesize);
+    return writesize.GetTotalBitsWritten();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

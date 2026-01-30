@@ -6,7 +6,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "bin_mat_payload.h"
+#include "genie/genotype/bin_mat_payload.h"
+#include <utility>
+#include <vector>
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/jbig/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
@@ -57,13 +59,13 @@ BinMatPayload::BinMatPayload(
     util::BitReader& reader,
     size_t payload_size,
     core::AlgoID codec_ID)
-    : codec_ID_(codec_ID){
+    : codec_ID_(codec_ID) {
 
     UTILS_DIE_IF(!reader.IsByteAligned(), "reader must be byte aligned!");
 
     switch (codec_ID_) {
         case genie::core::AlgoID::JBIG: {
-          //TODO: First 4 bytes are width, 2nd 4 bytes are heights
+          // TODO(Yeremia): First 4 bytes are width, 2nd 4 bytes are heights
           nrows_ = 0;
           ncols_ = 0;
           payload_.resize(payload_size);
@@ -124,11 +126,11 @@ BinMatPayload& BinMatPayload::operator=(BinMatPayload&& other) noexcept {
 
 // ---------------------------------------------------------------------------------------------------------------------
 bool BinMatPayload::operator==(const BinMatPayload& other) const {
-  if (codec_ID_ != other.codec_ID_){
+  if (codec_ID_ != other.codec_ID_) {
     return false;
   }
 
-  if (codec_ID_ != core::AlgoID::JBIG){
+  if (codec_ID_ != core::AlgoID::JBIG) {
       if (nrows_ != other.nrows_ || ncols_ != other.ncols_) {
           return false;
       }
@@ -201,7 +203,7 @@ uint32_t BinMatPayload::GetNCols() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//[[maybe_unused]] const std::vector<uint8_t>& BinMatPayload::GetCompressedPayload() const {
+// [[maybe_unused]] const std::vector<uint8_t>& BinMatPayload::GetCompressedPayload() const {
 //  return compressed_payload_;
 //}
 
@@ -219,19 +221,19 @@ uint32_t BinMatPayload::GetNCols() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//[[maybe_unused]] void BinMatPayload::SetNRows(uint32_t nrows) {
+// [[maybe_unused]] void BinMatPayload::SetNRows(uint32_t nrows) {
 //  nrows_ = nrows;
 //}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//[[maybe_unused]] void BinMatPayload::SetNCols(uint32_t ncols) {
+// [[maybe_unused]] void BinMatPayload::SetNCols(uint32_t ncols) {
 //  ncols_ = ncols;
 //}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//[[maybe_unused]] void BinMatPayload::SetCompressedPayload(std::vector<uint8_t>&& compressed_payload) {
+// [[maybe_unused]] void BinMatPayload::SetCompressedPayload(std::vector<uint8_t>&& compressed_payload) {
 //  compressed_payload_ = std::move(compressed_payload);
 //}
 
@@ -241,19 +243,20 @@ size_t BinMatPayload::GetPayloadSize() const { return payload_.size(); }
 
 size_t BinMatPayload::GetSize() const {
   size_t size = 0u;
-  if (codec_ID_ != genie::core::AlgoID::JBIG){
-    size += sizeof(uint32_t); // nrows u(32)
-    size += sizeof(uint32_t); // ncols u(32)
+  if (codec_ID_ != genie::core::AlgoID::JBIG) {
+    size += sizeof(uint32_t);  // nrows u(32)
+    size += sizeof(uint32_t);  // ncols u(32)
   }
 
   size += GetPayloadSize();
 
   return size;
 }
+
 // -----------------------------------------------------------------------------
 
-void BinMatPayload::Write(util::BitWriter writer) const {
-  if (codec_ID_ != genie::core::AlgoID::JBIG){
+void BinMatPayload::Write(util::BitWriter& writer) const {
+  if (codec_ID_ != genie::core::AlgoID::JBIG) {
     writer.WriteBypassBE(GetNRows());
     writer.WriteBypassBE(GetNCols());
   }

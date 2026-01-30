@@ -20,7 +20,7 @@
 #include "filesystem/filesystem.hpp"
 #include "genie/core/data_unit_record/record.h"
 #include "genie/core/variant_genotype_record/record.h"
-#include "genie/core/writer.h"
+#include "genie/util/bit_writer.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/genotype/parameterset_composer.h"
@@ -160,26 +160,16 @@ void encodeVariantSite(const std::string& _inputFileName,
   outputFile.open(_outputFileName, std::ios::binary | std::ios::out);
 
   if (outputFile.is_open()) {
-    genie::core::Writer dataUnitWriter(&outputFile);
+    genie::util::BitWriter dataUnitWriter(&outputFile);
     APS_dataUnit.Write(dataUnitWriter);
     for (auto& aau : annotationAccessUnit) {
       genie::core::record::data_unit::Record AAU_dataUnit(aau);
       AAU_dataUnit.Write(dataUnitWriter);
     }
     std::cerr << "bytes written: "
-              << std::to_string(dataUnitWriter.GetBitsWritten() / 8)
+              << std::to_string(dataUnitWriter.GetTotalBitsWritten() / 8)
               << std::endl;
     outputFile.close();
-    if (testOutput) {
-      genie::core::Writer txtWriter(&txtFile, true);
-      APS_dataUnit.Write(txtWriter);
-      for (auto& aau : annotationAccessUnit) {
-        genie::core::record::data_unit::Record AAU_dataUnit(aau);
-        AAU_dataUnit.Write(txtWriter);
-      }
-      txtWriter.Flush();
-      txtFile.close();
-    }
   } else {
     std::cerr << "Failed to open file : " << SYSERROR() << std::endl;
   }
@@ -222,9 +212,9 @@ void encodeVariantGenotype(const std::string& _input_fpath,
   //--------------------------------------------------
   uint8_t AT_ID = 1;
   uint8_t AG_class = 0;
-  genie::genotype::GenotypeParameters genotypeParameters; /* =
-      std::get<genie::genotype::GenotypeParameters>(genotypeData);
-  auto datablock = std::get<genie::genotype::EncodingBlock>(genotypeData); */
+  genie::genotype::GenotypeParameters genotypeParameters;
+  /* = std::get<genie::genotype::GenotypeParameters>(genotypeData); */
+  /* auto datablock = std::get<genie::genotype::EncodingBlock>(genotypeData); */
   std::map<std::string,
            genie::core::record::annotation_parameter_set::AttributeData>
       info;
@@ -263,7 +253,7 @@ void encodeVariantGenotype(const std::string& _input_fpath,
   {
     /* genie::genotype::GenotypePayload genotypePayload(datablock,
                                                      genotypeParameters);
-    genie::core::Writer writer(
+    genie::util::BitWriter writer(
         &descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
     genotypePayload.Write(writer);*/
   }
@@ -273,9 +263,9 @@ void encodeVariantGenotype(const std::string& _input_fpath,
     genie::likelihood::LikelihoodPayload payload(
         std::get<genie::likelihood::LikelihoodParameters>(likelihoodData),
         std::get<genie::likelihood::EncodingBlock>(likelihoodData));
-    genie::core::Writer writer(
+    genie::util::BitWriter writer(
         &descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
-    payload.write(writer);
+    payload.Write(writer);
   }
 
   // add LINK_ID default values
@@ -297,12 +287,12 @@ void encodeVariantGenotype(const std::string& _input_fpath,
   outputFile.open(_output_fpath, std::ios::binary | std::ios::out);
 
   if (outputFile.is_open()) {
-    genie::core::Writer dataUnitWriter(&outputFile);
+    genie::util::BitWriter dataUnitWriter(&outputFile);
     APS_dataUnit.Write(dataUnitWriter);
     AAU_dataUnit.Write(dataUnitWriter);
 
     std::cerr << "bytes written: "
-              << std::to_string(dataUnitWriter.GetBitsWritten() / 8)
+              << std::to_string(dataUnitWriter.GetTotalBitsWritten() / 8)
               << std::endl;
     outputFile.close();
   } else {

@@ -6,7 +6,10 @@
 #include "genie/variantsite/accessunit_composer.h"
 
 #include <algorithm>
+#include <filesystem>
+#include <map>
 #include <string>
+#include <vector>
 
 #include "genie/core/record/annotation_access_unit/AnnotationAccessUnitHeader.h"
 #include "genie/core/record/annotation_access_unit/block.h"
@@ -23,7 +26,6 @@
 #include "genie/entropy/lzma/encoder.h"
 #include "genie/entropy/zstd/encoder.h"
 
-#include <filesystem>
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -47,7 +49,7 @@ void AccessUnitComposer::setAccessUnit(
     uint64_t _rowIndex, uint64_t _colIndex) {
     tile_index_2 = _colIndex;
     tile_index_1 = _rowIndex;
-    std::vector<genie::core::record::annotation_access_unit::Block> blocks;
+    std::vector<core::record::annotation_access_unit::Block> blocks;
     AT_ID = _AT_ID;
     AG_class = _AG_class;
     if (AG_class == 0 || AG_class == 2)  // genotype or contact
@@ -64,8 +66,8 @@ void AccessUnitComposer::setAccessUnit(
     for (auto it = encodedDescriptors.begin(); it != encodedDescriptors.end(); ++it) {
         std::vector<uint8_t> data;
         for (auto readbyte : it->second.str()) data.push_back(readbyte);
-        genie::core::record::annotation_access_unit::BlockVectorData blockInfo(it->first, data);
-        genie::core::record::annotation_access_unit::Block block;
+        core::record::annotation_access_unit::BlockVectorData blockInfo(it->first, data);
+        core::record::annotation_access_unit::Block block;
         if (data.size() != 0) {
             block.set(blockInfo);
             blocks.push_back(block);
@@ -85,7 +87,6 @@ void AccessUnitComposer::setAccessUnit(
         if (compressorId != 0) {
             auto& AttributeStream = _attributeTileStream[attribute.getAttributeName()];
             auto& compressorSet = compressorParameterSets.at(compressorId - 1);
-           
 
             compress(AttributeStream, compressorSet);
          }
@@ -95,11 +96,11 @@ void AccessUnitComposer::setAccessUnit(
         auto attributeID = _attributeInfo[tile.first].getAttributeID();
 
         std::stringstream data;
-        genie::core::Writer writer(&data);
-        tile.second.write(writer);
-        writer.Flush();
+        util::BitWriter writer(&data);
+        tile.second.Write(writer);
+        writer.FlushBits();
         core::record::annotation_access_unit::BlockData blockInfo(core::AnnotDesc::ATTRIBUTE, attributeID, data);
-        genie::core::record::annotation_access_unit::Block block;
+        core::record::annotation_access_unit::Block block;
         block.set(blockInfo);
         blocks.push_back(block);
     }
@@ -108,39 +109,39 @@ void AccessUnitComposer::setAccessUnit(
 
     uint64_t n_blocks = static_cast<uint64_t>(blocks.size());
     ATCoordSize = _annotationParameterSet.getATCoordSize();
-    genie::core::record::annotation_access_unit::AnnotationAccessUnitHeader annotationAccessUnitHeadertot(
+    core::record::annotation_access_unit::AnnotationAccessUnitHeader annotationAccessUnitHeadertot(
         attributeContiguity, twoDimensional, columnMajorTileOrder, variable_size_tiles, ATCoordSize, is_attribute,
         attribute_ID, descriptor_ID, n_tiles_per_col, n_tiles_per_row, n_blocks, tile_index_1, tile_index_2_exists,
         tile_index_2);
-    genie::core::record::annotation_access_unit::Record annotationAccessUnit(
+    core::record::annotation_access_unit::Record annotationAccessUnit(
         AT_ID, AT_type, AT_subtype, AG_class, annotationAccessUnitHeadertot, blocks, attributeContiguity,
         twoDimensional, columnMajorTileOrder, ATCoordSize, variable_size_tiles, n_blocks, numChrs);
     _annotationAccessUnit = annotationAccessUnit;
 }
 
 void AccessUnitComposer::compress(
-    const std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration>& descriptorConfigurations,
-    std::map<genie::core::AnnotDesc, std::stringstream>& inputstream,
-    std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors) {
-    genie::entropy::bsc::BSCEncoder bscEncoder;
-    genie::entropy::lzma::LZMAEncoder lzmaEncoder;
-    genie::entropy::zstd::ZSTDEncoder zstdEncoder;
+    const std::vector<core::record::annotation_parameter_set::DescriptorConfiguration>& descriptorConfigurations,
+    std::map<core::AnnotDesc, std::stringstream>& inputstream,
+    std::map<core::AnnotDesc, std::stringstream>& encodedDescriptors) {
+    entropy::bsc::BSCEncoder bscEncoder;
+    entropy::lzma::LZMAEncoder lzmaEncoder;
+    entropy::zstd::ZSTDEncoder zstdEncoder;
     for (auto encodingpar : descriptorConfigurations) {
-        if (encodingpar.getDescriptorID() == genie::core::AnnotDesc::GENOTYPE ||
-            encodingpar.getDescriptorID() == genie::core::AnnotDesc::LIKELIHOOD ||
-            encodingpar.getDescriptorID() == genie::core::AnnotDesc::CONTACT) {
+        if (encodingpar.getDescriptorID() == core::AnnotDesc::GENOTYPE ||
+            encodingpar.getDescriptorID() == core::AnnotDesc::LIKELIHOOD ||
+            encodingpar.getDescriptorID() == core::AnnotDesc::CONTACT) {
             encodedDescriptors[encodingpar.getDescriptorID()] << inputstream[encodingpar.getDescriptorID()].rdbuf();
         } else {
             switch (encodingpar.getEncodingModeID()) {
-                case genie::core::AlgoID::BSC:
+                case core::AlgoID::BSC:
                     bscEncoder.encode(inputstream[encodingpar.getDescriptorID()],
                                       encodedDescriptors[encodingpar.getDescriptorID()]);
                     break;
-                case genie::core::AlgoID::LZMA:
+                case core::AlgoID::LZMA:
                     lzmaEncoder.encode(inputstream[encodingpar.getDescriptorID()],
                                        encodedDescriptors[encodingpar.getDescriptorID()]);
                     break;
-                case genie::core::AlgoID::ZSTD:
+                case core::AlgoID::ZSTD:
                     zstdEncoder.encode(inputstream[encodingpar.getDescriptorID()],
                                        encodedDescriptors[encodingpar.getDescriptorID()]);
                     break;
@@ -154,12 +155,12 @@ void AccessUnitComposer::compress(
 
 void AccessUnitComposer::compress(
     std::map<std::string, std::stringstream>& attributeStream,
-    const std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet>& attributeParameterSets,
-    const std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet>& compressorParameterSets,
+    const std::vector<core::record::annotation_parameter_set::AttributeParameterSet>& attributeParameterSets,
+    const std::vector<core::record::annotation_parameter_set::CompressorParameterSet>& compressorParameterSets,
     std::map<std::string, std::stringstream>& encodedAttributes) {
-    genie::entropy::bsc::BSCEncoder bscEncoder;
-    genie::entropy::lzma::LZMAEncoder lzmaEncoder;
-    genie::entropy::zstd::ZSTDEncoder zstdEncoder;
+    entropy::bsc::BSCEncoder bscEncoder;
+    entropy::lzma::LZMAEncoder lzmaEncoder;
+    entropy::zstd::ZSTDEncoder zstdEncoder;
 
     for (auto& attribute : attributeParameterSets) {
         auto attributeName = attribute.getAttributeName();
@@ -170,13 +171,13 @@ void AccessUnitComposer::compress(
             auto encodeID = compressorParameterSets[compressorID - 1].getAlgorithmIDs();
 
             switch (encodeID[0]) {
-                case genie::core::AlgoID::BSC:
+                case core::AlgoID::BSC:
                     bscEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
                     break;
-                case genie::core::AlgoID::LZMA:
+                case core::AlgoID::LZMA:
                     lzmaEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
                     break;
-                case genie::core::AlgoID::ZSTD:
+                case core::AlgoID::ZSTD:
                     zstdEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
                     break;
 
@@ -188,8 +189,8 @@ void AccessUnitComposer::compress(
     }
 }
 
-void AccessUnitComposer::compress(genie::core::record::annotation_access_unit::TypedData& oneBlock,
-                                  genie::core::record::annotation_parameter_set::CompressorParameterSet& compressor) {
+void AccessUnitComposer::compress(core::record::annotation_access_unit::TypedData& oneBlock,
+                                  core::record::annotation_parameter_set::CompressorParameterSet& compressor) {
     auto encodeId = compressor.getAlgorithmIDs();
     if (compressor.getCompressorID() != 0) {
         std::stringstream compressedData;

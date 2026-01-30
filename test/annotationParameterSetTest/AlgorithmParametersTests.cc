@@ -5,9 +5,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
-#include <fstream>
-#include <iostream>
-#include "genie/core/writer.h"
+#include <string>
+#include <vector>
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
@@ -65,14 +64,14 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersZero) {  // NOLINT(cert-err5
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
-    genie::core::record::annotation_parameter_set::AlgorithmParameters algortihmParameters;
+    genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters;
 
-    EXPECT_EQ(algortihmParameters.getNumberOfPars(), 0);
-    EXPECT_EQ(algortihmParameters.getParArrayDims().size(), 0);
-    EXPECT_EQ(algortihmParameters.getParIDs().size(), 0);
-    EXPECT_EQ(algortihmParameters.getParNumberOfArrayDims().size(), 0);
-    EXPECT_EQ(algortihmParameters.getParTypes().size(), 0);
-    EXPECT_EQ(algortihmParameters.getParValues().size(), 0);
+    EXPECT_EQ(algorithmParameters.getNumberOfPars(), 0);
+    EXPECT_EQ(algorithmParameters.getParArrayDims().size(), 0);
+    EXPECT_EQ(algorithmParameters.getParIDs().size(), 0);
+    EXPECT_EQ(algorithmParameters.getParNumberOfArrayDims().size(), 0);
+    EXPECT_EQ(algorithmParameters.getParTypes().size(), 0);
+    EXPECT_EQ(algorithmParameters.getParValues().size(), 0);
 }
 
 TEST_F(AlgorithmParametersTests, AlgorithmParametersFixedValues) {  // NOLINT(cert-err58-cpp)
@@ -102,16 +101,18 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersFixedValues) {  // NOLINT(ce
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 
     std::stringstream InOut;
-    genie::core::Writer strwriter(&InOut);
-    algorithmParameters.write(strwriter);
-    strwriter.Flush();
+    genie::util::BitWriter strwriter(&InOut);
+    algorithmParameters.Write(strwriter);
+    strwriter.FlushBits();
 
-    genie::core::Writer writesize;
-    auto size = algorithmParameters.getSize(writesize);
+    std::stringstream SizeOut;
+    genie::util::BitWriter writesize(&SizeOut);
+    auto size = algorithmParameters.GetSize(writesize);
     if ((size % 8) != 0) size += (8 - size % 8);
 
     EXPECT_EQ(InOut.str().size(), size / 8);
 }
+
 TEST_F(AlgorithmParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
@@ -126,20 +127,21 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-er
     algorithmParameters = randomAlgorithmParameters.randomAlgorithmParameters(nPars, parNumArrayDims);
 
     std::stringstream InOut;
-    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
-    algorithmParameters.write(strwriter);
-    strwriter.Flush();
-    algorithmParametersCheck.read(strreader);
+    genie::util::BitWriter strwriter(&InOut);
+    algorithmParameters.Write(strwriter);
+    strwriter.FlushBits();
+    algorithmParametersCheck.Read(strreader);
     std::stringstream TestOut;
-    genie::core::Writer teststrwriter(&TestOut);
-    algorithmParametersCheck.write(teststrwriter);
-    teststrwriter.Flush();
+    genie::util::BitWriter teststrwriter(&TestOut);
+    algorithmParametersCheck.Write(teststrwriter);
+    teststrwriter.FlushBits();
 
     EXPECT_EQ(InOut.str(), TestOut.str());
 
-    genie::core::Writer writeSize;
-    auto size = algorithmParameters.getSize(writeSize);
+    std::stringstream SizeOut;
+    genie::util::BitWriter writeSize(&SizeOut);
+    auto size = algorithmParameters.GetSize(writeSize);
     if ((size % 8) != 0) size += (8 - size % 8);
 
     EXPECT_EQ(InOut.str().size(), size / 8);
@@ -161,18 +163,10 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-er
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::core::Writer writer(&outputfile);
-        algorithmParameters.write(writer);
-        writer.flush();
+        genie::util::BitWriter writer(&outputfile);
+        algorithmParameters.Write(writer);
+        writer.FlushBits();
         outputfile.close();
     }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtwriter(&txtfile, true);
-        algorithmParameters.write(txtwriter);
-        txtfile.close();
-    }
-
 #endif
 }

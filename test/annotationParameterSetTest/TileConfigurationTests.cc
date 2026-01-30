@@ -5,11 +5,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
-#include <fstream>
-#include <iostream>
+#include <string>
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/TileConfiguration.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 #define GENERATE_TEST_FILES false
 
@@ -81,18 +81,19 @@ TEST_F(TileConfigurationTests, TileConfigurationRandom) {  // NOLINT(cert-err58-
 
     tileConfiguration = randomTileConfiguration.randomTileConfiguration(AT_coord_size);
     std::stringstream InOut;
-    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
-    tileConfiguration.write(strwriter);
-    strwriter.Flush();
-    tileConfigurationCheck.read(strreader);
+    genie::util::BitWriter strwriter(&InOut);
+    tileConfiguration.Write(strwriter);
+    strwriter.FlushBits();
+    tileConfigurationCheck.Read(strreader);
     std::stringstream CheckOut;
-    genie::core::Writer checkWriter(&CheckOut);
-    tileConfigurationCheck.write(checkWriter);
-    checkWriter.Flush();
+    genie::util::BitWriter checkWriter(&CheckOut);
+    tileConfigurationCheck.Write(checkWriter);
+    checkWriter.FlushBits();
 
-        genie::core::Writer writeSize;
-    auto size = tileConfiguration.getSize(writeSize);
+    std::stringstream SizeOut;
+    genie::util::BitWriter writeSize(&SizeOut);
+    auto size = tileConfiguration.GetSize(writeSize);
     if (size % 8 != 0) size += (8 - size % 8);
     EXPECT_EQ(InOut.str().size(), size / 8);
 
@@ -120,17 +121,10 @@ TEST_F(TileConfigurationTests, TileConfigurationRandom) {  // NOLINT(cert-err58-
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::core::Writer writer(&outputfile);
-        tileConfiguration.write(writer);
-        writer.flush();
+        genie::util::BitWriter writer(&outputfile);
+        tileConfiguration.Write(writer);
+        writer.FlushBits();
         outputfile.close();
-    }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile, true);
-        tileConfiguration.write(txtWriter);
-        txtfile.close();
     }
 #endif
 }
@@ -146,14 +140,15 @@ TEST_F(TileConfigurationTests, TileConfigurationRandomSimpleStructure) {  // NOL
     genie::core::record::annotation_parameter_set::TileConfiguration tileConfigurationCheck;
 
     std::stringstream InOut;
-    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
-    tileConfiguration.write(strwriter);
-    strwriter.Flush();
-    tileConfigurationCheck.read(strreader);
+    genie::util::BitWriter strwriter(&InOut);
+    tileConfiguration.Write(strwriter);
+    strwriter.FlushBits();
+    tileConfigurationCheck.Read(strreader);
 
-        genie::core::Writer writeSize;
-    auto size = tileConfiguration.getSize(writeSize);
+    std::stringstream SizeOut;
+    genie::util::BitWriter writeSize(&SizeOut);
+    auto size = tileConfiguration.GetSize(writeSize);
     if (size % 8 != 0) size += (8 - size % 8);
     EXPECT_EQ(InOut.str().size(), size / 8);
 
@@ -169,18 +164,10 @@ TEST_F(TileConfigurationTests, TileConfigurationRandomSimpleStructure) {  // NOL
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::core::Writer writer(&outputfile);
-        tileConfiguration.write(writer);
-        writer.flush();
+        genie::util::BitWriter writer(&outputfile);
+        tileConfiguration.Write(writer);
+        writer.FlushBits();
         outputfile.close();
-    }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile, true);
-        txtfile << std::to_string(ATCoordSize) << ",";
-        tileConfiguration.write(txtWriter);
-        txtfile.close();
     }
 #endif
 }

@@ -22,7 +22,7 @@ namespace variant_site {
 void TiledStream::write(std::string value) {
     setTile();
     tiles.tileWriter.back().Write(value);
-    tiles.tileWriter.back().Write(0, 8);
+    tiles.tileWriter.back().WriteBits(0, 8);
 }
 
 void TiledStream::setTile() {
@@ -30,7 +30,7 @@ void TiledStream::setTile() {
     } else if (rowInTile < rowsPerTile) {
         rowInTile++;
     } else {
-      tiles.tileWriter.back().Flush();
+        tiles.tileWriter.back().FlushBits();
         tiles.tileData.emplace_back("");
         tiles.tileWriter.emplace_back(&tiles.tileData.back());
         rowInTile = 1;

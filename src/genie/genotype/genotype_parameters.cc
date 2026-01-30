@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genotype_parameters.h"
+#include "genie/genotype/genotype_parameters.h"
 
 #include "genie/util/runtime_exception.h"
 
@@ -78,19 +78,19 @@ GenotypeParameters& GenotypeParameters::operator=(GenotypeParameters&& other) no
 GenotypeParameters::GenotypeParameters(
     genie::util::BitReader& reader
 ) {
-  UTILS_DIE_IF(!reader.IsByteAligned(), "Not byte aligned!");
+  // UTILS_DIE_IF(!reader.IsByteAligned(), "Not byte aligned!");
 
-  reader.ReadBits(3); // reserved u(3)
+  reader.ReadBits(3);  // reserved u(3)
   binarization_ID_ = static_cast<BinarizationID>(reader.ReadBits(3));
   concat_axis_ = static_cast<ConcatAxis>(reader.ReadBits(2));
 
-  reader.ReadBits(2); // reserved u(2)
+  reader.ReadBits(2);  // reserved u(2)
   sort_variants_rows_flag_ = reader.ReadBits(1);
   sort_variants_cols_flag_ = reader.ReadBits(1);
   transpose_variants_mat_flag_ = reader.ReadBits(1);
   variants_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(3));
 
-  reader.ReadBits(1); // reserved u(1)
+  reader.ReadBits(1);  // reserved u(1)
   encode_phases_data_flag_ = reader.ReadBits(1);
   sort_phases_rows_flag_ = reader.ReadBits(1);
   sort_phases_cols_flag_ = reader.ReadBits(1);
@@ -235,13 +235,13 @@ void GenotypeParameters::SetPhasesCodecID(genie::core::AlgoID codec_id) {
 size_t GenotypeParameters::GetSize() {
   size_t size = 0u;
 
-  size += sizeof(uint8_t); // reserved(3) + binarization_ID(3) + concat_axis(2)
+  size += sizeof(uint8_t);  // reserved(3) + binarization_ID(3) + concat_axis(2)
 
-  size += sizeof(uint8_t); // reserved(2) + sort_variants_rows_flag_(1) + sort_variants_cols_flag_(1)
-                          // + transpose_variants_mat_flag_(1) + variants_codec_ID(3)
+  size += sizeof(uint8_t);  // reserved(2) + sort_variants_rows_flag_(1) + sort_variants_cols_flag_(1)
+                            // + transpose_variants_mat_flag_(1) + variants_codec_ID(3)
 
-  size += sizeof(uint8_t); // reserved(1) + encode_phase_data_flag(1) +  sort_phases_rows_flag_(1)
-                          // + sort_phases_cols_flag_(1) +  transpose_phases_mat_flag_(1) + phases_codec_ID(3)
+  size += sizeof(uint8_t);  // reserved(1) + encode_phase_data_flag(1) +  sort_phases_rows_flag_(1)
+                            // + sort_phases_cols_flag_(1) +  transpose_phases_mat_flag_(1) + phases_codec_ID(3)
 
   return size;
 }
@@ -249,20 +249,19 @@ size_t GenotypeParameters::GetSize() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void GenotypeParameters::Write(util::BitWriter& writer) const {
+  // UTILS_DIE_IF(!writer.IsByteAligned(), "Not byte aligned!");
 
-  UTILS_DIE_IF(!writer.IsByteAligned(), "Not byte aligned!");
-
-  writer.WriteBits(0u, 3); // reserved(3)
+  writer.WriteBits(0u, 3);  // reserved(3)
   writer.WriteBits(static_cast<uint64_t>(binarization_ID_), 3);
   writer.WriteBits(static_cast<uint64_t>(concat_axis_), 2);
 
-  writer.WriteBits(0u, 2); // reserved(2)
+  writer.WriteBits(0u, 2);  // reserved(2)
   writer.WriteBits(GetSortVariantsRowsFlag(), 1);
   writer.WriteBits(GetSortVariantsColsFlag(), 1);
   writer.WriteBits(GetTransposeVariantsMatFlag(), 1);
   writer.WriteBits(static_cast<uint64_t>(GetVariantsCodecID()), 3);
 
-  writer.WriteBits(0u, 1); // reserved(1)
+  writer.WriteBits(0u, 1);  // reserved(1)
   writer.WriteBits(GetEncodePhasesDataFlag(), 1);
   writer.WriteBits(GetSortPhasesRowsFlag(), 1);
   writer.WriteBits(GetSortPhasesColsFlag(), 1);
@@ -272,29 +271,8 @@ void GenotypeParameters::Write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void GenotypeParameters::Write(core::Writer& writer) const {
-  writer.WriteReserved(3);
-  writer.Write(static_cast<uint64_t>(binarization_ID_), 3);
-  writer.Write(static_cast<uint64_t>(concat_axis_), 2);
-
-  writer.WriteReserved(2);
-  writer.Write(GetSortVariantsRowsFlag(), 1);
-  writer.Write(GetSortVariantsColsFlag(), 1);
-  writer.Write(GetTransposeVariantsMatFlag(), 1);
-  writer.Write(static_cast<uint64_t>(GetVariantsCodecID()), 3);
-
-  writer.WriteReserved(1);
-  writer.Write(GetEncodePhasesDataFlag(), 1);
-  writer.Write(GetSortPhasesRowsFlag(), 1);
-  writer.Write(GetSortPhasesColsFlag(), 1);
-  writer.Write(GetTransposePhasesMatFlag(), 1);
-  writer.Write(static_cast<uint64_t>(GetPhasesCodecID()), 3);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 // Read from BitReader
-void GenotypeParameters::read(util::BitReader& reader) {
+void GenotypeParameters::Read(util::BitReader& reader) {
   UTILS_DIE_IF(!reader.IsByteAligned(), "Not byte aligned!");
 
   reader.ReadBits(3);  // reserved u(3)
@@ -317,6 +295,6 @@ void GenotypeParameters::read(util::BitReader& reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-} // namespace genie::genotype
+}  // namespace genie::genotype
 
 // ---------------------------------------------------------------------------------------------------------------------

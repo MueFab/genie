@@ -7,7 +7,6 @@
 #include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
 #include "genie/core/record/annotation_access_unit/record.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/variantsite/variantsite_parser.h"

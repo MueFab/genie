@@ -5,23 +5,10 @@
  */
 
 // ---------------------------------------------------------------------------------------------------------------------
+
 #include "DescriptorConfiguration.h"
 
-#include <cassert>
-#include <cstdint>
-#include <iostream>
-#include <sstream>
-#include <string>
-
 #include <vector>
-
-#include "genie/core/constants.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-
-#include "genie/contact/contact_matrix_parameters.h"
-#include "genie/contact/subcontact_matrix_parameters.h"
-#include "genie/likelihood/likelihood_parameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +20,7 @@ namespace annotation_parameter_set {
 DescriptorConfiguration::DescriptorConfiguration()
     : descriptor_ID(AnnotDesc::GENOTYPE), encoding_mode_ID(AlgoID::CABAC) {}
 
-DescriptorConfiguration::DescriptorConfiguration(util::BitReader& reader) { read(reader); }
+DescriptorConfiguration::DescriptorConfiguration(util::BitReader& reader) { Read(reader); }
 
 DescriptorConfiguration::DescriptorConfiguration(AnnotDesc _descriptor_ID, AlgoID _encoding_mode_ID,
                                                  AlgorithmParameters _algorithm_parameters)
@@ -57,56 +44,41 @@ DescriptorConfiguration::DescriptorConfiguration(
     subcontract_matrix_parameters = _subconstract_matrix_parameters;
 }
 
-void DescriptorConfiguration::read(util::BitReader& reader) {
+void DescriptorConfiguration::Read(util::BitReader& reader) {
     descriptor_ID = static_cast<AnnotDesc>(static_cast<uint8_t>(reader.ReadBits(8)));
     if (descriptor_ID == AnnotDesc::GENOTYPE) {
-        genotype_parameters.read(reader);
+        genotype_parameters.Read(reader);
     } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
-        likelihood_parameters.read(reader);
+        likelihood_parameters.Read(reader);
     } else if (descriptor_ID == AnnotDesc::CONTACT) {
         // not implemented
+        // contact_matrix_parameters.Read(reader);
     } else {
         encoding_mode_ID = static_cast<AlgoID>(reader.ReadBits(8));
-        algorithm_parameters.read(reader);
+        algorithm_parameters.Read(reader);
     }
 }
-void DescriptorConfiguration::write(core::Writer& writer) const {
-  writer.Write(static_cast<uint8_t>(descriptor_ID), 8);
+
+void DescriptorConfiguration::Write(util::BitWriter& writer) const {
+    writer.WriteBits(static_cast<uint8_t>(descriptor_ID), 8);
     if (descriptor_ID == AnnotDesc::GENOTYPE) {
-      genotype_parameters.Write(writer);
+        genotype_parameters.Write(writer);
     } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
         likelihood_parameters.Write(writer);
     } else if (descriptor_ID == AnnotDesc::CONTACT) {
-      contact_matrix_parameters.Write(writer);
-        writer.Write(subcontract_matrix_parameters.size(), 16);
+        contact_matrix_parameters.Write(writer);
+        writer.WriteBits(subcontract_matrix_parameters.size(), 16);
         for (auto& scm_params : subcontract_matrix_parameters)
-          scm_params.Write(writer);
+            scm_params.Write(writer);
     } else {
-      writer.Write(static_cast<uint8_t>(encoding_mode_ID), 8);
-        algorithm_parameters.write(writer);
+        writer.WriteBits(static_cast<uint8_t>(encoding_mode_ID), 8);
+        algorithm_parameters.Write(writer);
     }
 }
 
-void DescriptorConfiguration::write(util::BitWriter& writer) const {
-  writer.WriteBits(static_cast<uint8_t>(descriptor_ID), 8);
-  if (descriptor_ID == AnnotDesc::GENOTYPE) {
-    genotype_parameters.Write(writer);
-  } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
-    likelihood_parameters.Write(writer);
-  } else if (descriptor_ID == AnnotDesc::CONTACT) {
-    contact_matrix_parameters.Write(writer);
-    writer.WriteBits(subcontract_matrix_parameters.size(), 16);
-    for (auto& scm_params : subcontract_matrix_parameters)
-      scm_params.Write(writer);
-  } else {
-    writer.WriteBits(static_cast<uint8_t>(encoding_mode_ID), 8);
-    algorithm_parameters.write(writer);
-  }
-}
-
-size_t DescriptorConfiguration::getSize(core::Writer& write_size) const {
-    write(write_size);
-    return write_size.GetBitsWritten();
+size_t DescriptorConfiguration::GetSize(util::BitWriter& write_size) const {
+    Write(write_size);
+    return write_size.GetTotalBitsWritten();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

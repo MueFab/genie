@@ -16,8 +16,8 @@
 
 #include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 #include "genie/annotation/compressors.h"
 #include "genie/core/record/annotation_access_unit/TypedData.h"

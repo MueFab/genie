@@ -5,13 +5,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
-#include <fstream>
-#include <iostream>
-#include <sstream>
+#include <string>
+#include <vector>
 
-#include "genie/core/writer.h"
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/TileStructure.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 #define GENERATE_TEST_FILES false
 
@@ -105,18 +104,17 @@ TEST_F(TileStructureTests, TileStructureRandom) {  // NOLINT(cert-err58-cpp)
     bool two_dimensional = static_cast<bool>(rand() % 2);
     tileStructure = RandomTileStructure.randomTileStructure(ATCoordSize, two_dimensional);
 
- 
-    std::stringstream InOut;
-    genie::core::Writer testWriter(&InOut);
-    genie::util::BitReader testReader(InOut);
 
-    tileStructure.write(testWriter);
-    testWriter.Flush();
-    tileStructureCheck.read(testReader, ATCoordSize, two_dimensional);
+    std::stringstream InOut;
+    genie::util::BitReader testReader(InOut);
+    genie::util::BitWriter testWriter(&InOut);
+    tileStructure.Write(testWriter);
+    testWriter.FlushBits();
+    tileStructureCheck.Read(testReader, ATCoordSize, two_dimensional);
 
     std::stringstream checkOut;
-    genie::core::Writer checkWriter(&checkOut);
-    tileStructureCheck.write(checkWriter);
+    genie::util::BitWriter checkWriter(&checkOut);
+    tileStructureCheck.Write(checkWriter);
 
     EXPECT_EQ(tileStructure.getALLEndIndices(), tileStructureCheck.getALLEndIndices());
     EXPECT_EQ(tileStructure.getAllStartIndices(), tileStructureCheck.getAllStartIndices());
@@ -124,8 +122,9 @@ TEST_F(TileStructureTests, TileStructureRandom) {  // NOLINT(cert-err58-cpp)
     EXPECT_EQ(tileStructure.isVariableSizeTiles(), tileStructureCheck.isVariableSizeTiles());
 
     EXPECT_EQ(InOut.str(), checkOut.str());
-    genie::core::Writer writeSize;
-    auto size = tileStructure.getSize(writeSize);
+    std::stringstream sizeOut;
+    genie::util::BitWriter writeSize(&sizeOut);
+    auto size = tileStructure.GetSize(writeSize);
     if (size % 8 != 0) size += (8 - size % 8);
     EXPECT_EQ(InOut.str().size(), size / 8);
 
@@ -136,19 +135,10 @@ TEST_F(TileStructureTests, TileStructureRandom) {  // NOLINT(cert-err58-cpp)
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::core::Writer writer(&outputfile);
-        tileStructure.write(writer);
-        writer.flush();
+        genie::util::BitWriter writer(&outputfile);
+        tileStructure.Write(writer);
+        writer.FlushBits();
         outputfile.close();
-    }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile, true);
-        txtfile << std::to_string(two_dimensional) << ",";
-        txtfile << std::to_string(ATCoordSize) << ",";
-        tileStructure.write(txtWriter);
-        txtfile.close();
     }
 #endif
 }

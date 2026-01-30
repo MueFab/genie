@@ -55,7 +55,6 @@ set(source_files
         record/annotation_parameter_set/record.cc
         record/annotation_parameter_set/AttributeParameterSet.cc
         record/annotation_parameter_set/AlgorithmParameters.cc
-        record/annotation_parameter_set/ContactMatrixParameters.cc
         record/annotation_parameter_set/TileConfiguation.cc
         record/annotation_parameter_set/TileStructure.cc
         record/annotation_parameter_set/DescriptorConfiguration.cc
@@ -64,7 +63,6 @@ set(source_files
         record/annotation_parameter_set/AttributeData.cc
 
         arrayType.cc
-        writer.cc
 
         stats/perf_stats.cc
 

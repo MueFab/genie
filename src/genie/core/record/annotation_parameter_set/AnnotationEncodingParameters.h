@@ -9,14 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
 #include <string>
-#include <utility>
 #include <vector>
-#include "genie/core/constants.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
 
 #include "AttributeParameterSet.h"
 #include "CompressorParameterSet.h"
@@ -85,10 +79,9 @@ class AnnotationEncodingParameters {
                                  std::vector<CompressorParameterSet> compressor_parameter_set, uint8_t n_attributes,
                                  std::vector<AttributeParameterSet> attribute_parameter_set);
 
-    void read(util::BitReader& reader);
-    void write(core::Writer& writer) const;
-    void write(util::BitWriter& writer) const;
-    size_t getSize(core::Writer& writesize) const;
+    void Read(util::BitReader& reader);
+    void Write(util::BitWriter& writer) const;
+    size_t GetSize(util::BitWriter& writesize) const;
 
     uint8_t getNumberOfFilters() const { return n_filter; }
     std::vector<uint8_t> getFilterIDLengths() const { return filter_ID_len; }

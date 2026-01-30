@@ -26,8 +26,8 @@
 #include "genie/core/record/annotation_parameter_set/AttributeParameterSet.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/feature_record/record.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -38,11 +38,11 @@ namespace feature {
 
 class FeatureParser {
  public:
-    using AttributeData = genie::core::record::annotation_parameter_set::AttributeData;
-    using InfoField = genie::annotation::InfoField;
+    using AttributeData = core::record::annotation_parameter_set::AttributeData;
+    using InfoField = annotation::InfoField;
 
 //    FeatureParser(std::istream& _feature_MGrecs, std::stringstream& _jsonInfoFields, uint64_t rowsPerTile);
-    FeatureParser(std::istream& _feature_MGrecs, std::vector<genie::annotation::InfoField>& _fields, uint64_t _rowsPerTile);
+    FeatureParser(std::istream& _feature_MGrecs, std::vector<annotation::InfoField>& _fields, uint64_t _rowsPerTile);
 //    FeatureParser(std::istream& _feature_MGrecs, std::map<std::string, genie::core::record::feature::Info_tag>& _fields, uint64_t _rowsPerTile);
 
     size_t getNumberOfRows() const { return numberOfRows; }
@@ -53,18 +53,18 @@ class FeatureParser {
     uint64_t getNrOfTiles() { return attributes.getTiles().begin()->second.getNrOfTiles(); }
 
  private:
-    genie::core::record::feature::Record feature;
+    core::record::feature::Record feature;
     std::istream& featureMGrecs;
     uint64_t rowsPerTile;
     size_t numberOfRows;
-    std::map<std::string, genie::core::record::feature::Info_tag> tags;
+    std::map<std::string, core::record::feature::Info_tag> tags;
     std::vector<InfoField> infoFields;
     std::vector<std::string> testAltern;
     std::map<std::string, uint8_t> infoFieldType;
 
-    std::vector<genie::core::Writer> fieldWriter;
+    std::vector<util::BitWriter> fieldWriter;
 
-    std::map<std::string, genie::core::Writer> attrWriter;
+    std::map<std::string, util::BitWriter> attrWriter;
 
     std::map<std::string, AttributeData> attributeData;
     variant_site::Attributes attributes;
