@@ -7,6 +7,8 @@
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/program-options.h"
 #include <cassert>
 #include <fstream>
+#include <iostream>
+#include <string>
 #include <thread>
 #include <vector>
 #include "cli11/CLI11.hpp"

@@ -5,8 +5,8 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_VARIANT_GENOTYPE_RECORD_H_
-#define SRC_GENIE_CORE_RECORD_VARIANT_GENOTYPE_RECORD_H_
+#ifndef SRC_GENIE_CORE_VARIANT_GENOTYPE_RECORD_RECORD_H_
+#define SRC_GENIE_CORE_VARIANT_GENOTYPE_RECORD_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -156,18 +156,18 @@ class VariantGenotype {
   std::vector<std::vector<uint8_t>> phasings_;  //!< @brief Phasing data
   std::vector<std::vector<uint32_t>> likelihoods_;  //!< @brief Likelihood data
 
-  std::optional<LinkRecord> link_record_; //!< @brief Link record
+  std::optional<LinkRecord> link_record_;  //!< @brief Link record
 
  public:
- /**
-   * @brief Default constructor
-   */
- VariantGenotype();
+  /**
+    * @brief Default constructor
+    */
+  VariantGenotype();
 
- /**
-   * @brief Parametrized constructor
-   */
- VariantGenotype(
+  /**
+    * @brief Parametrized constructor
+    */
+  VariantGenotype(
      uint64_t variant_index,
      uint32_t sample_index_from,
      uint32_t sample_count,
@@ -175,32 +175,31 @@ class VariantGenotype {
      std::vector<std::vector<int8_t>>&& alleles,
      std::vector<std::vector<uint8_t>>&& phasings,
      std::vector<std::vector<uint32_t>>&& likelihoods,
-     const std::optional<LinkRecord>& link_record
- );
+     const std::optional<LinkRecord>& link_record);
 
- /**
-   * @brief Copy constructor
-   * @param other VariantGenotype
-   */
- VariantGenotype(const VariantGenotype& other);
+  /**
+    * @brief Copy constructor
+    * @param other VariantGenotype
+    */
+  VariantGenotype(const VariantGenotype& other);
 
- /**
-   * @brief Move constructor
-   * @param other VariantGenotype
-   */
- VariantGenotype(VariantGenotype&& other) noexcept;
+  /**
+    * @brief Move constructor
+    * @param other VariantGenotype
+    */
+  VariantGenotype(VariantGenotype&& other) noexcept;
 
- /**
-   * @brief Copy assignment operator
-   * @param other VariantGenotype
-   */
- VariantGenotype& operator=(const VariantGenotype& other);
+  /**
+    * @brief Copy assignment operator
+    * @param other VariantGenotype
+    */
+  VariantGenotype& operator=(const VariantGenotype& other);
 
- /**
-   * @brief Move assignment operator
-   * @param other VariantGenotype
-   */
- VariantGenotype& operator=(VariantGenotype&& other) noexcept;
+  /**
+    * @brief Move assignment operator
+    * @param other VariantGenotype
+    */
+  VariantGenotype& operator=(VariantGenotype&& other) noexcept;
 
   /**
    * @brief Constructs a variant genotype by reading using BitReader
@@ -215,7 +214,7 @@ class VariantGenotype {
    */
   VariantGenotype(uint64_t variant_index, uint32_t sample_index_from);
 
- // Getters
+  // Getters
 
 
   /**
@@ -236,11 +235,11 @@ class VariantGenotype {
    */
   [[nodiscard]] uint32_t GetSampleCount() const;
 
- /**
-  * @brief Get the format
-  * @return Vector of FormatField
-  */
- [[nodiscard]] const std::vector<FormatField>& GetFormat() const;
+  /**
+   * @brief Get the format
+   * @return Vector of FormatField
+   */
+  [[nodiscard]] const std::vector<FormatField>& GetFormat() const;
 
   /**
    * @brief Gets the number of format fields
@@ -314,64 +313,64 @@ class VariantGenotype {
    */
   void SetVariantIndex(uint64_t value);
 
- /**
+  /**
     * @brief Set the variant index
     */
- void SetSampleIndexFrom(uint32_t value);
+  void SetSampleIndexFrom(uint32_t value);
 
- /**
+  /**
     * @brief Set the number of sample count
     */
- void SetSampleCount(uint32_t value);
+  void SetSampleCount(uint32_t value);
 
- /**
+  /**
     * @brief Set the format value
     */
- void SetFormat(std::vector<FormatField> value);
+  void SetFormat(std::vector<FormatField> value);
 
- /**
+  /**
     * @brief Set the format value
     */
- void SetFormat(std::vector<FormatField>&& value);
+  void SetFormat(std::vector<FormatField>&& value);
 
- /**
+  /**
    * @brief Set the likelihood information
    */
   void SetLikelihoods(std::vector<std::vector<uint32_t>> value);
 
- /**
+  /**
    * @brief Set the likelihood information
    */
- void SetLikelihoods(std::vector<std::vector<uint32_t>>&& value);
+  void SetLikelihoods(std::vector<std::vector<uint32_t>>&& value);
 
- /**
+  /**
    * @brief Set the link record information
    */
- void SetLinkRecord(const std::optional<LinkRecord>& value);
+  void SetLinkRecord(const std::optional<LinkRecord>& value);
 
   /**
    * @brief Sets the phasing information
    * @param value the phasing values to set
    */
- void SetPhasings(std::vector<std::vector<uint8_t>> value);
+  void SetPhasings(std::vector<std::vector<uint8_t>> value);
 
   /**
    * @brief Sets the phasing information
    * @param phasings The phasing values to set
    */
- void SetPhasings(std::vector<std::vector<uint8_t>>&& value);
+  void SetPhasings(std::vector<std::vector<uint8_t>>&& value);
 
   /**
    * @brief Sets the allele information
    * @param alleles The allele values to set
    */
- void SetAlleles(std::vector<std::vector<int8_t>> value);
+  void SetAlleles(std::vector<std::vector<int8_t>> value);
 
- /**
+  /**
    * @brief Sets the allele information
    * @param alleles The allele values to set
    */
- void SetAlleles(std::vector<std::vector<int8_t>>&& value);
+  void SetAlleles(std::vector<std::vector<int8_t>>&& value);
 
   /**
    * @brief Sets the number of samples
@@ -379,10 +378,10 @@ class VariantGenotype {
    */
   void SetNumberOfSamples(uint32_t sampleSize);
 
- /**
- * @brief Get size of the VariantGenotype
- * @return size_t of VariantGenotype size
- */
+  /**
+   * @brief Get size of the VariantGenotype
+   * @return size_t of VariantGenotype size
+   */
   size_t GetSize() const;
 };
 
@@ -390,7 +389,7 @@ class VariantGenotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_VARIANT_GENOTYPE_RECORD_H_
+#endif  // SRC_GENIE_CORE_VARIANT_GENOTYPE_RECORD_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

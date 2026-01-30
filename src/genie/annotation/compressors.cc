@@ -13,6 +13,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -75,18 +76,18 @@ void Compressor::compress(std::stringstream& input, std::stringstream& output, u
         }
 
         switch (comp.getAlgorithmIDs().at(i)) {
-            case genie::core::AlgoID::BSC: {
-                genie::entropy::bsc::BSCEncoder encoder;
+            case core::AlgoID::BSC: {
+                entropy::bsc::BSCEncoder encoder;
                 encoder.encode(intermediateIn, intermediateOut);
                 break;
             }
-            case genie::core::AlgoID::LZMA: {
-                genie::entropy::lzma::LZMAEncoder encoder;
+            case core::AlgoID::LZMA: {
+                entropy::lzma::LZMAEncoder encoder;
                 encoder.encode(intermediateIn, intermediateOut);
                 break;
             }
-            case genie::core::AlgoID::ZSTD: {
-                genie::entropy::zstd::ZSTDEncoder encoder;
+            case core::AlgoID::ZSTD: {
+                entropy::zstd::ZSTDEncoder encoder;
                 encoder.encode(intermediateIn, intermediateOut);
                 break;
             }
@@ -99,7 +100,6 @@ void Compressor::compress(std::stringstream& input, std::stringstream& output, u
     output << intermediateOut.rdbuf();
 }
 
-#include <type_traits>
 class Parameter {
  public:
     bool read(std::string parameterIn, uint8_t& parameterOut) {
@@ -114,10 +114,10 @@ class Parameter {
         parameterOut = static_cast<bool>(std::stoi(parameterIn));
         return lastParameter;
     }
-    bool read(std::string parameterIn, genie::core::AlgoID& parameterOut) {
+    bool read(std::string parameterIn, core::AlgoID& parameterOut) {
         if (parameterIn.empty()) return true;
         bool lastParameter = stripAndIfLast(parameterIn);
-        parameterOut = genie::core::stringToAlgoID(parameterIn);
+        parameterOut = core::stringToAlgoID(parameterIn);
         return lastParameter;
     }
     bool read(std::string parameterIn, uint16_t& parameterOut) {
@@ -175,8 +175,8 @@ class Parameter {
     }
 };
 
-genie::entropy::lzma::LZMAParameters Compressor::readLzmaParameters(std::vector<std::string>& stringpars) {
-    genie::entropy::lzma::LZMAParameters pars;
+entropy::lzma::LZMAParameters Compressor::readLzmaParameters(std::vector<std::string>& stringpars) {
+    entropy::lzma::LZMAParameters pars;
     uint8_t index = 0;
     if (stringpars.empty()) return pars;
     Parameter parameter;
@@ -186,8 +186,7 @@ genie::entropy::lzma::LZMAParameters Compressor::readLzmaParameters(std::vector<
         parameter.read(stringpars.at(index++), pars.lp) || index == stringpars.size() ||
         parameter.read(stringpars.at(index++), pars.pb) || index == stringpars.size() ||
         parameter.read(stringpars.at(index++), pars.fb) || index == stringpars.size() ||
-        parameter.read(stringpars.at(index++), pars.numThreads)) {
-    }
+        parameter.read(stringpars.at(index++), pars.numThreads)) {}
     if (stringpars.size() != index)
         stringpars.erase(stringpars.begin(), stringpars.begin() + index - 1);
     else
@@ -195,8 +194,8 @@ genie::entropy::lzma::LZMAParameters Compressor::readLzmaParameters(std::vector<
     return pars;
 }
 
-genie::entropy::bsc::BSCParameters Compressor::readBscParameters(std::vector<std::string>& stringpars) {
-    genie::entropy::bsc::BSCParameters pars;
+entropy::bsc::BSCParameters Compressor::readBscParameters(std::vector<std::string>& stringpars) {
+    entropy::bsc::BSCParameters pars;
     uint8_t index = 0;
     if (stringpars.empty()) return pars;
     Parameter parameter;
@@ -204,21 +203,19 @@ genie::entropy::bsc::BSCParameters Compressor::readBscParameters(std::vector<std
         parameter.read(stringpars.at(index++), pars.lzpMinLen) || index == stringpars.size() ||
         parameter.read(stringpars.at(index++), pars.blockSorter) || index == stringpars.size() ||
         parameter.read(stringpars.at(index++), pars.coder) || index == stringpars.size() ||
-        parameter.read(stringpars.at(index++), pars.features)) {
-    }
+        parameter.read(stringpars.at(index++), pars.features)) {}
     stringpars.erase(stringpars.begin(), stringpars.begin() + index - 1);
     return pars;
 }
 
-genie::entropy::zstd::ZSTDParameters Compressor::readZstdParameters(std::vector<std::string>& stringpars) {
-    genie::entropy::zstd::ZSTDParameters pars;
+entropy::zstd::ZSTDParameters Compressor::readZstdParameters(std::vector<std::string>& stringpars) {
+    entropy::zstd::ZSTDParameters pars;
     uint8_t index = 0;
     if (stringpars.empty()) return pars;
     Parameter parameter;
     if (parameter.read(stringpars.at(index++), pars.use_dictionary_flag) ||
         parameter.read(stringpars.at(index++), pars.dictionary_size) ||
-        parameter.read(stringpars.at(index++), pars.dictionary)) {
-    }
+        parameter.read(stringpars.at(index++), pars.dictionary)) {}
     stringpars.erase(stringpars.begin(), stringpars.begin() + index - 1);
     return pars;
 }
@@ -231,27 +228,27 @@ void Compressor::parseCompressor(std::vector<std::string> commandline) {
     uint8_t compressorID = 0;
     parameter.read(commandline.at(1), compressorID);
 
-    genie::core::record::annotation_parameter_set::compressorStep step;
+    core::record::annotation_parameter_set::compressorStep step;
     parameter.read(commandline.at(2), step.stepID);
     parameter.read(commandline.at(3), step.algorithmID);
 
     size_t index = 4;
     std::vector<std::string> sub(commandline.begin() + index, commandline.end());
     switch (step.algorithmID) {
-        case genie::core::AlgoID::LZMA: {
-            genie::entropy::lzma::LZMAParameters parameters = readLzmaParameters(sub);
+        case core::AlgoID::LZMA: {
+            entropy::lzma::LZMAParameters parameters = readLzmaParameters(sub);
             step.useDefaultAlgorithmParameters = parameters.parsAreDefault();
             step.algorithm_parameters = parameters.convertToAlgorithmParameters();
             break;
         }
-        case genie::core::AlgoID::ZSTD: {
-            genie::entropy::zstd::ZSTDParameters parameters = readZstdParameters(sub);
+        case core::AlgoID::ZSTD: {
+            entropy::zstd::ZSTDParameters parameters = readZstdParameters(sub);
             step.useDefaultAlgorithmParameters = parameters.parsAreDefault();
             step.algorithm_parameters = parameters.convertToAlgorithmParameters();
             break;
         }
-        case genie::core::AlgoID::BSC: {
-            genie::entropy::bsc::BSCParameters parameters = readBscParameters(sub);
+        case core::AlgoID::BSC: {
+            entropy::bsc::BSCParameters parameters = readBscParameters(sub);
             step.useDefaultAlgorithmParameters = parameters.parsAreDefault();
             step.algorithm_parameters = parameters.convertToAlgorithmParameters();
             break;
@@ -271,7 +268,7 @@ void Compressor::parseCompressor(std::vector<std::string> commandline) {
         compressorParameters.back().addCompressorStep(step);
     }
 
-    // genie::core::AlgoID algorithmID = genie::core::AlgoID.value
+    // core::AlgoID algorithmID = core::AlgoID.value
 }
 
 }  // namespace annotation

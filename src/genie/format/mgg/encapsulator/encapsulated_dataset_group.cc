@@ -6,7 +6,9 @@
 
 #include "genie/format/mgg/encapsulator/encapsulated_dataset_group.h"
 #include <map>
+#include <string>
 #include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

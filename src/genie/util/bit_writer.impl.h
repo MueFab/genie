@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_UTIL_BITWRITER_IMPL_H_
-#define SRC_GENIE_UTIL_BITWRITER_IMPL_H_
+#ifndef SRC_GENIE_UTIL_BIT_WRITER_IMPL_H_
+#define SRC_GENIE_UTIL_BIT_WRITER_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -52,7 +52,7 @@ void BitWriter::WriteBypassBE(T val) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_UTIL_BITWRITER_IMPL_H_
+#endif  // SRC_GENIE_UTIL_BIT_WRITER_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

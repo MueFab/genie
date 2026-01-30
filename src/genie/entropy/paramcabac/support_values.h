@@ -126,7 +126,7 @@ class SupportValues {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-} // namespace genie::entropy::paramcabac
+}  // namespace genie::entropy::paramcabac
 
 
 

@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mgg/encapsulator/encapsulated_dataset.h"
+#include <string>
 #include <utility>
 #include "filesystem/filesystem.hpp"
 

@@ -29,15 +29,15 @@ namespace annotation {
 void FeatureAnnotation::parseInfoTags(std::string& recordInputFileName) {
     std::ifstream readForTags;
     readForTags.open(recordInputFileName, std::ios::in | std::ios::binary);
-    genie::util::BitReader bitreader(readForTags);
-    std::vector<genie::core::record::feature::FeatureFields::Field> infoTag;
-    genie::core::record::feature::Record recs;
+    util::BitReader bitreader(readForTags);
+    std::vector<core::record::feature::FeatureFields::Field> infoTag;
+    core::record::feature::Record recs;
     while (recs.Read(bitreader)) {
         infoTag = recs.GetFeatureAttributes().GetFields();
         for (const auto& tag : infoTag) {
             InfoField infoField(tag.attr, tag.attr_type, static_cast<uint8_t>(tag.attr_values.size()));
-            genie::core::record::feature::Info_tag infotag{static_cast<uint8_t>(tag.attr.size()), tag.attr, tag.attr_type,
-                                                                static_cast<uint8_t>(tag.attr_values.size()), tag.attr_values};
+            core::record::feature::Info_tag infotag{static_cast<uint8_t>(tag.attr.size()), tag.attr, tag.attr_type,
+                                                    static_cast<uint8_t>(tag.attr_values.size()), tag.attr_values};
             infoTags[tag.attr] = infotag;
             attributeInfo[tag.attr] = infoField;
         }
@@ -48,7 +48,7 @@ void FeatureAnnotation::parseInfoTags(std::string& recordInputFileName) {
 }
 
 FeatureUnits FeatureAnnotation::parseFeature(std::ifstream& inputfile) {
-    genie::feature::FeatureParser parser(inputfile, infoFields, defaultTileSizeHeight);
+    feature::FeatureParser parser(inputfile, infoFields, defaultTileSizeHeight);
     uint8_t AG_class = 1;
     uint8_t AT_ID = 1;
 
@@ -63,17 +63,17 @@ FeatureUnits FeatureAnnotation::parseFeature(std::ifstream& inputfile) {
     annotationParameterSet =
         parameterset.Compose(AT_ID, AG_class, {defaultTileSizeHeight, 0}, annotationEncodingParameters);
 
-    genie::variant_site::ParameterSetComposer encodeParameters;
+    variant_site::ParameterSetComposer encodeParameters;
 
-    genie::variant_site::AccessUnitComposer accessUnit;
+    variant_site::AccessUnitComposer accessUnit;
     accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::VARIANTS, 1);
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;
 
-    std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attr;
+    std::map<std::string, core::record::annotation_access_unit::TypedData> attr;
     for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
-        std::map<genie::core::AnnotDesc, std::stringstream> desc;
+        std::map<core::AnnotDesc, std::stringstream> desc;
         for (auto& attrtile : parser.getAttributes().getTiles()) {
             attr[attrtile.first] = attrtile.second.getTypedTile(i);
         }

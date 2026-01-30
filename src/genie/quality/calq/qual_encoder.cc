@@ -5,6 +5,8 @@
  */
 
 #include "genie/quality/calq/qual_encoder.h"
+#include <map>
+#include <string>
 
 // -----------------------------------------------------------------------------
 

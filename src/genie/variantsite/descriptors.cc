@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "genie/core/arrayType.h"
 #include "genie/util/bit_reader.h"

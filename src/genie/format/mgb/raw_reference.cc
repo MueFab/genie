@@ -7,6 +7,7 @@
 #include "genie/format/mgb/raw_reference.h"
 #include <sstream>
 #include <utility>
+#include <vector>
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"
 #include "genie/util/runtime_exception.h"

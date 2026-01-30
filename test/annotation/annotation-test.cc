@@ -208,7 +208,7 @@ TEST_P(AnnotationTests, annotationGeno) {
 
   genie::genotype::EncodingOptions genotype_opt = {
       BLOCK_SIZE,                                  // block_size;
-      genie::genotype::BinarizationID::ROW_BIN,    // BIT_PLANE,  //
+      genie::genotype::BinarizationID::ROW_BIN,    // BIT_PLANE,
                                                    // binarization_ID;
       genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
       false,                                       // transpose_mat;
@@ -237,5 +237,5 @@ INSTANTIATE_TEST_SUITE_P(
     testoutputs, AnnotationTests,
     ::testing::Values(
         TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 1000, 3000u),
-                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 15u, 3000u),
-                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 3000u)));
+        TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 15u, 3000u),
+        TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 3000u)));

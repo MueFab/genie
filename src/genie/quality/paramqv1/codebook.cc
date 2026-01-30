@@ -5,6 +5,7 @@
  */
 
 #include "genie/quality/paramqv1/codebook.h"
+#include <vector>
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/runtime_exception.h"
@@ -56,7 +57,7 @@ const std::vector<uint8_t>& Codebook::getEntries() const { return qv_recon; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-} // namespace genie::quality::paramqv1
+}  // namespace genie::quality::paramqv1
 
 
 

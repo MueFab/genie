@@ -4,17 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <algorithm>
-#include <sstream>
-#include <string>
-#include <utility>
-#include "BlockPayload.h"
-
 #include "genie/core/record/annotation_access_unit/BlockPayloadStream.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,11 +14,11 @@ namespace record {
 namespace annotation_access_unit {
 
 BlockPayloadStream::BlockPayloadStream()
-    : descriptor_ID(genie::core::record::annotation_parameter_set::DescriptorID::GENOTYPE),
+    : descriptor_ID(annotation_parameter_set::DescriptorID::GENOTYPE),
       block_payload_size(0),
       generic_payload{} {}
 
-BlockPayloadStream::BlockPayloadStream(genie::core::record::annotation_parameter_set::DescriptorID _descriptorID,
+BlockPayloadStream::BlockPayloadStream(annotation_parameter_set::DescriptorID _descriptorID,
                                        uint32_t _block_payload_size, const std::stringstream& _generic_payload)
     : descriptor_ID(_descriptorID),
       block_payload_size(_block_payload_size),

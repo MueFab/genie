@@ -5,14 +5,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
-#include <fstream>
-#include <iostream>
-#include "genie/core/writer.h"
 
-#include "RandomRecordFillIn.h"
-#include "genie/contact/contact_matrix_parameters.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
-#include "genie/likelihood/likelihood_parameters.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 #define GENERATE_TEST_FILES false

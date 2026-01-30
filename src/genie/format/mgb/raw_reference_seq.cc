@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mgb/raw_reference_seq.h"
+#include <string>
 #include <utility>
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"

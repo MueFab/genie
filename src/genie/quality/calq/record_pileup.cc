@@ -8,6 +8,9 @@
 #include <algorithm>
 #include <cctype>
 #include <map>
+#include <string>
+#include <utility>
+#include <vector>
 #include "genie/core/constants.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -31,13 +31,13 @@ Record::Record(util::BitReader& reader) {
 
 // -------------------------------------------------------------------------------------------------
 
-void Record::Write(genie::util::BitWriter& writer) {
+void Record::Write(util::BitWriter& writer) {
     (void)writer;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-bool Record::Read(genie::util::BitReader& reader) {
+bool Record::Read(util::BitReader& reader) {
   ClearData();
   feature_index_ = reader.ReadBits(64);
   if (!reader.IsStreamGood())

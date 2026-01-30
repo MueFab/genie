@@ -7,6 +7,7 @@
 #include "genie/read/spring/encoder-source.h"
 #include <string>
 #include <utility>
+#include <vector>
 #include "filesystem/filesystem.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------

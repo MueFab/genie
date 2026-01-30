@@ -5,6 +5,9 @@
  */
 
 #include "genie/quality/calq/qual_decoder.h"
+#include <map>
+#include <string>
+#include <utility>
 
 // -----------------------------------------------------------------------------
 

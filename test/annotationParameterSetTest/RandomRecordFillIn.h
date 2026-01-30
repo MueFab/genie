@@ -4,18 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_TEST_RANDOMRECORDFILLIN_H_
-#define SRC_TEST_RANDOMRECORDFILLIN_H_
+#ifndef TEST_ANNOTATIONPARAMETERSETTEST_RANDOMRECORDFILLIN_H_
+#define TEST_ANNOTATIONPARAMETERSETTEST_RANDOMRECORDFILLIN_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
 #include <string>
-#include <utility>
 #include <vector>
+
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/likelihood/likelihood_parameters.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 class RandomAnnotationEncodingParameters {
@@ -114,9 +113,9 @@ class RandomAnnotationEncodingParameters {
     std::vector<uint8_t> randomValForType(genie::core::DataType selectType) {
         uint8_t size = typeSize(selectType);
         std::vector<uint8_t> randomVal{};
-        if (size == 1)
+        if (size == 1) {
             randomVal.push_back(static_cast<uint8_t>(randomBool()));
-        else if (size == 0) {
+        } else if (size == 0) {
             uint8_t randomstrlen = randomU4() + 3;
             randomVal.resize(randomstrlen, 0);
             std::string randomval = randomString(randomstrlen);
@@ -139,6 +138,6 @@ class RandomAnnotationEncodingParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_TEST_RANDOMRECORDFILLIN_H_
+#endif  // TEST_ANNOTATIONPARAMETERSETTEST_RANDOMRECORDFILLIN_H_
 
 // ---------------------------------------------------------------------------------------------------------------------

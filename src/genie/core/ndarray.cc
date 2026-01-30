@@ -1,6 +1,9 @@
-#include "ndarray.h"
-#include <numeric>
+#include "genie/core/ndarray.h"
 #include <algorithm>
+#include <functional>
+#include <numeric>
+#include <utility>
+#include <vector>
 
 // -----------------------------------------------------------------------------
 
@@ -264,4 +267,4 @@ NDArray<T> operator/(const NDArray<T>& lhs, const NDArray<T>& rhs) {
 
 // -----------------------------------------------------------------------------
 
-}
+}  // namespace genie::core

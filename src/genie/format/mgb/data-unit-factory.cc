@@ -6,6 +6,7 @@
 
 #include "genie/format/mgb/data-unit-factory.h"
 #include <iostream>
+#include <map>
 #include <string>
 #include <utility>
 #include "genie/format/mgb/access_unit.h"

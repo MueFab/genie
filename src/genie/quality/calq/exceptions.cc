@@ -5,6 +5,7 @@
  */
 
 #include "genie/quality/calq/exceptions.h"
+#include <string>
 
 // -----------------------------------------------------------------------------
 

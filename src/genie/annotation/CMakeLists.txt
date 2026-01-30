@@ -4,15 +4,15 @@ project("genie-annotation")
 
 set(source_files
         annotation.cc
-		geno_annotation.cc
-		site_annotation.cc
-		gene_expression_annotation.cc
-		feature_annotation.cc
-		contact_annotation.cc
+        geno_annotation.cc
+        site_annotation.cc
+        gene_expression_annotation.cc
+        feature_annotation.cc
+        contact_annotation.cc
         compressors.cc
-		parameterset_composer.cc
-		annotation_encoder.cc
-		json_attribute_parser.cc
+        parameterset_composer.cc
+        annotation_encoder.cc
+        json_attribute_parser.cc
 )
 
 

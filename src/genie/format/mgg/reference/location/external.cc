@@ -5,6 +5,8 @@
  */
 
 #include "genie/format/mgg/reference/location/external.h"
+#include <memory>
+#include <string>
 #include <utility>
 #include "genie/format/mgg/reference/location/external/fasta.h"
 #include "genie/format/mgg/reference/location/external/mpeg.h"

@@ -5,7 +5,9 @@
  */
 
 #include "genie/format/fastq/importer.h"
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/core/record/class_type.h"
 #include "genie/util/ordered_section.h"
 #include "genie/util/stop_watch.h"

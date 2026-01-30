@@ -74,7 +74,7 @@ class ParameterSet {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-} // namespace genie::quality::paramqv1
+}  // namespace genie::quality::paramqv1
 
 
 

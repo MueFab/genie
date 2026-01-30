@@ -6,8 +6,11 @@
 
 #include "genie/format/mgg/dataset_header.h"
 #include <limits>
+#include <memory>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

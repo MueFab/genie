@@ -5,8 +5,10 @@
  */
 
 #include <algorithm>
+#include <map>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "genie/core/constants.h"
 #include "genie/genotype/parameterset_composer.h"
@@ -14,6 +16,7 @@
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"
 #include "genie/util/runtime_exception.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -51,7 +54,6 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Buil
     n_features_names = 0;
     n_ontology_terms = 0;
 
-
     genie::core::AnnotDesc descriptor_ID = genie::core::AnnotDesc::GENOTYPE;
     std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration{
         genie::core::record::annotation_parameter_set::DescriptorConfiguration(genotypeParameters)};
@@ -59,14 +61,12 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Buil
     descriptor_ID = genie::core::AnnotDesc::LIKELIHOOD;
     descriptor_configuration.emplace_back(genie::core::record::annotation_parameter_set::DescriptorConfiguration(likelihoodParameters));
 
- descriptor_ID = genie::core::AnnotDesc::LINKID;
+    descriptor_ID = genie::core::AnnotDesc::LINKID;
     descriptor_configuration.emplace_back(genie::core::record::annotation_parameter_set::DescriptorConfiguration(
         descriptor_ID, genie::core::AlgoID::BSC, BSCalgorithmParameters));
 
     uint8_t ndescriptors = static_cast<uint8_t>(descriptor_configuration.size());
-    
 
- 
     uint8_t n_compressors = static_cast<uint8_t>(compressor_parameter_set.size());
 
     std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set;

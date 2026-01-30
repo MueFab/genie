@@ -10,10 +10,11 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <vector>
 #include "genie/util/make_unique.h"
 #include "genie/util/stop_watch.h"
 
-//#include "codecs/api/mpegg_utils.h"
+// #include "codecs/api/mpegg_utils.h"
 #include "codecs/include/mpegg-codecs.h"
 #include "genie/core/constants.h"
 #include "genie/entropy/bsc/encoder.h"
@@ -74,7 +75,7 @@ genie::core::record::annotation_parameter_set::AlgorithmParameters BSCParameters
 
     for (auto i = 0; i < n_pars; ++i) {
         if (par_type.at(i) == core::DataType::UINT8) {
-            par_val.push_back( core::record::annotation_parameter_set::parameterToVector<uint8_t>(
+            par_val.push_back(core::record::annotation_parameter_set::parameterToVector<uint8_t>(
                 {values.at(i)}, par_type.at(i), par_num_array_dims.at(i), par_array_dims.at(i)));
         }
     }

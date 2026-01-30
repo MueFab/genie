@@ -30,10 +30,10 @@ namespace annotation {
 CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
     uint8_t AG_class = 0;
     uint8_t AT_ID = 2;
-    std::vector<genie::core::record::ContactRecord> RECS;
-    genie::util::BitReader reader(inputfile);
+    std::vector<core::record::ContactRecord> RECS;
+    util::BitReader reader(inputfile);
 
-    genie::util::BitReader bitreader(reader);
+    util::BitReader bitreader(reader);
 
     while (bitreader.IsStreamGood()) {
         RECS.emplace_back(bitreader);
@@ -41,9 +41,9 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
 
     RECS.pop_back();
 
-    auto cm_param = genie::contact::ContactMatrixParameters();
-    auto scm_param = genie::contact::SubcontactMatrixParameters();
-    auto scm_payload = genie::contact::SubcontactMatrixPayload();
+    auto cm_param = contact::ContactMatrixParameters();
+    auto scm_param = contact::SubcontactMatrixParameters();
+    auto scm_payload = contact::SubcontactMatrixPayload();
 
     cm_param.SetBinSize(RECS.front().GetBinSize());
     cm_param.SetTileSize(contactMatrixParameters.TILE_SIZE);
@@ -58,20 +58,20 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
     cm_param.UpsertBinSizeMultiplier(contactMatrixParameters.MULT);
 
     auto& REC = RECS.front();
-    auto rec = genie::core::record::ContactRecord(REC);
-    genie::contact::encode_scm(cm_param, rec, scm_param, scm_payload, contactMatrixParameters.REMOVE_UNALIGNED_REGION,
-                               contactMatrixParameters.TRANSFORM_MASK, contactMatrixParameters.ENA_DIAG_TRANSFORM,
-                               contactMatrixParameters.ENA_BINARIZATION, contactMatrixParameters.NORM_AS_WEIGHT,
-                               contactMatrixParameters.MULTIPLICATIVE_NORM, contactMatrixParameters.CODEC_ID);
+    auto rec = core::record::ContactRecord(REC);
+    contact::encode_scm(cm_param, rec, scm_param, scm_payload, contactMatrixParameters.REMOVE_UNALIGNED_REGION,
+                        contactMatrixParameters.TRANSFORM_MASK, contactMatrixParameters.ENA_DIAG_TRANSFORM,
+                        contactMatrixParameters.ENA_BINARIZATION, contactMatrixParameters.NORM_AS_WEIGHT,
+                        contactMatrixParameters.MULTIPLICATIVE_NORM, contactMatrixParameters.CODEC_ID);
 
     AnnotationEncoder encodingPars;
     encodingPars.setCompressors(compressors);
     encodingPars.setContactParameters(cm_param, {scm_param});
 
-    genie::entropy::bsc::BSCParameters bscParameters;
+    entropy::bsc::BSCParameters bscParameters;
     auto BSCalgorithmParameters = bscParameters.convertToAlgorithmParameters();
 
-    encodingPars.setDescriptorParameters(genie::core::AnnotDesc::LINKID, genie::core::AlgoID::BSC,
+    encodingPars.setDescriptorParameters(core::AnnotDesc::LINKID, core::AlgoID::BSC,
                                          BSCalgorithmParameters);
 
     auto annotationEncodingParameters = encodingPars.Compose();
@@ -84,17 +84,17 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
     variant_site::AccessUnitComposer accessUnitcomposer;
     accessUnitcomposer.setCompressors(compressors);
 
-    std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attributeTDStream;
+    std::map<std::string, core::record::annotation_access_unit::TypedData> attributeTDStream;
     std::map<std::string, core::record::annotation_parameter_set::AttributeData> attributeInfo;
-    std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
-    util::BitWriter writer(&descriptorStream[genie::core::AnnotDesc::CONTACT]);
+    std::map<core::AnnotDesc, std::stringstream> descriptorStream;
+    util::BitWriter writer(&descriptorStream[core::AnnotDesc::CONTACT]);
     scm_payload.Write(writer);
     core::record::annotation_access_unit::Record annotationAccessUnit;
     // add LINK_ID default values
     uint64_t linkIdRowCnt = 0;
     for (auto j = 0u; j < defaultTileSizeHeight && linkIdRowCnt < RECS.size(); ++j, ++linkIdRowCnt) {
         const char val = '\xFF';
-        descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
+        descriptorStream[core::AnnotDesc::LINKID].write(&val, 1);
     }
     accessUnitcomposer.setATtype(core::record::annotation_access_unit::AnnotationType::CONTACT_MATRICES, 10);
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream, attributeInfo,

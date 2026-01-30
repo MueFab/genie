@@ -6,6 +6,7 @@
 
 #include "genie/quality/paramqv1/parameter_set.h"
 #include <utility>
+#include <vector>
 #include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -46,7 +47,7 @@ const std::vector<Codebook> &ParameterSet::getCodebooks() const { return qv_code
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-} // namespace genie::quality::paramqv1
+}  // namespace genie::quality::paramqv1
 
 
 

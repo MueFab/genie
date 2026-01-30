@@ -5,6 +5,11 @@
  */
 
 #include "genie/annotation/gene_expression_annotation.h"
+#include <iostream>
+#include <map>
+#include <string>
+#include <tuple>
+#include <vector>
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
 #include "genie/variantsite/accessunit_composer.h"
@@ -28,7 +33,7 @@ std::vector<GeneExpressionUnits> GeneExpressionAnnotation::parseGeneExpression(
     combined = blocksWPars.at(0);
     //--------------
 
-  for (auto i = 1; i < blocksWPars.size(); ++i) {
+    for (auto i = 1; i < blocksWPars.size(); ++i) {
       combined.blocks.push_back(blocksWPars.at(i).blocks.at(0));
     }
     std::map<std::string, core::record::annotation_parameter_set::AttributeData> attributeInfo;
@@ -36,10 +41,10 @@ std::vector<GeneExpressionUnits> GeneExpressionAnnotation::parseGeneExpression(
       attributeInfo[attr.first] = std::get<0>(attr.second);
 
     AnnotationEncoder encodingPars;
-    genie::entropy::bsc::BSCParameters bscParameters;
+    entropy::bsc::BSCParameters bscParameters;
     auto BSCalgorithmParameters = bscParameters.convertToAlgorithmParameters();
 
-    encodingPars.setDescriptorParameters(genie::core::AnnotDesc::LINKID, genie::core::AlgoID::BSC,
+    encodingPars.setDescriptorParameters(core::AnnotDesc::LINKID, core::AlgoID::BSC,
                                          BSCalgorithmParameters);
     encodingPars.setCompressors(compressors);
     encodingPars.setAttributes(attributeInfo);
@@ -59,7 +64,7 @@ std::vector<GeneExpressionUnits> GeneExpressionAnnotation::parseGeneExpression(
       std::cerr << " blockIndex: " << std::to_string(blockIndex) << std::endl;
 
       size_t linkIdRowCnt = 0;
-      std::map<std::string, genie::core::record::annotation_access_unit::TypedData>
+      std::map<std::string, core::record::annotation_access_unit::TypedData>
           attributeTDStream;
       std::cerr << " attributeTDStream... " << std::endl;
       for (auto& formatdata : combined.blocks.at(blockIndex).attributes) {
@@ -78,7 +83,7 @@ std::vector<GeneExpressionUnits> GeneExpressionAnnotation::parseGeneExpression(
             std::get<std::vector<std::vector<std::vector<AttrType>>>>(formatdata.second));
       }
 
-      std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
+      std::map<core::AnnotDesc, std::stringstream> descriptorStream;
 
       variant_site::AccessUnitComposer accessUnitcomposer;
       accessUnitcomposer.setATtype(core::record::annotation_access_unit::AnnotationType::GENIE_EXPRESSION,
@@ -91,7 +96,7 @@ std::vector<GeneExpressionUnits> GeneExpressionAnnotation::parseGeneExpression(
       for (auto j = 0u; j < defaultTileSizeHeight && linkIdRowCnt < parWBlocks.rows;
            ++j, ++linkIdRowCnt) {
         const char val = '\xFF';
-        descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
+        descriptorStream[core::AnnotDesc::LINKID].write(&val, 1);
       }
 
       accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream, attributeInfo,
@@ -109,7 +114,7 @@ size_t GeneExpressionAnnotation::readBlocks(std::ifstream& inputfile, const uint
                                   std::vector<ParsBlocks>& blocksWPars) {
   size_t TotalnumberOfRows = 0;
 
-  genie::util::BitReader bitreader(inputfile);
+  util::BitReader bitreader(inputfile);
 
   while (bitreader.IsStreamGood()) {
     RecData oneTileData;
@@ -131,11 +136,11 @@ size_t GeneExpressionAnnotation::readBlocks(std::ifstream& inputfile, const uint
   return TotalnumberOfRows;
 }
 
-size_t genie::annotation::GeneExpressionAnnotation::readOneBlock(
-    genie::util::BitReader& reader, const uint32_t& rowTileSize,
+size_t GeneExpressionAnnotation::readOneBlock(
+    util::BitReader& reader, const uint32_t& rowTileSize,
     RecData& recData) {
   // read rowTileSize of rows
-  std::vector<genie::core::record::gene_expression::Record> varGenoType;
+  std::vector<core::record::gene_expression::Record> varGenoType;
   while (reader.IsStreamGood() && varGenoType.size() < rowTileSize) {
     varGenoType.emplace_back(reader);
     if (!reader.IsStreamGood())
@@ -144,11 +149,11 @@ size_t genie::annotation::GeneExpressionAnnotation::readOneBlock(
   if (varGenoType.empty())
     return 0;
   // extract format fields
-  std::map<std::string, genie::core::record::gene_expression::ExpressionAttribute> geneExpressionAttributeList;
+  std::map<std::string, core::record::gene_expression::ExpressionAttribute> geneExpressionAttributeList;
   for (auto& rec : varGenoType)
     for (const auto& field : rec.GetExpressionAttributes()) {
       geneExpressionAttributeList[field.GetAttrName()] = field;
-      genie::core::ArrayType convertArray;
+      core::ArrayType convertArray;
       auto defaultValue =
           convertArray.toArray(field.GetAttrType(), convertArray.getDefaultValue(field.GetAttrType()));
       std::vector<std::vector<std::vector<uint8_t>>> exprAttrValue(
@@ -172,7 +177,7 @@ size_t genie::annotation::GeneExpressionAnnotation::readOneBlock(
     }
   }
 
-  genie::genotype::GenotypeParameters pars;
+  genotype::GenotypeParameters pars;
 
   uint32_t _numSamples = varGenoType.front().GetSampleCount();
   uint8_t _formatCount = varGenoType.front().GetExprAttrCount();
@@ -193,7 +198,7 @@ size_t genie::annotation::GeneExpressionAnnotation::readOneBlock(
 }
 
 void GeneExpressionAnnotation::sort_format(
-    std::vector<genie::core::record::gene_expression::Record>& recs) {
+    std::vector<core::record::gene_expression::Record>& recs) {
   // starting number
   uint8_t AttributeID = 25;
 

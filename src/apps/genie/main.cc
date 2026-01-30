@@ -6,6 +6,7 @@
 
 #define NOMINMAX
 #include "genie/run/main.h"
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include "cli11/CLI11.hpp"
@@ -13,10 +14,10 @@
 #include "genie/gabac/main.h"
 #include "genie/module/manager.h"
 #include "genie/util/runtime_exception.h"
-//#include "genie/capsulator/main.h"
-//#include "genie/transcode-fasta/main.h"
-//#include "genie/transcode-fastq/main.h"
-//#include "genie/transcode-sam/main.h"
+// #include "genie/capsulator/main.h"
+// #include "genie/transcode-fasta/main.h"
+// #include "genie/transcode-fastq/main.h"
+// #include "genie/transcode-sam/main.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -67,7 +68,6 @@ int main(int argc, char* argv[]) {
             genieapp::gabac::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "annotation") {
             genieapp::annotation::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
-           
         } else if (operation == "help") {
             help(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else {

@@ -121,7 +121,7 @@ class QualityValues1 : public core::parameter::QualityValues {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-} // namespace genie::quality::paramqv1
+}  // namespace genie::quality::paramqv1
 
 
 

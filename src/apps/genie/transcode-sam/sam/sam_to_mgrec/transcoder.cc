@@ -7,11 +7,14 @@
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/transcoder.h"
 #include <algorithm>
 #include <iostream>
+#include <list>
 #include <memory>
 #include <mutex>
 #include <queue>
+#include <string>
 #include <thread>
 #include <utility>
+#include <vector>
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_group.h"
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_reader.h"
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sorter.h"

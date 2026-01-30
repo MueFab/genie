@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mgg/reference/location.h"
+#include <memory>
 #include <utility>
 #include "genie/format/mgg/reference/location/external.h"
 #include "genie/format/mgg/reference/location/external/fasta.h"

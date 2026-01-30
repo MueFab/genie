@@ -6,8 +6,10 @@
 
 #include "genie/feature/feature_parser.h"
 #include <algorithm>
+#include <map>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "genie/core/arrayType.h"
 #include "genie/util/bit_reader.h"
@@ -19,7 +21,7 @@
 namespace genie {
 namespace feature {
 
-//FeatureParser::FeatureParser(std::istream& _feature_MGrecs, std::stringstream& _jsonInfoFields,
+// FeatureParser::FeatureParser(std::istream& _feature_MGrecs, std::stringstream& _jsonInfoFields,
 //                                     uint64_t _rowsPerTile)
 //    : featureMGrecs(_feature_MGrecs),
 //      rowsPerTile(_rowsPerTile),
@@ -27,7 +29,7 @@ namespace feature {
 //      fieldWriter{},
 //      numberOfAttributes(0),
 //      startPos(0) {
-//    genie::annotation::JsonAttributeParser InfoFieldParser(_jsonInfoFields);
+//    annotation::JsonAttributeParser InfoFieldParser(_jsonInfoFields);
 //    infoFields = InfoFieldParser.getInfoFields();
 //    init();
 //    descriptors.setTileSize(rowsPerTile);
@@ -41,7 +43,7 @@ namespace feature {
 //    descriptors.writeDanglingBits();
 //}
 
-FeatureParser::FeatureParser(std::istream& _feature_MGrecs, std::vector<genie::annotation::InfoField>& _fields,
+FeatureParser::FeatureParser(std::istream& _feature_MGrecs, std::vector<annotation::InfoField>& _fields,
                                      uint64_t _rowsPerTile)
     : featureMGrecs(_feature_MGrecs),
       rowsPerTile(_rowsPerTile),
@@ -76,8 +78,8 @@ void FeatureParser::init() {
 
         numberOfAttributes = (uint16_t)infoFields.size();
     } else {
-        std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> info;
-            std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributetags;
+        std::map<std::string, core::record::annotation_parameter_set::AttributeData> info;
+            std::map<std::string, core::record::annotation_parameter_set::AttributeData> attributetags;
         for (auto tag : tags) {
             AttributeData tagdata(static_cast<uint8_t>(tag.first.length()), tag.first, tag.second.info_type, tag.second.info_array_len, attributeID);
             attributetags[tag.first] = tagdata;

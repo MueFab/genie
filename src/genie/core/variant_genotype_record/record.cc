@@ -49,7 +49,7 @@ VariantGenotype::VariantGenotype(
 
 // -----------------------------------------------------------------------------
 
-//VariantGenotype::VariantGenotype(uint64_t _variant_index, uint32_t _sample_index_from)
+// VariantGenotype::VariantGenotype(uint64_t _variant_index, uint32_t _sample_index_from)
 //
 //    : variant_index(_variant_index),
 //      sample_index_from(_sample_index_from),
@@ -134,7 +134,7 @@ VariantGenotype::VariantGenotype(util::BitReader& reader)
         return;
     }
 
-   // std::cout << "format_count...";
+    // std::cout << "format_count...";
     auto format_count = reader.ReadAlignedInt<uint8_t>();
     for (uint8_t i = 0; i < format_count; i++) {
         format_.emplace_back(reader, sample_count_);
@@ -144,7 +144,7 @@ VariantGenotype::VariantGenotype(util::BitReader& reader)
     bool likelihood_present = reader.Read<bool>(8);
 
     if (genotype_present) {
-       // std::cout << "allele...";
+        // std::cout << "allele...";
         auto n_alleles_per_sample = reader.Read<uint8_t>(8);
         UTILS_DIE_IF(n_alleles_per_sample == 0, "Invalid n_alleles_per_sample!");
 
@@ -153,11 +153,11 @@ VariantGenotype::VariantGenotype(util::BitReader& reader)
 
         for (auto& alleles_sample : alleles_) {
             for (auto& allele : alleles_sample) {
-                // TODO (Yeremia): move this signed integer fix to btreader!
+                // TODO(Yeremia): move this signed integer fix to btreader!
                 allele = reader.ReadAlignedInt<int8_t>();
             }
         }
-        //std::cout << "phasings...";
+        // std::cout << "phasings...";
         if (n_alleles_per_sample - 1 > 0) {
             for (auto& phasings_sample : phasings_) {
                 for (auto& phasing : phasings_sample) {
@@ -331,7 +331,7 @@ size_t VariantGenotype::GetSize() const {
 //  }
 //
 //  return size;
-    // TODO: Implement
+    // TODO(Yeremia): Implement
     return 0;
 }
 
@@ -355,7 +355,7 @@ FormatField::FormatField(util::BitReader& bitreader, uint32_t _sample_count) : s
 }
 // ---------------------------------------------------------------------------------------------------------------------
 
-} // namespace genie::core::record
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

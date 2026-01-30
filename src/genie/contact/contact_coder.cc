@@ -4,19 +4,24 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "contact_coder.h"
+#include "genie/contact/contact_coder.h"
 #include <codecs/include/mpegg-codecs.h>
 #include <genie/core/contact_record/record.h>
 #include <genie/util/runtime_exception.h>
+#include <algorithm>
 #include <cstdint>
 #include <cstring>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xio.hpp>
 #include <xtensor/xsort.hpp>
-#include "contact_matrix_parameters.h"
-#include "contact_matrix_tile_payload.h"
-#include "subcontact_matrix_parameters.h"
+#include "genie/contact/contact_matrix_parameters.h"
+#include "genie/contact/contact_matrix_tile_payload.h"
+#include "genie/contact/subcontact_matrix_parameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,12 +35,12 @@ void compute_mask(
     size_t nelems,
     // Output
     BinVecDtype& mask
-){
+) {
 //    auto nelems = xt::amax(ids)(0)+1;
     mask = xt::zeros<bool>({nelems});
 
     UInt64VecDtype unique_ids = xt::unique(ids);
-    for (auto id: unique_ids){
+    for (auto id : unique_ids) {
         mask(id) = true;
     }
 }
@@ -52,14 +57,13 @@ void compute_masks(
     // Outputs:
     BinVecDtype& row_mask,
     BinVecDtype& col_mask
-){
+) {
     UTILS_DIE_IF(row_ids.shape(0) != col_ids.shape(0),
                  "The size of row_ids and col_ids must be same!");
 
-    if (is_intra_scm){
+    if (is_intra_scm) {
         UTILS_DIE_IF(nrows != ncols,
-            "Both nentries must be the same for intra SCM!"
-        );
+            "Both nentries must be the same for intra SCM!");
 
         BinVecDtype mask;
 
@@ -89,19 +93,19 @@ void decode_scm_masks(
     // Outputs
     BinVecDtype& row_mask,
     BinVecDtype& col_mask
-){
+) {
     auto row_nentries = cm_param.GetNumBinEntries(scm_param.GetChr1ID());
     auto col_nentries = cm_param.GetNumBinEntries(scm_param.GetChr2ID());
 
-    if (scm_param.GetRowMaskExistsFlag()){
+    if (scm_param.GetRowMaskExistsFlag()) {
         decode_scm_mask_payload(scm_payload.GetRowMaskPayload(), row_nentries, row_mask);
     } else {
         row_mask = xt::ones<bool>({row_nentries});
     }
 
-    if (scm_param.IsIntraSCM()){
+    if (scm_param.IsIntraSCM()) {
         col_mask = row_mask;
-    } else if (scm_param.GetColMaskExistsFlag()){
+    } else if (scm_param.GetColMaskExistsFlag()) {
         decode_scm_mask_payload(scm_payload.GetColMaskPayload(), col_nentries, col_mask);
     } else {
         col_mask = xt::ones<bool>({col_nentries});
@@ -118,12 +122,11 @@ void decode_scm_mask_payload(
     BinVecDtype& mask
 ) {
     auto transform_ID = mask_payload.GetTransformID();
-    if (transform_ID == TransformID::ID_0){
+    if (transform_ID == TransformID::ID_0) {
         auto& mask_array = mask_payload.GetMaskArray();
         UTILS_DIE_IF(
             num_entries != mask_array.size(),
-            "num_entries and the size of mask_array_ differ!"
-        );
+            "num_entries and the size of mask_array_ differ!");
         mask = xt::adapt(mask_array, {mask_array.size()});
     } else {
         mask.resize({num_entries});
@@ -133,7 +136,7 @@ void decode_scm_mask_payload(
 
         size_t start_idx = 0;
         size_t end_idx = 0;
-        for (const auto& rl_entry: rl_entries){
+        for (const auto& rl_entry : rl_entries) {
             end_idx += rl_entry;
             // This is the for-loop for assigning the values based on run-lenght
             xt::view(mask, xt::range(start_idx, end_idx)) = first_val;
@@ -142,8 +145,7 @@ void decode_scm_mask_payload(
         }
         UTILS_DIE_IF(
             start_idx > num_entries,
-            "start_idx value must be smaller than num_entries!"
-        );
+            "start_idx value must be smaller than num_entries!");
         // This is the for-loop for assigning the remaining values
         xt::view(mask, xt::range(start_idx, num_entries)) = first_val;
     }
@@ -157,34 +159,34 @@ void remove_unaligned(
     bool is_intra_tile,
     const BinVecDtype& row_mask,
     const BinVecDtype& col_mask
-){
+) {
     UTILS_DIE_IF(row_ids.shape(0) != col_ids.shape(0),
                  "The size of row_ids and col_ids must be same!");
 
 
-    if (is_intra_tile){
-        //TODO(yeremia): to be deleted!
+    if (is_intra_tile) {
+        // TODO(yeremia): to be deleted!
         UTILS_DIE_IF(row_mask != col_mask, "row_mask and col_mask are different!");
 
         auto num_entries = row_ids.shape(0);
-        auto& mask = row_mask; // Note: Does not matter either row_mask or col_mask
+        auto& mask = row_mask;  // Note: Does not matter either row_mask or col_mask
         auto mapping_len = mask.shape(0);
         UInt64VecDtype mapping = xt::empty<uint64_t>({mapping_len});
         uint64_t new_id = 0u;
-        for (auto i = 0u; i<mapping_len; i++){
+        for (auto i = 0u; i < mapping_len; i++) {
             mapping(i) = new_id;
             auto v = mask(i);
-            if (v){
+            if (v) {
                 new_id++;
             }
         }
 
-        for (auto i = 0u; i<num_entries; i++){
+        for (auto i = 0u; i < num_entries; i++) {
             auto old_row_id = row_ids(i);
             auto new_row_id = mapping(old_row_id);
             row_ids(i) = new_row_id;
         }
-        for (auto i = 0u; i<num_entries; i++){
+        for (auto i = 0u; i < num_entries; i++) {
             auto old_col_id = col_ids(i);
             auto new_col_id = mapping(old_col_id);
             col_ids(i) = new_col_id;
@@ -194,16 +196,16 @@ void remove_unaligned(
         auto row_mapping = xt::empty<uint64_t>({row_mapping_len});
         {
             uint64_t new_id = 0u;
-            for (auto i = 0u; i<row_mapping_len; i++){
+            for (auto i = 0u; i < row_mapping_len; i++) {
                 row_mapping(i) = new_id;
                 auto v = row_mask(i);
-                if (v){
+                if (v) {
                     new_id++;
                 }
             }
         }
         auto num_entries = row_ids.shape(0);
-        for (auto i = 0u; i<num_entries; i++){
+        for (auto i = 0u; i < num_entries; i++) {
             auto old_row_id = row_ids(i);
             auto new_row_id = row_mapping(old_row_id);
             row_ids(i) = new_row_id;
@@ -213,22 +215,21 @@ void remove_unaligned(
         auto col_mapping = xt::empty<uint64_t>({col_mapping_len});
         {
             uint64_t new_id = 0u;
-            for (auto i = 0u; i<col_mapping_len; i++){
+            for (auto i = 0u; i < col_mapping_len; i++) {
                 col_mapping(i) = new_id;
                 auto v = col_mask(i);
-                if (v){
+                if (v) {
                     new_id++;
                 }
             }
         }
         num_entries = col_ids.shape(0);
-        for (auto i = 0u; i<num_entries; i++){
+        for (auto i = 0u; i < num_entries; i++) {
             auto old_col_id = col_ids(i);
             auto new_col_id = col_mapping(old_col_id);
             col_ids(i) = new_col_id;
         }
     }
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -239,29 +240,29 @@ void insert_unaligned(
     bool is_intra_tile,
     BinVecDtype& row_mask,
     BinVecDtype& col_mask
-){
+) {
     UTILS_DIE_IF(row_ids.shape(0) != col_ids.shape(0),
                  "The size of row_ids and col_ids must be same!");
 
 
-    if (is_intra_tile){
-        //TODO(yeremia): to be deleted!
+    if (is_intra_tile) {
+        // TODO(yeremia): to be deleted!
         UTILS_DIE_IF(row_mask != col_mask, "row_mask and col_mask are different!");
 
         auto num_entries = row_ids.shape(0);
-        auto& mask = row_mask; // Note: Does not matter either row_mask or col_mask
+        auto& mask = row_mask;  // Note: Does not matter either row_mask or col_mask
 
         auto argwhere_vec = xt::argwhere(mask);
         auto mapping_len = xt::sum(xt::cast<uint64_t>(mask))(0);
         auto mapping = xt::empty<uint64_t>({mapping_len});
 
         auto k = 0u;
-        for (auto v : argwhere_vec){
+        for (auto v : argwhere_vec) {
             auto value = v[0];
             mapping(k++) = value;
         }
 
-        for (auto i = 0u; i<num_entries; i++){
+        for (auto i = 0u; i < num_entries; i++) {
             row_ids(i) = mapping(row_ids(i));
             col_ids(i) = mapping(col_ids(i));
         }
@@ -275,12 +276,12 @@ void insert_unaligned(
             auto mapping = xt::empty<uint64_t>({mapping_len});
 
             auto k = 0u;
-            for (auto v : argwhere_vec){
+            for (auto v : argwhere_vec) {
                 auto value = v[0];
                 mapping(k++) = value;
             }
 
-            for (auto i = 0u; i<num_entries; i++){
+            for (auto i = 0u; i < num_entries; i++) {
                 row_ids(i) = mapping(row_ids(i));
             }
         }
@@ -293,17 +294,15 @@ void insert_unaligned(
             auto mapping = xt::empty<uint64_t>({mapping_len});
 
             auto k = 0u;
-            for (auto v : argwhere_vec){
+            for (auto v : argwhere_vec) {
                 auto value = v[0];
                 mapping(k++) = value;
             }
 
-            for (auto i = 0u; i<num_entries; i++){
+            for (auto i = 0u; i < num_entries; i++) {
                 col_ids(i) = mapping(col_ids(i));
             }
         }
-
-
     }
 }
 
@@ -318,7 +317,7 @@ void sparse_to_dense(
     size_t ncols,
     // Outputs
     UIntMatDtype& mat
-){
+) {
     // TODO(yeremia): Moves this check somewhere else
     {
         UTILS_DIE_IF(xt::amax(row_ids)(0) >= nrows, "Invalid nrows or row_ids!");
@@ -328,7 +327,7 @@ void sparse_to_dense(
     mat = xt::zeros<uint32_t>({nrows, ncols});
 
     auto num_entries = counts.shape(0);
-    for (auto i = 0u; i< num_entries; i++){
+    for (auto i = 0u; i< num_entries; i++) {
         auto count = counts(i);
         auto row_id = row_ids(i);
         auto col_id = col_ids(i);
@@ -346,7 +345,7 @@ void dense_to_sparse(
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
     UIntVecDtype& counts
-){
+) {
     BinMatDtype mask = mat > 0u;
 
     auto ids = xt::argwhere(mask);
@@ -356,10 +355,10 @@ void dense_to_sparse(
     col_ids.resize({num_entries});
     counts.resize({num_entries});
 
-    for (auto k = 0u; k<num_entries; k++){
+    for (auto k = 0u; k < num_entries; k++) {
         auto i = ids[k][0];
         auto j = ids[k][1];
-        auto c = mat(i,j);
+        auto c = mat(i, j);
 
         row_ids[k] = i;
         col_ids[k] = j;
@@ -373,7 +372,7 @@ void dense_to_sparse(
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
     UIntVecDtype& counts
-){
+) {
     auto num_entries = row_ids.size();
 
     UInt64VecDtype sort_ids = xt::argsort(row_ids);
@@ -381,7 +380,7 @@ void dense_to_sparse(
     UInt64VecDtype tmp_col_ids = col_ids;
     UIntVecDtype tmp_counts = counts;
 
-    for (auto k = 0u; k< num_entries; k++){
+    for (auto k = 0u; k< num_entries; k++) {
         tmp_row_ids(k) = row_ids(sort_ids(k));
         tmp_col_ids(k) = col_ids(sort_ids(k));
         tmp_counts(k) = counts(sort_ids(k));
@@ -397,7 +396,7 @@ void dense_to_sparse(
 void inverse_diag_transform(
     UIntMatDtype& mat,
     DiagonalTransformMode mode
-){
+) {
     UIntMatDtype trans_mat;
 //    auto k = 0u;
 //    auto l = 0u;
@@ -437,25 +436,25 @@ void inverse_diag_transform(
             Int64VecDtype diag_ids = xt::empty<int64_t>({nrows+ncols-1});
             size_t k_elem;
 
-            if (mode == DiagonalTransformMode::MODE_1){
+            if (mode == DiagonalTransformMode::MODE_1) {
                 diag_ids(0) = 0;
                 k_elem = 1u;
                 auto ndiags = std::max(nrows, ncols);
-                for (auto diag_id = 1; diag_id<ndiags; diag_id++){
-                    if (diag_id < static_cast<int64_t>(ncols)){
+                for (auto diag_id = 1; diag_id < ndiags; diag_id++) {
+                    if (diag_id < static_cast<int64_t>(ncols)) {
                         diag_ids(k_elem++) = diag_id;
                     }
-                    if (diag_id < static_cast<int64_t>(nrows)){
+                    if (diag_id < static_cast<int64_t>(nrows)) {
                         diag_ids(k_elem++) = -diag_id;
                     }
                 }
-            } else if (mode == DiagonalTransformMode::MODE_2){
+            } else if (mode == DiagonalTransformMode::MODE_2) {
                 //            k_elem = 0u;
                 //            for (int64_t diag_id = -nrows+1; diag_id < ncols; diag_id++){
                 //                diag_ids(k_elem++) = diag_id;
                 //            }
                 diag_ids = xt::arange(-nrows+1, ncols, 1);
-            } else if (mode == DiagonalTransformMode::MODE_3){
+            } else if (mode == DiagonalTransformMode::MODE_3) {
                 //            k_elem = 0u;
                 //            for (int64_t diag_id = ncols-1; diag_id > -nrows; diag_id--){
                 //                diag_ids(k_elem++) = diag_id;
@@ -467,7 +466,7 @@ void inverse_diag_transform(
             int64_t i_offset, j_offset;
             int64_t nelems_in_diag;
             auto o = 0u;
-            for (auto diag_id : diag_ids){
+            for (auto diag_id : diag_ids) {
                 if (diag_id >= 0) {
                     nelems_in_diag = std::max(nrows, ncols) - diag_id;
                     i_offset = 0;
@@ -477,7 +476,7 @@ void inverse_diag_transform(
                     i_offset = -diag_id;
                     j_offset = 0;
                 }
-                for (auto k_diag = 0; k_diag<nelems_in_diag; k_diag++){
+                for (auto k_diag = 0; k_diag < nelems_in_diag; k_diag++) {
                     target_i = k_diag + i_offset;
                     target_j = k_diag + j_offset;
                     if (target_i >= nrows)
@@ -502,16 +501,15 @@ void inverse_diag_transform(
 void diag_transform(
     UIntMatDtype& mat,
     DiagonalTransformMode mode
-){
+) {
     UIntMatDtype trans_mat;
 
-    if (mode == DiagonalTransformMode::NONE){
-        return ; // Do nothing
+    if (mode == DiagonalTransformMode::NONE) {
+        return;  // Do nothing
     } else if (mode == DiagonalTransformMode::MODE_0) {
         UTILS_DIE_IF(
             mat.shape(0) != mat.shape(1),
-            "Matrix must be a square!"
-        );
+            "Matrix must be a square!");
 
         auto nrows = mat.shape(0);
         auto new_nrows = nrows / 2 + 1;
@@ -542,23 +540,23 @@ void diag_transform(
         Int64VecDtype diag_ids = xt::empty<int64_t>({nrows+ncols-1});
         size_t k_elem;
 
-        if (mode == DiagonalTransformMode::MODE_1){
+        if (mode == DiagonalTransformMode::MODE_1) {
             diag_ids(0) = 0;
             k_elem = 1u;
             auto ndiags = std::max(nrows, ncols);
-            for (auto diag_id = 1; diag_id<ndiags; diag_id++){
+            for (auto diag_id = 1; diag_id < ndiags; diag_id++) {
                 if (diag_id < static_cast<int64_t>(ncols))
                     diag_ids(k_elem++) = diag_id;
                 if (diag_id < static_cast<int64_t>(nrows))
                     diag_ids(k_elem++) = -diag_id;
             }
-        } else if (mode == DiagonalTransformMode::MODE_2){
+        } else if (mode == DiagonalTransformMode::MODE_2) {
 //            k_elem = 0u;
 //            for (int64_t diag_id = -nrows+1; diag_id < ncols; diag_id++){
 //                diag_ids(k_elem++) = diag_id;
 //            }
             diag_ids = xt::arange(-nrows+1, ncols, 1);
-        } else if (mode == DiagonalTransformMode::MODE_3){
+        } else if (mode == DiagonalTransformMode::MODE_3) {
 //            k_elem = 0u;
 //            for (int64_t diag_id = ncols-1; diag_id > -nrows; diag_id--){
 //                diag_ids(k_elem++) = diag_id;
@@ -570,7 +568,7 @@ void diag_transform(
         int64_t i_offset, j_offset;
         int64_t nelems_in_diag;
         auto o = 0u;
-        for (auto diag_id : diag_ids){
+        for (auto diag_id : diag_ids) {
             if (diag_id >= 0) {
                 nelems_in_diag = std::max(nrows, ncols) - diag_id;
                 i_offset = 0;
@@ -580,7 +578,7 @@ void diag_transform(
                 i_offset = -diag_id;
                 j_offset = 0;
             }
-            for (auto k_diag = 0; k_diag<nelems_in_diag; k_diag++){
+            for (auto k_diag = 0; k_diag < nelems_in_diag; k_diag++) {
                 i = k_diag + i_offset;
                 j = k_diag + j_offset;
                 if (i >= nrows)
@@ -611,7 +609,7 @@ void inverse_transform_row_bin(
     const BinMatDtype& bin_mat,
     // Outputs
     UIntMatDtype& mat
-){
+) {
     size_t bin_mat_nrows = bin_mat.shape(0);
     size_t bin_mat_ncols = bin_mat.shape(1);
 
@@ -631,14 +629,14 @@ void inverse_transform_row_bin(
     size_t target_i = 0;
     uint8_t bit_pos = 0;
     auto target_js = xt::range(1u, bin_mat_ncols);
-    for (auto i = 0u; i<bin_mat_nrows; i++){
+    for (auto i = 0u; i < bin_mat_nrows; i++) {
         xt::view(mat, target_i, xt::all()) |= xt::cast<uint32_t>(xt::view(bin_mat, i, target_js)) << bit_pos;
         bool sentinel_flag = bin_mat(i, 0);
 
-        if (sentinel_flag){
+        if (sentinel_flag) {
             target_i++;
             bit_pos = 0;
-        } else{
+        } else {
             bit_pos++;
         }
     }
@@ -658,8 +656,7 @@ void transform_row_bin(
     auto ncols = mat.shape(1);
 
     UInt8VecDtype nbits_per_row = xt::cast<uint8_t>(xt::ceil(
-        xt::log2(xt::amax(mat, {1}) + 1u)
-    ));
+        xt::log2(xt::amax(mat, {1}) + 1u)));
     // Handle the case where maximum value is 0 -> log2(1) = 0 bits
     xt::filter(nbits_per_row, xt::equal(nbits_per_row, 0u)) = 1;
 
@@ -692,7 +689,7 @@ void comp_start_end_ids(
     // Outputs
     size_t& start_idx,
     size_t& end_idx
-){
+) {
     start_idx = tile_idx * tile_size;
     end_idx = std::min(start_idx + tile_size, num_entries);
 }
@@ -738,7 +735,6 @@ void bin_mat_from_bytes(
     // Outputs
     BinMatDtype& bin_mat
 ) {
-
     auto bpl = (ncols >> 3u) + ((ncols & 7u) > 0u);  // bytes per line with ceil operation
     UTILS_DIE_IF(payload_len != static_cast<size_t>(nrows * bpl), "Invalid payload_len / nrows / ncols!");
 
@@ -764,20 +760,20 @@ void decode_cm_tile(
     core::AlgoID codec_ID,
     // Outputs
     BinMatDtype& bin_mat
-){
+) {
     uint8_t* raw_data;
     size_t raw_data_len;
     uint8_t* compressed_data;
     size_t compressed_data_len;
 
-    unsigned long tile_nrows;
-    unsigned long tile_ncols;
+    unsigned long tile_nrows;  // NOLINT(runtime/int)
+    unsigned long tile_ncols;  // NOLINT(runtime/int)
 
-    if (codec_ID == core::AlgoID::JBIG){
+    if (codec_ID == core::AlgoID::JBIG) {
         compressed_data_len = tile_payload.GetPayloadSize();
         auto& payload = tile_payload.GetPayload();
 
-        compressed_data = (uint8_t*)malloc(compressed_data_len * sizeof(uint8_t));
+        compressed_data = reinterpret_cast<uint8_t*>(malloc(compressed_data_len * sizeof(uint8_t)));
         memcpy(compressed_data, payload.data(), compressed_data_len);
 
         mpegg_jbig_decompress_default(
@@ -786,8 +782,7 @@ void decode_cm_tile(
             compressed_data,
             compressed_data_len,
             &tile_nrows,
-            &tile_ncols
-        );
+            &tile_ncols);
 
         free(compressed_data);
 
@@ -796,13 +791,11 @@ void decode_cm_tile(
             raw_data_len,
             static_cast<size_t>(tile_nrows),
             static_cast<size_t>(tile_ncols),
-            bin_mat
-        );
+            bin_mat);
 
         free(raw_data);
 
     } else {
-
         tile_nrows = tile_payload.GetTileNRows();
         tile_ncols = tile_payload.GetTileNCols();
 
@@ -828,7 +821,6 @@ void encode_cm_tile(
     auto tile_ncols = static_cast<uint32_t>(bin_mat.shape(1));
 
     if (codec_ID == genie::core::AlgoID::JBIG) {
-
         bin_mat_to_bytes(bin_mat, &payload, payload_len);
 
         mpegg_jbig_compress_default(
@@ -837,8 +829,7 @@ void encode_cm_tile(
             payload,
             payload_len,
             tile_nrows,
-            tile_ncols
-        );
+            tile_ncols);
 
         free(payload);
 
@@ -851,8 +842,7 @@ void encode_cm_tile(
         tile_nrows,
         tile_ncols,
         &compressed_payload,
-        compressed_payload_len
-    );
+        compressed_payload_len);
 
     tile_payload = std::move(_tile_payload);
 }
@@ -867,12 +857,11 @@ void conv_noop_on_sparse_mat(
     uint32_t bin_size_mult,
     // Options
     bool sort_output
-){
-
+) {
     size_t num_entries = tile_counts.shape(0);
 
     std::map<std::pair<uint64_t, uint64_t>, uint32_t> lr_sparse_tile;
-    for (auto i = 0u; i<num_entries; i++){
+    for (auto i = 0u; i < num_entries; i++) {
         auto lr_row_id = tile_row_ids(i) / bin_size_mult;
         auto lr_col_id = tile_col_ids(i) / bin_size_mult;
         auto count = tile_counts(i);
@@ -880,9 +869,9 @@ void conv_noop_on_sparse_mat(
         auto row_col_id_pair = std::pair<uint64_t, uint64_t>(lr_row_id, lr_col_id);
 
         auto it = lr_sparse_tile.find(row_col_id_pair);
-        if (it != lr_sparse_tile.end()){
+        if (it != lr_sparse_tile.end()) {
             it->second += count;
-        } else{
+        } else {
             lr_sparse_tile.emplace(row_col_id_pair, count);
         }
     }
@@ -894,7 +883,7 @@ void conv_noop_on_sparse_mat(
     UIntVecDtype lr_tile_counts = xt::empty<uint32_t>({lr_num_entries});
 
     auto i_entry = 0u;
-    for (const auto & it : lr_sparse_tile){
+    for (const auto & it : lr_sparse_tile) {
         lr_tile_row_ids(i_entry) = (it.first).first;
         lr_tile_col_ids(i_entry) = (it.first).second;
         lr_tile_counts(i_entry) = it.second;
@@ -905,18 +894,16 @@ void conv_noop_on_sparse_mat(
 
     // Sort the tile_row_ids, tile_col_ids, and tile_counts
     //      according to tile_row_ids and tile_col_ids
-    if (sort_output){
+    if (sort_output) {
         sort_sparse_mat_inplace(
             lr_tile_row_ids,
             lr_tile_col_ids,
-            lr_tile_counts
-        );
+            lr_tile_counts);
     }
 
     tile_row_ids = std::move(lr_tile_row_ids);
     tile_col_ids = std::move(lr_tile_col_ids);
     tile_counts = std::move(lr_tile_counts);
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -926,7 +913,7 @@ void sort_sparse_mat_inplace(
     UInt64VecDtype& tile_row_ids,
     UInt64VecDtype& tile_col_ids,
     UIntVecDtype& tile_counts
-){
+) {
     size_t num_entries = tile_counts.shape(0);
 
     // Assert that all input vectors have the same size
@@ -941,8 +928,7 @@ void sort_sparse_mat_inplace(
         sort_ids.end(),
         [&tile_row_ids, &tile_col_ids](size_t i1, size_t i2) {
             return std::tie(tile_row_ids[i1], tile_col_ids[i1]) < std::tie(tile_row_ids[i2], tile_col_ids[i2]);
-        }
-    );
+        });
 
     if (std::is_sorted(sort_ids.begin(), sort_ids.end())) {
         return;
@@ -953,7 +939,7 @@ void sort_sparse_mat_inplace(
     UInt64VecDtype sorted_tile_col_ids = xt::empty<uint64_t>({num_entries});
     UIntVecDtype sorted_tile_counts = xt::empty<uint32_t>({num_entries});
 
-    for (auto i_entry = 0u; i_entry < num_entries; i_entry++){
+    for (auto i_entry = 0u; i_entry < num_entries; i_entry++) {
         sorted_tile_row_ids(i_entry) = tile_row_ids(sort_ids[i_entry]);
         sorted_tile_col_ids(i_entry) = tile_col_ids(sort_ids[i_entry]);
         sorted_tile_counts(i_entry) = tile_counts(sort_ids[i_entry]);
@@ -975,7 +961,7 @@ void decode_scm(
     core::record::ContactRecord& rec,
     // Options
     uint32_t bin_size_mult
-){
+) {
     // (not part of specification) Initialize variables
     BinVecDtype row_mask;
     BinVecDtype col_mask;
@@ -991,8 +977,7 @@ void decode_scm(
 
     UTILS_DIE_IF(
         !cm_param.IsBinSizeMultiplierValid(bin_size_mult),
-        "Bin size multiplier is invalid!"
-    );
+        "Bin size multiplier is invalid!");
 
     // Input parameters retrieved from parameter set
     auto chr1_ID = scm_param.GetChr1ID();
@@ -1012,22 +997,20 @@ void decode_scm(
 
     UTILS_DIE_IF(
         !cm_param.IsBinSizeMultiplierValid(bin_size_mult),
-        "Bin size multiplier is not supported!"
-    );
+        "Bin size multiplier is not supported!");
 
-    if (row_mask_exists || col_mask_exists){
+    if (row_mask_exists || col_mask_exists) {
         decode_scm_masks(
             cm_param,
             scm_param,
             scm_payload,
             row_mask,
-            col_mask
-        );
+            col_mask);
     }
 
     for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++) {
         for (size_t j_tile = 0u; j_tile < ntiles_in_col; j_tile++) {
-            if (i_tile > j_tile && is_intra_scm){
+            if (i_tile > j_tile && is_intra_scm) {
                 continue;
             }
 
@@ -1044,23 +1027,21 @@ void decode_scm(
             auto diag_transform_mode = tile_param.diag_tranform_mode;
             bool is_intra_tile = is_intra_scm && (i_tile == j_tile);
 
-            if (tile_payload.GetPayloadSize() == 0){
+            if (tile_payload.GetPayloadSize() == 0) {
                 continue;
             }
 
-            if (binarization_mode == BinarizationMode::ROW_BINARIZATION){
+            if (binarization_mode == BinarizationMode::ROW_BINARIZATION) {
                 BinMatDtype bin_mat;
 
                 decode_cm_tile(
                     tile_payload,
                     codec_ID,
-                    bin_mat
-                );
+                    bin_mat);
 
                 inverse_transform_row_bin(
                     bin_mat,
-                    tile_mat
-                );
+                    tile_mat);
 
             } else {
                 UTILS_DIE("no binarization is not supported yet!");
@@ -1068,33 +1049,29 @@ void decode_scm(
 
             inverse_diag_transform(
                 tile_mat,
-                diag_transform_mode
-            );
+                diag_transform_mode);
 
             comp_start_end_ids(
                 chr1_num_bin_entries,
                 tile_size,
                 i_tile,
                 start1_idx,
-                end1_idx
-            );
+                end1_idx);
 
             comp_start_end_ids(
                 chr2_num_bin_entries,
                 tile_size,
                 j_tile,
                 start2_idx,
-                end2_idx
-            );
+                end2_idx);
 
             dense_to_sparse(
                 tile_mat,
                 tile_row_ids,
                 tile_col_ids,
-                tile_counts
-            );
+                tile_counts);
 
-            if (row_mask_exists || col_mask_exists){
+            if (row_mask_exists || col_mask_exists) {
                 // This is slice function
                 BinVecDtype tile_row_mask = xt::view(row_mask, xt::range(start1_idx, end1_idx));
                 BinVecDtype tile_col_mask = xt::view(col_mask, xt::range(start2_idx, end2_idx));
@@ -1104,24 +1081,22 @@ void decode_scm(
                     tile_col_ids,
                     is_intra_tile,
                     tile_row_mask,
-                    tile_col_mask
-                );
+                    tile_col_mask);
             }
 
-            if (i_tile != 0){
+            if (i_tile != 0) {
                 tile_row_ids += start1_idx;
             }
-            if (j_tile != 0){
+            if (j_tile != 0) {
                 tile_col_ids += start2_idx;
             }
 
-            if (bin_size_mult != 1){
+            if (bin_size_mult != 1) {
                 conv_noop_on_sparse_mat(
                     tile_row_ids,
                     tile_col_ids,
                     tile_counts,
-                    bin_size_mult
-                );
+                    bin_size_mult);
             }
 
             auto curr_num_entries = counts.size();
@@ -1133,7 +1108,7 @@ void decode_scm(
             end2.resize(curr_num_entries + tile_num_entries);
             counts.resize(curr_num_entries + tile_num_entries);
 
-            for (auto i_entry = 0u; i_entry < tile_num_entries; i_entry++){
+            for (auto i_entry = 0u; i_entry < tile_num_entries; i_entry++) {
                 auto start1_val = tile_row_ids(i_entry) * target_bin_size;
                 start1[i_entry+curr_num_entries] = start1_val;
                 end1[i_entry+curr_num_entries] = std::min(start1_val + target_bin_size, chr1_len);
@@ -1159,8 +1134,7 @@ void decode_scm(
         std::move(end1),
         std::move(start2),
         std::move(end2),
-        std::move(counts)
-    );
+        std::move(counts));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -1181,9 +1155,8 @@ void encode_scm(
     bool multiplicative_norm,
     core::AlgoID codec_ID
 ) {
-
-  // TODO (Yeremia): Weights as optional input?
-  // TODO (Yeremia): By design, we always binarize the contact matrix. Change?
+  // TODO(Yeremia): Weights as optional input?
+  // TODO(Yeremia): By design, we always binarize the contact matrix. Change?
   UTILS_DIE_IF(!ena_binarization, "Binarization must be activated!");
 
   // Initialize variables
@@ -1224,7 +1197,7 @@ void encode_scm(
 
   UIntVecDtype counts = xt::adapt(rec.GetCounts(), {num_entries});
 
-  if (remove_unaligned_region){
+  if (remove_unaligned_region) {
       // Compute mask for
       compute_masks(
           row_ids,
@@ -1233,13 +1206,12 @@ void encode_scm(
           chr2_num_bin_entries,
           is_intra_scm,
           row_mask,
-          col_mask
-      );
+          col_mask);
 
-      if (transform_mask){
+      if (transform_mask) {
           // TODO(irvan): implement 6.4.4.3.4.5
           {
-              if(!is_intra_scm) {
+              if (!is_intra_scm) {
                   RunLengthEncodingData rowRLEData;
                   RunLengthEncodingData colRLEData;
 
@@ -1249,14 +1221,12 @@ void encode_scm(
                   auto row_mask_payload = SubcontactMatrixMaskPayload(
                       rowRLEData.transformID,
                       rowRLEData.firstVal,
-                      rowRLEData.rl_entries
-                      );
+                      rowRLEData.rl_entries);
 
                   auto col_mask_payload = SubcontactMatrixMaskPayload(
                       colRLEData.transformID,
                       colRLEData.firstVal,
-                      colRLEData.rl_entries
-                      );
+                      colRLEData.rl_entries);
 
                   // set row and mask to scm_payload
                   scm_payload.SetRowMaskPayload(std::move(row_mask_payload));
@@ -1264,8 +1234,7 @@ void encode_scm(
 
                   scm_payload.SetColMaskPayload(std::move(col_mask_payload));
                   scm_param.SetColMaskExistsFlag(true);
-              }
-              else { // if is_intra_scm is true
+              } else {  // if is_intra_scm is true
                   RunLengthEncodingData symmetricalRLEData;
 
                   set_rle_information_from_mask(symmetricalRLEData, row_mask);
@@ -1273,8 +1242,7 @@ void encode_scm(
                   auto symmetrical_mask_payload = SubcontactMatrixMaskPayload(
                       symmetricalRLEData.transformID,
                       symmetricalRLEData.firstVal,
-                      symmetricalRLEData.rl_entries
-                      );
+                      symmetricalRLEData.rl_entries);
 
                   // set row and mask to scm_payload
                   scm_payload.SetRowMaskPayload(
@@ -1284,29 +1252,25 @@ void encode_scm(
           }
       } else {
           auto row_mask_payload = SubcontactMatrixMaskPayload(
-              std::move(row_mask)
-          );
+              std::move(row_mask));
 
           scm_payload.SetRowMaskPayload(std::move(row_mask_payload));
           scm_param.SetRowMaskESetRowMaskExistsFlag(true);
 
           auto col_mask_payload = SubcontactMatrixMaskPayload(
-              std::move(col_mask)
-          );
+              std::move(col_mask));
 
           scm_payload.SetColMaskPayload(std::move(col_mask_payload));
           scm_param.SetColMaskExistsFlag(true);
       }
   }
 
-  for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++){
-
+  for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++) {
       auto min_row_id = i_tile*tile_size;
       auto max_row_id = std::min(min_row_id+tile_size, chr1_num_bin_entries);
 
-      for (size_t j_tile = 0u; j_tile < ntiles_in_col; j_tile++){
-
-          if (i_tile > j_tile && is_intra_scm){
+      for (size_t j_tile = 0u; j_tile < ntiles_in_col; j_tile++) {
+          if (i_tile > j_tile && is_intra_scm) {
               continue;
           }
 
@@ -1319,14 +1283,14 @@ void encode_scm(
           bool is_intra_tile = is_intra_scm && (i_tile == j_tile);
 
           // Mode selection for encoding
-          if (ena_diag_transform){
-              if (i_tile == j_tile){
+          if (ena_diag_transform) {
+              if (i_tile == j_tile) {
                   if (is_intra_scm) {
                       diag_transform_mode = DiagonalTransformMode::MODE_0;
                   } else {
                       diag_transform_mode = DiagonalTransformMode::MODE_1;
                   }
-              } else if (i_tile < j_tile){
+              } else if (i_tile < j_tile) {
                   diag_transform_mode = DiagonalTransformMode::MODE_2;
               } else if (i_tile > j_tile) {
                   diag_transform_mode = DiagonalTransformMode::MODE_3;
@@ -1338,7 +1302,7 @@ void encode_scm(
               diag_transform_mode = DiagonalTransformMode::NONE;
           }
 
-          if (ena_binarization){
+          if (ena_binarization) {
               binarization_mode = BinarizationMode::ROW_BINARIZATION;
           } else {
               binarization_mode = BinarizationMode::NONE;
@@ -1357,20 +1321,20 @@ void encode_scm(
           BinVecDtype mask = mask1 && mask2;
 
           auto any_entry = xt::any(mask);
-          if (any_entry){
+          if (any_entry) {
               // Filter the values only for the corresponding tile
               UInt64VecDtype tile_row_ids = xt::filter(row_ids, mask);
               UInt64VecDtype tile_col_ids = xt::filter(col_ids, mask);
               UIntVecDtype tile_counts = xt::filter(counts, mask);
 
-              if (min_row_id > 0){
+              if (min_row_id > 0) {
                   tile_row_ids -= min_row_id;
               }
-              if (min_col_id > 0){
+              if (min_col_id > 0) {
                   tile_col_ids -= min_col_id;
               }
 
-              if (remove_unaligned_region){
+              if (remove_unaligned_region) {
                   BinVecDtype tile_row_mask = xt::view(row_mask, xt::range(min_row_id, max_row_id));
                   BinVecDtype tile_col_mask = xt::view(col_mask, xt::range(min_col_id, max_col_id));
 
@@ -1379,27 +1343,24 @@ void encode_scm(
                       tile_col_ids,
                       is_intra_tile,
                       tile_row_mask,
-                      tile_col_mask
-                  );
-
+                      tile_col_mask);
               }
 
               UIntMatDtype tile_mat;
 
-              //TODO(yeremia): Create a specification where sparse2dense
-              //               transformation is disabled
-              //               better for no transformation compression
+              // TODO(yeremia): Create a specification where sparse2dense
+              //                transformation is disabled
+              //                better for no transformation compression
               sparse_to_dense(
                   tile_row_ids,
                   tile_col_ids,
                   tile_counts,
                   tile_nrows,
                   tile_ncols,
-                  tile_mat
-              );
+                  tile_mat);
               genie::contact::diag_transform(tile_mat, diag_transform_mode);
 
-              if (binarization_mode == BinarizationMode::ROW_BINARIZATION){
+              if (binarization_mode == BinarizationMode::ROW_BINARIZATION) {
                   genie::contact::BinMatDtype bin_mat;
                   genie::contact::transform_row_bin(tile_mat, bin_mat);
 
@@ -1407,8 +1368,7 @@ void encode_scm(
                   encode_cm_tile(
                       bin_mat,
                       codec_ID,
-                      tile_payload
-                  );
+                      tile_payload);
 
                   scm_payload.SetTilePayload(i_tile, j_tile,
                                              std::move(tile_payload));
@@ -1423,11 +1383,10 @@ void encode_scm(
               std::vector<uint8_t> codec_payload;
               ContactMatrixTilePayload tile_payload(core::AlgoID::JBIG, 0, 0, std::move(codec_payload));
           }
-
       }
   }
 
-    //TODO(yeremia): Separate this loop as another function
+    // TODO(yeremia): Separate this loop as another function
 //    // Compression of balanced matrix can be done only for intra SCM
 //    if (is_intra_scm){
 //        // Weight computation
@@ -1459,7 +1418,7 @@ void encode_scm(
 void set_rle_information_from_mask(
     RunLengthEncodingData& rleData,
     const BinVecDtype& scm_mask
-)   {
+) {
     bool prevValue;
     uint32_t count = 1;
     size_t index = 0;
@@ -1469,7 +1428,7 @@ void set_rle_information_from_mask(
     // init counts from maximum possible size (then resize later)
     rleData.rl_entries = xt::xtensor<uint32_t, 1>::from_shape({scm_mask.size()});
 
-    for(size_t i = 1; i < scm_mask.size(); i++) {
+    for (size_t i = 1; i < scm_mask.size(); i++) {
         if (scm_mask(i) == prevValue) {
             count++;
         } else {
@@ -1478,9 +1437,9 @@ void set_rle_information_from_mask(
             count = 1;
         }
     }
-    rleData.rl_entries(index++) = count; // add the last entry
+    rleData.rl_entries(index++) = count;  // add the last entry
 
-    rleData.rl_entries = xt::view(rleData.rl_entries, xt::range(0, index)); // resize
+    rleData.rl_entries = xt::view(rleData.rl_entries, xt::range(0, index));  // resize
 
     rleData.maxCount = xt::amax(rleData.rl_entries)();
     if (rleData.maxCount <= UINT8_MAX) {
@@ -1494,11 +1453,11 @@ void set_rle_information_from_mask(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//void encode_cm(
+// void encode_cm(
 //    std::list<genie::core::record::ContactRecord>& recs,
 //    const EncodingOptions& opt,
 //    EncodingBlock& block
-//) {
+// ) {
 //
 //    auto params = ContactMatrixParameters();
 //    params.SetBinSize(opt.bin_size);
@@ -1545,18 +1504,18 @@ void set_rle_information_from_mask(
 ////            scm_payload
 ////        );
 //    }
-//}
+// }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//std::tuple<ContactMatrixParameters, EncodingBlock> encode_genotype(
+// std::tuple<ContactMatrixParameters, EncodingBlock> encode_genotype(
 //    const EncodingOptions& opt,
 //    std::vector<core::record::ContactRecord>& recs){
 //
-//}
+// }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-} // namespace genie::contact
+}  // namespace genie::contact
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -5,8 +5,10 @@
  */
 
 #include "genie/format/mgg/mgg_file.h"
+#include <iostream>
 #include <string>
 #include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

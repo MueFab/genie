@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include <string>
 #include <utility>
 #include <vector>
 

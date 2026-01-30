@@ -39,18 +39,18 @@ class FeatureAnnotation {
 
     void parseInfoTags(std::string& recordInputFileName);
     FeatureUnits parseFeature(std::ifstream& inputfile);
-    void setCompressors(genie::annotation::Compressor& _compressors) { compressors = _compressors; }
+    void setCompressors(Compressor& _compressors) { compressors = _compressors; }
 
  private:
-     std::ifstream recordInput;
-    genie::annotation::Compressor compressors;
-    std::map<std::string, genie::core::record::feature::Info_tag> infoTags;
+    std::ifstream recordInput;
+    Compressor compressors;
+    std::map<std::string, core::record::feature::Info_tag> infoTags;
     std::map<std::string, InfoField> attributeInfo;
     std::vector<InfoField> infoFields;
 
-    genie::variant_site::AccessUnitComposer accessUnitcomposer;
-    genie::core::record::annotation_parameter_set::Record annotationParameterSet;
-    std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit;
+    variant_site::AccessUnitComposer accessUnitcomposer;
+    core::record::annotation_parameter_set::Record annotationParameterSet;
+    std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
 };

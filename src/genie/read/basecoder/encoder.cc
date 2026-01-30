@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
+#include <string>
 #include <utility>
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/core/record/alignment_box.h"
@@ -138,7 +139,7 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
             if (rec.isRead1First()) {
                 container.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairR1Unpaired);
             } else {
-                container.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairR2Unpaired );
+                container.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairR2Unpaired);
             }
             // Other record
         } else {

@@ -57,7 +57,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
             if (r.getRead1First()) {
                 state.streams.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairR1Unpaired);
             } else {
-                state.streams.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairR2Unpaired );
+                state.streams.push(core::gen_sub::kPairDecodingCase, core::gen_const::kPairR2Unpaired);
             }
         }
     }

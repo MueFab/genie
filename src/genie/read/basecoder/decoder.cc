@@ -7,8 +7,10 @@
 #include "genie/read/basecoder/decoder.h"
 #include <genie/core/record/alignment_split/other-rec.h>
 #include <genie/core/record/alignment_split/unpaired.h>
+#include <string>
 #include <tuple>
 #include <utility>
+#include <vector>
 #include "genie/core/qv_decoder.h"
 #include "genie/core/record/alignment_split/same-rec.h"
 

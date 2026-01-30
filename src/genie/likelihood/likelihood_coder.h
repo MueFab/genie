@@ -4,11 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_LIKELIHOOD_LIKELIHOOD_CODER_H
-#define GENIE_LIKELIHOOD_LIKELIHOOD_CODER_H
+#ifndef SRC_GENIE_LIKELIHOOD_LIKELIHOOD_CODER_H_
+#define SRC_GENIE_LIKELIHOOD_LIKELIHOOD_CODER_H_
 
 #include <cmath>
 #include <tuple>
+#include <vector>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
@@ -19,7 +20,7 @@
 #pragma GCC diagnostic pop
 
 #include "genie/core/variant_genotype_record/record.h"
-#include "likelihood_parameters.h"
+#include "genie/likelihood/likelihood_parameters.h"
 
 // #include <xtensor/xstrided_view.hpp>
 
@@ -137,4 +138,4 @@ std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingB
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_LIKELIHOOD_LIKELIHOOD_CODER_H
+#endif  // SRC_GENIE_LIKELIHOOD_LIKELIHOOD_CODER_H_

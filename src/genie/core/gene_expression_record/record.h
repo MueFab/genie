@@ -26,6 +26,7 @@ class ExpressionAttribute {
   DataType attr_type_;     //!< @brief Attribute data type
   uint8_t attr_array_len_;      //!< @brief Attribute array length
   std::vector<std::vector<std::vector<uint8_t>>> attr_values_;  //!< @brief Attribute values
+
  public:
   ExpressionAttribute() = default;
   ExpressionAttribute(std::string& attr_name, DataType attr_type, uint8_t attr_array_len)
@@ -69,13 +70,14 @@ class Record {
   uint8_t link_name_len;  //!< @brief Length of the link name
   std::string link_name;  //!< @brief Link name
   uint8_t reference_box_ID;  //!< @brief Reference box identifier
+
  public:
   /**
    * @brief Default constructor
    */
   Record() = default;
 
-  Record(genie::util::BitReader& reader) {
+  explicit Record(genie::util::BitReader& reader) {
     Read(reader);
   }
 
@@ -189,7 +191,7 @@ class Record {
   }
 };
 
-}
+}  // namespace genie::core::record::gene_expression
 
 // ---------------------------------------------------------------------------------------------------------------------
 

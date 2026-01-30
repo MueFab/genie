@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CONTACT_CONTACT_CODER_H
-#define GENIE_CONTACT_CONTACT_CODER_H
+#ifndef SRC_GENIE_CONTACT_CONTACT_CODER_H_
+#define SRC_GENIE_CONTACT_CONTACT_CODER_H_
 
 #include <cstdint>
 #include <list>
@@ -13,12 +13,12 @@
 #include <tuple>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xtensor.hpp>
-#include "consts.h"
-#include "contact_matrix_parameters.h"
+#include "genie/contact/consts.h"
+#include "genie/contact/contact_matrix_parameters.h"
 #include "genie/core/constants.h"
 #include "genie/core/contact_record/record.h"
-#include "subcontact_matrix_parameters.h"
-#include "subcontact_matrix_payload.h"
+#include "genie/contact/subcontact_matrix_parameters.h"
+#include "genie/contact/subcontact_matrix_payload.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -470,7 +470,7 @@ void conv_noop_on_sparse_mat(
     UInt64VecDtype& tile_col_ids,
     UIntVecDtype& tile_counts,
     uint32_t bin_size_mult,
-    bool sort_output=false
+    bool sort_output = false
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -507,7 +507,7 @@ void decode_scm(
     SubcontactMatrixParameters& scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
     core::record::ContactRecord& rec,
-    uint32_t bin_size_mult=1
+    uint32_t bin_size_mult = 1
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -539,13 +539,13 @@ void encode_scm(
     SubcontactMatrixParameters& scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
     // Options
-    bool remove_unaligned_region=true,
-    bool transform_mask=true,
-    bool ena_diag_transform=true,
-    bool ena_binarization=true,
-    bool norm_as_weight=true,
-    bool multiplicative_norm=true,
-    core::AlgoID codec_ID=core::AlgoID::JBIG
+    bool remove_unaligned_region = true,
+    bool transform_mask = true,
+    bool ena_diag_transform = true,
+    bool ena_binarization = true,
+    bool norm_as_weight = true,
+    bool multiplicative_norm = true,
+    core::AlgoID codec_ID = core::AlgoID::JBIG
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -559,11 +559,11 @@ void encode_scm(
  * @param opt A reference to the encoding options that dictate how the block should be encoded.
  * @param block A reference to the encoding block that contains the data to be encoded.
  */
-//void encode_cm(
+// void encode_cm(
 //    ContactRecords& recs,
 //    const EncodingOptions& opt,
 //    EncodingBlock& block
-//);
+// );
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -577,10 +577,10 @@ void encode_scm(
  * @param recs A reference to the vector of contact records to be encoded.
  * @return A tuple containing the encoded contact parameters and the encoding block.
  */
-//std::tuple<ContactMatrixParameters, EncodingBlock> encode_genotype(
+// std::tuple<ContactMatrixParameters, EncodingBlock> encode_genotype(
 //    const EncodingOptions& opt,
 //    std::vector<core::record::ContactRecord>& recs
-//);
+// );
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -588,6 +588,6 @@ void encode_scm(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CONTACT_CONTACT_CODER_H
+#endif  // SRC_GENIE_CONTACT_CONTACT_CODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------

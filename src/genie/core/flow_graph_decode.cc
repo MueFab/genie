@@ -11,7 +11,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/core/flow_graph_decode.h"
 
 // -----------------------------------------------------------------------------
 

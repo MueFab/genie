@@ -5,6 +5,8 @@
  */
 
 #include "genie/core/gene_expression_record/record.h"
+#include <string>
+#include <vector>
 #include "genie/core/arrayType.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -20,11 +22,11 @@ bool Record::Read(genie::util::BitReader& reader) {
   if (!reader.IsStreamGood())
     return false;
   // Following fields are currently unused, spec <-> input file mismatch
- // feature_name_len = static_cast<uint8_t>(reader.ReadBits(8));
- // if (feature_name_len > 0) {
-	//feature_name.resize(feature_name_len);
- //   reader.ReadAlignedBytes(feature_name.data(), feature_name_len);
- // }
+  // feature_name_len = static_cast<uint8_t>(reader.ReadBits(8));
+  // if (feature_name_len > 0) {
+  //   feature_name.resize(feature_name_len);
+  //   reader.ReadAlignedBytes(feature_name.data(), feature_name_len);
+  // }
   sample_index_from = static_cast<uint32_t>(reader.ReadBits(32));
   sample_count = static_cast<uint32_t>(reader.ReadBits(32));
   expr_attr_count = static_cast<uint8_t>(reader.ReadBits(8));

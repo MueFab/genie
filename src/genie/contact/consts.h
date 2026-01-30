@@ -4,19 +4,19 @@
 * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CONTACT_CONSTS_H
-#define GENIE_CONTACT_CONSTS_H
+#ifndef SRC_GENIE_CONTACT_CONSTS_H_
+#define SRC_GENIE_CONTACT_CONSTS_H_
 
 #include <cstdint>
 #include <list>
 #include <tuple>
-//#include <optional>
-//#include <xtensor/xarray.hpp>
+// #include <optional>
+// #include <xtensor/xarray.hpp>
 #include <xtensor/xtensor.hpp>
 #include "genie/core/constants.h"
 #include "genie/core/contact_record/record.h"
 // #include "contact_parameters.h"
-//#include "subcontact_matrix_payload.h"
+// #include "subcontact_matrix_payload.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ namespace genie::contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//using CountsDtype = uint32_t;
+// using CountsDtype = uint32_t;
 using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
 using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
 using UInt8VecDtype = xt::xtensor<uint8_t, 1, xt::layout_type::row_major>;
@@ -37,17 +37,17 @@ using Int64VecDtype = xt::xtensor<int64_t, 1, xt::layout_type::row_major>;
 
 using DoubleVecDtype = xt::xtensor<double_t, 1, xt::layout_type::row_major>;
 
-//using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
+// using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
 using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//using ContactRecords = std::list<genie::core::record::ContactRecord>;
+// using ContactRecords = std::list<genie::core::record::ContactRecord>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-} // namespace genie::contact
+}  // namespace genie::contact
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CONTACT_CONSTS_H
+#endif  // SRC_GENIE_CONTACT_CONSTS_H_

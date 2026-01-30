@@ -4,7 +4,9 @@
 * https://github.com/mitogen/genie for more details.
 */
 
-#include "row_col_ids_payload.h"
+#include "genie/genotype/row_col_ids_payload.h"
+#include <utility>
+#include <vector>
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
@@ -63,7 +65,7 @@ RowColIdsPayload& RowColIdsPayload::operator=(RowColIdsPayload&& other) noexcept
 RowColIdsPayload::RowColIdsPayload(genie::util::BitReader& reader, size_t num_elements) {
 //    payload_.resize(num_elements);
   auto n_bits_per_elem = ComputeNBitsPerElem(num_elements);
-  for (auto i = 0u; i < num_elements; i++){
+  for (auto i = 0u; i < num_elements; i++) {
     row_col_ids_elements_.push_back(static_cast<uint32_t>(reader.ReadBits(n_bits_per_elem)));
   }
   reader.FlushHeldBits();
@@ -104,13 +106,13 @@ uint8_t RowColIdsPayload::GetNbitsPerElem() const {
 
 // -----------------------------------------------------------------------------
 
-//[[maybe_unused]] void RowColIdsPayload::SetNelements(uint64_t nelements) {
+// [[maybe_unused]] void RowColIdsPayload::SetNelements(uint64_t nelements) {
 //  row_col_ids_elements_.resize(nelements);
 //}
 
 // -----------------------------------------------------------------------------
 
-//[[maybe_unused]] void RowColIdsPayload::SetNbitsPerElem(uint32_t nbits_per_elem) {
+// [[maybe_unused]] void RowColIdsPayload::SetNbitsPerElem(uint32_t nbits_per_elem) {
 //  UTILS_DIE("Forbidden call! nbits_per_elem is computed!");
 //}
 
@@ -144,14 +146,14 @@ size_t RowColIdsPayload::GetSize() const {
   auto num_elements = row_col_ids_elements_.size();
   auto nbits_per_elem = ComputeNBitsPerElem(num_elements);
   auto size_in_bits = num_elements * nbits_per_elem;
-  return (size_in_bits + 7) / 8; // Rounds up to the nearest byte
+  return (size_in_bits + 7) / 8;  // Rounds up to the nearest byte
 }
 
 // -----------------------------------------------------------------------------
 
 void RowColIdsPayload::Write(util::BitWriter writer) const {
   auto nbits_per_elem = GetNbitsPerElem();
-  for (auto i = 0u; i< GetNelements(); i++){
+  for (auto i = 0u; i < GetNelements(); i++) {
     writer.WriteBits(row_col_ids_elements_[i], nbits_per_elem);
   }
 

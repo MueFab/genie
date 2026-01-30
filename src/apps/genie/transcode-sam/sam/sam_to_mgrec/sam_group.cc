@@ -11,7 +11,9 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <tuple>
 #include <utility>
+#include <vector>
 #include "apps/genie/transcode-sam/utils.h"
 #include "boost/optional/optional.hpp"
 #include "genie/core/record/alignment_external/other-rec.h"

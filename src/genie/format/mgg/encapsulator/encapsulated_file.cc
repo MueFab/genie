@@ -5,7 +5,10 @@
  */
 
 #include "genie/format/mgg/encapsulator/encapsulated_file.h"
+#include <map>
+#include <string>
 #include <utility>
+#include <vector>
 #include "filesystem/filesystem.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------

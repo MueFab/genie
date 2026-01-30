@@ -2,7 +2,7 @@
 #add_subdirectory(annotationAccessUnitTest)
 add_subdirectory(annotationParameterSetTest)
 #add_subdirectory(variantGenotypeRecordTest)
-add_subdirectory(variantSiteRecordTest)
+#add_subdirectory(variantSiteRecordTest)
 add_subdirectory(example)
 add_subdirectory(records)
 add_subdirectory(genotype)

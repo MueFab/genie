@@ -6,14 +6,17 @@
 
 #include "genie/variantsite/variantsite_parser.h"
 #include <algorithm>
+#include <map>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "genie/core/arrayType.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"
 #include "genie/util/runtime_exception.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -77,7 +80,7 @@ void VariantSiteParser::init() {
         Attributes attr(rowsPerTile, attributeData);
         attributes = attr;
 
-        numberOfAttributes = (uint16_t)infoFields.size();
+        numberOfAttributes = static_cast<uint16_t>(infoFields.size());
     } else {
         std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> info;
             std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributetags;
@@ -88,7 +91,7 @@ void VariantSiteParser::init() {
         }
         Attributes attr(rowsPerTile, attributetags);
         attributes = attr;
-        numberOfAttributes = (uint16_t)attributeID;
+        numberOfAttributes = static_cast<uint16_t>(attributeID);
     }
 }
 

@@ -5,7 +5,9 @@
  */
 
 #include "genie/format/mgg/encapsulator/decapsulated_dataset_group.h"
+#include <map>
 #include <string>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

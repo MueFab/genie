@@ -14,22 +14,22 @@
 #include "apps/genie/run/program-options.h"
 #include "genie/core/format_importer_null.h"
 #include "genie/core/name_encoder_none.h"
-//#include "genie/format/fasta/exporter.h"
-//#include "genie/format/fasta/manager.h"
-//#include "genie/format/fastq/exporter.h"
-//#include "genie/format/fastq/importer.h"
+// #include "genie/format/fasta/exporter.h"
+// #include "genie/format/fasta/manager.h"
+// #include "genie/format/fastq/exporter.h"
+// #include "genie/format/fastq/importer.h"
 #include "genie/format/mgb/exporter.h"
 #include "genie/format/mgb/importer.h"
 #include "genie/format/mgrec/exporter.h"
 #include "genie/format/mgrec/importer.h"
 #include "genie/module/default-setup.h"
-//#include "genie/quality/calq/decoder.h"
-//#include "genie/quality/calq/encoder.h"
-//#include "genie/quality/qvwriteout/encoder-none.h"
-//#include "genie/read/lowlatency/encoder.h"
+// #include "genie/quality/calq/decoder.h"
+// #include "genie/quality/calq/encoder.h"
+// #include "genie/quality/qvwriteout/encoder-none.h"
+// #include "genie/read/lowlatency/encoder.h"
 #include "genie/util/stop_watch.h"
 
-// TODO(Fabian): For some reason, compilation on windows fails if we Move this include further up. Investigate.
+// TODO(Fabian): For some reason, compilation on windows fails if we move this include further up. Investigate.
 #include "filesystem/filesystem.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -90,8 +90,8 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//template <class T>
-//void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
+// template <class T>
+// void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
 //    std::ostream* out_ptr = &std::cout;
 //    if (pOpts.outputFile.substr(0, 2) != "-.") {
 //        outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile));
@@ -103,12 +103,12 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //        flow.AddExporter(genie::util::make_unique<genie::format::fasta::Exporter>(&flow.GetRefMgr(), out_ptr,
 //                                                                                  pOpts.numberOfThreads));
 //    }
-//}
+// }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//void addFasta(const std::string& fastaFile, genie::core::FlowGraphEncode* flow,
-//              std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
+// void addFasta(const std::string& fastaFile, genie::core::FlowGraphEncode* flow,
+//               std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
 //    std::string fai = fastaFile.substr(0, fastaFile.find_last_of('.') + 1) + "fai";
 //    std::string sha = fastaFile.substr(0, fastaFile.find_last_of('.') + 1) + "sha256";
 //    auto fasta_file = genie::util::make_unique<std::ifstream>(fastaFile);
@@ -132,13 +132,13 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //    flow->AddReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
 //        **(inputFiles.rbegin() + 2), **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->GetRefMgr(),
 //        fastaFile));
-//}
+// }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//template <class T>
-//void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
-//                    std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
+// template <class T>
+// void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
+//                     std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
 //    constexpr size_t BLOCKSIZE = 128000;
 //    std::istream* in_ptr = &std::cin;
 //    if (pOpts.inputFile.substr(0, 2) != "-.") {
@@ -156,9 +156,9 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts,
-//                                                     std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
-//                                                     std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
+// std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts,
+//                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
+//                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
 //    constexpr size_t BLOCKSIZE = 128000;
 //    genie::core::ClassifierRegroup::RefMode mode;
 //    if (pOpts.ref_mode_ == "none") {
@@ -203,13 +203,13 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //        flow->SetReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(pOpts.rawStreams), 4);
 //    }
 //    return flow;
-//}
+// }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts,
-//                                                     std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
-//                                                     std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
+// std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts,
+//                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
+//                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
 //    constexpr size_t BLOCKSIZE = 128000;
 //    auto flow = genie::module::build_default_decoder(pOpts.numberOfThreads, pOpts.workingDirectory,
 //                                                   pOpts.combinePairsFlag, BLOCKSIZE);
@@ -272,7 +272,7 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 //        *in_ptr, &flow->GetRefMgr(), flow->GetRefDecoder(), file_extension(pOpts.outputFile) == "fasta"));
 //    attachExporter(*flow, pOpts, outputFiles);
 //    return flow;
-//}
+// }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -319,7 +319,7 @@ int main(int argc, char* argv[]) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace Run
+}  // namespace run
 }  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------

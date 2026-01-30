@@ -10,7 +10,6 @@
 #include <memory>
 #include <utility>
 #include <vector>
-#include "genie/core/flow_graph_convert.h"
 
 // -----------------------------------------------------------------------------
 

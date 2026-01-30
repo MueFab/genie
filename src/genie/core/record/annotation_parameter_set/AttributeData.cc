@@ -4,18 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <algorithm>
-#include <cstring>
-#include <sstream>
-#include <string>
-#include <utility>
-
-#include "genie/core/arrayType.h"
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
+
+#include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

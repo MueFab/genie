@@ -5,7 +5,9 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "format_field.h"
+#include "genie/core/variant_genotype_record/format_field.h"
+#include <string>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

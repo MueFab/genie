@@ -39,25 +39,25 @@ class SiteAnnotation {
 
     void parseInfoTags(std::string& recordInputFileName);
     SiteUnits parseSite(std::ifstream& inputfile);
-    void setCompressors(genie::annotation::Compressor& _compressors) { compressors = _compressors; }
+    void setCompressors(Compressor& _compressors) { compressors = _compressors; }
 
  private:
-     std::ifstream recordInput;
-    genie::annotation::Compressor compressors;
-    std::map<std::string, genie::core::record::variant_site::Info_tag> infoTags;
+    std::ifstream recordInput;
+    Compressor compressors;
+    std::map<std::string, core::record::variant_site::Info_tag> infoTags;
     std::map<std::string, InfoField> attributeInfo;
     std::vector<InfoField> infoFields;
-    const std::vector<genie::core::AnnotDesc> descrList{
-        genie::core::AnnotDesc::SEQUENCEID, genie::core::AnnotDesc::STARTPOS,       genie::core::AnnotDesc::STRAND,
-        genie::core::AnnotDesc::NAME,       genie::core::AnnotDesc::DESCRIPTION,    genie::core::AnnotDesc::LINKNAME,
-        genie::core::AnnotDesc::LINKID,     genie::core::AnnotDesc::DEPTH,          genie::core::AnnotDesc::SEQQUALITY,
-        genie::core::AnnotDesc::MAPQUALITY, genie::core::AnnotDesc::MAPNUMQUALITY0, genie::core::AnnotDesc::REFERENCE,
-        genie::core::AnnotDesc::ALTERN,     genie::core::AnnotDesc::FILTER};
+    const std::vector<core::AnnotDesc> descrList{
+        core::AnnotDesc::SEQUENCEID, core::AnnotDesc::STARTPOS,       core::AnnotDesc::STRAND,
+        core::AnnotDesc::NAME,       core::AnnotDesc::DESCRIPTION,    core::AnnotDesc::LINKNAME,
+        core::AnnotDesc::LINKID,     core::AnnotDesc::DEPTH,          core::AnnotDesc::SEQQUALITY,
+        core::AnnotDesc::MAPQUALITY, core::AnnotDesc::MAPNUMQUALITY0, core::AnnotDesc::REFERENCE,
+        core::AnnotDesc::ALTERN,     core::AnnotDesc::FILTER};
 
 
-    genie::variant_site::AccessUnitComposer accessUnitcomposer;
-    genie::core::record::annotation_parameter_set::Record annotationParameterSet;
-    std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit;
+    variant_site::AccessUnitComposer accessUnitcomposer;
+    core::record::annotation_parameter_set::Record annotationParameterSet;
+    std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
 };

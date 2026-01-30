@@ -4,9 +4,10 @@
 * https://github.com/mitogen/genie for more details.
  */
 
-#include "sorted_bin_mat_payload.h"
+#include "genie/genotype/sorted_bin_mat_payload.h"
 #include <optional>
-#include <genie/util/runtime_exception.h>
+#include <utility>
+#include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
@@ -81,7 +82,6 @@ SortedBinMatPayload& SortedBinMatPayload::operator=(
     bool rows_sorted,
     bool cols_sorted
 ): bin_mat_payload_(reader, static_cast<size_t>(reader.Read<uint32_t>()), codec_ID) {
-
   if (rows_sorted) {
     auto row_ids_payload_size = static_cast<size_t>(reader.Read<uint32_t>());
     auto num_rows = bin_mat_payload_.GetNRows();
@@ -177,15 +177,15 @@ const std::optional<RowColIdsPayload>& SortedBinMatPayload::GetColIdsPayload()
 size_t SortedBinMatPayload::GetSize() const {
   size_t size = 0;
 
-  size += sizeof(uint32_t); //bin_mat_payload_size u(32)
+  size += sizeof(uint32_t);  // bin_mat_payload_size u(32)
   size += bin_mat_payload_.GetSize();
 
   if (IsRowsSorted()) {
-    size += sizeof(uint32_t); //row_ids_payload_size u(32)
+    size += sizeof(uint32_t);  // row_ids_payload_size u(32)
     size += GetRowIdsPayload()->GetSize();
   }
   if (IsColsSorted()) {
-    size += sizeof(uint32_t); //col_ids_payload_size u(32)
+    size += sizeof(uint32_t);  // col_ids_payload_size u(32)
     size += GetColIdsPayload()->GetSize();
   }
   return size;
@@ -200,13 +200,13 @@ void SortedBinMatPayload::Write(util::BitWriter& writer) const {
   writer.WriteBypassBE(bin_mat_payload_size);
   bin_mat_payload_.Write(writer);
 
-  if (IsRowsSorted()){
+  if (IsRowsSorted()) {
     auto row_ids_size = static_cast<uint32_t>(GetRowIdsPayload()->GetSize());
     writer.WriteBypassBE(row_ids_size);
     GetRowIdsPayload()->Write(writer);
   }
 
-  if (IsColsSorted()){
+  if (IsColsSorted()) {
     auto col_ids_size = static_cast<uint32_t>(GetColIdsPayload()->GetSize());
     writer.WriteBypassBE(col_ids_size);
     GetColIdsPayload()->Write(writer);
