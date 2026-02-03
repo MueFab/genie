@@ -176,7 +176,7 @@ void AttributeParameterSet::Write(util::BitWriter& writer) const {
         writer.WriteBits(attribute_miss_default_flag, 1);
         if (!attribute_miss_default_flag) curType.toFile(attribute_type, attribute_miss_val, writer);
         writer.Write(attribute_miss_str);
-        writer.WriteBits(0, 8);
+        writer.WriteBits(0, 8);  // string-terminator
     }
 
     writer.WriteBits(compressor_ID, 8);

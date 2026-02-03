@@ -66,10 +66,10 @@ void Record::Write(util::BitWriter& writer) {
         for (auto j = 0u; j < info_tag[i].values.size(); ++j) {
             writeType.toFile(info_tag[i].type, info_tag.at(i).values.at(j), writer);
             if (info_tag[i].type == DataType::STRING)
-                writer.WriteBits(0, 8);  // reserved
+                writer.WriteReserved(8);
         }
     }
-    writer.WriteBits(0, 7);  // reserved
+    writer.WriteReserved(7);
     writer.WriteBits(linked_record_, 1);
     if (linked_record_) {
         writer.WriteBits(link_name_len_, 8);

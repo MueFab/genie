@@ -54,12 +54,12 @@ void Record::Write(util::BitWriter& writer, uint64_t write_size) const {
         case 2:
             break;
         case 3:
-            writer.WriteBits(0, 10);  // reserved
+            writer.WriteReserved(10);
             writer.WriteBits(write_size, 22);
             annotation_parameter_set_.Write(writer);
             break;
         case 4:
-            writer.WriteBits(0, 3);  // reserved
+            writer.WriteReserved(3);
             writer.WriteBits(write_size, 29);
             annotation_access_unit_.Write(writer);
             break;
@@ -81,13 +81,13 @@ uint64_t Record::Write(util::BitWriter& writer) const {
         case 2:
             break;
         case 3:
-            writer.WriteBits(0, 10);  // reserved
+            writer.WriteReserved(10);
             writesize = (annotation_parameter_set_.GetSize() + 40) / 8;
             writer.WriteBits(writesize, 22);
             annotation_parameter_set_.Write(writer);
             break;
         case 4:
-            writer.WriteBits(0, 3);  // reserved
+            writer.WriteReserved(3);
             writesize = (annotation_access_unit_.GetSize() + 40) / 8;
             writer.WriteBits(writesize, 29);
             annotation_access_unit_.Write(writer);

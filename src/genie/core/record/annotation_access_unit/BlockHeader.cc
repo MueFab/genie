@@ -45,7 +45,7 @@ void BlockHeader::Write(util::BitWriter& writer) const {
         writer.WriteBits(static_cast<uint8_t>(descriptor_ID), 8);
         if (descriptor_ID == AnnotDesc::ATTRIBUTE) writer.WriteBits(attribute_ID, 16);
     }
-    writer.WriteBits(0, 2);  // reserved
+    writer.WriteReserved(2);
     writer.WriteBits(indexed, 1);
     writer.WriteBits(block_payload_size, 29);
 }

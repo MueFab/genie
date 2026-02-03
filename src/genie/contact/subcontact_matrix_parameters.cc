@@ -333,7 +333,7 @@ void SubcontactMatrixParameters::Write(util::BitWriter& writer) const {
     writer.WriteBits(chr1_ID_, 8);
     writer.WriteBits(chr2_ID_, 8);
 
-    writer.WriteBits(0, 3);  // reserved
+    writer.WriteReserved(3);
     uint8_t flags = 0u;
     flags |= (static_cast<uint8_t>(codec_ID_) & 0x1F);
     writer.WriteBits(flags, 5);
@@ -348,12 +348,12 @@ void SubcontactMatrixParameters::Write(util::BitWriter& writer) const {
                 continue;
             }
             auto& tile_param = tile_parameters_[i][j];
-            writer.WriteBits(0, 3);  // reserved
+            writer.WriteReserved(3);
             writer.WriteBits(static_cast<uint8_t>(tile_param.diag_tranform_mode), 3);
             writer.WriteBits(static_cast<uint8_t>(tile_param.binarization_mode), 2);
         }
     }
-    writer.WriteBits(0, 6);  // reserved
+    writer.WriteReserved(6);
     writer.WriteBits(static_cast<uint8_t>(row_mask_exists_flag_), 1);
     writer.WriteBits(static_cast<uint8_t>(col_mask_exists_flag_), 1);
 }

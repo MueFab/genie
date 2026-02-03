@@ -251,17 +251,17 @@ size_t GenotypeParameters::GetSize() {
 void GenotypeParameters::Write(util::BitWriter& writer) const {
   // UTILS_DIE_IF(!writer.IsByteAligned(), "Not byte aligned!");
 
-  writer.WriteBits(0u, 3);  // reserved(3)
+  writer.WriteReserved(3);
   writer.WriteBits(static_cast<uint64_t>(binarization_ID_), 3);
   writer.WriteBits(static_cast<uint64_t>(concat_axis_), 2);
 
-  writer.WriteBits(0u, 2);  // reserved(2)
+  writer.WriteReserved(2);
   writer.WriteBits(GetSortVariantsRowsFlag(), 1);
   writer.WriteBits(GetSortVariantsColsFlag(), 1);
   writer.WriteBits(GetTransposeVariantsMatFlag(), 1);
   writer.WriteBits(static_cast<uint64_t>(GetVariantsCodecID()), 3);
 
-  writer.WriteBits(0u, 1);  // reserved(1)
+  writer.WriteReserved(1);
   writer.WriteBits(GetEncodePhasesDataFlag(), 1);
   writer.WriteBits(GetSortPhasesRowsFlag(), 1);
   writer.WriteBits(GetSortPhasesColsFlag(), 1);

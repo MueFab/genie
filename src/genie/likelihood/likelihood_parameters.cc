@@ -78,7 +78,7 @@ size_t LikelihoodParameters::GetSize(util::BitWriter& writesize) const {
 
 void LikelihoodParameters::Write(util::BitWriter& writer) const {
     writer.WriteBits(num_gl_per_sample, 8);
-    writer.WriteBits(0, 7);  // reserved
+    writer.WriteReserved(7);
     writer.WriteBits(transform_flag, 1);
     if (transform_flag) writer.WriteBits(static_cast<uint64_t>(dtype_id), 8);
 }

@@ -222,8 +222,8 @@ void ContactRecord::TransposeCM() {
     std::vector<uint64_t> end_pos = std::move(end_pos1_);
     start_pos1_ = std::move(start_pos2_);
     end_pos1_ = std::move(end_pos2_);
-    start_pos2_ = std::move(start_pos1_);
-    end_pos2_ = std::move(end_pos1_);
+    start_pos2_ = std::move(start_pos);
+    end_pos2_ = std::move(end_pos);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

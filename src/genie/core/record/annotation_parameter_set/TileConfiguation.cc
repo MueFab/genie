@@ -180,12 +180,12 @@ void TileConfiguration::Write(util::BitWriter& writer) const {
     writer.WriteBits(attribute_contiguity, 1);
     writer.WriteBits(two_dimensional, 1);
     if (two_dimensional) {
-        writer.WriteBits(0, 6);
+        writer.WriteReserved(6);
         writer.WriteBits(column_major_tile_order, 1);
         writer.WriteBits(symmetry_mode, 3);
         writer.WriteBits(symmetry_minor_diagonal, 1);
     } else {
-        writer.WriteBits(0, 3);
+        writer.WriteReserved(3);
     }
     writer.WriteBits(attribute_dependent_tiles, 1);
     default_tile_structure.Write(writer);

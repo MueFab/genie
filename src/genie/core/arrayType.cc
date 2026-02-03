@@ -216,7 +216,7 @@ void ArrayType::toFile(core::DataType type, std::vector<uint8_t> bytearray, util
         if (bytearray.size() > 0)
             for (auto byte : bytearray) stringOut += byte;
         writer.Write(stringOut);
-        writer.WriteBits(0, 8);
+        writer.WriteBits(0, 8);  // string-terminator
     } else {
         uint64_t writeValue = 0;
         if (bytearray.size() == 0) {
@@ -237,7 +237,7 @@ void ArrayType::toFile(core::DataType type, util::BitReader& reader, util::BitWr
         for (uint64_t i = 0; i < number; ++i) {
             std::string temp = reader.ReadAlignedStringTerminated();
             writer.Write(temp);
-            writer.WriteBits(0, 8);
+            writer.WriteBits(0, 8);  // string-terminator
         }
     } else {
         if (number > 0) {
