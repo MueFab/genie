@@ -810,17 +810,17 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+            cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                      rec.GetChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+            cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                      rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -844,7 +844,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), NUM_TILES_IN_ROW);
         ASSERT_EQ(scm_param.GetNTilesInRow(), NUM_TILES_IN_ROW);
         ASSERT_EQ(scm_payload.GetNTilesInCol(), NUM_TILES_IN_COL);
@@ -868,30 +868,30 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
             MULT
         );
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -928,7 +928,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
 
         
 
-                cm_param.SetBinSize(RECS.front().getBinSize());
+                cm_param.SetBinSize(RECS.front().GetBinSize());
 
                 cm_param.SetTileSize(TILE_SIZE);
 
@@ -936,19 +936,19 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
 
                 for (auto& rec : RECS) {
 
-                  cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+                  cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
         
 
-                    cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                    cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
 
-                                              rec.getChr1Length());
+                                              rec.GetChr1Length());
 
         
 
-                    cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                    cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
 
-                                              rec.getChr2Length());
+                                              rec.GetChr2Length());
 
                 }
 
@@ -996,7 +996,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
 
         
 
-                ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+                ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
 
                 ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
 
@@ -1040,30 +1040,30 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
 
     
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -1108,17 +1108,17 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+            cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                      rec.GetChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+            cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                      rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1142,7 +1142,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -1167,30 +1167,30 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
             MULT
         );
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -1211,17 +1211,17 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+            cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                      rec.GetChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+            cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                      rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1245,7 +1245,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -1270,30 +1270,30 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
             MULT
         );
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -1338,17 +1338,17 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+            cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                      rec.GetChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+            cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                      rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1372,7 +1372,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -1397,30 +1397,30 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
             MULT
         );
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -1441,17 +1441,17 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+            cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                      rec.GetChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+            cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                      rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1475,7 +1475,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -1500,30 +1500,30 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
             MULT
         );
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -1585,18 +1585,18 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
         cm_param.UpsertBinSizeMultiplier(MULT);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+            cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                      rec.GetChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+            cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                      rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1620,7 +1620,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -1647,30 +1647,30 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
 
         auto& LR_REC = LR_RECS.front();
 
-        ASSERT_EQ(recon_rec.getNumEntries(), LR_REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), LR_REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(LR_REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(LR_REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(LR_REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(LR_REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(LR_REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(LR_REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(LR_REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(LR_REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(LR_REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(LR_REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -1691,18 +1691,18 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
         cm_param.UpsertBinSizeMultiplier(MULT);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+            cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                      rec.GetChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+            cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                      rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1726,7 +1726,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -1753,30 +1753,30 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
 
         auto& LR_REC = LR_RECS.front();
 
-        ASSERT_EQ(recon_rec.getNumEntries(), LR_REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), LR_REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(LR_REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(LR_REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(LR_REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(LR_REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(LR_REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(LR_REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(LR_REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(LR_REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(LR_REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(LR_REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -1818,17 +1818,17 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+            cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                      rec.GetChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+            cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                      rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1852,7 +1852,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -1871,27 +1871,27 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
 
         decode_scm(cm_param, scm_param, recon_scm_payload, recon_rec, MULT);
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             genie::contact::UInt64VecDtype recon_start1 =
-                genie::contact::create_vector(recon_rec.getStartPos1());
+                genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             genie::contact::UInt64VecDtype recon_start2 =
-                genie::contact::create_vector(recon_rec.getStartPos2());
+                genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
 //            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
             recon_end2 = genie::contact::sort(recon_end2);
             END2 = genie::contact::sort(END2);
@@ -1899,8 +1899,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
             ASSERT_TRUE(genie::contact::all(mask));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -1921,17 +1921,17 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+            cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                      rec.GetChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+            cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                      rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1955,7 +1955,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -1970,32 +1970,32 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
 
         decode_scm(cm_param, scm_param, recon_scm_payload, recon_rec, MULT);
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             genie::contact::UInt64VecDtype recon_start1 =
-                genie::contact::create_vector(recon_rec.getStartPos1());
+                genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             genie::contact::UInt64VecDtype recon_start2 =
-                genie::contact::create_vector(recon_rec.getStartPos2());
+                genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -2057,18 +2057,18 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
         cm_param.UpsertBinSizeMultiplier(MULT);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+            cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                      rec.GetChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+            cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                      rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -2092,7 +2092,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -2119,22 +2119,22 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
 
         auto& LR_REC = LR_RECS.front();
 
-        if (recon_rec.getNumEntries() != LR_REC.getNumEntries()){
-            size_t recon_num_entries = recon_rec.getNumEntries();
+        if (recon_rec.GetNumEntries() != LR_REC.GetNumEntries()){
+            size_t recon_num_entries = recon_rec.GetNumEntries();
 
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             genie::contact::UInt64VecDtype recon_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
 
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             genie::contact::UInt64VecDtype recon_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
 
-            auto recon_counts = genie::contact::create_vector(recon_rec.getCounts());
+            auto recon_counts = genie::contact::create_vector(recon_rec.GetCounts());
 
             std::map<std::pair<uint64_t, uint64_t>, uint32_t> recon_sparse_mat;
             for (auto i_entry = 0u; i_entry<recon_num_entries; i_entry++){
-                auto recon_row_id = recon_row_ids(i_entry);
-                auto recon_col_id = recon_col_ids(i_entry);
-                auto recon_count = recon_counts(i_entry);
+                auto recon_row_id = recon_row_ids[i_entry];
+                auto recon_col_id = recon_col_ids[i_entry];
+                auto recon_count = recon_counts[i_entry];
                 auto recon_row_col_id_pair = std::pair<uint64_t, uint64_t>(recon_row_id, recon_col_id);
 
                 auto it = recon_sparse_mat.find(recon_row_col_id_pair);
@@ -2142,21 +2142,21 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
                 recon_sparse_mat.emplace(recon_row_col_id_pair, recon_count);
             }
 
-            size_t lr_num_entries = LR_REC.getNumEntries();
+            size_t lr_num_entries = LR_REC.GetNumEntries();
 
-            auto lr_start1 = genie::contact::create_vector(LR_REC.getStartPos1());
+            auto lr_start1 = genie::contact::create_vector(LR_REC.GetStartPos1());
             genie::contact::UInt64VecDtype lr_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
 
-            auto lr_start2 = genie::contact::create_vector(LR_REC.getStartPos2());
+            auto lr_start2 = genie::contact::create_vector(LR_REC.GetStartPos2());
             genie::contact::UInt64VecDtype lr_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
 
-            auto lr_counts = genie::contact::create_vector(LR_REC.getCounts());
+            auto lr_counts = genie::contact::create_vector(LR_REC.GetCounts());
 
             std::map<std::pair<uint64_t, uint64_t>, uint32_t> lr_sparse_mat;
             for (auto i_entry = 0u; i_entry<recon_num_entries; i_entry++){
-                auto lr_row_id = lr_row_ids(i_entry);
-                auto lr_col_id = lr_col_ids(i_entry);
-                auto lr_count = lr_counts(i_entry);
+                auto lr_row_id = lr_row_ids[i_entry];
+                auto lr_col_id = lr_col_ids[i_entry];
+                auto lr_count = lr_counts[i_entry];
                 auto lr_row_col_id_pair = std::pair<uint64_t, uint64_t>(lr_row_id, lr_col_id);
 
                 auto it = lr_sparse_mat.find(lr_row_col_id_pair);
@@ -2165,21 +2165,21 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             }
 
             {
-                size_t hr_num_entries = REC.getNumEntries();
+                size_t hr_num_entries = REC.GetNumEntries();
 
-                auto hr_start1 = genie::contact::create_vector(REC.getStartPos1());
+                auto hr_start1 = genie::contact::create_vector(REC.GetStartPos1());
                 genie::contact::UInt64VecDtype hr_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
 
-                auto hr_start2 = genie::contact::create_vector(REC.getStartPos2());
+                auto hr_start2 = genie::contact::create_vector(REC.GetStartPos2());
                 genie::contact::UInt64VecDtype hr_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
 
-                auto hr_counts = genie::contact::create_vector(REC.getCounts());
+                auto hr_counts = genie::contact::create_vector(REC.GetCounts());
 
                 std::vector<uint64_t> tmp_counts;
                 for (auto i_entry = 0u; i_entry<hr_num_entries; i_entry++){
-                    auto hr_row_id = hr_row_ids(i_entry);
-                    auto hr_col_id = hr_col_ids(i_entry);
-                    auto hr_count = hr_counts(i_entry);
+                    auto hr_row_id = hr_row_ids[i_entry];
+                    auto hr_col_id = hr_col_ids[i_entry];
+                    auto hr_count = hr_counts[i_entry];
 
                     if (hr_row_id == 64 && hr_col_id == 201){
                         tmp_counts.push_back(hr_count);
@@ -2198,30 +2198,30 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             // auto y = 10;
         }
 
-        ASSERT_EQ(recon_rec.getNumEntries(), LR_REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), LR_REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(LR_REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(LR_REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(LR_REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(LR_REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(LR_REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(LR_REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(LR_REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(LR_REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(LR_REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(LR_REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -2242,18 +2242,18 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
         cm_param.UpsertBinSizeMultiplier(MULT);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+            cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                      rec.GetChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+            cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                      rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -2277,7 +2277,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -2304,30 +2304,30 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
 
         auto& LR_REC = LR_RECS.front();
 
-        ASSERT_EQ(recon_rec.getNumEntries(), LR_REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), LR_REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(LR_REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(LR_REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(LR_REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(LR_REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(LR_REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(LR_REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(LR_REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(LR_REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(LR_REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(LR_REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -2371,17 +2371,17 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+            cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                      rec.GetChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+            cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                      rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -2405,7 +2405,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -2430,31 +2430,31 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
             MULT
         );
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             auto mask = genie::contact::not_equal(START1, recon_start1);
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -2475,17 +2475,17 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                      rec.getChr1Length());
+            cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                      rec.GetChr1Length());
 
-            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                      rec.getChr2Length());
+            cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                      rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -2509,7 +2509,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -2534,30 +2534,30 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
             MULT
         );
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -2620,18 +2620,18 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
         cm_param.UpsertBinSizeMultiplier(MULT);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                    rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                    rec.GetChr1Length());
 
-          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                    rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                    rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -2655,7 +2655,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -2682,22 +2682,22 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
 
         auto& LR_REC = LR_RECS.front();
 
-        if (recon_rec.getNumEntries() != LR_REC.getNumEntries()){
-            size_t recon_num_entries = recon_rec.getNumEntries();
+        if (recon_rec.GetNumEntries() != LR_REC.GetNumEntries()){
+            size_t recon_num_entries = recon_rec.GetNumEntries();
 
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             genie::contact::UInt64VecDtype recon_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
 
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             genie::contact::UInt64VecDtype recon_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
 
-            auto recon_counts = genie::contact::create_vector(recon_rec.getCounts());
+            auto recon_counts = genie::contact::create_vector(recon_rec.GetCounts());
 
             std::map<std::pair<uint64_t, uint64_t>, uint32_t> recon_sparse_mat;
             for (auto i_entry = 0u; i_entry<recon_num_entries; i_entry++){
-                auto recon_row_id = recon_row_ids(i_entry);
-                auto recon_col_id = recon_col_ids(i_entry);
-                auto recon_count = recon_counts(i_entry);
+                auto recon_row_id = recon_row_ids[i_entry];
+                auto recon_col_id = recon_col_ids[i_entry];
+                auto recon_count = recon_counts[i_entry];
                 auto recon_row_col_id_pair = std::pair<uint64_t, uint64_t>(recon_row_id, recon_col_id);
 
                 auto it = recon_sparse_mat.find(recon_row_col_id_pair);
@@ -2705,21 +2705,21 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
                 recon_sparse_mat.emplace(recon_row_col_id_pair, recon_count);
             }
 
-            size_t lr_num_entries = LR_REC.getNumEntries();
+            size_t lr_num_entries = LR_REC.GetNumEntries();
 
-            auto lr_start1 = genie::contact::create_vector(LR_REC.getStartPos1());
+            auto lr_start1 = genie::contact::create_vector(LR_REC.GetStartPos1());
             genie::contact::UInt64VecDtype lr_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
 
-            auto lr_start2 = genie::contact::create_vector(LR_REC.getStartPos2());
+            auto lr_start2 = genie::contact::create_vector(LR_REC.GetStartPos2());
             genie::contact::UInt64VecDtype lr_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
 
-            auto lr_counts = genie::contact::create_vector(LR_REC.getCounts());
+            auto lr_counts = genie::contact::create_vector(LR_REC.GetCounts());
 
             std::map<std::pair<uint64_t, uint64_t>, uint32_t> lr_sparse_mat;
             for (auto i_entry = 0u; i_entry<recon_num_entries; i_entry++){
-                auto lr_row_id = lr_row_ids(i_entry);
-                auto lr_col_id = lr_col_ids(i_entry);
-                auto lr_count = lr_counts(i_entry);
+                auto lr_row_id = lr_row_ids[i_entry];
+                auto lr_col_id = lr_col_ids[i_entry];
+                auto lr_count = lr_counts[i_entry];
                 auto lr_row_col_id_pair = std::pair<uint64_t, uint64_t>(lr_row_id, lr_col_id);
 
                 auto it = lr_sparse_mat.find(lr_row_col_id_pair);
@@ -2736,30 +2736,30 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
             // auto y = 10;
         }
 
-        ASSERT_EQ(recon_rec.getNumEntries(), LR_REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), LR_REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(LR_REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(LR_REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(LR_REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(LR_REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(LR_REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(LR_REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(LR_REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(LR_REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(LR_REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(LR_REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -2780,18 +2780,18 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
         cm_param.UpsertBinSizeMultiplier(MULT);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                    rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                    rec.GetChr1Length());
 
-          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                    rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                    rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -2815,7 +2815,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -2842,30 +2842,30 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
 
         auto& LR_REC = LR_RECS.front();
 
-        ASSERT_EQ(recon_rec.getNumEntries(), LR_REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), LR_REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(LR_REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(LR_REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(LR_REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(LR_REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(LR_REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(LR_REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(LR_REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(LR_REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(LR_REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(LR_REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -2988,17 +2988,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                    rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                    rec.GetChr1Length());
 
-          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                    rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                    rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3037,12 +3037,12 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             }
             {
                 std::ofstream tmp_writer(out_path + "case01-cm_param.bin", std::ios::binary);
-                genie::core::Writer tmp_corewriter(&tmp_writer);
+                genie::util::BitWriter tmp_corewriter(&tmp_writer);
                 cm_param.Write(tmp_corewriter);
             }
         }
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -3067,30 +3067,30 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             MULT
         );
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -3112,17 +3112,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                    rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                    rec.GetChr1Length());
 
-          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                    rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                    rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3146,7 +3146,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -3161,30 +3161,30 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
 
         decode_scm(cm_param, scm_param, recon_scm_payload, recon_rec, MULT);
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -3211,17 +3211,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                    rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                    rec.GetChr1Length());
 
-          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                    rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                    rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3245,7 +3245,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -3270,30 +3270,30 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             MULT
         );
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -3314,17 +3314,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                    rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                    rec.GetChr1Length());
 
-          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                    rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                    rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3348,7 +3348,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -3373,30 +3373,30 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             MULT
         );
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -3421,17 +3421,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                    rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                    rec.GetChr1Length());
 
-          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                    rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                    rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3455,7 +3455,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -3474,27 +3474,27 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
 
         decode_scm(cm_param, scm_param, recon_scm_payload, recon_rec, MULT);
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             genie::contact::UInt64VecDtype recon_start1 =
-                genie::contact::create_vector(recon_rec.getStartPos1());
+                genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             genie::contact::UInt64VecDtype recon_start2 =
-                genie::contact::create_vector(recon_rec.getStartPos2());
+                genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
 //            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
             recon_end2 = genie::contact::sort(recon_end2);
             END2 = genie::contact::sort(END2);
@@ -3502,8 +3502,8 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             ASSERT_TRUE(genie::contact::all(mask));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -3524,17 +3524,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                    rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                    rec.GetChr1Length());
 
-          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                    rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                    rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3558,7 +3558,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -3573,32 +3573,32 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
 
         decode_scm(cm_param, scm_param, recon_scm_payload, recon_rec, MULT);
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             genie::contact::UInt64VecDtype recon_start1 =
-                genie::contact::create_vector(recon_rec.getStartPos1());
+                genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             genie::contact::UInt64VecDtype recon_start2 =
-                genie::contact::create_vector(recon_rec.getStartPos2());
+                genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -3623,17 +3623,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                    rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                    rec.GetChr1Length());
 
-          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                    rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                    rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3657,7 +3657,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -3682,31 +3682,31 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             MULT
         );
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             auto mask = genie::contact::not_equal(START1, recon_start1);
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }
@@ -3727,17 +3727,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
+          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
-          cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                    rec.getChr1Length());
+          cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                    rec.GetChr1Length());
 
-          cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                    rec.getChr2Length());
+          cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                    rec.GetChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3761,7 +3761,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.GetSampleID());
         ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
         ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
         ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
@@ -3786,30 +3786,30 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             MULT
         );
 
-        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
-            auto START1 = genie::contact::create_vector(REC.getStartPos1());
-            auto recon_start1 = genie::contact::create_vector(recon_rec.getStartPos1());
+            auto START1 = genie::contact::create_vector(REC.GetStartPos1());
+            auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
             ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
         }
         {
-            auto END1 = genie::contact::create_vector(REC.getEndPos1());
-            auto recon_end1 = genie::contact::create_vector(recon_rec.getEndPos1());
+            auto END1 = genie::contact::create_vector(REC.GetEndPos1());
+            auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
             ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
         }
         {
-            auto START2 = genie::contact::create_vector(REC.getStartPos2());
-            auto recon_start2 = genie::contact::create_vector(recon_rec.getStartPos2());
+            auto START2 = genie::contact::create_vector(REC.GetStartPos2());
+            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
         }
         {
-            auto END2 = genie::contact::create_vector(REC.getEndPos2());
-            auto recon_end2 = genie::contact::create_vector(recon_rec.getEndPos2());
+            auto END2 = genie::contact::create_vector(REC.GetEndPos2());
+            auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
             ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
-            auto COUNT = genie::contact::create_vector(REC.getCounts());
-            auto recon_count = genie::contact::create_vector(recon_rec.getCounts());
+            auto COUNT = genie::contact::create_vector(REC.GetCounts());
+            auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
             ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
         }
     }

@@ -7,14 +7,9 @@
 #include "genotype_parameters.h"
 #include "genotype_payload.h"
 #include "genie/core/variant_genotype_record/record.h"
+#include "genotype_types.h"
 
 namespace genie::genotype::detail::eigen {
-
-// TODO: Define correct Eigen types
-using BinMatDtype = Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
-using UInt8MatDtype = Eigen::Matrix<uint8_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
-using Int8MatDtype = Eigen::Matrix<int8_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
-using UIntVecDtype = Eigen::Matrix<uint32_t, Eigen::Dynamic, 1>;
 
 void decompose(
     std::vector<core::record::VariantGenotype>& recs,

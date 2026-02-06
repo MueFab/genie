@@ -9,35 +9,34 @@
 
 #include <cmath>
 #include <tuple>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#include <xtensor/xindex_view.hpp>
-#include <xtensor/xrandom.hpp>
-#include <xtensor/xsort.hpp>
-#include <xtensor/xview.hpp>
-#pragma GCC diagnostic pop
+#include <sstream>
+#include <vector>
 
 #include "genie/core/variant_genotype_record/record.h"
 #include "likelihood_parameters.h"
+#include "likelihood_types.h"
 
-// #include <xtensor/xstrided_view.hpp>
+// Backend Selection
+#if defined(GENIE_LIKELIHOOD_BACKEND_XTENSOR)
+    #include "likelihood_coder_xtensor.h"
+    namespace genie::likelihood {
+        namespace backend = detail::xtensor;
+    }
+#elif defined(GENIE_LIKELIHOOD_BACKEND_EIGEN)
+    #include "likelihood_coder_eigen.h"
+    namespace genie::likelihood {
+        namespace backend = detail::eigen;
+    }
+#else // Default to STD
+    #include "likelihood_coder_std.h"
+    namespace genie::likelihood {
+        namespace backend = detail::std_lib;
+    }
+#endif
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-namespace genie {
-namespace likelihood {
+namespace genie::likelihood {
 
 class LikelihoodPayload;
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-using UInt32ArrDtype = xt::xtensor<uint32_t, 1, xt::layout_type::row_major>;
-// using FP32MatDtype = xt::xtensor<uint32_t, 2, xt::layout_type::row_major>;
-// using UInt8MatDtype = xt::xtensor<uint8_t, 2, xt::layout_type::row_major>;
-// using UInt16MatDtype = xt::xtensor<uint16_t, 2, xt::layout_type::row_major>;
-using UInt32MatDtype = xt::xtensor<uint32_t, 2, xt::layout_type::row_major>;
-using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -96,60 +95,76 @@ struct EncodingBlock {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void extract_likelihoods(
+inline void extract_likelihoods(
     const EncodingOptions& opt,
     EncodingBlock& block,
-    std::vector<core::record::VariantGenotype>& recs);
+    std::vector<core::record::VariantGenotype>& recs
+) {
+    backend::extract_likelihoods(opt, block, recs);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block);
+inline void transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block) {
+    backend::transform_likelihood_mat(opt, block);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block);
+inline void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block) {
+    backend::inverse_transform_likelihood_mat(opt, block);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, uint32_t& nelems, UInt32MatDtype& idx_mat,
-                   core::DataType& dtype_id);
+inline void transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, uint32_t& nelems, UInt32MatDtype& idx_mat,
+                   core::DataType& dtype_id) {
+    backend::transform_lut(likelihood_mat, lut, nelems, idx_mat, dtype_id);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void inverse_transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, UInt32MatDtype& idx_mat);
+inline void inverse_transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, UInt32MatDtype& idx_mat) {
+    backend::inverse_transform_lut(likelihood_mat, lut, idx_mat);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void serialize_mat(UInt32MatDtype mat, core::DataType dtype_id, uint32_t& nrows, uint32_t& ncols,
-                   std::stringstream& payload);
+inline void serialize_mat(UInt32MatDtype mat, core::DataType dtype_id, uint32_t& nrows, uint32_t& ncols,
+                   std::stringstream& payload) {
+    backend::serialize_mat(mat, dtype_id, nrows, ncols, payload);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void serialize_arr(UInt32ArrDtype arr, uint32_t nelems, std::stringstream& payload);
+inline void serialize_arr(UInt32ArrDtype arr, uint32_t nelems, std::stringstream& payload) {
+    backend::serialize_arr(arr, nelems, payload);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void encode_likelihood(
+inline void encode_likelihood(
     // Inputs
     std::vector<core::record::VariantGenotype>& recs,
     // Outputs
     LikelihoodParameters& params, LikelihoodPayload& payload,
     // Options
-    size_t block_size = 512, bool transform_flag = true);
+    size_t block_size = 512, bool transform_flag = true) {
+    backend::encode_likelihood(recs, params, payload, block_size, transform_flag);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void decode_likelihood(
+inline void decode_likelihood(
     // Inputs
     const LikelihoodParameters& params, LikelihoodPayload& payload,
     // Outputs
-    std::vector<core::record::VariantGenotype>& recs);
+    std::vector<core::record::VariantGenotype>& recs) {
+    backend::decode_likelihood(params, payload, recs);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace likelihood
-}  // namespace genie
-
-// ---------------------------------------------------------------------------------------------------------------------
+}  // namespace genie::likelihood
 
 #endif  // GENIE_LIKELIHOOD_LIKELIHOOD_CODER_H

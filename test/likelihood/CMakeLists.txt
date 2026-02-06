@@ -3,11 +3,6 @@ project("genie-test-likelihood")
 set(XTENSOR_USE_XSIMD 0)
 set(XTENSOR_USE_TBB 0)
 
-find_package(xtl REQUIRED)
-find_package(xtensor REQUIRED)
-
-message(STATUS "xtensor: ${xtensor_INCLUDE_DIRS}")
-
 set(source_files
         helpers.cc
         encode-test.cc
@@ -35,7 +30,6 @@ endif ()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main)
 #target_link_libraries(${PROJECT_NAME} PRIVATE xtensor xtensor::optimize)
-target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 #target_link_libraries(${PROJECT_NAME} PRIVATE genie-gvc)

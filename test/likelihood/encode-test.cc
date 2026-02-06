@@ -7,10 +7,6 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <vector>
-//#include <xtensor/xmath.hpp>
-//#include <xtensor/xoperation.hpp>
-//#include <xtensor/xrandom.hpp>
-//#include <xtensor/xview.hpp>
 #include <codecs/include/mpegg-codecs.h>
 #include "genie/core/constants.h"
 #include "genie/core/variant_genotype_record/record.h"
@@ -51,11 +47,11 @@ TEST(Likelihood, ParseLikelihood) {
 
     auto& likelihood_mat = block.likelihood_mat;
 
-    ASSERT_EQ(likelihood_mat.dimension(), 2);
-    ASSERT_EQ(likelihood_mat.shape(0), BLOCK_SIZE);
-    ASSERT_EQ(likelihood_mat.shape(1), 1092 * 3);
-    ASSERT_EQ(likelihood_mat(0, 4), 3197737370);  // TODO (Yeremia): Check whats the value at this position
-    ASSERT_EQ(likelihood_mat(0, 8), 3241567846);  // TODO (Yeremia): Check whats the value at this position
+    ASSERT_FALSE(likelihood_mat.empty());
+    ASSERT_EQ(likelihood_mat.size(), BLOCK_SIZE);
+    ASSERT_EQ(likelihood_mat[0].size(), 1092 * 3);
+    ASSERT_EQ(likelihood_mat[0][4], 3197737370);  // TODO (Yeremia): Check whats the value at this position
+    ASSERT_EQ(likelihood_mat[0][8], 3241567846);  // TODO (Yeremia): Check whats the value at this position
 }
 
 TEST(Likelihood, RoundTripNoTransform) {
@@ -84,20 +80,19 @@ TEST(Likelihood, RoundTripNoTransform) {
     };
 
     genie::likelihood::EncodingBlock block{};
-    auto& likelihood_mat = block.likelihood_mat;
     genie::likelihood::extract_likelihoods(opt, block, recs);
+    
+    // Capture original data for verification
+    auto original_likelihood_mat = block.likelihood_mat;
 
     genie::likelihood::transform_likelihood_mat(opt, block);
-    genie::likelihood::UInt32MatDtype recon_likelihood_mat;
 
-    block.likelihood_mat = xt::empty<uint32_t>({0});
+    block.likelihood_mat.clear();
 
     genie::likelihood::inverse_transform_likelihood_mat(opt, block);
-    recon_likelihood_mat = xt::empty_like(block.likelihood_mat);
-    xt::view(recon_likelihood_mat, xt::all(), xt::all()) = xt::view(block.likelihood_mat, xt::all(), xt::all());
 
     ASSERT_TRUE(block.dtype_id == genie::core::DataType::UINT32);
-    ASSERT_TRUE(xt::all(xt::equal(likelihood_mat, recon_likelihood_mat)));
+    ASSERT_EQ(original_likelihood_mat, block.likelihood_mat);
 }
 
 TEST(Likelihood, RoundTripTransform) {
@@ -127,20 +122,19 @@ TEST(Likelihood, RoundTripTransform) {
     };
 
     genie::likelihood::EncodingBlock block{};
-    auto& likelihood_mat = block.likelihood_mat;
     genie::likelihood::extract_likelihoods(opt, block, recs);
 
-    transform_likelihood_mat(opt, block);
-    genie::likelihood::UInt32MatDtype recon_likelihood_mat;
+    // Capture original data for verification
+    auto original_likelihood_mat = block.likelihood_mat;
+
+    genie::likelihood::transform_likelihood_mat(opt, block);
  
-    block.likelihood_mat = xt::empty<uint32_t>({0});
+    block.likelihood_mat.clear();
 
     genie::likelihood::inverse_transform_likelihood_mat(opt, block);
-    recon_likelihood_mat = xt::empty_like(block.likelihood_mat);
-    xt::view(recon_likelihood_mat, xt::all(), xt::all()) = xt::view(block.likelihood_mat, xt::all(), xt::all());
 
     ASSERT_TRUE(block.dtype_id == genie::core::DataType::UINT16);
-    ASSERT_TRUE(xt::all(xt::equal(likelihood_mat, recon_likelihood_mat)));
+    ASSERT_EQ(original_likelihood_mat, block.likelihood_mat);
 }
 
 TEST(Likelihood, RoundTripNoTransformEncode) {
@@ -173,7 +167,6 @@ TEST(Likelihood, RoundTripNoTransformEncode) {
     genie::likelihood::extract_likelihoods(opt, block, recs);
 
     transform_likelihood_mat(opt, block);
-    genie::likelihood::UInt32MatDtype recon_likelihood_mat;
 
     genie::likelihood::serialize_mat(block.idx_mat, block.dtype_id, block.nrows, block.ncols, block.serialized_mat);
 
@@ -187,12 +180,6 @@ TEST(Likelihood, RoundTripNoTransformEncode) {
 
     block.serialized_mat.seekp(0, std::ios::end);
     ASSERT_EQ((size_t)block.serialized_mat.tellp(), target_serialized_mat_len);
-
-    //    block.serialized_arr.seekp(0, std::ios::end);
-    //    ASSERT_EQ(
-    //        (size_t) block.serialized_arr.tellp(),
-    //        block.lut.size() * 4
-    //    );
 
     const std::string& serialized_mat_str = block.serialized_mat.str();
     size_t serialized_mat_len = (size_t)block.serialized_mat.tellp();
@@ -255,7 +242,6 @@ TEST(Likelihood, RoundTripTransformEncode) {
     genie::likelihood::extract_likelihoods(opt, block, recs);
 
     transform_likelihood_mat(opt, block);
-    genie::likelihood::UInt32MatDtype recon_likelihood_mat;
 
     genie::likelihood::serialize_mat(block.idx_mat, block.dtype_id, block.nrows, block.ncols, block.serialized_mat);
 

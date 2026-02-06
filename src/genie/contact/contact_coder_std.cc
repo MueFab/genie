@@ -209,6 +209,12 @@ void remove_unaligned(
         }
 
         for (size_t i = 0u; i<num_entries; i++){
+            if (row_ids[i] >= mapping_len || col_ids[i] >= mapping_len) {
+                 // Skip or handle out of bounds? 
+                 // For now, strict check to see if this is the cause.
+                 // Actually, throwing error is better than segfault.
+                 UTILS_DIE("Row/Col ID out of bounds in remove_unaligned!");
+            }
             row_ids[i] = mapping[row_ids[i]];
             col_ids[i] = mapping[col_ids[i]];
         }
@@ -226,6 +232,7 @@ void remove_unaligned(
         }
         auto num_entries = row_ids.size();
         for (size_t i = 0u; i<num_entries; i++){
+            if (row_ids[i] >= row_mapping_len) UTILS_DIE("Row ID out of bounds in remove_unaligned!");
             row_ids[i] = row_mapping[row_ids[i]];
         }
 
@@ -242,6 +249,7 @@ void remove_unaligned(
         }
         num_entries = col_ids.size();
         for (size_t i = 0u; i<num_entries; i++){
+            if (col_ids[i] >= col_mapping_len) UTILS_DIE("Col ID out of bounds in remove_unaligned!");
             col_ids[i] = col_mapping[col_ids[i]];
         }
     }
@@ -272,6 +280,7 @@ void insert_unaligned(
         }
 
         for (size_t i = 0u; i<num_entries; i++){
+            if (row_ids[i] >= mapping.size() || col_ids[i] >= mapping.size()) UTILS_DIE("ID out of mapping bounds in insert_unaligned!");
             row_ids[i] = mapping[row_ids[i]];
             col_ids[i] = mapping[col_ids[i]];
         }
@@ -287,6 +296,7 @@ void insert_unaligned(
             }
 
             for (size_t i = 0u; i<num_entries; i++){
+                if (row_ids[i] >= mapping.size()) UTILS_DIE("Row ID out of mapping bounds in insert_unaligned!");
                 row_ids[i] = mapping[row_ids[i]];
             }
         }
@@ -300,6 +310,7 @@ void insert_unaligned(
                 }
             }
             for (size_t i = 0u; i<num_entries; i++){
+                if (col_ids[i] >= mapping.size()) UTILS_DIE("Col ID out of mapping bounds in insert_unaligned!");
                 col_ids[i] = mapping[col_ids[i]];
             }
         }
@@ -328,7 +339,7 @@ void sparse_to_dense(
     mat.assign(nrows, std::vector<uint32_t>(ncols, 0));
 
     for (size_t i = 0u; i< counts.size(); i++){
-        mat[row_ids[i]][col_ids[i]] = counts[i];
+        mat[row_ids[i]][col_ids[i]] += counts[i];
     }
 }
 
@@ -408,6 +419,23 @@ void sort_sparse_mat_inplace(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::vector<int64_t> get_diag_ids(size_t nrows, size_t ncols, DiagonalTransformMode mode) {
+    std::vector<int64_t> diag_ids;
+    if (mode == DiagonalTransformMode::MODE_1) {
+        diag_ids.push_back(0);
+        auto ndiags = std::max((int64_t)nrows, (int64_t)ncols);
+        for (int64_t diag_id = 1; diag_id < ndiags; diag_id++) {
+            if (diag_id < (int64_t)ncols) diag_ids.push_back(diag_id);
+            if (diag_id < (int64_t)nrows) diag_ids.push_back(-diag_id);
+        }
+    } else if (mode == DiagonalTransformMode::MODE_2) {
+        for (int64_t i = -(int64_t)nrows + 1; i < (int64_t)ncols; ++i) diag_ids.push_back(i);
+    } else if (mode == DiagonalTransformMode::MODE_3) {
+        for (int64_t i = (int64_t)ncols - 1; i > -(int64_t)nrows; --i) diag_ids.push_back(i);
+    }
+    return diag_ids;
+}
+
 void inverse_diag_transform(
     std::vector<std::vector<uint32_t>>& mat,
     DiagonalTransformMode mode
@@ -448,6 +476,38 @@ void inverse_diag_transform(
         }
         end_mode_0_inverse_transform:;
         mat = trans_mat;
+    } else {
+        trans_mat.assign(nrows, std::vector<uint32_t>(ncols, 0));
+        auto diag_ids = get_diag_ids(nrows, ncols, mode);
+
+        int64_t target_i, target_j;
+        int64_t i_offset, j_offset;
+        int64_t nelems_in_diag;
+        auto o = 0u;
+        for (auto diag_id : diag_ids){
+            if (diag_id >= 0) {
+                nelems_in_diag = std::max((int64_t)nrows, (int64_t)ncols) - diag_id;
+                i_offset = 0;
+                j_offset = diag_id;
+            } else {
+                nelems_in_diag = std::max((int64_t)nrows, (int64_t)ncols) + diag_id;
+                i_offset = -diag_id;
+                j_offset = 0;
+            }
+            for (int64_t k_diag = 0; k_diag < nelems_in_diag; k_diag++){
+                target_i = k_diag + i_offset;
+                target_j = k_diag + j_offset;
+                if (target_i >= (int64_t)nrows || target_j >= (int64_t)ncols) break;
+
+                size_t i = o / ncols;
+                size_t j = o % ncols;
+                if (i < nrows && j < ncols) {
+                    trans_mat[target_i][target_j] = mat[i][j];
+                }
+                o++;
+            }
+        }
+        mat = trans_mat;
     }
 }
 
@@ -487,6 +547,39 @@ void diag_transform(
 
                 if (target_i < new_nrows && target_j < ncols) {
                     trans_mat[target_i][target_j] = v;
+                }
+                o++;
+            }
+        }
+        mat = trans_mat;
+    } else {
+        trans_mat.assign(nrows, std::vector<uint32_t>(ncols, 0));
+        auto diag_ids = get_diag_ids(nrows, ncols, mode);
+
+        int64_t i, j;
+        int64_t i_offset, j_offset;
+        int64_t nelems_in_diag;
+        auto o = 0u;
+        for (auto diag_id : diag_ids){
+            if (diag_id >= 0) {
+                nelems_in_diag = std::max((int64_t)nrows, (int64_t)ncols) - diag_id;
+                i_offset = 0;
+                j_offset = diag_id;
+            } else {
+                nelems_in_diag = std::max((int64_t)nrows, (int64_t)ncols) + diag_id;
+                i_offset = -diag_id;
+                j_offset = 0;
+            }
+            for (int64_t k_diag = 0; k_diag < nelems_in_diag; k_diag++){
+                i = k_diag + i_offset;
+                j = k_diag + j_offset;
+                if (i >= (int64_t)nrows || j >= (int64_t)ncols) break;
+
+                auto v = mat[i][j];
+                size_t new_i = o / ncols;
+                size_t new_j = o % ncols;
+                if (new_i < nrows && new_j < ncols) {
+                    trans_mat[new_i][new_j] = v;
                 }
                 o++;
             }
@@ -931,7 +1024,8 @@ void decode_scm(
                     tile_row_ids,
                     tile_col_ids,
                     tile_counts,
-                    bin_size_mult
+                    bin_size_mult,
+                    false
                 );
             }
 
@@ -1018,12 +1112,16 @@ void encode_scm(
 
   // Convert std::vector from record to xtensor
   std::vector<uint64_t> row_ids = rec.GetStartPos1();
-  for(auto& id : row_ids) id /= interval;
-
   std::vector<uint64_t> col_ids = rec.GetStartPos2();
-  for(auto& id : col_ids) id /= interval;
-
   std::vector<uint32_t> counts = rec.GetCounts();
+
+  for(size_t k=0; k<row_ids.size(); ++k) {
+      row_ids[k] /= interval;
+      col_ids[k] /= interval;
+      if (is_intra_scm && row_ids[k] > col_ids[k]) {
+          std::swap(row_ids[k], col_ids[k]);
+      }
+  }
 
   if (remove_unaligned_region){
       compute_masks(

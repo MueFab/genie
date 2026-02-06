@@ -32,13 +32,15 @@ void compute_mask(
     // Output
     BinVecDtype& mask
 ){
-//    auto nelems = xt::amax(ids)(0)+1;
-    mask = xt::zeros<bool>({nelems});
+    auto xt_ids = xt::adapt(ids, {ids.size()});
+    auto xt_mask = xt::zeros<bool>({nelems});
 
-    UInt64VecDtype unique_ids = xt::unique(ids);
+    auto unique_ids = xt::unique(xt_ids);
     for (auto id: unique_ids){
-        mask(id) = true;
+        if (id < nelems) xt_mask(id) = true;
     }
+    
+    mask.assign(xt_mask.begin(), xt_mask.end());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -54,7 +56,7 @@ void compute_masks(
     BinVecDtype& row_mask,
     BinVecDtype& col_mask
 ){
-    UTILS_DIE_IF(row_ids.shape(0) != col_ids.shape(0),
+    UTILS_DIE_IF(row_ids.size() != col_ids.size(),
                  "The size of row_ids and col_ids must be same!");
 
     if (is_intra_scm){
@@ -62,21 +64,23 @@ void compute_masks(
             "Both nentries must be the same for intra SCM!"
         );
 
-        BinVecDtype mask;
+        auto xt_row_ids = xt::adapt(row_ids, {row_ids.size()});
+        auto xt_col_ids = xt::adapt(col_ids, {col_ids.size()});
 
         // Handle the symmetry of intra SCM
-        UInt64VecDtype ids = xt::concatenate(xt::xtuple(row_ids, col_ids));
-        ids = xt::unique(ids);
+        auto ids = xt::concatenate(xt::xtuple(xt_row_ids, xt_col_ids));
+        auto unique_ids = xt::unique(ids);
+        
+        auto xt_mask = xt::zeros<bool>({nrows});
+        for (auto id : unique_ids) {
+            if (id < nrows) xt_mask(id) = true;
+        }
 
-        compute_mask(ids, nrows, mask);
-
-        row_mask.resize(mask.shape());
-        row_mask = BinVecDtype(mask);
-        col_mask.resize(mask.shape());
-        col_mask = BinVecDtype(std::move(mask));
+        row_mask.assign(xt_mask.begin(), xt_mask.end());
+        col_mask = row_mask;
     } else {
-        compute_mask(row_ids, nrows, row_mask);
-        compute_mask(col_ids, ncols, col_mask);
+        detail::xtensor::compute_mask(row_ids, nrows, row_mask);
+        detail::xtensor::compute_mask(col_ids, ncols, col_mask);
     }
 }
 
@@ -95,17 +99,17 @@ void decode_scm_masks(
     auto col_nentries = cm_param.GetNumBinEntries(scm_param.GetChr2ID());
 
     if (scm_param.GetRowMaskExistsFlag()){
-        decode_scm_mask_payload(scm_payload.GetRowMaskPayload(), row_nentries, row_mask);
+        detail::xtensor::decode_scm_mask_payload(scm_payload.GetRowMaskPayload(), row_nentries, row_mask);
     } else {
-        row_mask = xt::ones<bool>({row_nentries});
+        row_mask.assign(row_nentries, true);
     }
 
     if (scm_param.IsIntraSCM()){
         col_mask = row_mask;
     } else if (scm_param.GetColMaskExistsFlag()){
-        decode_scm_mask_payload(scm_payload.GetColMaskPayload(), col_nentries, col_mask);
+        detail::xtensor::decode_scm_mask_payload(scm_payload.GetColMaskPayload(), col_nentries, col_mask);
     } else {
-        col_mask = xt::ones<bool>({col_nentries});
+        col_mask.assign(col_nentries, true);
     }
 }
 
@@ -125,9 +129,9 @@ void decode_scm_mask_payload(
             num_entries != mask_array.size(),
             "num_entries and the size of mask_array_ differ!"
         );
-        mask = xt::adapt(mask_array, {mask_array.size()});
+        mask = mask_array;
     } else {
-        mask.resize({num_entries});
+        mask.assign(num_entries, false);
 
         bool first_val = mask_payload.GetFirstVal();
         auto& rl_entries = mask_payload.GetRlEntries();
@@ -136,8 +140,7 @@ void decode_scm_mask_payload(
         size_t end_idx = 0;
         for (const auto& rl_entry: rl_entries){
             end_idx += rl_entry;
-            // This is the for-loop for assigning the values based on run-lenght
-            xt::view(mask, xt::range(start_idx, end_idx)) = first_val;
+            std::fill(mask.begin() + start_idx, mask.begin() + std::min(end_idx, num_entries), first_val);
             start_idx = end_idx;
             first_val = !first_val;
         }
@@ -145,8 +148,9 @@ void decode_scm_mask_payload(
             start_idx > num_entries,
             "start_idx value must be smaller than num_entries!"
         );
-        // This is the for-loop for assigning the remaining values
-        xt::view(mask, xt::range(start_idx, num_entries)) = first_val;
+        if (start_idx < num_entries) {
+            std::fill(mask.begin() + start_idx, mask.end(), first_val);
+        }
     }
 }
 
@@ -159,7 +163,7 @@ void remove_unaligned(
     const BinVecDtype& row_mask,
     const BinVecDtype& col_mask
 ){
-    UTILS_DIE_IF(row_ids.shape(0) != col_ids.shape(0),
+    UTILS_DIE_IF(row_ids.size() != col_ids.size(),
                  "The size of row_ids and col_ids must be same!");
 
 
@@ -167,67 +171,47 @@ void remove_unaligned(
         //TODO(yeremia): to be deleted!
         UTILS_DIE_IF(row_mask != col_mask, "row_mask and col_mask are different!");
 
-        auto num_entries = row_ids.shape(0);
-        auto& mask = row_mask; // Note: Does not matter either row_mask or col_mask
-        auto mapping_len = mask.shape(0);
-        UInt64VecDtype mapping = xt::empty<uint64_t>({mapping_len});
+        auto num_entries = row_ids.size();
+        auto mapping_len = row_mask.size();
+        std::vector<uint64_t> mapping(mapping_len);
         uint64_t new_id = 0u;
-        for (auto i = 0u; i<mapping_len; i++){
-            mapping(i) = new_id;
-            auto v = mask(i);
-            if (v){
+        for (size_t i = 0u; i<mapping_len; i++){
+            mapping[i] = new_id;
+            if (row_mask[i]){
                 new_id++;
             }
         }
 
-        for (auto i = 0u; i<num_entries; i++){
-            auto old_row_id = row_ids(i);
-            auto new_row_id = mapping(old_row_id);
-            row_ids(i) = new_row_id;
-        }
-        for (auto i = 0u; i<num_entries; i++){
-            auto old_col_id = col_ids(i);
-            auto new_col_id = mapping(old_col_id);
-            col_ids(i) = new_col_id;
+        for (size_t i = 0u; i<num_entries; i++){
+            row_ids[i] = mapping[row_ids[i]];
+            col_ids[i] = mapping[col_ids[i]];
         }
     } else {
-        auto row_mapping_len = row_mask.shape(0);
-        auto row_mapping = xt::empty<uint64_t>({row_mapping_len});
+        auto row_mapping_len = row_mask.size();
+        std::vector<uint64_t> row_mapping(row_mapping_len);
         {
             uint64_t new_id = 0u;
-            for (auto i = 0u; i<row_mapping_len; i++){
-                row_mapping(i) = new_id;
-                auto v = row_mask(i);
-                if (v){
+            for (size_t i = 0u; i<row_mapping_len; i++){
+                row_mapping[i] = new_id;
+                if (row_mask[i]){
                     new_id++;
                 }
             }
         }
-        auto num_entries = row_ids.shape(0);
-        for (auto i = 0u; i<num_entries; i++){
-            auto old_row_id = row_ids(i);
-            auto new_row_id = row_mapping(old_row_id);
-            row_ids(i) = new_row_id;
-        }
+        for (auto& row_id : row_ids) row_id = row_mapping[row_id];
 
-        auto col_mapping_len = col_mask.shape(0);
-        auto col_mapping = xt::empty<uint64_t>({col_mapping_len});
+        auto col_mapping_len = col_mask.size();
+        std::vector<uint64_t> col_mapping(col_mapping_len);
         {
             uint64_t new_id = 0u;
-            for (auto i = 0u; i<col_mapping_len; i++){
-                col_mapping(i) = new_id;
-                auto v = col_mask(i);
-                if (v){
+            for (size_t i = 0u; i<col_mapping_len; i++){
+                col_mapping[i] = new_id;
+                if (col_mask[i]){
                     new_id++;
                 }
             }
         }
-        num_entries = col_ids.shape(0);
-        for (auto i = 0u; i<num_entries; i++){
-            auto old_col_id = col_ids(i);
-            auto new_col_id = col_mapping(old_col_id);
-            col_ids(i) = new_col_id;
-        }
+        for (auto& col_id : col_ids) col_id = col_mapping[col_id];
     }
 
 }
@@ -241,70 +225,39 @@ void insert_unaligned(
     BinVecDtype& row_mask,
     BinVecDtype& col_mask
 ){
-    UTILS_DIE_IF(row_ids.shape(0) != col_ids.shape(0),
+    UTILS_DIE_IF(row_ids.size() != col_ids.size(),
                  "The size of row_ids and col_ids must be same!");
 
 
     if (is_intra_tile){
-        //TODO(yeremia): to be deleted!
         UTILS_DIE_IF(row_mask != col_mask, "row_mask and col_mask are different!");
 
-        auto num_entries = row_ids.shape(0);
-        auto& mask = row_mask; // Note: Does not matter either row_mask or col_mask
+        std::vector<uint64_t> mapping;
+        for (size_t i = 0; i < row_mask.size(); ++i) if (row_mask[i]) mapping.push_back(i);
 
-        auto argwhere_vec = xt::argwhere(mask);
-        auto mapping_len = xt::sum(xt::cast<uint64_t>(mask))(0);
-        auto mapping = xt::empty<uint64_t>({mapping_len});
-
-        auto k = 0u;
-        for (auto v : argwhere_vec){
-            auto value = v[0];
-            mapping(k++) = value;
-        }
-
-        for (auto i = 0u; i<num_entries; i++){
-            row_ids(i) = mapping(row_ids(i));
-            col_ids(i) = mapping(col_ids(i));
+        for (size_t i = 0u; i<row_ids.size(); i++){
+            row_ids[i] = mapping[row_ids[i]];
+            col_ids[i] = mapping[col_ids[i]];
         }
 
     } else {
         // Handle row_mask
         {
-            auto num_entries = row_ids.shape(0);
-            auto argwhere_vec = xt::argwhere(row_mask);
-            auto mapping_len = xt::sum(xt::cast<uint64_t>(row_mask))(0);
-            auto mapping = xt::empty<uint64_t>({mapping_len});
-
-            auto k = 0u;
-            for (auto v : argwhere_vec){
-                auto value = v[0];
-                mapping(k++) = value;
-            }
-
-            for (auto i = 0u; i<num_entries; i++){
-                row_ids(i) = mapping(row_ids(i));
+            std::vector<uint64_t> mapping;
+            for (size_t i = 0; i < row_mask.size(); ++i) if (row_mask[i]) mapping.push_back(i);
+            for (size_t i = 0u; i<row_ids.size(); i++){
+                row_ids[i] = mapping[row_ids[i]];
             }
         }
 
         // Handle col_mask
         {
-            auto num_entries = col_ids.shape(0);
-            auto argwhere_vec = xt::argwhere(col_mask);
-            auto mapping_len = xt::sum(xt::cast<uint64_t>(col_mask))(0);
-            auto mapping = xt::empty<uint64_t>({mapping_len});
-
-            auto k = 0u;
-            for (auto v : argwhere_vec){
-                auto value = v[0];
-                mapping(k++) = value;
-            }
-
-            for (auto i = 0u; i<num_entries; i++){
-                col_ids(i) = mapping(col_ids(i));
+            std::vector<uint64_t> mapping;
+            for (size_t i = 0; i < col_mask.size(); ++i) if (col_mask[i]) mapping.push_back(i);
+            for (size_t i = 0u; i<col_ids.size(); i++){
+                col_ids[i] = mapping[col_ids[i]];
             }
         }
-
-
     }
 }
 
@@ -320,21 +273,10 @@ void sparse_to_dense(
     // Outputs
     UIntMatDtype& mat
 ){
-    // TODO(yeremia): Moves this check somewhere else
-    {
-        UTILS_DIE_IF(xt::amax(row_ids)(0) >= nrows, "Invalid nrows or row_ids!");
-        UTILS_DIE_IF(xt::amax(col_ids)(0) >= ncols, "Invalid ncols or col_ids!");
-        UTILS_DIE_IF(xt::any(xt::equal(counts, 0)), "Count with value 0 is found!");
-    }
-    mat = xt::zeros<uint32_t>({nrows, ncols});
+    mat.assign(nrows, std::vector<uint32_t>(ncols, 0));
 
-    auto num_entries = counts.shape(0);
-    for (auto i = 0u; i< num_entries; i++){
-        auto count = counts(i);
-        auto row_id = row_ids(i);
-        auto col_id = col_ids(i);
-
-        mat(row_id, col_id) = count;
+    for (size_t i = 0u; i< counts.size(); i++){
+        mat[row_ids[i]][col_ids[i]] = counts[i];
     }
 }
 
@@ -348,23 +290,17 @@ void dense_to_sparse(
     UInt64VecDtype& col_ids,
     UIntVecDtype& counts
 ){
-    BinMatDtype mask = mat > 0u;
-
-    auto ids = xt::argwhere(mask);
-    auto num_entries = ids.size();
-
-    row_ids.resize({num_entries});
-    col_ids.resize({num_entries});
-    counts.resize({num_entries});
-
-    for (auto k = 0u; k<num_entries; k++){
-        auto i = ids[k][0];
-        auto j = ids[k][1];
-        auto c = mat(i,j);
-
-        row_ids[k] = i;
-        col_ids[k] = j;
-        counts[k] = c;
+    row_ids.clear();
+    col_ids.clear();
+    counts.clear();
+    for (size_t i = 0; i < mat.size(); ++i) {
+        for (size_t j = 0; j < mat[i].size(); ++j) {
+            if (mat[i][j] > 0) {
+                row_ids.push_back(i);
+                col_ids.push_back(j);
+                counts.push_back(mat[i][j]);
+            }
+        }
     }
 }
 
@@ -375,22 +311,23 @@ void dense_to_sparse(
     UInt64VecDtype& col_ids,
     UIntVecDtype& counts
 ){
-    auto num_entries = row_ids.size();
+    size_t num_entries = row_ids.size();
+    std::vector<size_t> p(num_entries);
+    std::iota(p.begin(), p.end(), 0);
+    std::stable_sort(p.begin(), p.end(),
+                     [&](size_t i, size_t j) { return row_ids[i] < row_ids[j]; });
 
-    UInt64VecDtype sort_ids = xt::argsort(row_ids);
-    UInt64VecDtype tmp_row_ids = row_ids;
-    UInt64VecDtype tmp_col_ids = col_ids;
-    UIntVecDtype tmp_counts = counts;
-
-    for (auto k = 0u; k< num_entries; k++){
-        tmp_row_ids(k) = row_ids(sort_ids(k));
-        tmp_col_ids(k) = col_ids(sort_ids(k));
-        tmp_counts(k) = counts(sort_ids(k));
+    UInt64VecDtype sorted_row_ids(num_entries);
+    UInt64VecDtype sorted_col_ids(num_entries);
+    UIntVecDtype sorted_counts(num_entries);
+    for (size_t i = 0; i < num_entries; ++i) {
+        sorted_row_ids[i] = row_ids[p[i]];
+        sorted_col_ids[i] = col_ids[p[i]];
+        sorted_counts[i] = counts[p[i]];
     }
-
-    row_ids = tmp_row_ids;
-    col_ids = tmp_col_ids;
-    counts = tmp_counts;
+    row_ids = std::move(sorted_row_ids);
+    col_ids = std::move(sorted_col_ids);
+    counts = std::move(sorted_counts);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -399,101 +336,91 @@ void inverse_diag_transform(
     UIntMatDtype& mat,
     DiagonalTransformMode mode
 ){
-    UIntMatDtype trans_mat;
-//    auto k = 0u;
-//    auto l = 0u;
-
     if (mode == DiagonalTransformMode::NONE) {
-        return;  // Do nothing
+        return;
+    }
+
+    auto nrows = mat.size();
+    if (nrows == 0) return;
+    auto ncols = mat[0].size();
+
+    // Adapter for internal xtensor usage
+    std::vector<uint32_t> flat_mat;
+    flat_mat.reserve(nrows * ncols);
+    for (const auto& row : mat) flat_mat.insert(flat_mat.end(), row.begin(), row.end());
+    auto xt_mat = xt::adapt(flat_mat, std::vector<size_t>{nrows, ncols});
+
+    if (mode == DiagonalTransformMode::MODE_0) {
+        auto target_nrows = ncols;
+        auto xt_trans_mat = xt::zeros<uint32_t>({target_nrows, ncols});
+
+        auto o = 0u;
+        for (size_t k_diag = 0u; k_diag < ncols; k_diag++) {
+            for (size_t target_i = 0u; target_i < (target_nrows - k_diag); target_i++) {
+                size_t target_j = target_i + k_diag;
+                size_t i = o / target_nrows;
+                size_t j = o % target_nrows;
+                xt_trans_mat(target_i, target_j) = xt_mat(i, j);
+                o++;
+            }
+        }
+        
+        mat.assign(target_nrows, std::vector<uint32_t>(ncols));
+        for (size_t i = 0; i < target_nrows; ++i) {
+            for (size_t j = 0; j < ncols; ++j) {
+                mat[i][j] = xt_trans_mat(i, j);
+            }
+        }
     } else {
-        if (mode == DiagonalTransformMode::MODE_0) {
-//            auto nrows = mat.shape(0);
-            auto ncols = mat.shape(1);
-            auto target_nrows = ncols;
+        auto xt_trans_mat = xt::empty<uint32_t>({nrows, ncols});
+        Int64VecDtype diag_ids;
 
-            // Initailze trans_mat with zeros
-            trans_mat = xt::zeros<uint32_t>({target_nrows, ncols});
-
-            auto o = 0u;
-            for (size_t k_diag = 0u; k_diag < ncols; k_diag++) {
-                for (size_t target_i = 0u; target_i < (target_nrows - k_diag); target_i++) {
-                    size_t target_j = target_i + k_diag;
-
-                    size_t i = o / target_nrows;
-                    size_t j = o % target_nrows;
-
-                    auto v = mat(i, j);
-                    trans_mat(target_i, target_j) = v;
-
-                    o++;
-                }
+        if (mode == DiagonalTransformMode::MODE_1){
+            std::vector<int64_t> diag_ids_vec;
+            diag_ids_vec.push_back(0);
+            auto ndiags = std::max((int64_t)nrows, (int64_t)ncols);
+            for (int64_t diag_id = 1; diag_id < ndiags; diag_id++){
+                if (diag_id < (int64_t)ncols) diag_ids_vec.push_back(diag_id);
+                if (diag_id < (int64_t)nrows) diag_ids_vec.push_back(-diag_id);
             }
-            mat.resize(trans_mat.shape());
-            mat = trans_mat;
-        } else {
-            auto nrows = static_cast<int64_t>(mat.shape(0));
-            auto ncols = static_cast<int64_t>(mat.shape(1));
-            trans_mat = xt::empty<uint32_t>({nrows, ncols});
+            diag_ids = xt::adapt(diag_ids_vec, {diag_ids_vec.size()});
+        } else if (mode == DiagonalTransformMode::MODE_2){
+            diag_ids = xt::arange(-(int64_t)nrows+1, (int64_t)ncols, 1);
+        } else if (mode == DiagonalTransformMode::MODE_3){
+            diag_ids = xt::arange<int64_t>((int64_t)ncols-1, -(int64_t)nrows, -1);
+        }
 
-            Int64VecDtype diag_ids = xt::empty<int64_t>({nrows+ncols-1});
-            size_t k_elem;
-
-            if (mode == DiagonalTransformMode::MODE_1){
-                diag_ids(0) = 0;
-                k_elem = 1u;
-                auto ndiags = std::max(nrows, ncols);
-                for (auto diag_id = 1; diag_id<ndiags; diag_id++){
-                    if (diag_id < static_cast<int64_t>(ncols)){
-                        diag_ids(k_elem++) = diag_id;
-                    }
-                    if (diag_id < static_cast<int64_t>(nrows)){
-                        diag_ids(k_elem++) = -diag_id;
-                    }
-                }
-            } else if (mode == DiagonalTransformMode::MODE_2){
-                //            k_elem = 0u;
-                //            for (int64_t diag_id = -nrows+1; diag_id < ncols; diag_id++){
-                //                diag_ids(k_elem++) = diag_id;
-                //            }
-                diag_ids = xt::arange(-nrows+1, ncols, 1);
-            } else if (mode == DiagonalTransformMode::MODE_3){
-                //            k_elem = 0u;
-                //            for (int64_t diag_id = ncols-1; diag_id > -nrows; diag_id--){
-                //                diag_ids(k_elem++) = diag_id;
-                //            }
-                diag_ids = xt::arange<int64_t>(ncols-1, -nrows, -1);
+        int64_t target_i, target_j;
+        int64_t i_offset, j_offset;
+        int64_t nelems_in_diag;
+        auto o = 0u;
+        for (auto diag_id : diag_ids){
+            if (diag_id >= 0) {
+                nelems_in_diag = std::max((int64_t)nrows, (int64_t)ncols) - diag_id;
+                i_offset = 0;
+                j_offset = diag_id;
+            } else {
+                nelems_in_diag = std::max((int64_t)nrows, (int64_t)ncols) + diag_id;
+                i_offset = -diag_id;
+                j_offset = 0;
             }
+            for (int64_t k_diag = 0; k_diag < nelems_in_diag; k_diag++){
+                target_i = k_diag + i_offset;
+                target_j = k_diag + j_offset;
+                if (target_i >= (int64_t)nrows || target_j >= (int64_t)ncols) break;
 
-            int64_t target_i, target_j;
-            int64_t i_offset, j_offset;
-            int64_t nelems_in_diag;
-            auto o = 0u;
-            for (auto diag_id : diag_ids){
-                if (diag_id >= 0) {
-                    nelems_in_diag = std::max(nrows, ncols) - diag_id;
-                    i_offset = 0;
-                    j_offset = diag_id;
-                } else {
-                    nelems_in_diag = std::max(nrows, ncols) + diag_id;
-                    i_offset = -diag_id;
-                    j_offset = 0;
-                }
-                for (auto k_diag = 0; k_diag<nelems_in_diag; k_diag++){
-                    target_i = k_diag + i_offset;
-                    target_j = k_diag + j_offset;
-                    if (target_i >= nrows)
-                        break;
-                    if (target_j >= ncols)
-                        break;
-
-                    size_t i = o / mat.shape(1);
-                    size_t j = o % mat.shape(1);
-                    trans_mat(target_i, target_j) = mat(i, j);
-
-                    o++;
-                }
+                size_t i = o / ncols;
+                size_t j = o % ncols;
+                xt_trans_mat(target_i, target_j) = xt_mat(i, j);
+                o++;
             }
-            mat = std::move(trans_mat);
+        }
+        
+        mat.assign(nrows, std::vector<uint32_t>(ncols));
+        for (size_t i = 0; i < nrows; ++i) {
+            for (size_t j = 0; j < ncols; ++j) {
+                mat[i][j] = xt_trans_mat(i, j);
+            }
         }
     }
 }
@@ -504,67 +431,63 @@ void diag_transform(
     UIntMatDtype& mat,
     DiagonalTransformMode mode
 ){
-    UIntMatDtype trans_mat;
-
     if (mode == DiagonalTransformMode::NONE){
-        return ; // Do nothing
-    } else if (mode == DiagonalTransformMode::MODE_0) {
-        UTILS_DIE_IF(
-            mat.shape(0) != mat.shape(1),
-            "Matrix must be a square!"
-        );
+        return;
+    }
 
-        auto nrows = mat.shape(0);
+    auto nrows = mat.size();
+    if (nrows == 0) return;
+    auto ncols = mat[0].size();
+
+    // Adapter for internal xtensor usage
+    std::vector<uint32_t> flat_mat;
+    flat_mat.reserve(nrows * ncols);
+    for (const auto& row : mat) flat_mat.insert(flat_mat.end(), row.begin(), row.end());
+    auto xt_mat = xt::adapt(flat_mat, std::vector<size_t>{nrows, ncols});
+
+    if (mode == DiagonalTransformMode::MODE_0) {
+        UTILS_DIE_IF(nrows != ncols, "Matrix must be a square!");
+
         auto new_nrows = nrows / 2 + 1;
-        trans_mat = xt::zeros<uint32_t>({new_nrows, nrows});
+        auto xt_trans_mat = xt::zeros<uint32_t>({new_nrows, nrows});
 
         auto o = 0u;
         for (size_t k_diag = 0u; k_diag < nrows; k_diag++) {
             for (size_t i = 0u; i < (nrows - k_diag); i++) {
                 size_t j = i + k_diag;
-
-                auto v = mat(i, j);
+                auto v = xt_mat(i, j);
                 if (v != 0) {
                     size_t target_i = o / nrows;
                     size_t target_j = o % nrows;
-                    trans_mat(target_i, target_j) = v;
+                    xt_trans_mat(target_i, target_j) = v;
                 }
                 o++;
             }
         }
-        mat.resize(trans_mat.shape());
-        mat = trans_mat;
-
+        
+        mat.assign(new_nrows, std::vector<uint32_t>(nrows));
+        for (size_t i = 0; i < new_nrows; ++i) {
+            for (size_t j = 0; j < nrows; ++j) {
+                mat[i][j] = xt_trans_mat(i, j);
+            }
+        }
     } else {
-        auto nrows = static_cast<int64_t>(mat.shape(0));
-        auto ncols = static_cast<int64_t>(mat.shape(1));
-        trans_mat = xt::empty<uint32_t>({nrows, ncols});
-
-        Int64VecDtype diag_ids = xt::empty<int64_t>({nrows+ncols-1});
-        size_t k_elem;
+        auto xt_trans_mat = xt::zeros<uint32_t>({nrows, ncols});
+        Int64VecDtype diag_ids;
 
         if (mode == DiagonalTransformMode::MODE_1){
-            diag_ids(0) = 0;
-            k_elem = 1u;
-            auto ndiags = std::max(nrows, ncols);
-            for (auto diag_id = 1; diag_id<ndiags; diag_id++){
-                if (diag_id < static_cast<int64_t>(ncols))
-                    diag_ids(k_elem++) = diag_id;
-                if (diag_id < static_cast<int64_t>(nrows))
-                    diag_ids(k_elem++) = -diag_id;
+            std::vector<int64_t> diag_ids_vec;
+            diag_ids_vec.push_back(0);
+            auto ndiags = std::max((int64_t)nrows, (int64_t)ncols);
+            for (auto diag_id = 1; diag_id < ndiags; diag_id++){
+                if (diag_id < (int64_t)ncols) diag_ids_vec.push_back(diag_id);
+                if (diag_id < (int64_t)nrows) diag_ids_vec.push_back(-diag_id);
             }
+            diag_ids = xt::adapt(diag_ids_vec, {diag_ids_vec.size()});
         } else if (mode == DiagonalTransformMode::MODE_2){
-//            k_elem = 0u;
-//            for (int64_t diag_id = -nrows+1; diag_id < ncols; diag_id++){
-//                diag_ids(k_elem++) = diag_id;
-//            }
-            diag_ids = xt::arange(-nrows+1, ncols, 1);
+            diag_ids = xt::arange(-(int64_t)nrows+1, (int64_t)ncols, 1);
         } else if (mode == DiagonalTransformMode::MODE_3){
-//            k_elem = 0u;
-//            for (int64_t diag_id = ncols-1; diag_id > -nrows; diag_id--){
-//                diag_ids(k_elem++) = diag_id;
-//            }
-            diag_ids = xt::arange<int64_t>(ncols-1, -nrows, -1);
+            diag_ids = xt::arange<int64_t>((int64_t)ncols-1, -(int64_t)nrows, -1);
         }
 
         int64_t i, j;
@@ -573,35 +496,33 @@ void diag_transform(
         auto o = 0u;
         for (auto diag_id : diag_ids){
             if (diag_id >= 0) {
-                nelems_in_diag = std::max(nrows, ncols) - diag_id;
+                nelems_in_diag = std::max((int64_t)nrows, (int64_t)ncols) - diag_id;
                 i_offset = 0;
                 j_offset = diag_id;
             } else {
-                nelems_in_diag = std::max(nrows, ncols) + diag_id;
+                nelems_in_diag = std::max((int64_t)nrows, (int64_t)ncols) + diag_id;
                 i_offset = -diag_id;
                 j_offset = 0;
             }
-            for (auto k_diag = 0; k_diag<nelems_in_diag; k_diag++){
+            for (int64_t k_diag = 0; k_diag < nelems_in_diag; k_diag++){
                 i = k_diag + i_offset;
                 j = k_diag + j_offset;
-                if (i >= nrows)
-                    break;
-                if (j >= ncols)
-                    break;
+                if (i >= (int64_t)nrows || j >= (int64_t)ncols) break;
 
-                auto v = mat(i, j);
-                size_t new_i = o / mat.shape(1);
-                size_t new_j = o % mat.shape(1);
-                trans_mat(new_i, new_j) = v;
-//                if (v != 0) {
-//                    size_t new_i = o / mat.shape(1);
-//                    size_t new_j = o % mat.shape(1);
-//                    trans_mat(new_i, new_j) = v;
-//                }
+                auto v = xt_mat(i, j);
+                size_t new_i = o / ncols;
+                size_t new_j = o % ncols;
+                xt_trans_mat(new_i, new_j) = v;
                 o++;
             }
         }
-        mat = std::move(trans_mat);
+        
+        mat.assign(nrows, std::vector<uint32_t>(ncols));
+        for (size_t i_row = 0; i_row < nrows; ++i_row) {
+            for (size_t j_col = 0; j_col < ncols; ++j_col) {
+                mat[i_row][j_col] = xt_trans_mat(i_row, j_col);
+            }
+        }
     }
 }
 
@@ -613,28 +534,32 @@ void inverse_transform_row_bin(
     // Outputs
     UIntMatDtype& mat
 ){
-    size_t bin_mat_nrows = bin_mat.shape(0);
-    size_t bin_mat_ncols = bin_mat.shape(1);
+    size_t bin_mat_nrows = bin_mat.size();
+    if (bin_mat_nrows == 0) return;
+    size_t bin_mat_ncols = bin_mat[0].size();
 
     UTILS_DIE_IF(bin_mat_nrows == 0, "Invalid mat_nrows!");
     UTILS_DIE_IF(bin_mat_ncols == 0, "Invalid mat_ncols!");
 
     size_t mat_ncols = bin_mat_ncols-1;
 
-    UIntVecDtype first_col = xt::cast<uint32_t>(xt::view(bin_mat, xt::all(), 0u));
-    size_t mat_nrows = xt::sum(first_col)(0);
+    size_t mat_nrows = 0;
+    for (const auto& row : bin_mat) if (row[0]) mat_nrows++;
 
     UTILS_DIE_IF(mat_nrows == 0, "Invalid mat_nrows!");
     UTILS_DIE_IF(mat_ncols == 0, "Invalid mat_ncols!");
 
-    mat = xt::zeros<uint32_t>({mat_nrows, mat_ncols});
+    mat.assign(mat_nrows, std::vector<uint32_t>(mat_ncols, 0));
 
     size_t target_i = 0;
     uint8_t bit_pos = 0;
-    auto target_js = xt::range(1u, bin_mat_ncols);
-    for (auto i = 0u; i<bin_mat_nrows; i++){
-        xt::view(mat, target_i, xt::all()) |= xt::cast<uint32_t>(xt::view(bin_mat, i, target_js)) << bit_pos;
-        bool sentinel_flag = bin_mat(i, 0);
+    for (size_t i = 0u; i < bin_mat_nrows; i++){
+        for (size_t j = 1u; j < bin_mat_ncols; j++) {
+            if (bin_mat[i][j]) {
+                mat[target_i][j-1] |= (1u << bit_pos);
+            }
+        }
+        bool sentinel_flag = bin_mat[i][0];
 
         if (sentinel_flag){
             target_i++;
@@ -655,31 +580,36 @@ void transform_row_bin(
     // Outputs
     BinMatDtype& bin_mat
 ) {
-    auto nrows = mat.shape(0);
-    auto ncols = mat.shape(1);
+    auto nrows = mat.size();
+    if (nrows == 0) return;
+    auto ncols = mat[0].size();
 
-    UInt8VecDtype nbits_per_row = xt::cast<uint8_t>(xt::ceil(
-        xt::log2(xt::amax(mat, {1}) + 1u)
-    ));
-    // Handle the case where maximum value is 0 -> log2(1) = 0 bits
-    xt::filter(nbits_per_row, xt::equal(nbits_per_row, 0u)) = 1;
+    std::vector<uint8_t> nbits_per_row(nrows);
+    for (size_t i = 0; i < nrows; ++i) {
+        uint32_t max_val = 0;
+        for (uint32_t val : mat[i]) max_val = std::max(max_val, val);
+        nbits_per_row[i] = (max_val == 0) ? 1 : static_cast<uint8_t>(std::ceil(std::log2(max_val + 1u)));
+        if (nbits_per_row[i] == 0) nbits_per_row[i] = 1;
+    }
 
-    uint64_t bin_mat_nrows = static_cast<uint64_t>(xt::sum(nbits_per_row)(0));
+    uint64_t bin_mat_nrows = 0;
+    for (auto n : nbits_per_row) bin_mat_nrows += n;
     uint64_t bin_mat_ncols = ncols + 1;
 
-    bin_mat = xt::zeros<bool>({bin_mat_nrows, bin_mat_ncols});
+    bin_mat.assign(bin_mat_nrows, std::vector<bool>(bin_mat_ncols, false));
 
     size_t target_i = 0;
-    auto target_js = xt::range(1u, bin_mat_ncols);
     for (size_t i = 0; i < nrows; i++) {
         auto bitlength = nbits_per_row[i];
         for (size_t i_bit = 0; i_bit < bitlength; i_bit++) {
-            xt::view(bin_mat, target_i++, target_js) = xt::cast<bool>(xt::view(mat, i, xt::all()) & (1u << i_bit));
+            for (size_t j = 0; j < ncols; ++j) {
+                if (mat[i][j] & (1u << i_bit)) bin_mat[target_i][j+1] = true;
+            }
+            target_i++;
         }
 
         // Set the sentinel flag
-        // Add offset due to "++" operation in the for-loop
-        bin_mat(target_i - 1, 0) = true;
+        bin_mat[target_i - 1][0] = true;
     }
 }
 
@@ -700,7 +630,6 @@ void comp_start_end_ids(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO(yeremia): This should be part of LCC?
 void bin_mat_to_bytes(
     // Inputs
     const BinMatDtype& bin_mat,
@@ -708,19 +637,24 @@ void bin_mat_to_bytes(
     uint8_t** payload,
     size_t& payload_len
 ) {
-    auto nrows = static_cast<size_t>(bin_mat.shape(0));
-    auto ncols = static_cast<size_t>(bin_mat.shape(1));
+    auto nrows = bin_mat.size();
+    if (nrows == 0) {
+        payload_len = 0;
+        *payload = nullptr;
+        return;
+    }
+    auto ncols = bin_mat[0].size();
 
     auto bpl = (ncols >> 3u) + ((ncols & 7u) > 0u);  // Ceil div operation
     payload_len = bpl * nrows;
     *payload = (unsigned char*) calloc (payload_len, sizeof(unsigned char));
 
-    for (auto i = 0u; i < nrows; i++) {
+    for (size_t i = 0u; i < nrows; i++) {
         size_t row_offset = i * bpl;
-        for (auto j = 0u; j < ncols; j++) {
+        for (size_t j = 0u; j < ncols; j++) {
             auto byte_offset = row_offset + (j >> 3u);
             uint8_t shift = (7u - (j & 7u));
-            auto val = static_cast<uint8_t>(bin_mat(i, j));
+            auto val = static_cast<uint8_t>(bin_mat[i][j]);
             val = static_cast<uint8_t>(val << shift);
             *(*payload + byte_offset) |= val;
         }
@@ -729,32 +663,52 @@ void bin_mat_to_bytes(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO(yeremia): This should be part of LCC?
 void bin_mat_from_bytes(
+
     // Inputs
+
     const uint8_t* payload,
+
     size_t payload_len,
+
     size_t nrows,
+
     size_t ncols,
+
     // Outputs
+
     BinMatDtype& bin_mat
+
 ) {
 
+
+
     auto bpl = (ncols >> 3u) + ((ncols & 7u) > 0u);  // bytes per line with ceil operation
+
     UTILS_DIE_IF(payload_len != static_cast<size_t>(nrows * bpl), "Invalid payload_len / nrows / ncols!");
 
-    MatShapeDtype bin_mat_shape = {nrows, ncols};
-    bin_mat.resize(bin_mat_shape);
-    xt::view(bin_mat, xt::all(), xt::all()) = false;  // Initialize value with 0
 
-    for (auto i = 0u; i < nrows; i++) {
+
+    bin_mat.assign(nrows, std::vector<bool>(ncols, false));
+
+
+
+    for (size_t i = 0u; i < nrows; i++) {
+
         size_t row_offset = i * bpl;
-        for (auto j = 0u; j < ncols; j++) {
+
+        for (size_t j = 0u; j < ncols; j++) {
+
             auto byte_offset = row_offset + (j >> 3u);
+
             uint8_t shift = (7u - (j & 7u));
-            bin_mat(i, j) = (*(payload + byte_offset) >> shift) & 1u;
+
+            bin_mat[i][j] = (*(payload + byte_offset) >> shift) & 1u;
+
         }
+
     }
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -825,12 +779,12 @@ void encode_cm_tile(
     uint8_t* compressed_payload;
     size_t compressed_payload_len;
 
-    auto tile_nrows = static_cast<uint32_t>(bin_mat.shape(0));
-    auto tile_ncols = static_cast<uint32_t>(bin_mat.shape(1));
+    auto tile_nrows = static_cast<uint32_t>(bin_mat.size());
+    auto tile_ncols = static_cast<uint32_t>(bin_mat.empty() ? 0 : bin_mat[0].size());
 
     if (codec_ID == genie::core::AlgoID::JBIG) {
 
-        bin_mat_to_bytes(bin_mat, &payload, payload_len);
+        detail::xtensor::bin_mat_to_bytes(bin_mat, &payload, payload_len);
 
         mpegg_jbig_compress_default(
             &compressed_payload,
@@ -870,13 +824,13 @@ void conv_noop_on_sparse_mat(
     bool sort_output
 ){
 
-    size_t num_entries = tile_counts.shape(0);
+    size_t num_entries = tile_counts.size();
 
     std::map<std::pair<uint64_t, uint64_t>, uint32_t> lr_sparse_tile;
     for (auto i = 0u; i<num_entries; i++){
-        auto lr_row_id = tile_row_ids(i) / bin_size_mult;
-        auto lr_col_id = tile_col_ids(i) / bin_size_mult;
-        auto count = tile_counts(i);
+        auto lr_row_id = tile_row_ids[i] / bin_size_mult;
+        auto lr_col_id = tile_col_ids[i] / bin_size_mult;
+        auto count = tile_counts[i];
 
         auto row_col_id_pair = std::pair<uint64_t, uint64_t>(lr_row_id, lr_col_id);
 
@@ -890,15 +844,15 @@ void conv_noop_on_sparse_mat(
 
     size_t lr_num_entries = lr_sparse_tile.size();
 
-    UInt64VecDtype lr_tile_row_ids = xt::empty<uint64_t>({lr_num_entries});
-    UInt64VecDtype lr_tile_col_ids = xt::empty<uint64_t>({lr_num_entries});
-    UIntVecDtype lr_tile_counts = xt::empty<uint32_t>({lr_num_entries});
+    UInt64VecDtype lr_tile_row_ids(lr_num_entries);
+    UInt64VecDtype lr_tile_col_ids(lr_num_entries);
+    UIntVecDtype lr_tile_counts(lr_num_entries);
 
     auto i_entry = 0u;
     for (const auto & it : lr_sparse_tile){
-        lr_tile_row_ids(i_entry) = (it.first).first;
-        lr_tile_col_ids(i_entry) = (it.first).second;
-        lr_tile_counts(i_entry) = it.second;
+        lr_tile_row_ids[i_entry] = (it.first).first;
+        lr_tile_col_ids[i_entry] = (it.first).second;
+        lr_tile_counts[i_entry] = it.second;
         i_entry++;
     }
 
@@ -907,7 +861,7 @@ void conv_noop_on_sparse_mat(
     // Sort the tile_row_ids, tile_col_ids, and tile_counts
     //      according to tile_row_ids and tile_col_ids
     if (sort_output){
-        sort_sparse_mat_inplace(
+        detail::xtensor::sort_sparse_mat_inplace(
             lr_tile_row_ids,
             lr_tile_col_ids,
             lr_tile_counts
@@ -928,7 +882,7 @@ void sort_sparse_mat_inplace(
     UInt64VecDtype& tile_col_ids,
     UIntVecDtype& tile_counts
 ){
-    size_t num_entries = tile_counts.shape(0);
+    size_t num_entries = tile_counts.size();
 
     // Assert that all input vectors have the same size
     assert(tile_row_ids.size() == num_entries);
@@ -950,14 +904,14 @@ void sort_sparse_mat_inplace(
     }
 
     // Only reorder the ids and counts if the original order is not sorted
-    UInt64VecDtype sorted_tile_row_ids = xt::empty<uint64_t>({num_entries});
-    UInt64VecDtype sorted_tile_col_ids = xt::empty<uint64_t>({num_entries});
-    UIntVecDtype sorted_tile_counts = xt::empty<uint32_t>({num_entries});
+    UInt64VecDtype sorted_tile_row_ids(num_entries);
+    UInt64VecDtype sorted_tile_col_ids(num_entries);
+    UIntVecDtype sorted_tile_counts(num_entries);
 
     for (auto i_entry = 0u; i_entry < num_entries; i_entry++){
-        sorted_tile_row_ids(i_entry) = tile_row_ids(sort_ids[i_entry]);
-        sorted_tile_col_ids(i_entry) = tile_col_ids(sort_ids[i_entry]);
-        sorted_tile_counts(i_entry) = tile_counts(sort_ids[i_entry]);
+        sorted_tile_row_ids[i_entry] = tile_row_ids[sort_ids[i_entry]];
+        sorted_tile_col_ids[i_entry] = tile_col_ids[sort_ids[i_entry]];
+        sorted_tile_counts[i_entry] = tile_counts[sort_ids[i_entry]];
     }
 
     tile_row_ids = std::move(sorted_tile_row_ids);
@@ -974,26 +928,27 @@ void set_rle_information_from_mask(
     bool prevValue;
     uint32_t count = 1;
     size_t index = 0;
-    prevValue = scm_mask(0);
-    rleData.firstVal = scm_mask(0);
+    prevValue = scm_mask[0];
+    rleData.firstVal = scm_mask[0];
 
-    // init counts from maximum possible size (then resize later)
-    rleData.rl_entries = xt::xtensor<uint32_t, 1>::from_shape({scm_mask.size()});
+    // init counts from maximum possible size
+    std::vector<uint32_t> rl_entries_vec(scm_mask.size());
 
     for(size_t i = 1; i < scm_mask.size(); i++) {
-        if (scm_mask(i) == prevValue) {
+        if (scm_mask[i] == prevValue) {
             count++;
         } else {
-            rleData.rl_entries(index++) = count;
+            rl_entries_vec[index++] = count;
             prevValue = !prevValue;
             count = 1;
         }
     }
-    rleData.rl_entries(index++) = count; // add the last entry
+    rl_entries_vec[index++] = count; // add the last entry
 
-    rleData.rl_entries = xt::view(rleData.rl_entries, xt::range(0, index)); // resize
+    rl_entries_vec.resize(index);
+    rleData.rl_entries = std::move(rl_entries_vec);
 
-    rleData.maxCount = xt::amax(rleData.rl_entries)();
+    rleData.maxCount = *std::max_element(rleData.rl_entries.begin(), rleData.rl_entries.end());
     if (rleData.maxCount <= UINT8_MAX) {
         rleData.transformID = TransformID::ID_1;
     } else if (rleData.maxCount <= UINT16_MAX) {
@@ -1045,7 +1000,7 @@ void decode_scm(
     auto ntiles_in_col = cm_param.GetNumTiles(chr2_ID);
 
     if (row_mask_exists || col_mask_exists){
-        decode_scm_masks(
+        detail::xtensor::decode_scm_masks(
             cm_param,
             scm_param,
             scm_payload,
@@ -1079,13 +1034,13 @@ void decode_scm(
             if (binarization_mode == BinarizationMode::ROW_BINARIZATION){
                 BinMatDtype bin_mat;
 
-                decode_cm_tile(
+                detail::xtensor::decode_cm_tile(
                     tile_payload,
                     codec_ID,
                     bin_mat
                 );
 
-                inverse_transform_row_bin(
+                detail::xtensor::inverse_transform_row_bin(
                     bin_mat,
                     tile_mat
                 );
@@ -1094,12 +1049,12 @@ void decode_scm(
                 UTILS_DIE("no binarization is not supported yet!");
             }
 
-            inverse_diag_transform(
+            detail::xtensor::inverse_diag_transform(
                 tile_mat,
                 diag_transform_mode
             );
 
-            comp_start_end_ids(
+            detail::xtensor::comp_start_end_ids(
                 chr1_num_bin_entries,
                 tile_size,
                 i_tile,
@@ -1107,7 +1062,7 @@ void decode_scm(
                 end1_idx
             );
 
-            comp_start_end_ids(
+            detail::xtensor::comp_start_end_ids(
                 chr2_num_bin_entries,
                 tile_size,
                 j_tile,
@@ -1115,7 +1070,7 @@ void decode_scm(
                 end2_idx
             );
 
-            dense_to_sparse(
+            detail::xtensor::dense_to_sparse(
                 tile_mat,
                 tile_row_ids,
                 tile_col_ids,
@@ -1123,10 +1078,10 @@ void decode_scm(
             );
 
             if (row_mask_exists || col_mask_exists){
-                BinVecDtype tile_row_mask = xt::view(row_mask, xt::range(start1_idx, end1_idx));
-                BinVecDtype tile_col_mask = xt::view(col_mask, xt::range(start2_idx, end2_idx));
+                BinVecDtype tile_row_mask(row_mask.begin() + start1_idx, row_mask.begin() + end1_idx);
+                BinVecDtype tile_col_mask(col_mask.begin() + start2_idx, col_mask.begin() + end2_idx);
 
-                insert_unaligned(
+                detail::xtensor::insert_unaligned(
                     tile_row_ids,
                     tile_col_ids,
                     is_intra_tile,
@@ -1135,27 +1090,22 @@ void decode_scm(
                 );
             }
 
-            tile_row_ids += start1_idx;
-            tile_col_ids += start2_idx;
+            for (auto& id : tile_row_ids) id += start1_idx;
+            for (auto& id : tile_col_ids) id += start2_idx;
 
             if (bin_size_mult != 1){
-                conv_noop_on_sparse_mat(
+                detail::xtensor::conv_noop_on_sparse_mat(
                     tile_row_ids,
                     tile_col_ids,
                     tile_counts,
-                    bin_size_mult
+                    bin_size_mult,
+                    false
                 );
             }
 
-            // Append to std::vectors for Record (which expects std::vector)
-            // Need to convert xtensor to std::vector
-            std::vector<uint64_t> row_vec(tile_row_ids.begin(), tile_row_ids.end());
-            std::vector<uint64_t> col_vec(tile_col_ids.begin(), tile_col_ids.end());
-            std::vector<uint32_t> count_vec(tile_counts.begin(), tile_counts.end());
-            
-            start1_vec.insert(start1_vec.end(), row_vec.begin(), row_vec.end());
-            start2_vec.insert(start2_vec.end(), col_vec.begin(), col_vec.end());
-            counts_vec.insert(counts_vec.end(), count_vec.begin(), count_vec.end());
+            start1_vec.insert(start1_vec.end(), tile_row_ids.begin(), tile_row_ids.end());
+            start2_vec.insert(start2_vec.end(), tile_col_ids.begin(), tile_col_ids.end());
+            counts_vec.insert(counts_vec.end(), tile_counts.begin(), tile_counts.end());
         }
     }
 
@@ -1230,17 +1180,17 @@ void encode_scm(
   scm_param.SetNumTiles(ntiles_in_row, ntiles_in_col);
   scm_payload.SetNumTiles(ntiles_in_row, ntiles_in_col);
 
-  // Convert std::vector from record to xtensor
-  UInt64VecDtype row_ids = xt::adapt(rec.GetStartPos1());
-  row_ids /= interval; 
+  // Convert std::vector from record to xtensor for processing
+  UInt64VecDtype row_ids = rec.GetStartPos1();
+  for (auto& id : row_ids) id /= interval; 
 
-  UInt64VecDtype col_ids = xt::adapt(rec.GetStartPos2());
-  col_ids /= interval;
+  UInt64VecDtype col_ids = rec.GetStartPos2();
+  for (auto& id : col_ids) id /= interval;
 
-  UIntVecDtype counts = xt::adapt(rec.GetCounts());
+  UIntVecDtype counts = rec.GetCounts();
 
   if (remove_unaligned_region){
-      compute_masks(
+      detail::xtensor::compute_masks(
           row_ids,
           col_ids,
           chr1_num_bin_entries,
@@ -1252,7 +1202,7 @@ void encode_scm(
 
       if (transform_mask){
           RunLengthEncodingData rowRLEData;
-          set_rle_information_from_mask(rowRLEData, row_mask);
+          detail::xtensor::set_rle_information_from_mask(rowRLEData, row_mask);
           
           if(is_intra_scm) {
             scm_payload.SetRowMaskPayload(SubcontactMatrixMaskPayload(
@@ -1264,7 +1214,7 @@ void encode_scm(
             scm_param.SetColMaskExistsFlag(false);
           } else {
             RunLengthEncodingData colRLEData;
-            set_rle_information_from_mask(colRLEData, col_mask);
+            detail::xtensor::set_rle_information_from_mask(colRLEData, col_mask);
             scm_payload.SetRowMaskPayload(SubcontactMatrixMaskPayload(
                 rowRLEData.transformID,
                 rowRLEData.firstVal,
@@ -1281,15 +1231,15 @@ void encode_scm(
 
       } else {
         // Direct mask storage, no RLE
-        scm_payload.SetRowMaskPayload(SubcontactMatrixMaskPayload(std::move(row_mask)));
+        scm_payload.SetRowMaskPayload(SubcontactMatrixMaskPayload(row_mask));
         scm_param.SetRowMaskExistsFlag(true);
         if (!is_intra_scm){
-          scm_payload.SetColMaskPayload(SubcontactMatrixMaskPayload(std::move(col_mask)));
+          scm_payload.SetColMaskPayload(SubcontactMatrixMaskPayload(col_mask));
           scm_param.SetColMaskExistsFlag(true);
         }
       }
 
-      remove_unaligned(
+      detail::xtensor::remove_unaligned(
           row_ids,
           col_ids,
           is_intra_scm,
@@ -1308,13 +1258,23 @@ void encode_scm(
           }
 
           size_t start1_idx, end1_idx, start2_idx, end2_idx;
-          comp_start_end_ids(chr1_num_bin_entries, tile_size, i_tile, start1_idx, end1_idx);
-          comp_start_end_ids(chr2_num_bin_entries, tile_size, j_tile, start2_idx, end2_idx);
+          detail::xtensor::comp_start_end_ids(chr1_num_bin_entries, tile_size, i_tile, start1_idx, end1_idx);
+          detail::xtensor::comp_start_end_ids(chr2_num_bin_entries, tile_size, j_tile, start2_idx, end2_idx);
 
           // Filtering
-          auto filter_mask = (row_ids >= start1_idx) & (row_ids < end1_idx) & (col_ids >= start2_idx) & (col_ids < end2_idx);
+          std::vector<uint64_t> tile_row_ids_vec;
+          std::vector<uint64_t> tile_col_ids_vec;
+          std::vector<uint32_t> tile_counts_vec;
+          for (size_t k = 0; k < row_ids.size(); ++k) {
+              if (row_ids[k] >= start1_idx && row_ids[k] < end1_idx &&
+                  col_ids[k] >= start2_idx && col_ids[k] < end2_idx) {
+                  tile_row_ids_vec.push_back(row_ids[k] - start1_idx);
+                  tile_col_ids_vec.push_back(col_ids[k] - start2_idx);
+                  tile_counts_vec.push_back(counts[k]);
+              }
+          }
           
-          if (!xt::any(filter_mask)) {
+          if (tile_counts_vec.empty()) {
               scm_payload.SetTilePayload(
                   i_tile,
                   j_tile,
@@ -1328,17 +1288,14 @@ void encode_scm(
               continue;
           }
           
-          UInt64VecDtype tile_row_ids = xt::filter(row_ids, filter_mask);
-          UInt64VecDtype tile_col_ids = xt::filter(col_ids, filter_mask);
-          UIntVecDtype tile_counts = xt::filter(counts, filter_mask);
-          
-          tile_row_ids -= start1_idx;
-          tile_col_ids -= start2_idx;
+          UInt64VecDtype tile_row_ids = std::move(tile_row_ids_vec);
+          UInt64VecDtype tile_col_ids = std::move(tile_col_ids_vec);
+          UIntVecDtype tile_counts = std::move(tile_counts_vec);
 
-          sort_sparse_mat_inplace(tile_row_ids, tile_col_ids, tile_counts);
+          detail::xtensor::sort_sparse_mat_inplace(tile_row_ids, tile_col_ids, tile_counts);
 
           UIntMatDtype tile_mat;
-          sparse_to_dense(
+          detail::xtensor::sparse_to_dense(
               tile_row_ids,
               tile_col_ids,
               tile_counts,
@@ -1347,25 +1304,25 @@ void encode_scm(
               tile_mat
           );
 
-          if (ena_diag_transform) {
-              diag_transform(tile_mat, DiagonalTransformMode::MODE_0);
+          if (ena_diag_transform && is_intra_scm && i_tile == j_tile) {
+              detail::xtensor::diag_transform(tile_mat, DiagonalTransformMode::MODE_0);
           }
           
           BinMatDtype bin_mat;
           if (ena_binarization) {
-              transform_row_bin(tile_mat, bin_mat);
+              detail::xtensor::transform_row_bin(tile_mat, bin_mat);
           } else {
               UTILS_DIE("Non-binarized encoding not supported for xtensor!");
           }
 
           genie::contact::ContactMatrixTilePayload cm_tile_payload;
-          encode_cm_tile(bin_mat, codec_ID, cm_tile_payload);
+          detail::xtensor::encode_cm_tile(bin_mat, codec_ID, cm_tile_payload);
 
           scm_param.SetTileParameter(
               i_tile,
               j_tile,
               {
-                  ena_diag_transform ? DiagonalTransformMode::MODE_0 : DiagonalTransformMode::NONE,
+                  (ena_diag_transform && is_intra_scm && i_tile == j_tile) ? DiagonalTransformMode::MODE_0 : DiagonalTransformMode::NONE,
                   BinarizationMode::ROW_BINARIZATION
               }
           );

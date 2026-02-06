@@ -1,11 +1,5 @@
 project("genie-contact")
 
-set(XTENSOR_USE_XSIMD 0)
-set(XTENSOR_USE_TBB 0)
-
-find_package(xtl REQUIRED)
-find_package(xtensor REQUIRED)
-
 set(source_files
         consts.h
         subcontact_matrix_parameters.cc
@@ -17,6 +11,11 @@ set(source_files
 )
 
 if(GENIE_CONTACT_BACKEND STREQUAL "xtensor")
+    set(XTENSOR_USE_XSIMD 0)
+    set(XTENSOR_USE_TBB 0)
+
+    find_package(xtl REQUIRED)
+    find_package(xtensor REQUIRED)
     list(APPEND source_files contact_coder_xtensor.cc)
 elseif(GENIE_CONTACT_BACKEND STREQUAL "eigen")
     find_package(Eigen REQUIRED)
@@ -29,6 +28,32 @@ add_library(${PROJECT_NAME} ${source_files})
 
 if(GENIE_CONTACT_BACKEND STREQUAL "xtensor")
     target_compile_definitions(${PROJECT_NAME} PUBLIC GENIE_CONTACT_BACKEND_XTENSOR)
+    
+    add_library(xtensor_no_warnings INTERFACE)
+    target_link_libraries(xtensor_no_warnings INTERFACE xtensor)
+
+    # Create an interface library for xtensor with suppressed warnings
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+        target_compile_options(xtensor_no_warnings INTERFACE
+            -Wno-undef
+            -Wno-shadow
+            -Wno-pedantic
+            -Wno-unused-local-typedefs
+            -Wno-sign-compare
+            -Wno-unused-variable
+            -Wno-unused-parameter
+            -Wno-unused-but-set-variable
+            -Wno-implicit-fallthrough
+            -Wno-maybe-uninitialized
+            -Wno-array-bounds
+            -Wno-stringop-overflow
+        )
+    else ()
+        target_compile_options(xtensor_no_warnings INTERFACE "/w")
+    endif()
+
+    target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
+
 elseif(GENIE_CONTACT_BACKEND STREQUAL "eigen")
     target_compile_definitions(${PROJECT_NAME} PUBLIC GENIE_CONTACT_BACKEND_EIGEN)
     target_link_libraries(${PROJECT_NAME} PUBLIC eigen)
@@ -37,10 +62,6 @@ endif()
 if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
 endif()
-
-
-add_library(xtensor_no_warnings INTERFACE)
-target_link_libraries(xtensor_no_warnings INTERFACE xtensor)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     target_compile_options(${PROJECT_NAME} PRIVATE "-pedantic")
@@ -53,27 +74,9 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=conversion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=sign-conversion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-strict-aliasing")
-# Create an interface library for xtensor with suppressed warnings
-target_compile_options(xtensor_no_warnings INTERFACE
-        -Wno-undef
-        -Wno-shadow
-        -Wno-pedantic
-        -Wno-unused-local-typedefs
-        -Wno-sign-compare
-        -Wno-unused-variable
-        -Wno-unused-parameter
-        -Wno-unused-but-set-variable
-        -Wno-implicit-fallthrough
-        -Wno-maybe-uninitialized
-        -Wno-array-bounds
-        -Wno-stringop-overflow
-)
-else ()
-target_compile_options(xtensor_no_warnings INTERFACE "/w")
 endif()
 
 
-target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
 target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-core)
 #target_link_libraries(${PROJECT_NAME} PUBLIC mpeggCodecs-shared)

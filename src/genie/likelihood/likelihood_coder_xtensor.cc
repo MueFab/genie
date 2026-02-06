@@ -4,16 +4,22 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/likelihood/likelihood_coder.h"
+#include "genie/likelihood/likelihood_coder_xtensor.h"
 #include <xtensor/xsort.hpp>
+#include <xtensor/xtensor.hpp>
+#include <xtensor/xindex_view.hpp>
+#include <xtensor/xview.hpp>
+#include <xtensor/xrandom.hpp>
+#include "genie/likelihood/likelihood_coder.h"
 #include "genie/entropy/lzma/encoder.h"
 #include "genie/likelihood/likelihood_payload.h"
 #include "genie/util/runtime_exception.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/bit_reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace likelihood {
+namespace genie::likelihood::detail::xtensor {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,10 +31,7 @@ void extract_likelihoods(const EncodingOptions& opt, EncodingBlock& block,
     uint32_t num_samples = recs.front().GetSampleCount();
     uint8_t num_likelihoods = recs.front().GetNumberOfLikelihoods();
 
-    auto& likelihood_mat = block.likelihood_mat;
-
-    MatShapeDtype likelihood_mat_shape = {block_size, num_samples * num_likelihoods};
-    likelihood_mat = xt::empty<uint32_t, xt::layout_type::row_major>(likelihood_mat_shape);
+    block.likelihood_mat.assign(block_size, std::vector<uint32_t>(num_samples * num_likelihoods));
 
     for (uint32_t i_rec = 0; i_rec < block_size; i_rec++) {
         auto& rec = recs[i_rec];
@@ -40,24 +43,23 @@ void extract_likelihoods(const EncodingOptions& opt, EncodingBlock& block,
         auto& rec_likelihoods = rec.GetLikelihoods();
         for (uint32_t j_sample = 0; j_sample < num_samples; j_sample++) {
             for (uint8_t k_likelihood = 0; k_likelihood < num_likelihoods; k_likelihood++) {
-                likelihood_mat(i_rec, j_sample * num_likelihoods + k_likelihood) =
+                block.likelihood_mat[i_rec][j_sample * num_likelihoods + k_likelihood] =
                     rec_likelihoods[j_sample][k_likelihood];
             }
         }
     }
 
-    block.nrows = (uint32_t)likelihood_mat.shape(0);
-    block.ncols = (uint32_t)likelihood_mat.shape(1);
+    block.nrows = block_size;
+    block.ncols = num_samples * num_likelihoods;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block) {
     if (opt.transform_flag) {
-        transform_lut(block.likelihood_mat, block.lut, block.nelems, block.idx_mat, block.dtype_id);
+        detail::xtensor::transform_lut(block.likelihood_mat, block.lut, block.nelems, block.idx_mat, block.dtype_id);
     } else {
-        block.idx_mat = xt::empty_like(block.likelihood_mat);
-        xt::view(block.idx_mat, xt::all(), xt::all()) = xt::view(block.likelihood_mat, xt::all(), xt::all());
+        block.idx_mat = block.likelihood_mat;
     }
 }
 
@@ -65,16 +67,9 @@ void transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block) 
 
 void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block) {
     if (opt.transform_flag) {
-        inverse_transform_lut(block.likelihood_mat, block.lut, block.idx_mat);
+        detail::xtensor::inverse_transform_lut(block.likelihood_mat, block.lut, block.idx_mat);
     } else {
-        block.likelihood_mat = xt::empty_like(block.idx_mat);
-        auto ndim = block.likelihood_mat.dimension();
-        auto dim0 = block.likelihood_mat.shape(0);
-        auto dim1 = block.likelihood_mat.shape(1);
-        (void)ndim;
-        (void)dim0;
-        (void)dim1;
-        xt::view(block.likelihood_mat, xt::all(), xt::all()) = xt::view(block.idx_mat, xt::all(), xt::all());
+        block.likelihood_mat = block.idx_mat;
     }
 }
 
@@ -82,31 +77,46 @@ void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock&
 
 void transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, uint32_t& nelems, UInt32MatDtype& idx_mat,
                    core::DataType& dtype_id) {
-    auto m = likelihood_mat.shape(0);
-    auto n = likelihood_mat.shape(1);
+    auto m = likelihood_mat.size();
+    auto n = (m == 0) ? 0 : likelihood_mat[0].size();
 
-    idx_mat = xt::xtensor<uint32_t, 2>({m, n});
-    lut = xt::unique(likelihood_mat);
+    // Flatten and convert to xtensor
+    std::vector<uint32_t> flat_mat;
+    flat_mat.reserve(m * n);
+    for (const auto& row : likelihood_mat) flat_mat.insert(flat_mat.end(), row.begin(), row.end());
+    
+    auto xt_likelihood_mat = xt::adapt(flat_mat, std::vector<size_t>{m, n});
+    auto xt_lut = xt::unique(xt_likelihood_mat);
+    auto xt_idx_mat = xt::xtensor<uint32_t, 2>({m, n});
 
     for (size_t i = 0; i < m; i++) {
         for (size_t j = 0; j < n; j++) {
-            auto& likelihood_val = likelihood_mat(i, j);
+            auto likelihood_val = likelihood_mat[i][j];
 
             // Binary Search Algorithm
             uint32_t low = 0;
-            uint32_t high = static_cast<uint32_t>(lut.shape(0)) - 1;
+            uint32_t high = static_cast<uint32_t>(xt_lut.shape(0)) - 1;
 
             while (low <= high) {
                 uint32_t idx = (low + high) / 2;
-                if (lut[idx] > likelihood_val)
+                if (xt_lut[idx] > likelihood_val)
                     high = idx - 1;
-                else if (lut[idx] < likelihood_val)
+                else if (xt_lut[idx] < likelihood_val)
                     low = idx + 1;
                 else {
-                    idx_mat(i, j) = idx;
+                    xt_idx_mat(i, j) = idx;
                     break;
                 }
             }
+        }
+    }
+
+    // Convert back to std::vector
+    lut.assign(xt_lut.begin(), xt_lut.end());
+    idx_mat.assign(m, std::vector<uint32_t>(n));
+    for (size_t i = 0; i < m; i++) {
+        for (size_t j = 0; j < n; j++) {
+            idx_mat[i][j] = xt_idx_mat(i, j);
         }
     }
 
@@ -115,36 +125,22 @@ void transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, uint32_t
         dtype_id = core::DataType::UINT8;
     } else if (nelems < (1 << 16)) {
         dtype_id = core::DataType::UINT16;
-    } else if (nelems < ((size_t)1 << 32)) {
-        dtype_id = core::DataType::UINT32;
     } else {
-        UTILS_DIE("Invalid DataType");
+        dtype_id = core::DataType::UINT32;
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void inverse_transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, UInt32MatDtype& idx_mat) {
-    auto num_dim = lut.dimension();
+    auto m = idx_mat.size();
+    auto n = (m == 0) ? 0 : idx_mat[0].size();
 
-    UTILS_DIE_IF(num_dim != 1, "LUT dimension must be 1!");
-    auto num_unique_vals = lut.shape(0);
+    likelihood_mat.assign(m, std::vector<uint32_t>(n));
 
-    likelihood_mat = xt::empty_like(idx_mat);
-    auto m = likelihood_mat.shape(0);
-    auto n = likelihood_mat.shape(1);
-
-    if (num_unique_vals > 1) {
-        for (size_t i = 0; i < m; i++) {
-            for (size_t j = 0; j < n; j++) {
-                likelihood_mat(i, j) = lut(idx_mat(i, j));
-            }
-        }
-    } else {
-        for (size_t i = 0; i < m; i++) {
-            for (size_t j = 0; j < n; j++) {
-                likelihood_mat(i, j) = lut(i, j);
-            }
+    for (size_t i = 0; i < m; i++) {
+        for (size_t j = 0; j < n; j++) {
+            likelihood_mat[i][j] = lut[idx_mat[i][j]];
         }
     }
 }
@@ -153,27 +149,27 @@ void inverse_transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, 
 
 void serialize_mat(UInt32MatDtype mat, const core::DataType dtype_id, uint32_t& nrows, uint32_t& ncols,
                    std::stringstream& payload) {
-    nrows = (uint32_t)mat.shape(0);
-    ncols = (uint32_t)mat.shape(1);
+    nrows = (uint32_t)mat.size();
+    ncols = (uint32_t)(mat.empty() ? 0 : mat[0].size());
 
     util::BitWriter writer(&payload);
 
     if (dtype_id == core::DataType::UINT8) {
         for (size_t i = 0; i < nrows; i++) {
             for (size_t j = 0; j < ncols; j++) {
-                writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(mat(i, j)));
+                writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(mat[i][j]));
             }
         }
     } else if (dtype_id == core::DataType::UINT16) {
         for (size_t i = 0; i < nrows; i++) {
             for (size_t j = 0; j < ncols; j++) {
-                writer.WriteBypassBE<uint16_t>(static_cast<uint16_t>(mat(i, j)));
+                writer.WriteBypassBE<uint16_t>(static_cast<uint16_t>(mat[i][j]));
             }
         }
     } else if (dtype_id == core::DataType::UINT32) {
         for (size_t i = 0; i < nrows; i++) {
             for (size_t j = 0; j < ncols; j++) {
-                writer.WriteBypassBE<uint32_t>(static_cast<uint32_t>(mat(i, j)));
+                writer.WriteBypassBE<uint32_t>(static_cast<uint32_t>(mat[i][j]));
             }
         }
     } else
@@ -186,20 +182,29 @@ void serialize_arr(UInt32ArrDtype arr, const uint32_t nelems, std::stringstream&
     util::BitWriter writer(&payload);
 
     for (size_t i = 0; i < nelems; i++) {
-        writer.WriteBypassBE<uint32_t>(static_cast<uint32_t>(arr(i)));
+        writer.WriteBypassBE<uint32_t>(static_cast<uint32_t>(arr[i]));
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void encode_likelihood(std::vector<core::record::VariantGenotype>& recs, LikelihoodParameters& params,
-                       LikelihoodPayload& payload, size_t block_size, bool transform_flag) {
+void encode_likelihood(std::vector<core::record::VariantGenotype>& recs,
+
+                       LikelihoodParameters& params, LikelihoodPayload& payload,
+
+                       size_t block_size, bool transform_flag) {
+
     EncodingOptions opt = {(uint32_t)block_size, transform_flag};
+
     EncodingBlock block;
-    extract_likelihoods(opt, block, recs);
-    transform_likelihood_mat(opt, block);
-    genie::likelihood::serialize_mat(block.idx_mat, block.dtype_id, block.nrows, block.ncols, block.serialized_mat);
-    genie::likelihood::serialize_arr(block.lut, block.nelems, block.serialized_arr);
+
+    detail::xtensor::extract_likelihoods(opt, block, recs);
+
+    detail::xtensor::transform_likelihood_mat(opt, block);
+
+    detail::xtensor::serialize_mat(block.idx_mat, block.dtype_id, block.nrows, block.ncols, block.serialized_mat);
+
+    detail::xtensor::serialize_arr(block.lut, block.nelems, block.serialized_arr);
     block.serialized_mat.seekp(0, std::ios::end);
     if (recs.at(0).GetNumberOfLikelihoods() > 0) {
         genie::entropy::lzma::LZMAEncoder lzmaEncoder;
@@ -232,22 +237,24 @@ void deserialize_mat(std::vector<uint8_t> payload, const core::DataType dtype_id
     std::stringstream stream(s);
     util::BitReader reader(stream);
 
+    mat.assign(nrows, std::vector<uint32_t>(ncols));
+
     if (dtype_id == core::DataType::UINT8) {
         for (size_t i = 0; i < nrows; i++) {
             for (size_t j = 0; j < ncols; j++) {
-                mat(i, j) = reader.Read<uint8_t>();
+                mat[i][j] = reader.Read<uint8_t>();
             }
         }
     } else if (dtype_id == core::DataType::UINT16) {
         for (size_t i = 0; i < nrows; i++) {
             for (size_t j = 0; j < ncols; j++) {
-                mat(i, j) = reader.Read<uint16_t>();
+                mat[i][j] = reader.Read<uint16_t>();
             }
         }
     } else if (dtype_id == core::DataType::UINT32) {
         for (size_t i = 0; i < nrows; i++) {
             for (size_t j = 0; j < ncols; j++) {
-                mat(i, j) = reader.Read<uint32_t>();
+                mat[i][j] = reader.Read<uint32_t>();
             }
         }
     } else
@@ -263,17 +270,16 @@ void decode_likelihood(const LikelihoodParameters& params, LikelihoodPayload& pa
     block.nrows = payload.getNRows();
     block.ncols = payload.getNCols();
     block.dtype_id = params.GetDtypeId();
-    MatShapeDtype likelihood_mat_shape = {block.nrows, block.ncols};
-    block.idx_mat = xt::empty<uint32_t, xt::layout_type::row_major>(likelihood_mat_shape);
-    deserialize_mat(payload.getPayload(), block.dtype_id, block.nrows, block.ncols, block.idx_mat);
-    inverse_transform_likelihood_mat(opt, block);
+    
+    detail::xtensor::deserialize_mat(payload.getPayload(), block.dtype_id, block.nrows, block.ncols, block.idx_mat);
+    detail::xtensor::inverse_transform_likelihood_mat(opt, block);
     for (uint32_t i = 0; i < block.nrows; ++i) {
         recs.emplace_back();
         std::vector<std::vector<uint32_t>> likelihoods;
         for (uint32_t j = 0; j < block.ncols; j += params.GetNumGlPerSample()) {
             std::vector<uint32_t> sample_likelihoods;
             for (uint8_t k = 0; k < params.GetNumGlPerSample(); ++k) {
-                sample_likelihoods.push_back(block.likelihood_mat(i, j + k));
+                sample_likelihoods.push_back(block.likelihood_mat[i][j + k]);
             }
             likelihoods.push_back(sample_likelihoods);
         }
@@ -283,7 +289,6 @@ void decode_likelihood(const LikelihoodParameters& params, LikelihoodPayload& pa
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace likelihood
-}  // namespace genie
+}  // namespace genie::likelihood::detail::xtensor
 
 // ---------------------------------------------------------------------------------------------------------------------

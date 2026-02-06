@@ -7,7 +7,6 @@
 #include "subcontact_matrix_payload.h"
 #include "contact_matrix_parameters.h"
 #include "genie/util/bit_reader.h"
-#include <Eigen/Dense>
 #include <vector>
 
 namespace genie {
@@ -16,95 +15,95 @@ namespace detail::eigen {
 
 void set_rle_information_from_mask(
     RunLengthEncodingData& rleData,
-    const Eigen::Matrix<bool, -1, 1>& scm_mask
+    const BinVecDtype& scm_mask
 );
 
 void compute_mask(
-    const Eigen::Matrix<uint64_t, -1, 1>& ids,
+    UInt64VecDtype& ids,
     size_t nelems,
-    Eigen::Matrix<bool, -1, 1>& mask
+    BinVecDtype& mask
 );
 
 void compute_masks(
-    Eigen::Matrix<uint64_t, -1, 1>& row_ids,
-    Eigen::Matrix<uint64_t, -1, 1>& col_ids,
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
     size_t nrows,
     size_t ncols,
     bool is_intra_scm,
-    Eigen::Matrix<bool, -1, 1>& row_mask,
-    Eigen::Matrix<bool, -1, 1>& col_mask
+    BinVecDtype& row_mask,
+    BinVecDtype& col_mask
 );
 
 void decode_scm_masks(
     ContactMatrixParameters& cm_param,
     SubcontactMatrixParameters& scm_param,
     const SubcontactMatrixPayload& scm_payload,
-    Eigen::Matrix<bool, -1, 1>& row_mask,
-    Eigen::Matrix<bool, -1, 1>& col_mask
+    BinVecDtype& row_mask,
+    BinVecDtype& col_mask
 );
 
 void decode_scm_mask_payload(
     const SubcontactMatrixMaskPayload& mask_payload,
     size_t num_entries,
-    Eigen::Matrix<bool, -1, 1>& mask
+    BinVecDtype& mask
 );
 
 void remove_unaligned(
-    Eigen::Matrix<uint64_t, -1, 1>& row_ids,
-    Eigen::Matrix<uint64_t, -1, 1>& col_ids,
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
     bool is_intra_tile,
-    const Eigen::Matrix<bool, -1, 1>& row_mask,
-    const Eigen::Matrix<bool, -1, 1>& col_mask
+    const BinVecDtype& row_mask,
+    const BinVecDtype& col_mask
 );
 
 void insert_unaligned(
-    Eigen::Matrix<uint64_t, -1, 1>& row_ids,
-    Eigen::Matrix<uint64_t, -1, 1>& col_ids,
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
     bool is_intra_tile,
-    const Eigen::Matrix<bool, -1, 1>& row_mask,
-    const Eigen::Matrix<bool, -1, 1>& col_mask
+    BinVecDtype& row_mask,
+    BinVecDtype& col_mask
 );
 
 void sparse_to_dense(
-    const Eigen::Matrix<uint64_t, -1, 1>& row_ids,
-    const Eigen::Matrix<uint64_t, -1, 1>& col_ids,
-    const Eigen::Matrix<uint32_t, -1, 1>& counts,
+    const UInt64VecDtype& row_ids,
+    const UInt64VecDtype& col_ids,
+    const UIntVecDtype& counts,
     size_t nrows,
     size_t ncols,
-    Eigen::Matrix<uint32_t, -1, -1, Eigen::RowMajor>& mat
+    UIntMatDtype& mat
 );
 
 void dense_to_sparse(
-    const Eigen::Matrix<uint32_t, -1, -1, Eigen::RowMajor>& mat,
-    Eigen::Matrix<uint64_t, -1, 1>& row_ids,
-    Eigen::Matrix<uint64_t, -1, 1>& col_ids,
-    Eigen::Matrix<uint32_t, -1, 1>& counts
+    const UIntMatDtype& mat,
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    UIntVecDtype& counts
 );
 
 [[maybe_unused]] void sort_by_row_ids(
-    Eigen::Matrix<uint64_t, -1, 1>& row_ids,
-    Eigen::Matrix<uint64_t, -1, 1>& col_ids,
-    Eigen::Matrix<uint32_t, -1, 1>& counts
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    UIntVecDtype& counts
 );
 
 void inverse_diag_transform(
-    Eigen::Matrix<uint32_t, -1, -1, Eigen::RowMajor>& mat,
+    UIntMatDtype& mat,
     DiagonalTransformMode mode
 );
 
 void diag_transform(
-    Eigen::Matrix<uint32_t, -1, -1, Eigen::RowMajor>& mat,
+    UIntMatDtype& mat,
     DiagonalTransformMode mode
 );
 
 void inverse_transform_row_bin(
-    const Eigen::Matrix<bool, -1, -1, Eigen::RowMajor>& bin_mat,
-    Eigen::Matrix<uint32_t, -1, -1, Eigen::RowMajor>& mat
+    const BinMatDtype& bin_mat,
+    UIntMatDtype& mat
 );
 
 void transform_row_bin(
-    const Eigen::Matrix<uint32_t, -1, -1, Eigen::RowMajor>& mat,
-    Eigen::Matrix<bool, -1, -1, Eigen::RowMajor>& bin_mat
+    const UIntMatDtype& mat,
+    BinMatDtype& bin_mat
 );
 
 void comp_start_end_ids(
@@ -116,7 +115,7 @@ void comp_start_end_ids(
 );
 
 void bin_mat_to_bytes(
-    const Eigen::Matrix<bool, -1, -1, Eigen::RowMajor>& bin_mat,
+    const BinMatDtype& bin_mat,
     uint8_t** payload,
     size_t& payload_len
 );
@@ -126,11 +125,11 @@ void bin_mat_from_bytes(
     size_t payload_len,
     size_t nrows,
     size_t ncols,
-    Eigen::Matrix<bool, -1, -1, Eigen::RowMajor>& bin_mat
+    BinMatDtype& bin_mat
 );
 
 void encode_cm_tile(
-    const Eigen::Matrix<bool, -1, -1, Eigen::RowMajor>& bin_mat,
+    const BinMatDtype& bin_mat,
     core::AlgoID codec_ID,
     genie::contact::ContactMatrixTilePayload& tile_payload
 );
@@ -138,7 +137,7 @@ void encode_cm_tile(
 void decode_cm_tile(
     const genie::contact::ContactMatrixTilePayload& tile_payload,
     core::AlgoID codec_ID,
-    Eigen::Matrix<bool, -1, -1, Eigen::RowMajor>& bin_mat
+    BinMatDtype& bin_mat
 );
 
 void conv_noop_on_sparse_mat(
@@ -150,9 +149,9 @@ void conv_noop_on_sparse_mat(
 );
 
 void sort_sparse_mat_inplace(
-    Eigen::Matrix<uint64_t, -1, 1>& tile_row_ids,
-    Eigen::Matrix<uint64_t, -1, 1>& tile_col_ids,
-    Eigen::Matrix<uint32_t, -1, 1>& tile_counts
+    UInt64VecDtype& tile_row_ids,
+    UInt64VecDtype& tile_col_ids,
+    UIntVecDtype& tile_counts
 );
 
 void decode_scm(

@@ -15,6 +15,7 @@
 #include "genie/core/variant_genotype_record/record.h"
 #include "genotype_parameters.h"
 #include "genotype_payload.h"
+#include "genotype_types.h"
 
 // Backend Selection
 #if defined(GENIE_GENOTYPE_BACKEND_XTENSOR)
@@ -41,12 +42,6 @@
 #endif
 
 namespace genie::genotype {
-
-// Type Aliases (delegated to backend)
-using BinMatDtype = backend::BinMatDtype;
-using Int8MatDtype = backend::Int8MatDtype;
-using UIntVecDtype = backend::UIntVecDtype;
-using UInt8MatDtype = backend::UInt8MatDtype;
 
 struct EncodingOptions {
     uint32_t block_size = 0;

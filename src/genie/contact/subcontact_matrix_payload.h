@@ -11,8 +11,6 @@
 #include <list>
 #include <optional>
 #include <tuple>
-#include <xtensor/xarray.hpp>
-#include <xtensor/xtensor.hpp>
 #include "genie/core/constants.h"
 #include "contact_matrix_parameters.h"
 #include "subcontact_matrix_parameters.h"

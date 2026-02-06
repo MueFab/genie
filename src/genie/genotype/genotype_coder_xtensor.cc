@@ -49,47 +49,51 @@ void decompose(
     max_ploidy = max_ploidy > tmp_p ? max_ploidy : tmp_p;
   }
 
-  MatShapeDtype allele_mat_shape = {block_size, num_samples * max_ploidy};
-  allele_mat = xt::empty<bool, xt::layout_type::row_major>(allele_mat_shape);
-  xt::view(allele_mat, xt::all(), xt::all()) =
-      -2;  // Initialize value with "not available"
+  auto xt_allele_mat = xt::empty<int8_t, xt::layout_type::row_major>({block_size, num_samples * max_ploidy});
+  xt_allele_mat.fill(-2);  // Initialize value with "not available"
 
-  phasing_mat = BinMatDtype(
-      {block_size, num_samples * static_cast<uint8_t>(max_ploidy - 1)});
+  auto xt_phasing_mat = xt::zeros<bool, xt::layout_type::row_major>(
+      {block_size, num_samples * static_cast<uint8_t>(max_ploidy > 0 ? max_ploidy - 1 : 0)});
 
   for (i_rec = 0; i_rec < block_size; i_rec++) {
     auto& rec = recs[i_rec];
 
-    // Check and update num_samples;
-    if (num_samples == 0) {
-      num_samples = rec.GetSampleCount();
-    } else {
-      UTILS_DIE_IF(num_samples != rec.GetSampleCount(),
-                   "Number of samples is not constant within a block!");
-    }
-
     auto& rec_alleles = rec.GetAlleles();
     for (uint32_t j_sample = 0; j_sample < num_samples; j_sample++) {
-      // Iterate only until given number of allele of the current record
       for (uint8_t k_allele = 0; k_allele < rec.GetNumberOfAllelesPerSample();
            k_allele++) {
-        allele_mat(i_rec, j_sample * max_ploidy + k_allele) =
+        xt_allele_mat(i_rec, j_sample * max_ploidy + k_allele) =
             static_cast<int8_t>(rec_alleles[j_sample][k_allele]);
       }
     }
 
-    if (max_ploidy - 1 > 0) {
+    if (max_ploidy > 1) {
       unsigned int phasing_ploidy = max_ploidy - 1;
       auto& rec_phasings = rec.GetPhasing();
       for (uint32_t j_sample = 0; j_sample < num_samples; j_sample++) {
-        // Iterate only until given number of allele of the current record
         for (uint8_t k_allele = 0;
              k_allele < rec.GetNumberOfAllelesPerSample() - 1; k_allele++) {
-          phasing_mat(i_rec, j_sample * phasing_ploidy + k_allele) =
+          xt_phasing_mat(i_rec, j_sample * phasing_ploidy + k_allele) =
               rec_phasings[j_sample][k_allele];
         }
       }
     }
+  }
+  
+  // Convert back to std::vector
+  allele_mat.assign(block_size, std::vector<int8_t>(num_samples * max_ploidy));
+  for (size_t i = 0; i < block_size; ++i) {
+      for (size_t j = 0; j < num_samples * max_ploidy; ++j) {
+          allele_mat[i][j] = xt_allele_mat(i, j);
+      }
+  }
+  
+  size_t phasing_ncols = num_samples * (max_ploidy > 0 ? max_ploidy - 1 : 0);
+  phasing_mat.assign(block_size, std::vector<bool>(phasing_ncols));
+  for (size_t i = 0; i < block_size; ++i) {
+      for (size_t j = 0; j < phasing_ncols; ++j) {
+          phasing_mat[i][j] = xt_phasing_mat(i, j);
+      }
   }
 }
 
@@ -97,19 +101,34 @@ void decompose(
 
 void transform_max_value(Int8MatDtype& allele_mat, bool& no_ref_flag,
                          bool& not_avail_flag) {
-  no_ref_flag = xt::any(xt::equal(allele_mat, -1));
-  not_avail_flag = xt::any(xt::equal(allele_mat, -2));
+  if (allele_mat.empty()) return;
+  auto nrows = allele_mat.size();
+  auto ncols = allele_mat[0].size();
 
-  auto max_val = static_cast<int8_t>(xt::amax(allele_mat)(0));
+  std::vector<int8_t> flat_mat;
+  flat_mat.reserve(nrows * ncols);
+  for (const auto& row : allele_mat) flat_mat.insert(flat_mat.end(), row.begin(), row.end());
+  auto xt_allele_mat = xt::adapt(flat_mat, std::vector<size_t>{nrows, ncols});
+
+  no_ref_flag = xt::any(xt::equal(xt_allele_mat, -1));
+  not_avail_flag = xt::any(xt::equal(xt_allele_mat, -2));
+
+  auto max_val = static_cast<int8_t>(xt::amax(xt_allele_mat)(0));
 
   if (no_ref_flag) {
     max_val++;
-    xt::filter(allele_mat, xt::equal(allele_mat, -1)) = max_val;
+    xt::filter(xt_allele_mat, xt::equal(xt_allele_mat, -1)) = max_val;
   }
 
   if (not_avail_flag) {
     max_val++;
-    xt::filter(allele_mat, xt::equal(allele_mat, -2)) = max_val;
+    xt::filter(xt_allele_mat, xt::equal(xt_allele_mat, -2)) = max_val;
+  }
+  
+  for (size_t i = 0; i < nrows; ++i) {
+      for (size_t j = 0; j < ncols; ++j) {
+          allele_mat[i][j] = xt_allele_mat(i, j);
+      }
   }
 }
 
@@ -117,15 +136,30 @@ void transform_max_value(Int8MatDtype& allele_mat, bool& no_ref_flag,
 
 void inverse_transform_max_val(Int8MatDtype& allele_mat, bool no_ref_flag,
                                bool not_avail_flag) {
-  auto max_val = static_cast<signed char>(xt::amax(allele_mat)(0));
+  if (allele_mat.empty()) return;
+  auto nrows = allele_mat.size();
+  auto ncols = allele_mat[0].size();
+
+  std::vector<int8_t> flat_mat;
+  flat_mat.reserve(nrows * ncols);
+  for (const auto& row : allele_mat) flat_mat.insert(flat_mat.end(), row.begin(), row.end());
+  auto xt_allele_mat = xt::adapt(flat_mat, std::vector<size_t>{nrows, ncols});
+
+  auto max_val = static_cast<signed char>(xt::amax(xt_allele_mat)(0));
 
   if (not_avail_flag) {
-    xt::filter(allele_mat, xt::equal(allele_mat, max_val)) = -2;
+    xt::filter(xt_allele_mat, xt::equal(xt_allele_mat, max_val)) = -2;
     max_val--;
   }
 
   if (no_ref_flag) {
-    xt::filter(allele_mat, xt::equal(allele_mat, max_val)) = -1;
+    xt::filter(xt_allele_mat, xt::equal(xt_allele_mat, max_val)) = -1;
+  }
+  
+  for (size_t i = 0; i < nrows; ++i) {
+      for (size_t j = 0; j < ncols; ++j) {
+          allele_mat[i][j] = xt_allele_mat(i, j);
+      }
   }
 }
 
@@ -139,31 +173,53 @@ void binarize_bit_plane(
     // Options
     const ConcatAxis concat_axis
 ) {
-  auto max_val = static_cast<uint8_t>(xt::amax(allele_mat)(0));
+  if (allele_mat.empty()) return;
+  auto nrows = allele_mat.size();
+  auto ncols = allele_mat[0].size();
+
+  std::vector<int8_t> flat_mat;
+  flat_mat.reserve(nrows * ncols);
+  for (const auto& row : allele_mat) flat_mat.insert(flat_mat.end(), row.begin(), row.end());
+  auto xt_allele_mat = xt::adapt(flat_mat, std::vector<size_t>{nrows, ncols});
+
+  auto max_val = static_cast<uint8_t>(xt::amax(xt_allele_mat)(0));
   num_bit_planes = static_cast<uint8_t>(std::ceil(std::log2(max_val + 1)));
   if (num_bit_planes == 0) num_bit_planes = 1;
 
-  bin_mats.resize(num_bit_planes);
+  std::vector<xt::xtensor<bool, 2>> xt_bin_mats(num_bit_planes);
 
   for (uint8_t k = 0; k < num_bit_planes; k++) {
-    bin_mats[k] = xt::eval(xt::cast<bool>(allele_mat & (1 << k)));
+    xt_bin_mats[k] = xt::eval(xt::cast<bool>(xt_allele_mat & (1 << k)));
   }
 
   if (concat_axis != ConcatAxis::DO_NOT_CONCAT) {
     for (uint8_t k = 1; k < num_bit_planes; k++) {
       if (concat_axis == ConcatAxis::CONCAT_ROW_DIR) {
-        bin_mats[0] =
-            xt::eval(xt::concatenate(xt::xtuple(bin_mats[0], bin_mats[k]), 0));
+        xt_bin_mats[0] =
+            xt::eval(xt::concatenate(xt::xtuple(xt_bin_mats[0], xt_bin_mats[k]), 0));
       } else if (concat_axis == ConcatAxis::CONCAT_COL_DIR) {
-        bin_mats[0] =
-            xt::eval(xt::concatenate(xt::xtuple(bin_mats[0], bin_mats[k]), 1));
+        xt_bin_mats[0] =
+            xt::eval(xt::concatenate(xt::xtuple(xt_bin_mats[0], xt_bin_mats[k]), 1));
       }
     }
     // Clean-up the remaining bin_mats
-    bin_mats.resize(1);
+    xt_bin_mats.resize(1);
   }
 
-  allele_mat.resize({0, 0});
+  bin_mats.clear();
+  for (const auto& xt_bin_mat : xt_bin_mats) {
+      size_t r = xt_bin_mat.shape(0);
+      size_t c = xt_bin_mat.shape(1);
+      BinMatDtype b(r, std::vector<bool>(c));
+      for (size_t i = 0; i < r; ++i) {
+          for (size_t j = 0; j < c; ++j) {
+              b[i][j] = xt_bin_mat(i, j);
+          }
+      }
+      bin_mats.push_back(std::move(b));
+  }
+
+  allele_mat.clear();
 }
 
 // -----------------------------------------------------------------------------
@@ -176,39 +232,58 @@ void debinarize_bit_plane(
     // Output
     Int8MatDtype& allele_mat
 ) {
-  size_t nrows;
-  size_t ncols;
+  if (bin_mats.empty()) return;
+  
+  std::vector<xt::xtensor<bool, 2>> xt_bin_mats;
+  for (const auto& b : bin_mats) {
+      size_t r = b.size();
+      size_t c = b.empty() ? 0 : b[0].size();
+      xt::xtensor<bool, 2> xt_b = xt::empty<bool>({r, c});
+      for (size_t i = 0; i < r; ++i) {
+          for (size_t j = 0; j < c; ++j) {
+              xt_b(i, j) = b[i][j];
+          }
+      }
+      xt_bin_mats.push_back(std::move(xt_b));
+  }
 
-  auto& bin_mat = bin_mats.front();
+  auto& bin_mat = xt_bin_mats.front();
   if (concat_axis == ConcatAxis::CONCAT_ROW_DIR) {
-    nrows = bin_mat.shape(0);
+    size_t nrows = bin_mat.shape(0);
     auto new_nrows = nrows / num_bit_planes;
     for (auto k = 0u; k < num_bit_planes; k++) {
-      BinMatDtype curr_bin_mat = xt::view(
+      xt::xtensor<bool, 2> curr_bin_mat = xt::view(
           bin_mat, xt::range((k)*new_nrows, (k + 1) * new_nrows), xt::all());
-      bin_mats.emplace_back(std::move(curr_bin_mat));
+      xt_bin_mats.emplace_back(std::move(curr_bin_mat));
     }
   } else if (concat_axis == ConcatAxis::CONCAT_COL_DIR) {
-    ncols = bin_mat.shape(1);
+    size_t ncols = bin_mat.shape(1);
     auto new_ncols = ncols / num_bit_planes;
     for (auto k = 0u; k < num_bit_planes; k++) {
-      BinMatDtype curr_bin_mat = xt::view(
+      xt::xtensor<bool, 2> curr_bin_mat = xt::view(
           bin_mat, xt::all(), xt::range((k)*new_ncols, (k + 1) * new_ncols));
-      bin_mats.emplace_back(std::move(curr_bin_mat));
+      xt_bin_mats.emplace_back(std::move(curr_bin_mat));
     }
   }
 
   if (concat_axis == ConcatAxis::CONCAT_ROW_DIR ||
       concat_axis == ConcatAxis::CONCAT_COL_DIR) {
-    bin_mats.erase(bin_mats.begin());
+    xt_bin_mats.erase(xt_bin_mats.begin());
   }
 
-  auto num_bin_mats = bin_mats.size();
-  nrows = bin_mats.front().shape(0);
-  ncols = bin_mats.front().shape(1);
-  allele_mat = xt::zeros<int8_t>({nrows, ncols});
+  auto num_bin_mats = xt_bin_mats.size();
+  size_t final_nrows = xt_bin_mats.front().shape(0);
+  size_t final_ncols = xt_bin_mats.front().shape(1);
+  auto xt_allele_mat = xt::zeros<int8_t>({final_nrows, final_ncols});
   for (auto k = 0u; k < num_bin_mats; k++) {
-    allele_mat += xt::cast<int8_t>(bin_mats[k]) << k;
+    xt_allele_mat += xt::cast<int8_t>(xt_bin_mats[k]) << k;
+  }
+  
+  allele_mat.assign(final_nrows, std::vector<int8_t>(final_ncols));
+  for (size_t i = 0; i < final_nrows; ++i) {
+      for (size_t j = 0; j < final_ncols; ++j) {
+          allele_mat[i][j] = xt_allele_mat(i, j);
+      }
   }
 }
 
@@ -222,30 +297,43 @@ void binarize_row_bin(
 //    uint8_t& num_bit_planes,
     UIntVecDtype& amax_vec
 ) {
+    if (allele_mat.empty()) return;
+    auto nrows = allele_mat.size();
+    auto ncols = allele_mat[0].size();
 
-    auto nrows = allele_mat.shape(0);
-    auto ncols = allele_mat.shape(1);
+    std::vector<int8_t> flat_mat;
+    flat_mat.reserve(nrows * ncols);
+    for (const auto& row : allele_mat) flat_mat.insert(flat_mat.end(), row.begin(), row.end());
+    auto xt_allele_mat = xt::adapt(flat_mat, std::vector<size_t>{nrows, ncols});
 
-  amax_vec =
-      xt::cast<uint8_t>(xt::ceil(xt::log2(xt::amax(allele_mat, {1}) + 1)));
+  auto xt_amax_vec =
+      xt::cast<uint8_t>(xt::ceil(xt::log2(xt::amax(xt_allele_mat, {1}) + 1)));
   // Handle the case where maximum value is 0 -> log2(1) = 0 bits
-  xt::filter(amax_vec, xt::equal(amax_vec, 0u)) = 1;
+  xt::filter(xt_amax_vec, xt::equal(xt_amax_vec, 0u)) = 1;
 
-  auto bin_mat_nrows = static_cast<size_t>(xt::sum(amax_vec)(0));
+  auto bin_mat_nrows = static_cast<size_t>(xt::sum(xt_amax_vec)(0));
 
-  BinMatDtype bin_mat = xt::zeros<bool>({bin_mat_nrows, ncols});
+  auto xt_bin_mat = xt::zeros<bool>({bin_mat_nrows, ncols});
 
   size_t i2 = 0;
   for (size_t i = 0; i < nrows; i++) {
-    for (size_t i_bit = 0; i_bit < amax_vec[i]; i_bit++) {
-      xt::view(bin_mat, i2++, xt::all()) =
-          xt::cast<bool>(xt::view(allele_mat, i, xt::all()) & (1 << i_bit));
+    for (size_t i_bit = 0; i_bit < xt_amax_vec[i]; i_bit++) {
+      xt::view(xt_bin_mat, i2++, xt::all()) =
+          xt::cast<bool>(xt::view(xt_allele_mat, i, xt::all()) & (1 << i_bit));
     }
   }
 
-  bin_mats.emplace_back(std::move(bin_mat));
+  BinMatDtype b(bin_mat_nrows, std::vector<bool>(ncols));
+  for (size_t i = 0; i < bin_mat_nrows; ++i) {
+      for (size_t j = 0; j < ncols; ++j) {
+          b[i][j] = xt_bin_mat(i, j);
+      }
+  }
+  bin_mats.emplace_back(std::move(b));
+  
+  amax_vec.assign(xt_amax_vec.begin(), xt_amax_vec.end());
 
-  allele_mat.resize({0, 0});
+  allele_mat.clear();
 }
 
 // -----------------------------------------------------------------------------
@@ -257,19 +345,21 @@ void debinarize_row_bin(
   // Outputs
   Int8MatDtype& allele_mat
 ) {
+  if (bin_mats.empty()) return;
   auto& bin_mat = bin_mats.front();
-  auto nrows = amax_vec.shape(0);
-  auto ncols = bin_mat.shape(1);
+  auto nrows = amax_vec.size();
+  auto ncols = bin_mat.empty() ? 0 : bin_mat[0].size();
 
   // Initialize values, has to be zero
-  allele_mat = xt::zeros<int8_t>({nrows, ncols});
+  allele_mat.assign(nrows, std::vector<int8_t>(ncols, 0));
 
   int l = 0;
   for (auto i = 0u; i < nrows; i++) {
     for (auto j = 0u; j < amax_vec[i]; j++) {
-      // Simplify the for-loop
-      xt::view(allele_mat, i, xt::all()) +=
-          xt::cast<int8_t>(xt::view(bin_mat, l++, xt::all())) << j;
+      for (size_t col = 0; col < ncols; ++col) {
+          if (bin_mat[l][col]) allele_mat[i][col] += (1 << j);
+      }
+      l++;
     }
   }
 }
@@ -290,7 +380,7 @@ void binarize_allele_mat(
 
   switch (binarization_ID) {
       case genie::genotype::BinarizationID::BIT_PLANE: {
-          binarize_bit_plane(
+          detail::xtensor::binarize_bit_plane(
               allele_mat,
               bin_mats,
               num_bit_planes,
@@ -301,7 +391,7 @@ void binarize_allele_mat(
       case genie::genotype::BinarizationID::ROW_BIN: {
           num_bit_planes = 1;
 
-          binarize_row_bin(
+          detail::xtensor::binarize_row_bin(
               allele_mat,
               bin_mats,
 //                num_bit_planes,
@@ -314,7 +404,7 @@ void binarize_allele_mat(
   }
 
   // TODO(Yeremia): Free memory of allele_mat
-  allele_mat.resize({0, 0});
+  allele_mat.clear();
 }
 
 // -----------------------------------------------------------------------------
@@ -340,30 +430,28 @@ void sort_matrix(
   uint8_t axis
 ) {
   UTILS_DIE_IF(axis > 1, "Invalid axis value!");
-  UTILS_DIE_IF(bin_mat.shape(axis) != ids.shape(0),
+  if (bin_mat.empty()) return;
+  size_t nrows = bin_mat.size();
+  size_t ncols = bin_mat[0].size();
+  UTILS_DIE_IF((axis == 0 ? nrows : ncols) != ids.size(),
                "bin_mat and ids have different dimension!");
 
-  if (ids.shape(0) == 0) return;
+  if (ids.empty()) return;
 
-  // TODO(Yeremia): (optimization) Create a boolean vector for the buffer
-  // instead of whole matrix;
-  BinMatDtype tmp_bin_mat = xt::empty_like(bin_mat);
   if (axis == 0) {
-    for (auto i = 0u; i < ids.shape(0); i++) {
-      xt::view(tmp_bin_mat, i, xt::all()) =
-          xt::view(bin_mat, ids[i], xt::all());
+    BinMatDtype tmp_bin_mat(nrows);
+    for (size_t i = 0; i < nrows; i++) {
+      tmp_bin_mat[i] = bin_mat[ids[i]];
     }
-    for (uint32_t i = 0; i < ids.shape(0); i++) {
-      xt::view(bin_mat, i, xt::all()) = xt::view(tmp_bin_mat, i, xt::all());
-    }
+    bin_mat = std::move(tmp_bin_mat);
   } else if (axis == 1) {
-    for (auto i = 0u; i < ids.shape(0); i++) {
-      xt::view(tmp_bin_mat, xt::all(), i) =
-          xt::view(bin_mat, xt::all(), ids[i]);
+    BinMatDtype tmp_bin_mat(nrows, std::vector<bool>(ncols));
+    for (size_t i = 0; i < nrows; i++) {
+      for (size_t j = 0; j < ncols; j++) {
+          tmp_bin_mat[i][j] = bin_mat[i][ids[j]];
+      }
     }
-    for (auto i = 0u; i < ids.shape(0); i++) {
-      xt::view(bin_mat, xt::all(), i) = xt::view(tmp_bin_mat, xt::all(), i);
-    }
+    bin_mat = std::move(tmp_bin_mat);
   }
 }
 
@@ -372,11 +460,13 @@ void sort_matrix(
 void random_sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& ids,
                          uint8_t axis) {
   UTILS_DIE_IF(axis > 1, "Invalid axis value!");
-  auto num_elem = static_cast<uint32_t>(bin_mat.shape(axis));
-  // TODO(Yeremia): requires explicit conversion
-  ids = xt::random::permutation<uint32_t>(num_elem);
-  sort_matrix(bin_mat, ids, axis);
-  ids = xt::argsort(ids);
+  if (bin_mat.empty()) return;
+  auto num_elem = static_cast<uint32_t>(axis == 0 ? bin_mat.size() : bin_mat[0].size());
+  auto xt_ids = xt::random::permutation<uint32_t>(num_elem);
+  ids.assign(xt_ids.begin(), xt_ids.end());
+  detail::xtensor::sort_matrix(bin_mat, ids, axis);
+  auto xt_argsort_ids = xt::argsort(xt_ids);
+  ids.assign(xt_argsort_ids.begin(), xt_argsort_ids.end());
 }
 
 // -----------------------------------------------------------------------------
@@ -393,7 +483,7 @@ void sort_bin_mat(
             row_ids = UIntVecDtype({0});
             break;
         case genie::genotype::SortingAlgoID::RANDOM_SORT:
-            random_sort_bin_mat(bin_mat, row_ids, 0);
+            detail::xtensor::random_sort_bin_mat(bin_mat, row_ids, 0);
             break;
         case genie::genotype::SortingAlgoID::NEAREST_NEIGHBOR:
             UTILS_DIE("Not yet implemented!");
@@ -410,7 +500,7 @@ void sort_bin_mat(
             col_ids = UIntVecDtype({0});
             break;
         case genie::genotype::SortingAlgoID::RANDOM_SORT:
-            random_sort_bin_mat(bin_mat, col_ids, 1);
+            detail::xtensor::random_sort_bin_mat(bin_mat, col_ids, 1);
             break;
         case genie::genotype::SortingAlgoID::NEAREST_NEIGHBOR:
             UTILS_DIE("Not yet implemented!");
@@ -430,14 +520,13 @@ void invert_sort_bin_mat(
     UIntVecDtype& row_ids,
     UIntVecDtype& col_ids
 ) {
-  if (row_ids.shape(0) != 1) {
-    sort_matrix(bin_mat, row_ids, 0);
-    row_ids.resize({0});
+  if (row_ids.size() != 1) {
+    detail::xtensor::sort_matrix(bin_mat, row_ids, 0);
+    row_ids.resize(0);
   }
-  if (col_ids.shape(0) != 1) {
-    sort_matrix(bin_mat, col_ids, 1);
-
-    col_ids.resize({0});
+  if (col_ids.size() != 1) {
+    detail::xtensor::sort_matrix(bin_mat, col_ids, 1);
+    col_ids.resize(0);
   }
 }
 
@@ -471,7 +560,6 @@ void invert_sort_bin_mat(
 
 // -----------------------------------------------------------------------------
 
-// TODO(yeremia): This should be part of LCC?
 void bin_mat_to_bytes(
     // Inputs
     const BinMatDtype& bin_mat,
@@ -479,8 +567,13 @@ void bin_mat_to_bytes(
     uint8_t** payload,
     size_t& payload_len
 ) {
-  auto nrows = static_cast<size_t>(bin_mat.shape(0));
-  auto ncols = static_cast<size_t>(bin_mat.shape(1));
+  auto nrows = bin_mat.size();
+  if (nrows == 0) {
+      payload_len = 0;
+      *payload = nullptr;
+      return;
+  }
+  auto ncols = bin_mat[0].size();
 
   auto bpl = (ncols >> 3u) + ((ncols & 7u) > 0u);  // Ceil div operation
   payload_len = bpl * nrows;
@@ -491,7 +584,7 @@ void bin_mat_to_bytes(
     for (auto j = 0u; j < ncols; j++) {
       auto byte_offset = row_offset + (j >> 3u);
       uint8_t shift = (7u - (j & 7u));
-      auto bool_val = bin_mat(i, j);
+      auto bool_val = bin_mat[i][j];
       auto val = static_cast<uint8_t>(bool_val);
       val = static_cast<uint8_t>(val << shift);
       *(*payload + byte_offset) |= val;
@@ -501,8 +594,6 @@ void bin_mat_to_bytes(
 
 // -----------------------------------------------------------------------------
 
-// TODO(yeremia): completely the same as the function with same name in contact.
-// Move this to somewhere elsee
 void bin_mat_from_bytes(
     // Inputs
     const uint8_t* payload,
@@ -517,16 +608,14 @@ void bin_mat_from_bytes(
   UTILS_DIE_IF(payload_len != static_cast<size_t>(nrows * bpl),
                "Invalid payload_len / nrows / ncols!");
 
-  MatShapeDtype bin_mat_shape = {nrows, ncols};
-  bin_mat.resize(bin_mat_shape);
-  xt::view(bin_mat, xt::all(), xt::all()) = false;  // Initialize value with 0
+  bin_mat.assign(nrows, std::vector<bool>(ncols, false));
 
   for (auto i = 0u; i < nrows; i++) {
     size_t row_offset = i * bpl;
     for (auto j = 0u; j < ncols; j++) {
       auto byte_offset = row_offset + (j >> 3u);
       uint8_t shift = (7u - (j & 7u));
-      bin_mat(i, j) = (*(payload + byte_offset) >> shift) & 1u;
+      bin_mat[i][j] = (*(payload + byte_offset) >> shift) & 1u;
     }
   }
 }
@@ -577,12 +666,12 @@ void entropy_encode_bin_mat(
     uint8_t* compressed_data;
     size_t compressed_data_len;
 
-    bin_mat_to_bytes(bin_mat, &raw_data, raw_data_len);
+    detail::xtensor::bin_mat_to_bytes(bin_mat, &raw_data, raw_data_len);
 
     switch (codec_ID) {
       case genie::core::AlgoID::JBIG: {
-        auto nrows = static_cast<unsigned long>(bin_mat.shape(0));
-        auto ncols = static_cast<unsigned long>(bin_mat.shape(1));
+        auto nrows = static_cast<unsigned long>(bin_mat.size());
+        auto ncols = static_cast<unsigned long>(bin_mat.empty() ? 0 : bin_mat[0].size());
         mpegg_jbig_compress_default(
             &compressed_data,
             &compressed_data_len,
@@ -700,7 +789,7 @@ void encode_and_sort_bin_mat(
   UIntVecDtype row_ids;
   UIntVecDtype col_ids;
 
-  sort_bin_mat(
+  detail::xtensor::sort_bin_mat(
       bin_mat,
       row_ids,
       col_ids,
@@ -709,9 +798,7 @@ void encode_and_sort_bin_mat(
   );
 
   if (sort_rows_flag) {
-    std::vector<uint32_t> row_ids_vec(row_ids.begin(), row_ids.end());
-
-    RowColIdsPayload row_ids_payload(std::move(row_ids_vec));
+    RowColIdsPayload row_ids_payload(row_ids);
 
     sorted_bin_mat_payload.SetRowIdsPayload(
         std::move(row_ids_payload)
@@ -719,9 +806,7 @@ void encode_and_sort_bin_mat(
   }
 
   if (sort_cols_flag) {
-    std::vector<uint32_t> col_ids_vec(col_ids.begin(), col_ids.end());
-
-    RowColIdsPayload col_ids_payload(std::move(col_ids_vec));
+    RowColIdsPayload col_ids_payload(col_ids);
 
     sorted_bin_mat_payload.SetColIdsPayload(
         std::move(col_ids_payload)
@@ -730,11 +815,11 @@ void encode_and_sort_bin_mat(
 
   // Handle entropy coding
   {
-    auto nrows = static_cast<uint32_t>(bin_mat.shape(0));
-    auto ncols = static_cast<uint32_t>(bin_mat.shape(1));
+    auto nrows = static_cast<uint32_t>(bin_mat.size());
+    auto ncols = static_cast<uint32_t>(bin_mat.empty() ? 0 : bin_mat[0].size());
     std::vector<uint8_t> payload;
 
-    entropy_encode_bin_mat(
+    detail::xtensor::entropy_encode_bin_mat(
         bin_mat,
         codec_ID,
         payload
@@ -768,7 +853,7 @@ void decode_and_inverse_sort_bin_mat(
 
   auto& bin_mat_payload = sorted_bin_mat_payload.GetBinMatPayload();
 
-  entropy_decode_bin_mat(
+  detail::xtensor::entropy_decode_bin_mat(
     bin_mat_payload.GetPayload(),
     codec_ID,
     static_cast<size_t>(bin_mat_payload.GetNRows()),
@@ -777,15 +862,13 @@ void decode_and_inverse_sort_bin_mat(
   );
 
   if (sort_rows_flag) {
-    auto row_ids_vec = sorted_bin_mat_payload.GetRowIdsPayload()->GetRowColIdsElements();
-    UIntVecDtype row_ids = xt::adapt(row_ids_vec.data(), {row_ids_vec.size()});
-    sort_matrix(bin_mat, row_ids, 0);
+    auto row_ids = sorted_bin_mat_payload.GetRowIdsPayload()->GetRowColIdsElements();
+    detail::xtensor::sort_matrix(bin_mat, row_ids, 0);
   }
 
   if (sort_cols_flag) {
-    auto col_ids_vec = sorted_bin_mat_payload.GetColIdsPayload()->GetRowColIdsElements();
-    UIntVecDtype col_ids = xt::adapt(col_ids_vec.data(), {col_ids_vec.size()});
-    sort_matrix(bin_mat, col_ids, 1);
+    auto col_ids = sorted_bin_mat_payload.GetColIdsPayload()->GetRowColIdsElements();
+    detail::xtensor::sort_matrix(bin_mat, col_ids, 1);
   }
 }
 
@@ -837,7 +920,7 @@ void encode_genotype(
 
     {
         Int8MatDtype allele_mat;
-        decompose(
+        detail::xtensor::decompose(
             recs,
             max_ploidy,
             allele_mat,
@@ -846,9 +929,8 @@ void encode_genotype(
         );
 
         tmp_payload.SetMaxPloidy(max_ploidy);
-        //if (max_ploidy > 1) tmp_payload.SetPhasesValue(phasing_mat(0,0));  // TODO(Ronald): Is this correct???
 
-        transform_max_value(
+        detail::xtensor::transform_max_value(
             allele_mat,
             dot_flag,
             na_flag
@@ -859,7 +941,7 @@ void encode_genotype(
 
         UIntVecDtype amax_vec;
 
-        binarize_allele_mat(
+        detail::xtensor::binarize_allele_mat(
             allele_mat,
             allele_bin_mat_vect,
             num_bit_planes,
@@ -883,10 +965,10 @@ void encode_genotype(
       num_variants_payloads = num_bit_planes;
     }
 
-    for (auto i_mat = 0u; i_mat < num_variants_payloads; i_mat++) {
+    for (auto i_mat = 0u; i_mat < (uint32_t)num_variants_payloads; i_mat++) {
       genie::genotype::SortedBinMatPayload sorted_bin_mat_payload;
 
-      encode_and_sort_bin_mat(
+      detail::xtensor::encode_and_sort_bin_mat(
         // Inputs
         allele_bin_mat_vect[i_mat],
         // Outputs
@@ -905,7 +987,7 @@ void encode_genotype(
     if (tmp_params.GetEncodePhasesDataFlag()) {
       genie::genotype::SortedBinMatPayload sorted_bin_mat_payload;
 
-      encode_and_sort_bin_mat(
+      detail::xtensor::encode_and_sort_bin_mat(
         phasing_mat,
         sorted_bin_mat_payload,
         sort_row_method,
@@ -920,7 +1002,6 @@ void encode_genotype(
 
     params = std::move(tmp_params);
     payload = std::move(tmp_payload);
-//    sort_format(recs, opt.block_size < recs.size() ? opt.block_size : recs.size(), block);
 }
 
 // -----------------------------------------------------------------------------
@@ -935,7 +1016,7 @@ void decode_genotype(
 
   for (const auto& sorted_bin_mat_payload : payload.GetVariantsPayloads()){
     BinMatDtype recon_bin_mat;
-    decode_and_inverse_sort_bin_mat(
+    detail::xtensor::decode_and_inverse_sort_bin_mat(
         sorted_bin_mat_payload,
         recon_bin_mat,
         params.GetVariantsCodecID(),
@@ -948,14 +1029,14 @@ void decode_genotype(
 
   if (params.GetBinarizationID() == BinarizationID::ROW_BIN){
       auto amax_elements = payload.GetVariantsAmaxPayload()->GetAmaxElements();
-      UIntVecDtype amax_vec = xt::adapt(amax_elements.data(), {amax_elements.size()});
-      debinarize_row_bin(
+      UIntVecDtype amax_vec(amax_elements.begin(), amax_elements.end());
+      detail::xtensor::debinarize_row_bin(
           bin_mats,
           amax_vec,
           allele_mat
       );
   } else if (params.GetBinarizationID() == BinarizationID::BIT_PLANE) {
-      debinarize_bit_plane(
+      detail::xtensor::debinarize_bit_plane(
           bin_mats,
           payload.GetNumBitPlanes(),
           params.GetConcatAxis(),
@@ -967,7 +1048,7 @@ void decode_genotype(
       const auto& phasing_payload = payload.GetPhasesPayload();
       BinMatDtype decoded_phasing_mat;
 
-      decode_and_inverse_sort_bin_mat(
+      detail::xtensor::decode_and_inverse_sort_bin_mat(
           *phasing_payload,
           decoded_phasing_mat,
           params.GetPhasesCodecID(),
@@ -977,7 +1058,7 @@ void decode_genotype(
       phasing_mat = decoded_phasing_mat;
   }
 
-  inverse_transform_max_val(
+  detail::xtensor::inverse_transform_max_val(
       allele_mat,
       payload.GetNoReferenceFlag(),
       payload.GetNotAvailableFlag()

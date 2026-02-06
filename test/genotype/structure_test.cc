@@ -10,8 +10,6 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <xtensor/xarray.hpp>
-#include <xtensor/xrandom.hpp>
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -19,6 +17,7 @@
 #include "genie/genotype/bin_mat_payload.h"
 #include "genie/genotype/row_col_ids_payload.h"
 #include "genie/genotype/genotype_parameters.h"
+#include "genie/genotype/genotype_test_helpers.h"
 #include "helpers.h"
 
 // -----------------------------------------------------------------------------
@@ -411,7 +410,7 @@ TEST(GenotypeStructure, RoundTrip_RowColIdsPayload) {
   }
 
   for (size_t NUM_ELEMENTS : {2u, 3u, 4u, 5u, 7u, 8u, 15u, 16u}){
-    auto ORIG_IDS = xt::random::permutation<uint32_t>(static_cast<uint32_t>(NUM_ELEMENTS));
+    auto ORIG_IDS = genie::genotype::random_permutation<uint32_t>(static_cast<uint32_t>(NUM_ELEMENTS));
     auto ORIG_IDS_VEC = std::vector<uint32_t>(ORIG_IDS.begin(), ORIG_IDS.end());
 
     auto row_col_ids = ORIG_IDS_VEC;

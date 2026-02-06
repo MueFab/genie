@@ -1,11 +1,5 @@
 project("genie-genotype")
 
-set(XTENSOR_USE_XSIMD 0)
-set(XTENSOR_USE_TBB 0)
-
-find_package(xtl REQUIRED)
-find_package(xtensor REQUIRED)
-
 set(source_files
         amax_payload.cc
         bin_mat_payload.cc
@@ -17,6 +11,11 @@ set(source_files
 )
 
 if(GENIE_GENOTYPE_BACKEND STREQUAL "xtensor")
+    set(XTENSOR_USE_XSIMD 0)
+    set(XTENSOR_USE_TBB 0)
+
+    find_package(xtl REQUIRED)
+    find_package(xtensor REQUIRED)
     list(APPEND source_files genotype_coder_xtensor.cc)
 elseif(GENIE_GENOTYPE_BACKEND STREQUAL "eigen")
     find_package(Eigen REQUIRED)
@@ -29,6 +28,7 @@ add_library(${PROJECT_NAME} ${source_files})
 
 if(GENIE_GENOTYPE_BACKEND STREQUAL "xtensor")
     target_compile_definitions(${PROJECT_NAME} PUBLIC GENIE_GENOTYPE_BACKEND_XTENSOR)
+    target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
 elseif(GENIE_GENOTYPE_BACKEND STREQUAL "eigen")
     target_compile_definitions(${PROJECT_NAME} PUBLIC GENIE_GENOTYPE_BACKEND_EIGEN)
     target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
@@ -53,8 +53,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=maybe-uninitialized")
 endif ()
 
-#target_link_libraries(${PROJECT_NAME} PUBLIC xtensor xtensor::optimize)
-target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
 target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
 #target_link_libraries(${PROJECT_NAME} PUBLIC mpeggCodecs-shared)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-jbig)

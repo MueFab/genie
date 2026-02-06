@@ -1,3 +1,7 @@
+.gemini
+GEMINI.md
+docs
+build_*/
 tmp/
 git-diff.txt
 

@@ -13,10 +13,9 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <xtensor/xarray.hpp>
-#include <xtensor/xrandom.hpp>
 #include "genie/contact/contact_coder.h"
 #include "genie/contact/contact_matrix_bin_payload.h"
+#include "genie/contact/contact_test_helpers.h"
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -139,7 +138,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto TRANSFORM_ID = genie::contact::TransformID::ID_0;
         auto NUM_BIN_ENTRIES = 100u;
 
-        genie::contact::BinVecDtype MASK_ARRAY = xt::cast<bool>(xt::random::randint<uint16_t>({NUM_BIN_ENTRIES}, 0, 2));
+        genie::contact::BinVecDtype MASK_ARRAY = genie::contact::cast<bool>(genie::contact::random_randint_vec<uint16_t>(NUM_BIN_ENTRIES, 0, 2));
 
         // Default Constructor
         {
@@ -165,9 +164,9 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 
             ASSERT_EQ(recon_obj.GetTransformID(), TRANSFORM_ID);
             for (auto i = 0u; i < NUM_BIN_ENTRIES; i++){
-                ASSERT_EQ(recon_obj.GetMaskArray()[i], MASK_ARRAY(i));
+                ASSERT_EQ(recon_obj.GetMaskArray()[i], MASK_ARRAY[i]);
             }
-            ASSERT_EQ(recon_obj.GetFirstVal(), MASK_ARRAY(0));
+            ASSERT_EQ(recon_obj.GetFirstVal(), MASK_ARRAY[0]);
             ASSERT_EQ(recon_obj.AnyRlEntries(), false);
 
             ASSERT_TRUE(orig_obj == recon_obj);
@@ -197,9 +196,9 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 
             ASSERT_EQ(recon_obj.GetTransformID(), TRANSFORM_ID);
             for (auto i = 0u; i < NUM_BIN_ENTRIES; i++){
-                ASSERT_EQ(recon_obj.GetMaskArray()[i], MASK_ARRAY(i));
+                ASSERT_EQ(recon_obj.GetMaskArray()[i], MASK_ARRAY[i]);
             }
-            ASSERT_EQ(recon_obj.GetFirstVal(), MASK_ARRAY(0));
+            ASSERT_EQ(recon_obj.GetFirstVal(), MASK_ARRAY[0]);
             ASSERT_EQ(recon_obj.AnyRlEntries(), false);
 
             ASSERT_TRUE(orig_obj == recon_obj);
@@ -212,12 +211,12 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto NUM_RL_ENTRIES = 10u;
         auto MIN_VAL = 1;
         auto MAX_VAL = (1u <<  (static_cast<uint8_t>(TRANSFORM_ID)*8) )-1;
-        genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint8_t>(
-            static_cast<uint8_t>(MIN_VAL),
-            static_cast<uint8_t>(MAX_VAL),
+        genie::contact::UIntVecDtype RL_ENTRIES = genie::contact::linspace<uint32_t>( // Use uint32_t to avoid overflow/truncation issues during linspace
+            MIN_VAL,
+            MAX_VAL,
             NUM_RL_ENTRIES
         );
-        auto NUM_BIN_ENTRIES = static_cast<uint32_t>(xt::sum(RL_ENTRIES)(0));
+        auto NUM_BIN_ENTRIES = static_cast<uint32_t>(genie::contact::sum(RL_ENTRIES));
         auto FIRST_VAL = true;
 
         auto orig_rl_entries = genie::contact::UIntVecDtype(RL_ENTRIES);
@@ -243,7 +242,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         ASSERT_FALSE(recon_obj.AnyMaskArray());
         ASSERT_EQ(recon_obj.GetFirstVal(), FIRST_VAL);
         for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
-            ASSERT_EQ(recon_obj.GetRlEntries()[i], RL_ENTRIES(i));
+            ASSERT_EQ(recon_obj.GetRlEntries()[i], RL_ENTRIES[i]);
         }
 
         ASSERT_TRUE(orig_obj == recon_obj);
@@ -255,12 +254,12 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto NUM_RL_ENTRIES = 10u;
         auto MIN_VAL = 1;
         auto MAX_VAL = (1u <<  (static_cast<uint8_t>(TRANSFORM_ID)*8) )-1;
-        genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint16_t>(
-            static_cast<uint16_t>(MIN_VAL),
-            static_cast<uint16_t>(MAX_VAL),
+        genie::contact::UIntVecDtype RL_ENTRIES = genie::contact::linspace<uint32_t>(
+            MIN_VAL,
+            MAX_VAL,
             NUM_RL_ENTRIES
         );
-        auto NUM_BIN_ENTRIES = static_cast<uint32_t>(xt::sum(RL_ENTRIES)(0));
+        auto NUM_BIN_ENTRIES = static_cast<uint32_t>(genie::contact::sum(RL_ENTRIES));
         auto FIRST_VAL = true;
 
         auto orig_rl_entries = genie::contact::UIntVecDtype(RL_ENTRIES);
@@ -285,7 +284,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         ASSERT_FALSE(recon_obj.AnyMaskArray());
         ASSERT_EQ(recon_obj.GetFirstVal(), FIRST_VAL);
         for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
-            ASSERT_EQ(recon_obj.GetRlEntries()[i], RL_ENTRIES(i));
+            ASSERT_EQ(recon_obj.GetRlEntries()[i], RL_ENTRIES[i]);
         }
 
         ASSERT_TRUE(orig_obj == recon_obj);
@@ -297,12 +296,12 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto NUM_RL_ENTRIES = 10u;
         auto MIN_VAL = 1;
         auto MAX_VAL = (1u <<  (static_cast<uint8_t>(TRANSFORM_ID)*8) )-1;
-        genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint32_t>(
-            static_cast<uint32_t>(MIN_VAL),
-            static_cast<uint32_t>(MAX_VAL),
+        genie::contact::UIntVecDtype RL_ENTRIES = genie::contact::linspace<uint32_t>(
+            MIN_VAL,
+            MAX_VAL,
             NUM_RL_ENTRIES
         );
-        auto NUM_BIN_ENTRIES = static_cast<uint32_t>(xt::sum(RL_ENTRIES)(0));
+        auto NUM_BIN_ENTRIES = static_cast<uint32_t>(genie::contact::sum(RL_ENTRIES));
         auto FIRST_VAL = true;
 
         auto orig_rl_entries = genie::contact::UIntVecDtype(RL_ENTRIES);
@@ -328,7 +327,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         ASSERT_FALSE(recon_obj.AnyMaskArray());
         ASSERT_EQ(recon_obj.GetFirstVal(), FIRST_VAL);
         for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
-            ASSERT_EQ(recon_obj.GetRlEntries()[i], RL_ENTRIES(i));
+            ASSERT_EQ(recon_obj.GetRlEntries()[i], RL_ENTRIES[i]);
         }
 
         ASSERT_TRUE(orig_obj == recon_obj);

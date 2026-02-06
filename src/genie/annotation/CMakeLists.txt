@@ -26,6 +26,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC genie-core)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-bsc)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-lzma)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-zstd)
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-genotype)
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 foreach(dir ${dirs})
