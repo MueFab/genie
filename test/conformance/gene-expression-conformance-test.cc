@@ -31,7 +31,7 @@ TEST_P(GeneExpressionConformanceTest, GeneExpressionConformanceTests) {
     std::string filename = GetParam();
     std::string filepath = gitRootDir + filename;
 
-    uint32_t BLOCK_SIZE = 200;
+    uint32_t BLOCK_SIZE = 25000;
 
     std::string set1 = "compressor 1 0 BSC {32 128 1 1}";
     std::string set2 = "compressor 1 1 LZMA {8 16777216 3 0 2 32}";

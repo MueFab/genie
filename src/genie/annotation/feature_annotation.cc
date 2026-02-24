@@ -55,6 +55,11 @@ FeatureUnits FeatureAnnotation::parseFeature(std::ifstream& inputfile) {
     for (const auto& infoField : infoFields) attributeInfo[infoField.ID] = infoField;
 
     AnnotationEncoder encodingPars;
+    entropy::bsc::BSCParameters bscParameters;
+    auto BSCalgorithmParameters = bscParameters.convertToAlgorithmParameters();
+
+    encodingPars.setDescriptorParameters(core::AnnotDesc::LINKID, core::AlgoID::BSC,
+                                         BSCalgorithmParameters);
     encodingPars.setCompressors(compressors);
     encodingPars.setAttributes(parser.getAttributes().getInfo());
     auto annotationEncodingParameters = encodingPars.Compose();
@@ -66,7 +71,7 @@ FeatureUnits FeatureAnnotation::parseFeature(std::ifstream& inputfile) {
     variant_site::ParameterSetComposer encodeParameters;
 
     variant_site::AccessUnitComposer accessUnit;
-    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::VARIANTS, 1);
+    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::GENIE_EXPRESSION, 9);
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;
@@ -76,6 +81,15 @@ FeatureUnits FeatureAnnotation::parseFeature(std::ifstream& inputfile) {
         std::map<core::AnnotDesc, std::stringstream> desc;
         for (auto& attrtile : parser.getAttributes().getTiles()) {
             attr[attrtile.first] = attrtile.second.getTypedTile(i);
+        }
+
+        if (i == 0) {
+            // add LINK_ID default values
+            std::cerr << " add link values... " << std::endl;
+            for (auto j = 0u; j < defaultTileSizeHeight; ++j) {
+                const char val = '\xFF';
+                desc[core::AnnotDesc::LINKID].write(&val, 1);
+            }
         }
 
         accessUnit.setAccessUnit(desc, attr, parser.getAttributes().getInfo(), annotationParameterSet,

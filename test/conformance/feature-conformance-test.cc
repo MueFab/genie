@@ -65,7 +65,7 @@ TEST_P(FeatureConformanceTest, FeatureConformancetests) {  // NOLINT(cert-err58-
     genie::annotation::Annotation annotationGenerator;
 
     annotationGenerator.setCompressorConfig(config);
-    annotationGenerator.setTileSize(1000, 3000);
+    annotationGenerator.setTileSize(23642, 3000);
 
     annotationGenerator.startStream(genie::annotation::RecType::FEATURE_FILE, filepath, filepath + "_output");
 }

@@ -38,10 +38,10 @@ class Code {
     Code(const std::string& _inputFileName, const std::string& _outputFileName, const std::string& _jsonInfoFileName);
     Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput);
     Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,
-         const std::string& rec = (std::string&)"all");
+         const std::string& rec = "all");
 
     Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,
-         const std::string& _infoFieldsFileName, const std::string& rec = (std::string&)"all");
+         const std::string& _infoFieldsFileName, const std::string& rec = "all");
 
  private:
     using AnnotationParameterSet = genie::core::record::annotation_parameter_set::Record;
