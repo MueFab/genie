@@ -21,28 +21,6 @@
 namespace genie {
 namespace feature {
 
-// FeatureParser::FeatureParser(std::istream& _feature_MGrecs, std::stringstream& _jsonInfoFields,
-//                                     uint64_t _rowsPerTile)
-//    : featureMGrecs(_feature_MGrecs),
-//      rowsPerTile(_rowsPerTile),
-//      numberOfRows(0),
-//      fieldWriter{},
-//      numberOfAttributes(0),
-//      startPos(0) {
-//    annotation::JsonAttributeParser InfoFieldParser(_jsonInfoFields);
-//    infoFields = InfoFieldParser.getInfoFields();
-//    init();
-//    descriptors.setTileSize(rowsPerTile);
-//
-//    util::BitReader reader(featureMGrecs);
-//    while (fillRecord(reader)) {
-//        descriptors.write(feature);
-//        attributes.add(feature.GetFeatureAttributes().GetFields());
-//        numberOfRows++;
-//    }
-//    descriptors.writeDanglingBits();
-//}
-
 FeatureParser::FeatureParser(std::istream& _feature_MGrecs, std::vector<annotation::InfoField>& _fields,
                                      uint64_t _rowsPerTile)
     : featureMGrecs(_feature_MGrecs),

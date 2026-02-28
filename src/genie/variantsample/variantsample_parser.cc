@@ -37,28 +37,6 @@ namespace variant_sample {
           attributes.add(sample.GetSampleAttributes().GetFields());
           numberOfColumns++;
         }
-        //std::map<std::string, uint8_t> sequence;
-
-        //std::ostringstream content;
-        //content << sampleMGrecs.rdbuf();
-
-        //const json::JSON jvalue = json::JSON{}.Load(content.str());
-        //if (jvalue.IsNull())
-        //    throw std::domain_error("The sample file could not be parsed or is empty.");
-
-        //for (const auto& item : jvalue.ArrayRange()) {
-        //    std::string str = item.ToString();
-        //    std::vector<uint8_t> value;
-        //    std::vector<std::vector<uint8_t>> values;
-        //    for (auto ch : str) {
-        //        value.push_back(ch);
-        //    }
-        //    values.push_back(value);
-        //    std::vector<genie::core::record::variant_site::InfoFields::Field> fields;
-        //    fields.push_back({ SAMPLE_NAME, genie::core::DataType::STRING,  values });
-        //    attributes.add(fields);
-        //    numberOfColumns++;
-        //}
     }
 
     void VariantSampleParser::init() {

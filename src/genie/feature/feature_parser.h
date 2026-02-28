@@ -41,14 +41,11 @@ class FeatureParser {
     using AttributeData = core::record::annotation_parameter_set::AttributeData;
     using InfoField = annotation::InfoField;
 
-//    FeatureParser(std::istream& _feature_MGrecs, std::stringstream& _jsonInfoFields, uint64_t rowsPerTile);
     FeatureParser(std::istream& _feature_MGrecs, std::vector<annotation::InfoField>& _fields, uint64_t _rowsPerTile);
-//    FeatureParser(std::istream& _feature_MGrecs, std::map<std::string, genie::core::record::feature::Info_tag>& _fields, uint64_t _rowsPerTile);
 
     size_t getNumberOfRows() const { return numberOfRows; }
 
     variant_site::Attributes& getAttributes() { return attributes; }
-//    variant_site::Descriptors& getDescriptors() { return descriptors; }
 
     uint64_t getNrOfTiles() { return attributes.getTiles().begin()->second.getNrOfTiles(); }
 
@@ -68,7 +65,6 @@ class FeatureParser {
 
     std::map<std::string, AttributeData> attributeData;
     variant_site::Attributes attributes;
-//    variant_site::Descriptors descriptors;
 
     uint16_t numberOfAttributes;
 

@@ -149,12 +149,6 @@ class Record {
    * @param reader The bit reader to read from
    */
   explicit Record(util::BitReader& reader);
-  /**
-   * @brief
-   */
-  //  Record(util::BitReader& reader, std::vector<Info_tag> infoTag) :
-  //  info_tag(infoTag) { read(reader); }
-  //   Record(util::BitReader& reader) { read(reader); }
 
   /**
    * @brief Reads record data from a bit reader
