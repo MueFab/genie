@@ -6,6 +6,7 @@ set(source_files
         annotation.cc
         geno_annotation.cc
         site_annotation.cc
+        sample_annotation.cc
         gene_expression_annotation.cc
         feature_annotation.cc
         contact_annotation.cc

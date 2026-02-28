@@ -23,6 +23,7 @@
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/annotation/geno_annotation.h"
 #include "genie/annotation/site_annotation.h"
+#include "genie/annotation/sample_annotation.h"
 #include "genie/annotation/gene_expression_annotation.h"
 #include "genie/annotation/feature_annotation.h"
 // -----------------------------------------------------------------------------
@@ -31,7 +32,7 @@ namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum class RecType { SITE_FILE = 0, GENO_FILE, FEATURE_FILE, GENE_EXPRESSION_FILE, CM_FILE };
+enum class RecType { SITE_FILE = 0, GENO_FILE, SAMPLE_FILE, FEATURE_FILE, GENE_EXPRESSION_FILE, CM_FILE };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -78,6 +79,7 @@ class Annotation {
 
     GenoAnnotation genoAnnotation;
     SiteAnnotation siteAnnotation;
+    SampleAnnotation sampleAnnotation;
     GeneExpressionAnnotation geneExpressionAnnotation;
     FeatureAnnotation featureAnnotation;
     CMAnnotation cmAnnotation;

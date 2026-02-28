@@ -1,0 +1,75 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+#include <gtest/gtest.h>
+
+#include <sstream>
+#include <string>
+#include <vector>
+
+#include <codecs/include/mpegg-codecs.h>
+#include "genie/core/constants.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/runtime_exception.h"
+
+#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
+#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
+#include "genie/genotype/parameterset_composer.h"
+#include "genie/genotype/genotype_parameters.h"
+#include "genie/genotype/genotype_payload.h"
+
+#include "genie/core/record/annotation_access_unit/TypedData.h"
+#include "genie/core/record/annotation_access_unit/record.h"
+#include "genie/core/record/annotation_parameter_set/record.h"
+#include "genie/core/data_unit_record/record.h"
+#include "genie/core/variant_genotype_record/record.h"
+#include "genie/variantsite/accessunit_composer.h"
+
+#include "genie/annotation/annotation.h"
+#include "genie/variantsite/parameterset_composer.h"
+#include "genie/variantsite/variantsite_parser.h"
+#include "helpers.h"
+
+class SampleConformanceTest : public ::testing::TestWithParam<std::string> {
+ protected:
+    // Do any necessary setup for your tests here
+    SampleConformanceTest() = default;
+
+    ~SampleConformanceTest() override = default;
+
+    void SetUp() override {
+        // Code here will be called immediately before each test
+    }
+
+    void TearDown() override {
+        // Code here will be called immediately after each test
+    }
+};
+
+TEST_P(SampleConformanceTest, SampleConformancetests) {  // NOLINT(cert-err58-cpp)
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filename = GetParam();
+    std::string filepath = gitRootDir + filename;
+
+    std::string set1 = "compressor 1 0 BSC";
+    std::string set2 = "compressor 1 1 LZMA";
+    std::string set3 = "compressor 2 0 ZSTD";
+    std::string set4 = "compressor 3 0 BSC";
+    std::stringstream config;
+    config << set1 << '\n' << set3 << '\n' << set4 << '\n';
+
+    genie::annotation::Annotation annotationGenerator;
+
+    annotationGenerator.setCompressorConfig(config);
+    annotationGenerator.setTileSize(1000, 3000);
+
+    annotationGenerator.startStream(genie::annotation::RecType::SAMPLE_FILE, filepath, filepath + "_output");
+}
+
+INSTANTIATE_TEST_SUITE_P(testallSampleConformance, SampleConformanceTest,
+                        ::testing::Values("/data/records/conformance/1.3.5.bgz.samples",
+                                          "/data/records/conformance/1.3.11.bgz.samples"));

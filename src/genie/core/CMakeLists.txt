@@ -30,6 +30,8 @@ set(source_files
 
         variant_site_record/record.cc
 
+        sample_record/record.cc
+
         feature_record/record.cc
 
         gene_expression_record/record.cc

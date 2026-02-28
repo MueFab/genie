@@ -155,6 +155,21 @@ void Attributes::add(std::vector<genie::core::record::feature::FeatureFields::Fi
     }
 }
 
+void Attributes::add(std::vector<genie::core::record::sample::SampleFields::Field> tags) {
+  size_t index = 0;
+  for (const auto& tag : tags) {
+    attributeTiles[tag.attr].write(tag.attr_values);
+    attrWritten[tag.attr] = true;
+    index++;
+  }
+  for (const auto& isWritten : attrWritten) {
+    if (!isWritten.second) {
+      attributeTiles[isWritten.first].writeMissing();
+    }
+    attrWritten[isWritten.first] = false;
+  }
+}
+
 Attributes::Attributes(Attributes& other) {
     info = other.info;
     rowsPerTile = other.rowsPerTile;

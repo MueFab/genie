@@ -11,6 +11,7 @@ message(STATUS "xtensor: ${xtensor_INCLUDE_DIRS}")
 set(source_files
         site-conformance-test.cc
         geno-conformance-test.cc
+        sample-conformance-test.cc
         gene-expression-conformance-test.cc
         feature-conformance-test.cc
         helpers.cc
@@ -44,6 +45,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE genie-annotation)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-genotype)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-variantsample)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-feature)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
 

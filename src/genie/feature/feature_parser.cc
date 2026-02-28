@@ -93,7 +93,6 @@ void FeatureParser::init() {
 
 bool FeatureParser::fillRecord(util::BitReader reader) {
     if (!feature.Read(reader)) return false;
-    // for (auto field : feature.getInfoTag()) tags[field.info_tag].infoValue = field.infoValue;
     return true;
 }
 

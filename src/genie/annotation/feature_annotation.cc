@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/annotation/feature_annotation.h"
+#include "feature_annotation.h"
 
 #include <codecs/include/mpegg-codecs.h>
 

@@ -49,6 +49,14 @@ void Annotation::startStream(RecType recType, std::string recordInputFileName,
         auto dataunits = siteAnnotation.parseSite(inputfile);
         annotationParameterSet.push_back(dataunits.annotationParameterSet);
         annotationAccessUnit = dataunits.annotationAccessUnit;
+    } else if (recType == RecType::SAMPLE_FILE) {
+        sampleAnnotation.setCompressors(compressors);
+        sampleAnnotation.setTileSize(defaultTileSizeWidth);
+        sampleAnnotation.parseInfoTags(recordInputFileName);
+        sampleAnnotation.setTileSize(defaultTileSizeWidth);
+        annotation::SampleUnits dataunits = sampleAnnotation.parseSample(inputfile);
+        annotationParameterSet.push_back(dataunits.annotationParameterSet);
+        annotationAccessUnit = dataunits.annotationAccessUnit;
     } else if (recType == RecType::GENE_EXPRESSION_FILE) {  // gene expression
         geneExpressionAnnotation.setCompressors(compressors);
         geneExpressionAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);

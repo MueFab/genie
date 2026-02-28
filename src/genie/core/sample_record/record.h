@@ -5,8 +5,8 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_FEATURE_RECORD_RECORD_H_
-#define SRC_GENIE_CORE_FEATURE_RECORD_RECORD_H_
+#ifndef SRC_GENIE_CORE_SAMPLE_RECORD_RECORD_H_
+#define SRC_GENIE_CORE_SAMPLE_RECORD_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,12 +23,12 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie::core::record::feature {
+namespace genie::core::record::sample {
 
 /**
- * @brief Class for handling information fields in feature records
+ * @brief Class for handling information fields in sample records
  */
-class FeatureFields {
+class SampleFields {
  public:
   /**
    * @brief Custom type definition for field values
@@ -115,12 +115,12 @@ struct Info_tag {
 };
 
 /**
- * @brief Class representing a feature record
+ * @brief Class representing a sample record
  */
 class Record {
  private:
-  uint64_t feature_index_;   //!< @brief Index of the feature
-  FeatureFields feature_attributes_;  //!< @brief Feature attributes
+  uint64_t sample_index_;   //!< @brief Index of the sample
+  SampleFields sample_attributes_;  //!< @brief Sample attributes
 
   uint8_t linked_record_;     //!< @brief Flag indicating if record is linked
   uint8_t link_name_len_;     //!< @brief Length of the link name
@@ -137,8 +137,8 @@ class Record {
    * @brief Default constructor for Record
    */
   Record()
-      : feature_index_(0),
-        feature_attributes_(),
+      : sample_index_(0),
+        sample_attributes_(),
         linked_record_(0),
         link_name_len_(0),
         link_name_(""),
@@ -171,18 +171,18 @@ class Record {
 
   /**
    * @brief Gets the feature index
-   * @return The feature index
+   * @return The sample index
    */
-  [[nodiscard]] uint64_t GetFeatureIndex() const {
-    return feature_index_;
+  [[nodiscard]] uint64_t GetSampleIndex() const {
+    return sample_index_;
   }
 
   /**
-   * @brief Gets the feature attributes
-   * @return Reference to the feature attributes
+   * @brief Gets the sample attributes
+   * @return Reference to the sample attributes
    */
-  FeatureFields& GetFeatureAttributes() {
-    return feature_attributes_;
+  SampleFields& GetSampleAttributes() {
+    return sample_attributes_;
   }
 
   /**
@@ -212,11 +212,11 @@ class Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genie::core::record::feature
+}  // namespace genie::core::record::sample
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_FEATURE_RECORD_RECORD_H_
+#endif  // SRC_GENIE_CORE_SAMPLE_RECORD_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
