@@ -72,4 +72,5 @@ TEST_P(SampleConformanceTest, SampleConformancetests) {  // NOLINT(cert-err58-cp
 
 INSTANTIATE_TEST_SUITE_P(testallSampleConformance, SampleConformanceTest,
                         ::testing::Values("/data/records/conformance/1.3.5.bgz.samples",
-                                          "/data/records/conformance/1.3.11.bgz.samples"));
+                                          "/data/records/conformance/1.3.11.bgz.samples",
+                                          "/data/records/expression/5.4.1-tp01.sample"));

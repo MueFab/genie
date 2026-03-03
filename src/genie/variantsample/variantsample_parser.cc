@@ -51,7 +51,7 @@ namespace variant_sample {
         variant_site::Attributes attr(rowsPerTile, attributeData);
         attributes = attr;
 
-        numberOfAttributes = (uint16_t)infoFields.size();
+        numberOfAttributes = static_cast<uint16_t>(infoFields.size());
     }
 
 bool VariantSampleParser::fillRecord(util::BitReader reader) {
@@ -59,7 +59,7 @@ bool VariantSampleParser::fillRecord(util::BitReader reader) {
         return false;
       return true;
     }
-    
+
 }  // namespace variant_sample
 }  // namespace genie
 

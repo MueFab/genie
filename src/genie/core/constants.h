@@ -12,12 +12,12 @@
 
 #define NOMINMAX
 #include <algorithm>
-#include <boost/variant/variant.hpp>
 #include <cmath>
 #include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
+#include <boost/variant/variant.hpp>
 
 #include "genie/util/literal.h"
 

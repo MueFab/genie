@@ -54,7 +54,7 @@ void FeatureParser::init() {
         variant_site::Attributes attr(rowsPerTile, attributeData);
         attributes = attr;
 
-        numberOfAttributes = (uint16_t)infoFields.size();
+        numberOfAttributes = static_cast<uint16_t>(infoFields.size());
     } else {
         std::map<std::string, core::record::annotation_parameter_set::AttributeData> info;
             std::map<std::string, core::record::annotation_parameter_set::AttributeData> attributetags;
@@ -65,7 +65,7 @@ void FeatureParser::init() {
         }
         variant_site::Attributes attr(rowsPerTile, attributetags);
         attributes = attr;
-        numberOfAttributes = (uint16_t)attributeID;
+        numberOfAttributes = static_cast<uint16_t>(attributeID);
     }
 }
 

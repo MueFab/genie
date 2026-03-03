@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FEATURE_VARIANTSAMPLE_PARSER_H_
-#define SRC_GENIE_FEATURE_VARIANTSAMPLE_PARSER_H_
+#ifndef SRC_GENIE_VARIANTSAMPLE_VARIANTSAMPLE_PARSER_H_
+#define SRC_GENIE_VARIANTSAMPLE_VARIANTSAMPLE_PARSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <cstdint>
@@ -78,6 +78,6 @@ class VariantSampleParser {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FEATURE_FEATURE_PARSER_H_
+#endif  // SRC_GENIE_VARIANTSAMPLE_VARIANTSAMPLE_PARSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
