@@ -35,6 +35,12 @@ class SampleAnnotation {
     defaultTileSizeWidth = _defaultTileSizeWidth;
   }
 
+  void setATtype(core::record::annotation_access_unit::AnnotationType annotationType, core::record::annotation_access_unit::AnnotationSubtype
+          annotationSubtype) {
+    annotationType_ = annotationType;
+    annotationSubtype_ = annotationSubtype;
+  }
+
   void parseInfoTags(std::string& recordInputFileName);
   SampleUnits parseSample(std::ifstream& inputfile);
   void setCompressors(annotation::Compressor& _compressors) {
@@ -54,6 +60,10 @@ class SampleAnnotation {
 
   uint32_t defaultTileSizeWidth;
   uint64_t colIndex = 0;
+  core::record::annotation_access_unit::AnnotationType annotationType_ = 
+      core::record::annotation_access_unit::AnnotationType::VARIANTS;
+  core::record::annotation_access_unit::AnnotationSubtype annotationSubtype_ = 
+      core::record::annotation_access_unit::AnnotationSubtype::VCF;
 };
 
 }  // namespace annotation

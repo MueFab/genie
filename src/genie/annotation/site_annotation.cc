@@ -67,7 +67,8 @@ SiteUnits SiteAnnotation::parseSite(std::ifstream& inputfile) {
     variant_site::ParameterSetComposer encodeParameters;
 
     variant_site::AccessUnitComposer accessUnit;
-    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::VARIANTS, 1);
+    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::VARIANTS,
+                         core::record::annotation_access_unit::AnnotationSubtype::VCF);
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;

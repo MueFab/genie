@@ -71,7 +71,8 @@ FeatureUnits FeatureAnnotation::parseFeature(std::ifstream& inputfile) {
     variant_site::ParameterSetComposer encodeParameters;
 
     variant_site::AccessUnitComposer accessUnit;
-    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::GENIE_EXPRESSION, 9);
+    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::GENE_EXPRESSION,
+                         core::record::annotation_access_unit::AnnotationSubtype::VCF);
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;

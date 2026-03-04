@@ -12,6 +12,7 @@ set(source_files
         site-conformance-test.cc
         geno-conformance-test.cc
         sample-conformance-test.cc
+        expression-sample-conformance-test.cc
         gene-expression-conformance-test.cc
         feature-conformance-test.cc
         helpers.cc

@@ -117,8 +117,8 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(
       combined.blocks.at(blockIndex).payload.Write(writer);
     }
     variant_site::AccessUnitComposer accessUnitcomposer;
-    accessUnitcomposer.setATtype(
-        core::record::annotation_access_unit::AnnotationType::VARIANTS, 1);
+    accessUnitcomposer.setATtype(core::record::annotation_access_unit::AnnotationType::VARIANTS,
+                                 core::record::annotation_access_unit::AnnotationSubtype::VCF);
 
     accessUnitcomposer.setCompressors(compressors);
 

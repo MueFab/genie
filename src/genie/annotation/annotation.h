@@ -51,6 +51,12 @@ class Annotation {
         featureAnnotation.setTileSize(_defaultTileSizeHeight);
     }
 
+    void setATType(core::record::annotation_access_unit::AnnotationType ATtype,
+                   core::record::annotation_access_unit::AnnotationSubtype ATsubtype) {
+      annotationType_ = ATtype;
+      annotationSubtype_ = ATsubtype;
+    }
+
     void startStream(RecType recType, std::string recordInputFileName,
                      std::string outputFileName);
 
@@ -86,6 +92,10 @@ class Annotation {
 
     uint32_t defaultTileSizeHeight{0};
     uint32_t defaultTileSizeWidth{0};
+    core::record::annotation_access_unit::AnnotationType annotationType_{
+        core::record::annotation_access_unit::AnnotationType::VARIANTS};
+    core::record::annotation_access_unit::AnnotationSubtype annotationSubtype_{
+        core::record::annotation_access_unit::AnnotationSubtype::VCF};
 };
 
 }  // namespace annotation

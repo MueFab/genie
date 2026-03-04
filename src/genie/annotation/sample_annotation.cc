@@ -69,7 +69,8 @@ SampleUnits SampleAnnotation::parseSample(std::ifstream& inputfile) {
                                                 annotationEncodingParameters);
 
   variant_site::AccessUnitComposer accessUnit;
-  accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::VARIANTS, 1);
+  accessUnit.setATtype(annotationType_,
+                       annotationSubtype_);
   accessUnit.setCompressors(compressors);
   annotationAccessUnits.resize(parser.getNrOfTiles());
   uint64_t rowIndex = 0;

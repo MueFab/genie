@@ -86,8 +86,8 @@ std::vector<GeneExpressionUnits> GeneExpressionAnnotation::parseGeneExpression(
       std::map<core::AnnotDesc, std::stringstream> descriptorStream;
 
       variant_site::AccessUnitComposer accessUnitcomposer;
-      accessUnitcomposer.setATtype(core::record::annotation_access_unit::AnnotationType::GENIE_EXPRESSION,
-                                   9);
+      accessUnitcomposer.setATtype(core::record::annotation_access_unit::AnnotationType::GENE_EXPRESSION,
+          core::record::annotation_access_unit::AnnotationSubtype::GENE_EXPRESSION);
 
       accessUnitcomposer.setCompressors(compressors);
 

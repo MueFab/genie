@@ -39,7 +39,8 @@ class AccessUnitComposer {
     //       annotationParameterSet = _annotationParameterSet;
     // AG_class = annotationParameterSet;
     //   }
-    void setATtype(core::record::annotation_access_unit::AnnotationType ATtype, uint8_t ATsubtype) {
+    void setATtype(core::record::annotation_access_unit::AnnotationType ATtype,
+                   core::record::annotation_access_unit::AnnotationSubtype ATsubtype) {
         AT_type = ATtype;
         AT_subtype = ATsubtype;
     }
@@ -68,7 +69,8 @@ class AccessUnitComposer {
     bool columnMajorTileOrder = false;
     uint8_t ATCoordSize = 3;
     bool variable_size_tiles = false;
-    uint8_t AT_subtype = 1;
+    core::record::annotation_access_unit::AnnotationSubtype AT_subtype{
+        core::record::annotation_access_unit::AnnotationSubtype::VCF};
     uint64_t n_tiles_per_col = 1;
     uint64_t n_tiles_per_row = 1;
     uint64_t tile_index_1 = 0;

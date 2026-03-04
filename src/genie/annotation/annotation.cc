@@ -54,6 +54,7 @@ void Annotation::startStream(RecType recType, std::string recordInputFileName,
         sampleAnnotation.setTileSize(defaultTileSizeWidth);
         sampleAnnotation.parseInfoTags(recordInputFileName);
         sampleAnnotation.setTileSize(defaultTileSizeWidth);
+        sampleAnnotation.setATtype(annotationType_, annotationSubtype_);
         annotation::SampleUnits dataunits = sampleAnnotation.parseSample(inputfile);
         annotationParameterSet.push_back(dataunits.annotationParameterSet);
         annotationAccessUnit = dataunits.annotationAccessUnit;

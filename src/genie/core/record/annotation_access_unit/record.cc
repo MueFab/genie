@@ -20,7 +20,7 @@ namespace annotation_access_unit {
 Record::Record()
     : AT_ID(0),
       AT_type(AnnotationType::VARIANTS),
-      AT_subtype(1),
+      AT_subtype(AnnotationSubtype::VCF),
       AG_class(0),
       annotation_access_unit_header{},
       block{},
@@ -37,7 +37,7 @@ Record::Record(util::BitReader& reader, bool attributeContiguity, bool twoDimens
     Read(reader, attributeContiguity, twoDimensional, columnMajorTileOrder, ATCoordSize, numChrs);
 }
 
-Record::Record(uint8_t AT_ID, AnnotationType AT_type, uint8_t AT_subtype, uint8_t AG_class,
+Record::Record(uint8_t AT_ID, AnnotationType AT_type, AnnotationSubtype AT_subtype, uint8_t AG_class,
                AnnotationAccessUnitHeader annotation_access_unit_header, std::vector<Block> blocks,
                bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder, uint8_t ATCoordSize,
                bool variable_size_tiles, uint64_t n_blocks, uint8_t numChrs)
@@ -60,7 +60,7 @@ Record::Record(uint8_t AT_ID, AnnotationType AT_type, uint8_t AT_subtype, uint8_
 void Record::Read(util::BitReader& reader) {
     AT_ID = static_cast<uint8_t>(reader.ReadBits(8));
     AT_type = static_cast<AnnotationType>(reader.ReadBits(4));
-    AT_subtype = static_cast<uint8_t>(reader.ReadBits(4));
+    AT_subtype = static_cast<AnnotationSubtype>(reader.ReadBits(4));
     AG_class = static_cast<uint8_t>(reader.ReadBits(3));
     reader.ReadBits(5);
     annotation_access_unit_header.Read(reader, attribute_contiguity, two_dimensional, column_major_tile_order,
@@ -83,7 +83,7 @@ void Record::Read(util::BitReader& reader, bool attributeContiguity, bool twoDim
 void Record::Write(util::BitWriter& writer) const {
     writer.WriteBits(AT_ID, 8);
     writer.WriteBits(static_cast<uint8_t>(AT_type), 4);
-    writer.WriteBits(AT_subtype, 4);
+    writer.WriteBits(static_cast<uint8_t>(AT_subtype), 4);
     writer.WriteBits(AG_class, 3);
     writer.WriteReserved(5);
     annotation_access_unit_header.Write(writer);
