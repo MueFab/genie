@@ -2,6 +2,7 @@ project("genie-lzma")
 
 set(source_files
     encoder.cc
+    encoder.h
 )
 add_library(genie-lzma ${source_files})
 

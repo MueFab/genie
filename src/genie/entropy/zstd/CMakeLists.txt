@@ -2,6 +2,7 @@ project("genie-zstd")
 
 set(source_files
     encoder.cc
+    encoder.h
 )
 add_library(genie-zstd ${source_files})
 

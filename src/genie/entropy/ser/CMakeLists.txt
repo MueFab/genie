@@ -2,6 +2,7 @@ project("genie-ser")
 
 set(source_files
     encoder.cc
+    encoder.h
 )
 add_library(genie-ser ${source_files})
 
