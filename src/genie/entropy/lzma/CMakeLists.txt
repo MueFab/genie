@@ -7,4 +7,5 @@ add_library(genie-lzma ${source_files})
 
 target_link_libraries(genie-lzma PRIVATE genie-core)
 target_link_libraries(genie-lzma PRIVATE genie-util)
+target_link_libraries(genie-lzma PRIVATE genie-base)
 target_link_libraries(genie-lzma PRIVATE mpeggCodecs-static)

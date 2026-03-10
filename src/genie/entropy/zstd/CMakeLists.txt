@@ -7,4 +7,5 @@ add_library(genie-zstd ${source_files})
 
 target_link_libraries(genie-zstd PRIVATE genie-core)
 target_link_libraries(genie-zstd PRIVATE genie-util)
+target_link_libraries(genie-zstd PRIVATE genie-base)
 target_link_libraries(genie-zstd PRIVATE mpeggCodecs-static)
