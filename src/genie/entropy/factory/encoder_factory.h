@@ -15,6 +15,7 @@
 
 #include <memory>
 #include "genie/entropy/base/encoder.h"
+#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
 #include "genie/core/record/annotation_access_unit/TypedData.h"
 // -----------------------------------------------------------------------------
 
@@ -37,8 +38,8 @@ public:
      * @throws std::runtime_error if the algorithm ID is not supported
      */
     static std::unique_ptr<base::Encoder> createEncoder(
-        AlgorithmID algorithmID,
-        const annotation_parameter_set::AlgorithmParameters& parameters);
+        core::AlgoID algorithmID,
+        const core::record::annotation_parameter_set::AlgorithmParameters& parameters);
 };
 
 // -----------------------------------------------------------------------------

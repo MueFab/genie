@@ -327,7 +327,7 @@ enum class AlgoID : uint8_t {
     UNDEFINED = 22
 };
 
-AlgoID stringToAlgoID(std::string& algostring);
+AlgoID stringToAlgoID(const std::string& algostring);
 
 enum class DataType : uint8_t {
     STRING = 0,
