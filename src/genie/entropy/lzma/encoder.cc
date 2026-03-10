@@ -30,12 +30,54 @@ namespace lzma {
 
 LZMAEncoder::LZMAEncoder()
     : level(MPEGG_LZMA_DEFAULT_LEVEL),
-      dictSize(MPEGG_LZMA_DEFAULT_DIC_SIZE),
-      lc(MPEGG_LZMA_DEFAULT_LC),
-      lp(MPEGG_LZMA_DEFAULT_LP),
-      pb(MPEGG_LZMA_DEFAULT_PB),
-      fb(MPEGG_LZMA_DEFAULT_FB),
-      numThreads(MPEGG_LZMA_DEFAULT_THREADS) {}
+        dictSize(MPEGG_LZMA_DEFAULT_DIC_SIZE),
+        lc(MPEGG_LZMA_DEFAULT_LC),
+        lp(MPEGG_LZMA_DEFAULT_LP),
+        pb(MPEGG_LZMA_DEFAULT_PB),
+        fb(MPEGG_LZMA_DEFAULT_FB),
+        numThreads(MPEGG_LZMA_DEFAULT_THREADS) {}
+
+    void LZMAEncoder::encode() {
+    // Use base class input/output storage
+    if (inputs.empty()) {
+    throw std::runtime_error("LZMAEncoder: No input data set");
+    }
+
+    auto &inputData = inputs[0];
+    const size_t srcLen = inputData.getDataStream().str().size();
+    if (srcLen == 0)
+    return;
+
+    unsigned char *compressedBuffer = NULL;
+    size_t compSize = 0;
+
+    int ret = mpegg_lzma_compress(
+        &compressedBuffer, &compSize,
+        reinterpret_cast<const unsigned char *>(inputData.getDataStream().str().data()), srcLen,
+        level, dictSize, lc, lp, pb, fb, numThreads);
+
+    if (ret != 0) {
+    if (compressedBuffer)
+        free(compressedBuffer);
+    throw std::runtime_error("LZMA compression failed");
+    }
+
+    // Store output in base class storage
+    outputs.clear();
+    outputs.resize(1);
+    outputs[0] = genie::core::record::annotation_access_unit::TypedData(
+        inputData.getDataTypeID(), inputData.getNumArrayDims(), inputData.getArrayDims());
+    outputs[0].getCompresseddata().str(
+        std::string(reinterpret_cast<const char *>(compressedBuffer), compSize));
+
+    if (compressedBuffer)
+    free(compressedBuffer);
+}
+
+void LZMAEncoder::decode() {
+    // Use base class input/output storage
+    throw std::runtime_error("LZMAEncoder: Decoder not implemented");
+}
 
 void LZMAEncoder::encode(std::stringstream &input, std::stringstream &output) {
     const size_t srcLen = input.str().size();

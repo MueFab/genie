@@ -18,6 +18,7 @@
 
 #include <sstream>
 
+#include "genie/entropy/base/encoder.h"
 #include "genie/core/access_unit.h"
 #include "genie/core/entropy_encoder.h"
 #include "genie/util/make_unique.h"
@@ -26,6 +27,8 @@
 #include "apps/genie/annotation/code.h"
 #include "codecs/include/mpegg-codecs.h"
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
+#include "genie/core/record/annotation_access_unit/TypedData.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -63,9 +66,12 @@ class BSCParameters {
     }
 };
 
-class BSCEncoder {
+class BSCEncoder : public base::Encoder {
  public:
     BSCEncoder();
+
+    void encode() override;
+    void decode() override;
 
     void encode(std::stringstream &input, std::stringstream &output);
 
