@@ -63,13 +63,17 @@ void AlgorithmParameters::Write(util::BitWriter& writer) const {
     for (auto i = 0; i < n_pars; ++i) {
         writer.WriteBits(par_ID[i], 4);
         writer.WriteBits(static_cast<uint8_t>(par_type[i]), 8);
+        DataType paramType = par_type[i];
+        if (paramType == DataType::BOOL) {
+          paramType = DataType::UINT8;
+        }
         writer.WriteBits(par_num_array_dims[i], 2);
         for (auto j = 0; j < par_num_array_dims[i]; ++j) {
           writer.WriteBits(par_array_dims[i][j], 8);
         }
         for (auto j : par_val[i])
             for (auto k : j)
-                for (auto l : k) types.toFile(par_type[i], l, writer);
+                for (auto l : k) types.toFile(paramType, l, writer);
     }
 }
 
