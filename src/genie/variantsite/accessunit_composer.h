@@ -88,14 +88,12 @@ class AccessUnitComposer {
                       descriptorConfigurations,
                   std::map<genie::core::AnnotDesc, std::stringstream>& inputstream,
                   std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors);
-    void compress(
-        std::map<std::string, std::stringstream>& attributeStream,
-        const std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet>& attributeParameterSets,
-        const std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet>&
-            compressorParameterSets,
-        std::map<std::string, std::stringstream>& encodedAttributes);
 
     void compress(genie::core::record::annotation_access_unit::TypedData& oneBlock,
+                  genie::core::record::annotation_parameter_set::CompressorParameterSet& compressor);
+
+    void compress(genie::core::record::annotation_access_unit::TypedData& oneBlock,
+                  std::vector<genie::core::record::annotation_access_unit::TypedData>& outputBlocks,
                   genie::core::record::annotation_parameter_set::CompressorParameterSet& compressor);
 };
 

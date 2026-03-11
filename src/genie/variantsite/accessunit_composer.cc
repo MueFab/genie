@@ -80,24 +80,33 @@ void AccessUnitComposer::setAccessUnit(
         _annotationParameterSet.getAnnotationEncodingParameters().getCompressorParameterSets();
     std::map<std::string, std::stringstream> encodedAttributes;
 
-    // auto temp1 = _attributeTileStream["AA"].getdata().str().length();
-
+    std::map<std::string, std::vector<core::record::annotation_access_unit::TypedData>> attributeTileStreamOutputs;
     for (auto& attribute : attributeParameterSets) {
         auto compressorId = attribute.getCompressorID();
         if (compressorId != 0) {
             auto& AttributeStream = _attributeTileStream[attribute.getAttributeName()];
-            auto& compressorSet = compressorParameterSets.at(compressorId - 1);
+            auto& attributeStreamOutput = attributeTileStreamOutputs[attribute.getAttributeName()];
+            auto it = std::find_if(
+                compressorParameterSets.begin(), compressorParameterSets.end(),
+                [compressorId](const core::record::annotation_parameter_set::CompressorParameterSet& comp) {
+                  return comp.getCompressorID() == compressorId;
+                });
 
-            compress(AttributeStream, compressorSet);
+            if (it != compressorParameterSets.end()) {
+              auto& compressorSet = *it;
+              compress(AttributeStream, attributeStreamOutput, compressorSet);
+            }
          }
     }
 
-    for (auto& tile : _attributeTileStream) {
-        auto attributeID = _attributeInfo[tile.first].getAttributeID();
+    for (auto& tileData : attributeTileStreamOutputs) {
+      auto attributeID = _attributeInfo[tileData.first].getAttributeID();
 
         std::stringstream data;
         util::BitWriter writer(&data);
-        tile.second.Write(writer);
+        for (auto& oneBlock : tileData.second) {
+          oneBlock.Write(writer);
+        }
         writer.FlushBits();
         core::record::annotation_access_unit::BlockData blockInfo(core::AnnotDesc::ATTRIBUTE, attributeID, data);
         core::record::annotation_access_unit::Block block;
@@ -153,42 +162,6 @@ void AccessUnitComposer::compress(
     }
 }
 
-void AccessUnitComposer::compress(
-    std::map<std::string, std::stringstream>& attributeStream,
-    const std::vector<core::record::annotation_parameter_set::AttributeParameterSet>& attributeParameterSets,
-    const std::vector<core::record::annotation_parameter_set::CompressorParameterSet>& compressorParameterSets,
-    std::map<std::string, std::stringstream>& encodedAttributes) {
-    entropy::bsc::BSCEncoder bscEncoder;
-    entropy::lzma::LZMAEncoder lzmaEncoder;
-    entropy::zstd::ZSTDEncoder zstdEncoder;
-
-    for (auto& attribute : attributeParameterSets) {
-        auto attributeName = attribute.getAttributeName();
-        auto compressorID = attribute.getCompressorID();
-        if (compressorID == 0) {
-            encodedAttributes[attributeName] << attributeStream[attributeName].rdbuf();
-        } else {
-            auto encodeID = compressorParameterSets[compressorID - 1].getAlgorithmIDs();
-
-            switch (encodeID[0]) {
-                case core::AlgoID::BSC:
-                    bscEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
-                    break;
-                case core::AlgoID::LZMA:
-                    lzmaEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
-                    break;
-                case core::AlgoID::ZSTD:
-                    zstdEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
-                    break;
-
-                default:
-                    encodedAttributes[attributeName] << attributeStream[attributeName].rdbuf();
-                    break;
-            }
-        }
-    }
-}
-
 void AccessUnitComposer::compress(core::record::annotation_access_unit::TypedData& oneBlock,
                                   core::record::annotation_parameter_set::CompressorParameterSet& compressor) {
     auto encodeId = compressor.getAlgorithmIDs();
@@ -196,6 +169,15 @@ void AccessUnitComposer::compress(core::record::annotation_access_unit::TypedDat
         std::stringstream compressedData;
         compressors.compress(oneBlock.getdata(), compressedData, compressor.getCompressorID());
         oneBlock.setCompressedData(compressedData);
+    }
+}
+
+void AccessUnitComposer::compress(core::record::annotation_access_unit::TypedData& oneBlock,
+                                    std::vector<core::record::annotation_access_unit::TypedData>& outputBlocks,
+                                    core::record::annotation_parameter_set::CompressorParameterSet& compressor) {
+    auto encodeId = compressor.getAlgorithmIDs();
+    if (compressor.getCompressorID() != 0) {
+        compressors.compress(oneBlock, outputBlocks, compressor.getCompressorID());
     }
 }
 

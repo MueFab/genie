@@ -27,7 +27,7 @@ namespace zstd {
 
 ZSTDEncoder::ZSTDEncoder() : use_dictionary_flag(false), dictionary_size(0), dictionary{} {}
 
-    void ZSTDEncoder::encode() {
+void ZSTDEncoder::encode() {
     // Use base class input/output storage
     if (inputs.empty()) {
     throw std::runtime_error("ZSTDEncoder: No input data set");

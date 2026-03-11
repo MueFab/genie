@@ -37,7 +37,7 @@ LZMAEncoder::LZMAEncoder()
         fb(MPEGG_LZMA_DEFAULT_FB),
         numThreads(MPEGG_LZMA_DEFAULT_THREADS) {}
 
-    void LZMAEncoder::encode() {
+void LZMAEncoder::encode() {
     // Use base class input/output storage
     if (inputs.empty()) {
     throw std::runtime_error("LZMAEncoder: No input data set");
