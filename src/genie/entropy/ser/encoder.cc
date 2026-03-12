@@ -77,6 +77,7 @@ void SEREncoder::encode() {
             break;
         case core::DataType::UINT64:
         case core::DataType::INT64:
+        case core::DataType::DOUBLE:
             elementSize = 8;
             break;
         case core::DataType::STRING:

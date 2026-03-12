@@ -33,12 +33,12 @@ TEST_P(GeneExpressionConformanceTest, GeneExpressionConformanceTests) {
 
     uint32_t BLOCK_SIZE = 25000;
 
-    std::string set1 = "compressor 1 0 BSC {32 128 1 1}";
-    std::string set2 = "compressor 1 1 LZMA {8 16777216 3 0 2 32}";
+    std::string set1 = "compressor 1 0 SER {0} {} {1}";
+    std::string set2 = "compressor 1 1 BSC {32 128 1 1} {{0 0 0}} {0}";
     std::string set3 = "compressor 2 0 ZSTD";
     std::string set4 = "compressor 3 0 BSC";
     std::stringstream config;
-    config << set1 << '\n' << set3 << '\n' << set4 << '\n';
+    config << set1 << '\n' << set2 << '\n' << set3 << '\n' << set4 << '\n';
 
     genie::annotation::Annotation annotationGenerator;
     annotationGenerator.setCompressorConfig(config);

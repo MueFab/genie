@@ -55,12 +55,12 @@ TEST_P(SampleConformanceTest, SampleConformancetests) {  // NOLINT(cert-err58-cp
     std::string filename = GetParam();
     std::string filepath = gitRootDir + filename;
 
-    std::string set1 = "compressor 1 0 BSC";
-    std::string set2 = "compressor 1 1 LZMA";
+    std::string set1 = "compressor 1 0 SER {0} {} {1}";
+    std::string set2 = "compressor 1 1 BSC {} {{0 0 0}} {0}";
     std::string set3 = "compressor 2 0 ZSTD";
     std::string set4 = "compressor 3 0 BSC";
     std::stringstream config;
-    config << set1 << '\n' << set3 << '\n' << set4 << '\n';
+    config << set1 << '\n' << set2 << '\n' << set3 << '\n' << set4 << '\n';
 
     genie::annotation::Annotation annotationGenerator;
 
