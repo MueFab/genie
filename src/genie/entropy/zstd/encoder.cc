@@ -30,7 +30,10 @@ ZSTDEncoder::ZSTDEncoder() : use_dictionary_flag(false), dictionary_size(0), dic
 void ZSTDEncoder::encode() {
     // Use base class input/output storage
     if (inputs.empty()) {
-    throw std::runtime_error("ZSTDEncoder: No input data set");
+        throw std::runtime_error("ZSTDEncoder: No input data set");
+    }
+    if (inputs[0].getArrayDims().size() != 1) {
+        throw std::runtime_error("ZSTDEncoder: Input data must be a 1D array");
     }
 
     auto &inputData = inputs[0];

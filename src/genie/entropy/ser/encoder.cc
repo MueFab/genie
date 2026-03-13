@@ -30,6 +30,9 @@ void SEREncoder::encode() {
     if (inputs.empty()) {
         throw std::runtime_error("SEREncoder: No input data set");
     }
+    if (inputs[0].getArrayDims().size() < 2) {
+        throw std::runtime_error("SEREncoder: Input data must have at least 2 dimensions");
+    }
 
     auto& inputData = inputs[0];
     const auto& arrayDims = inputData.getArrayDims();

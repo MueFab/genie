@@ -32,13 +32,19 @@ void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
     } else if (rowInTile < (rowsPerTile-1)) {
         rowInTile++;
         typedTiles.back().setArrayDim0(static_cast<uint32_t>(rowInTile));
+        if (value.size() > typedTiles.back().getArrayDims()[1]) {
+            typedTiles.back().setArrayDim1(static_cast<uint32_t>(value.size()));
+        }
     } else {
         typedTiles.back().setArrayDim0(static_cast<uint32_t>(rowInTile + 1));
+        if (value.size() > typedTiles.back().getArrayDims()[1]) {
+            typedTiles.back().setArrayDim1(static_cast<uint32_t>(value.size()));
+        }
         writers.back().FlushBits();
 
         std::vector<uint32_t> arrayDims;
         arrayDims.push_back(static_cast<uint32_t>(rowInTile+1));
-        for (uint8_t i = 1; i < info.getArrayLength(); ++i) arrayDims.push_back(static_cast<uint32_t>(2));
+        arrayDims.push_back(static_cast<uint32_t>(value.size()));
         typedTiles.emplace_back(info.getAttributeType(), info.getArrayLength(), arrayDims);
         tiles.emplace_back("");
         writers.emplace_back(&tiles.back());
@@ -85,7 +91,7 @@ void AttributeTile::AddFirst() {
     if (typedTiles.empty()) {
         std::vector<uint32_t> arrayDims;
         arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
-        for (uint8_t i = 1; i < info.getArrayLength(); ++i) arrayDims.push_back(static_cast<uint32_t>(2));
+        arrayDims.push_back(static_cast<uint32_t>(1));
         typedTiles.emplace_back(info.getAttributeType(), info.getArrayLength(), arrayDims);
     }
 }

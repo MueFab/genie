@@ -36,7 +36,10 @@ BSCEncoder::BSCEncoder()
 void BSCEncoder::encode() {
     // Use base class input/output storage
     if (inputs.empty()) {
-    throw std::runtime_error("BSCEncoder: No input data set");
+        throw std::runtime_error("BSCEncoder: No input data set");
+    }
+    if (inputs[0].getArrayDims().size() != 1) {
+        throw std::runtime_error("BSCEncoder: Input data must be a 1D array");
     }
 
     auto &inputData = inputs[0];
