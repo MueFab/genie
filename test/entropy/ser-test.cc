@@ -43,12 +43,10 @@ protected:
     }
 };
 
-// Test SER encoding with 1D array (order = false)
-TEST_F(SERTestCase, SEREncode1DArrayInOrderTest) {  // NOLINT(cert-err58-cpp)
+// Test SER encoding with 1D array should throw exception
+TEST_F(SERTestCase, SEREncode1DArrayThrowsExceptionTest) {  // NOLINT(cert-err58-cpp)
     // Create input data: [10, 20, 30, 40]
-    // Expected output:
-    //   Symbols: [10, 20, 30, 40] (flattened, same order)
-    //   Dimensions: [4]
+    // Expected: Exception should be thrown for 1D array
     
     std::vector<uint8_t> inputValues = {10, 20, 30, 40};
     
@@ -70,34 +68,38 @@ TEST_F(SERTestCase, SEREncode1DArrayInOrderTest) {  // NOLINT(cert-err58-cpp)
     encoder.configure(params);
     encoder.setInput(0, inputData);
     
-    // Perform encoding
-    encoder.encode();
+    // Perform encoding - should throw exception
+    EXPECT_THROW(encoder.encode(), std::runtime_error);
+}
+
+// Test SER encoding with 1D string array should throw exception
+TEST_F(SERTestCase, SEREncode1DStringArrayThrowsExceptionTest) {  // NOLINT(cert-err58-cpp)
+    // Create input data with strings
+    // Expected: Exception should be thrown for 1D array
     
-    // Get outputs
-    auto& symbolOutput = encoder.getOutput(0);
-    auto& dimensionsOutput = encoder.getOutput(1);
+    std::vector<std::string> inputStrings = {"hello", "world", "test"};
     
-    // Verify output types and dimensions
-    ASSERT_EQ(symbolOutput.getDataTypeID(), genie::core::DataType::UINT8);
-    ASSERT_EQ(dimensionsOutput.getDataTypeID(), genie::core::DataType::UINT32);
+    // Create TypedData for 1D string input
+    genie::core::record::annotation_access_unit::TypedData inputData(
+        genie::core::DataType::STRING, 
+        1, 
+        std::vector<uint32_t>{static_cast<uint32_t>(inputStrings.size())}
+    );
     
-    // Verify symbols
-    std::string symbolStr = symbolOutput.getDataStream().str();
-    const uint8_t* symbols = reinterpret_cast<const uint8_t*>(symbolStr.data());
-    size_t numSymbols = symbolStr.size() / sizeof(uint8_t);
+    // Write input data to stream
+    auto& inputStream = inputData.getDataStream();
+    for (const auto& str : inputStrings) {
+        inputStream.write(str.c_str(), str.length() + 1);
+    }
     
-    ASSERT_EQ(numSymbols, 4);
-    EXPECT_EQ(symbols[0], 10);
-    EXPECT_EQ(symbols[1], 20);
-    EXPECT_EQ(symbols[2], 30);
-    EXPECT_EQ(symbols[3], 40);
+    // Create encoder and configure
+    genie::entropy::ser::SEREncoder encoder;
+    genie::entropy::ser::SERParameters params(false);
+    encoder.configure(params);
+    encoder.setInput(0, inputData);
     
-    // Verify dimensions (read in network byte order)
-    std::string dimensionsStr = dimensionsOutput.getDataStream().str();
-    std::vector<uint32_t> dimensions = readDimensions(dimensionsStr);
-    
-    ASSERT_EQ(dimensions.size(), 1);
-    EXPECT_EQ(dimensions[0], 4);
+    // Perform encoding - should throw exception
+    EXPECT_THROW(encoder.encode(), std::runtime_error);
 }
 
 // Test SER encoding with 2D array (order = false)
@@ -271,16 +273,16 @@ TEST_F(SERTestCase, SEREncode3DArrayInOrderTest) {  // NOLINT(cert-err58-cpp)
     EXPECT_EQ(dimensions[2], 2);
 }
 
-// Test SER encoding with UINT16 data type
+// Test SER encoding with UINT16 data type (2D to satisfy minimum dimension requirement)
 TEST_F(SERTestCase, SEREncodeUINT16Test) {  // NOLINT(cert-err58-cpp)
-    // Create input data with uint16_t
+    // Create input data with uint16_t in 2D array (2x2)
     std::vector<uint16_t> inputValues = {100, 200, 300, 400};
     
-    // Create TypedData for 1D input
+    // Create TypedData for 2D input
     genie::core::record::annotation_access_unit::TypedData inputData(
         genie::core::DataType::UINT16, 
-        1, 
-        std::vector<uint32_t>{static_cast<uint32_t>(inputValues.size())}
+        2, 
+        std::vector<uint32_t>{2, 2}
     );
     
     // Write input data to stream
@@ -319,72 +321,9 @@ TEST_F(SERTestCase, SEREncodeUINT16Test) {  // NOLINT(cert-err58-cpp)
     std::string dimensionsStr = dimensionsOutput.getDataStream().str();
     std::vector<uint32_t> dimensions = readDimensions(dimensionsStr);
     
-    ASSERT_EQ(dimensions.size(), 1);
-    EXPECT_EQ(dimensions[0], 4);
-}
-
-// Test SER encoding with STRING data type (1D array, order = false)
-TEST_F(SERTestCase, SEREncodeString1DInOrderTest) {  // NOLINT(cert-err58-cpp)
-    // Create input data: ["hello", "world", "test"]
-    // Expected output with order=false:
-    //   Symbols: "hello\0world\0test\0" (concatenated with null terminators)
-    //   Dimensions: [3]
-    
-    std::vector<std::string> inputStrings = {"hello", "world", "test"};
-    
-    // Create TypedData for 1D string input
-    genie::core::record::annotation_access_unit::TypedData inputData(
-        genie::core::DataType::STRING, 
-        1, 
-        std::vector<uint32_t>{static_cast<uint32_t>(inputStrings.size())}
-    );
-    
-    // Write input data to stream (each string null-terminated)
-    auto& inputStream = inputData.getDataStream();
-    for (const auto& str : inputStrings) {
-        inputStream.write(str.c_str(), str.length() + 1);  // Include null terminator
-    }
-    
-    // Create encoder and configure
-    genie::entropy::ser::SEREncoder encoder;
-    genie::entropy::ser::SERParameters params(false);  // order = false
-    encoder.configure(params);
-    encoder.setInput(0, inputData);
-    
-    // Perform encoding
-    encoder.encode();
-    
-    // Get outputs
-    auto& symbolOutput = encoder.getOutput(0);
-    auto& dimensionsOutput = encoder.getOutput(1);
-    
-    // Verify output type
-    ASSERT_EQ(symbolOutput.getDataTypeID(), genie::core::DataType::STRING);
-    
-    // Verify symbols (strings should be concatenated with null terminators)
-    std::string symbolStr = symbolOutput.getDataStream().str();
-    const char* symbols = symbolStr.c_str();
-    
-    // Parse strings from output
-    std::vector<std::string> outputStrings;
-    size_t offset = 0;
-    while (offset < symbolStr.size()) {
-        std::string str(symbols + offset);
-        outputStrings.push_back(str);
-        offset += str.length() + 1;  // Move past null terminator
-    }
-    
-    ASSERT_EQ(outputStrings.size(), inputStrings.size());
-    for (size_t i = 0; i < outputStrings.size(); ++i) {
-        EXPECT_EQ(outputStrings[i], inputStrings[i]);
-    }
-    
-    // Verify dimensions (read in network byte order)
-    std::string dimensionsStr = dimensionsOutput.getDataStream().str();
-    std::vector<uint32_t> dimensions = readDimensions(dimensionsStr);
-    
-    ASSERT_EQ(dimensions.size(), 1);
-    EXPECT_EQ(dimensions[0], 3);
+    ASSERT_EQ(dimensions.size(), 2);
+    EXPECT_EQ(dimensions[0], 2);
+    EXPECT_EQ(dimensions[1], 2);
 }
 
 // Test SER encoding with STRING data type (2D array, order = false)
@@ -581,55 +520,6 @@ TEST_F(SERTestCase, SEREncodeString3DInOrderTest) {  // NOLINT(cert-err58-cpp)
     EXPECT_EQ(dimensions[0], 2);
     EXPECT_EQ(dimensions[1], 2);
     EXPECT_EQ(dimensions[2], 2);
-}
-
-// Test SER encoding with STRING data type (variable length strings)
-TEST_F(SERTestCase, SEREncodeStringVariableLengthTest) {  // NOLINT(cert-err58-cpp)
-    // Create input data with strings of varying lengths
-    std::vector<std::string> inputStrings = {"", "a", "hello world", "test123"};
-    
-    // Create TypedData for 1D string input
-    genie::core::record::annotation_access_unit::TypedData inputData(
-        genie::core::DataType::STRING, 
-        1, 
-        std::vector<uint32_t>{static_cast<uint32_t>(inputStrings.size())}
-    );
-    
-    // Write input data to stream
-    auto& inputStream = inputData.getDataStream();
-    for (const auto& str : inputStrings) {
-        inputStream.write(str.c_str(), str.length() + 1);
-    }
-    
-    // Create encoder and configure
-    genie::entropy::ser::SEREncoder encoder;
-    genie::entropy::ser::SERParameters params(false);
-    encoder.configure(params);
-    encoder.setInput(0, inputData);
-    
-    // Perform encoding
-    encoder.encode();
-    
-    // Get outputs
-    auto& symbolOutput = encoder.getOutput(0);
-    
-    // Verify symbols
-    std::string symbolStr = symbolOutput.getDataStream().str();
-    const char* symbols = symbolStr.c_str();
-    
-    // Parse strings from output
-    std::vector<std::string> outputStrings;
-    size_t offset = 0;
-    while (offset < symbolStr.size()) {
-        std::string str(symbols + offset);
-        outputStrings.push_back(str);
-        offset += str.length() + 1;
-    }
-    
-    ASSERT_EQ(outputStrings.size(), inputStrings.size());
-    for (size_t i = 0; i < outputStrings.size(); ++i) {
-        EXPECT_EQ(outputStrings[i], inputStrings[i]);
-    }
 }
 
 // Test SER encoding with STRING data type (3D array, order = true)
