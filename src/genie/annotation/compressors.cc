@@ -10,6 +10,7 @@
 
 #include <cctype>
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <string>

@@ -60,9 +60,9 @@ class SampleAnnotation {
 
   uint32_t defaultTileSizeWidth;
   uint64_t colIndex = 0;
-  core::record::annotation_access_unit::AnnotationType annotationType_ = 
+  core::record::annotation_access_unit::AnnotationType annotationType_ =
       core::record::annotation_access_unit::AnnotationType::VARIANTS;
-  core::record::annotation_access_unit::AnnotationSubtype annotationSubtype_ = 
+  core::record::annotation_access_unit::AnnotationSubtype annotationSubtype_ =
       core::record::annotation_access_unit::AnnotationSubtype::VCF;
 };
 

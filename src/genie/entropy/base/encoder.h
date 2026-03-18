@@ -14,7 +14,7 @@
 // -----------------------------------------------------------------------------
 
 #include <vector>
-//#include "genie/core/entropy_encoder.h"
+// #include "genie/core/entropy_encoder.h"
 #include "genie/core/record/annotation_access_unit/TypedData.h"
 
 // -----------------------------------------------------------------------------

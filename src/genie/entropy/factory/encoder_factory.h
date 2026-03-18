@@ -29,7 +29,7 @@ namespace factory {
  * the creation logic from the base class.
  */
 class EncoderFactory {
-public:
+ public:
     /**
      * Creates an encoder instance based on the algorithm ID.
      * @param algorithmID The algorithm to use for encoding

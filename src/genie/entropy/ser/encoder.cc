@@ -63,7 +63,7 @@ void SEREncoder::encode() {
     // Determine element size based on data type
     size_t elementSize = 0;
     bool isStringType = false;
-    
+
     switch (inputData.getDataTypeID()) {
         case core::DataType::UINT8:
         case core::DataType::INT8:
@@ -85,7 +85,7 @@ void SEREncoder::encode() {
             break;
         case core::DataType::STRING:
             isStringType = true;
-            elementSize = 0; // Variable size
+            elementSize = 0;  // Variable size
             break;
         default:
             throw std::runtime_error("SEREncoder: Unsupported data type");
@@ -222,10 +222,10 @@ void SEREncoder::serializeStringsReverseOrder(const uint8_t* data, size_t dataSi
     // First, parse all strings into a vector to enable random access
     std::vector<const uint8_t*> stringPointers;
     std::vector<size_t> stringLengths;
-    
+
     const uint8_t* current = data;
     const uint8_t* end = data + dataSize;
-    
+
     while (current < end) {
         stringPointers.push_back(current);
         const uint8_t* stringEnd = current;
@@ -233,7 +233,7 @@ void SEREncoder::serializeStringsReverseOrder(const uint8_t* data, size_t dataSi
             ++stringEnd;
         }
         if (stringEnd < end) {
-            ++stringEnd; // Include the null terminator
+            ++stringEnd;  // Include the null terminator
         }
         stringLengths.push_back(stringEnd - current);
         current = stringEnd;
@@ -260,7 +260,7 @@ void SEREncoder::serializeStringsReverseOrder(const uint8_t* data, size_t dataSi
 
             // Write string element
             if (linearIndex < stringPointers.size()) {
-                output.write(reinterpret_cast<const char*>(stringPointers[linearIndex]), 
+                output.write(reinterpret_cast<const char*>(stringPointers[linearIndex]),
                            stringLengths[linearIndex]);
             }
             return;

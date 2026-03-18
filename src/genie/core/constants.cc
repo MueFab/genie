@@ -526,8 +526,7 @@ std::string AnnotDescToString(AnnotDesc desc) {
     }
 }
 
-AlgoID stringToAlgoID(const std::string& algostring)
-{
+AlgoID stringToAlgoID(const std::string& algostring) {
     std::map<std::string, AlgoID> stringtoalgo;
     stringtoalgo["CABAC"] = AlgoID::CABAC;
     stringtoalgo["LZMA"] = AlgoID::LZMA;

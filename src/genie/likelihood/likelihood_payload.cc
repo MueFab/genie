@@ -9,12 +9,12 @@
 #include <utility>
 #include <vector>
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie {
 namespace likelihood {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 LikelihoodPayload::LikelihoodPayload(LikelihoodParameters _parameters, uint32_t _nrows, uint32_t _ncols,
                                      std::vector<uint8_t> _payload, std::vector<uint8_t> _additionalPayload)
@@ -28,7 +28,7 @@ LikelihoodPayload::LikelihoodPayload(LikelihoodParameters _parameters, uint32_t 
     (void)_parameters;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 LikelihoodPayload::LikelihoodPayload(genie::likelihood::EncodingBlock& block) {
     nrows = block.nrows;
@@ -36,7 +36,7 @@ LikelihoodPayload::LikelihoodPayload(genie::likelihood::EncodingBlock& block) {
     payloadStream << block.serialized_mat.rdbuf();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 LikelihoodPayload::LikelihoodPayload(genie::likelihood::LikelihoodParameters parameters, genie::likelihood::EncodingBlock& data)
     : LikelihoodPayload(data) {

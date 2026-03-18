@@ -17,6 +17,7 @@
 #endif
 
 #include <sstream>
+#include <string>
 
 #include "genie/entropy/base/encoder.h"
 #include "genie/core/access_unit.h"

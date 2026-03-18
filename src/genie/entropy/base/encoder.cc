@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
- #include "encoder.h"
+#include "encoder.h"
 
 /// ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,6 +26,6 @@ const core::record::annotation_access_unit::TypedData& Encoder::getOutput(uint8_
     return outputs[outVarID];
 }
 
-} // namespace base
-} // namespace entropy
-} // namespace genie
+}  // namespace base
+}  // namespace entropy
+}  // namespace genie

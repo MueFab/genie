@@ -4,7 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encoder_factory.h"
+#include <memory>
+ 
+#include "genie/entropy/factory/encoder_factory.h"
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
 #include "genie/entropy/ser/encoder.h"
@@ -19,7 +21,7 @@ namespace factory {
 std::unique_ptr<base::Encoder> EncoderFactory::createEncoder(
     genie::core::AlgoID algorithmID,
     const genie::core::record::annotation_parameter_set::AlgorithmParameters& parameters) {
-    
+
     switch (algorithmID) {
         case genie::core::AlgoID::BSC: {
             auto encoder = std::make_unique<bsc::BSCEncoder>();
@@ -46,6 +48,6 @@ std::unique_ptr<base::Encoder> EncoderFactory::createEncoder(
     }
 }
 
-} // namespace factory
-} // namespace entropy
-} // namespace genie
+}  // namespace factory
+}  // namespace entropy
+}  // namespace genie
