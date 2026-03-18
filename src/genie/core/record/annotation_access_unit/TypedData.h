@@ -32,7 +32,7 @@ class TypedData {
           num_array_dims(numArrayDims),
           array_dims(arrayDims),
           dataStream{},
-          writer{&dataStream},
+          writer{dataStream},
           compressedDataStream{} {}
 
     TypedData()
@@ -40,27 +40,37 @@ class TypedData {
           num_array_dims(0),
           array_dims{},
           dataStream{},
-          writer{&dataStream},
+          writer{dataStream},
           compressedDataStream{} {}
 
     TypedData& operator=(const TypedData& other) {
+      if (this != &other) {
         data_type_ID = other.data_type_ID;
         num_array_dims = other.num_array_dims;
         array_dims = other.array_dims;
-        dataStream << other.dataStream.rdbuf();
-        compressedDataStream << other.compressedDataStream.rdbuf();
+        dataStream.str(other.dataStream.str());
+        dataStream.clear();
+        compressedDataStream.str(other.compressedDataStream.str());
+        compressedDataStream.clear();
+      }
         return *this;
     }
 
-    TypedData(TypedData& other) {
-        data_type_ID = other.data_type_ID;
-        num_array_dims = other.num_array_dims;
-        array_dims = other.array_dims;
-        dataStream << other.dataStream.rdbuf();
-        compressedDataStream << other.compressedDataStream.rdbuf();
+    TypedData(const TypedData& other)
+        : data_type_ID(other.data_type_ID),
+          num_array_dims(other.num_array_dims),
+          array_dims(other.array_dims),
+          dataStream{},
+          writer{dataStream},
+          compressedDataStream{} {
+      dataStream.str(other.dataStream.str());
+      dataStream.clear();
+      compressedDataStream.str(other.compressedDataStream.str());
+      compressedDataStream.clear();
     }
 
     TypedData(TypedData&&) = default;
+    TypedData& operator=(TypedData&&) = default;
 
     void set(core::DataType TypeId, uint8_t numArrayDims, std ::vector<uint32_t> arrayDims) {
         data_type_ID = TypeId;
@@ -83,6 +93,7 @@ class TypedData {
     void convertToTypedData(std::vector<std::vector<std::vector<CustomType>>> matrix);
 
     std::stringstream& getDataStream() { return dataStream; }
+    const std::stringstream& getDataStream() const { return dataStream; }
 
     std::stringstream& getdata() {
         writer.FlushBits();
@@ -105,13 +116,18 @@ class TypedData {
 
     void Write(util::BitWriter& writer) const;
 
+    // Getter methods
+    core::DataType getDataTypeID() const { return data_type_ID; }
+    uint8_t getNumArrayDims() const { return num_array_dims; }
+    const std::vector<uint32_t>& getArrayDims() const { return array_dims; }
+
  private:
     core::DataType data_type_ID;
     uint8_t num_array_dims;
     std::vector<uint32_t> array_dims;
     std::vector<CustomType> data_block;
     std::stringstream dataStream;
-    util::BitWriter writer{&dataStream};
+    util::BitWriter writer{dataStream};
     std::stringstream compressedDataStream;
 };
 

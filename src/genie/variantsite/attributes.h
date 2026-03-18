@@ -48,10 +48,12 @@ class AttributeTile {
     AttributeTile(const AttributeTile& other);
 
     size_t getNrOfTiles() {
-        if (rowsPerTile == 0) {
-            tiles.pop_back();
+        size_t size = tiles.size();
+        if (rowInTile == 0) {
+            // the last tile is empty, so we don't count it
+            size--;
         }
-        return tiles.size();
+        return size;
     }
 
     void setCompressedData(uint64_t tilenr, std::stringstream& compressedData);
@@ -61,7 +63,7 @@ class AttributeTile {
 
     std::stringstream& getTile(uint64_t tilenr) {
         if (tilenr == tiles.size() - 1) {
-          writers.back().FlushBits();
+            writers.back().FlushBits();
         }
         return tiles.at(tilenr);
     }

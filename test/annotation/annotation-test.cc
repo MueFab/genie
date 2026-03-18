@@ -157,11 +157,12 @@ TEST_P(AnnotationTests, annotationSite) {
 
   genie::annotation::Annotation annotationGenerator;
   std::string comment = "# with parameters";
-  std::string set1 = "compressor 1 1 BSC";
+  std::string set1a = "compressor 1 0 SER {0} {} {1}";
+  std::string set1b = "compressor 1 1 BSC {} {{0 0 0}} {0}";
   std::string set2 = "compressor 2 1 LZMA {8 16777216 3 0 2 32}";
   std::string set3 = "compressor 3 1 ZSTD {0 0}";
   std::stringstream config;
-  config << set1 << '\n';  //    << set2 << '\n' << set3 << '\n';
+  config << set1a << '\n' << set1b << '\n';  //    << set2 << '\n' << set3 << '\n';
 
   annotationGenerator.setCompressorConfig(config);
   annotationGenerator.setTileSize(testParams.defaultTileHeight,
@@ -192,11 +193,12 @@ TEST_P(AnnotationTests, annotationGeno) {
   std::filesystem::remove(outputFilename + ".bin");
 
   std::string comment = "# with parameters";
-  std::string set1 = "compressor 1 1 BSC";
+  std::string set1a = "compressor 1 0 SER {0} {} {1}";
+  std::string set1b = "compressor 1 1 BSC {} {{0 0 0}} {0}";
   std::string set2 = "compressor 3 2 LZMA {8 16777216 3 0 2 32}";
   std::string set3 = "compressor 3 1 ZSTD {0 0}";
   std::stringstream config;
-  config << set1 << '\n';  //   << set2 << '\n' << set3 << '\n';
+  config << set1a << '\n' << set1b << '\n';  //   << set2 << '\n' << set3 << '\n';
 
   uint32_t BLOCK_SIZE = testParams.defaultTileHeight;
   bool TRANSFORM_MODE = true;

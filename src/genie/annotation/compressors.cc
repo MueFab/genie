@@ -24,6 +24,8 @@
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
 #include "genie/entropy/zstd/encoder.h"
+#include "genie/entropy/ser/encoder.h"
+#include "genie/entropy/factory/encoder_factory.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,25 +34,96 @@ namespace annotation {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// --- Helper functions for reading parameters (not part of CompressorParser class) ---
+
+static entropy::lzma::LZMAParameters readLzmaParameters(std::vector<std::string>& stringpars) {
+  entropy::lzma::LZMAParameters pars;
+  if (stringpars.empty())
+    return pars;
+
+  CompressorParser::Parameter parameter;
+  size_t index = 0;
+
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.level);
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.dictSize);
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.lc);
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.lp);
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.pb);
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.fb);
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.numThreads);
+
+  stringpars.clear();
+  return pars;
+}
+
+static entropy::bsc::BSCParameters readBscParameters(std::vector<std::string>& stringpars) {
+  entropy::bsc::BSCParameters pars;
+  if (stringpars.empty())
+    return pars;
+
+  CompressorParser::Parameter parameter;
+  size_t index = 0;
+
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.lzpHashSize);
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.lzpMinLen);
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.blockSorter);
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.coder);
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.features);
+
+  stringpars.clear();
+  return pars;
+}
+
+static entropy::zstd::ZSTDParameters readZstdParameters(std::vector<std::string>& stringpars) {
+  entropy::zstd::ZSTDParameters pars;
+  if (stringpars.empty())
+    return pars;
+
+  CompressorParser::Parameter parameter;
+  size_t index = 0;
+
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.use_dictionary_flag);
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.dictionary_size);
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.dictionary);
+
+  stringpars.clear();
+  return pars;
+}
+
+static entropy::ser::SERParameters readSerParameters(std::vector<std::string>& stringpars) {
+  entropy::ser::SERParameters pars;
+  if (stringpars.empty())
+    return pars;
+
+  CompressorParser::Parameter parameter;
+  size_t index = 0;
+
+  if (index < stringpars.size())
+    parameter.read(stringpars.at(index++), pars.order);
+
+  stringpars.clear();
+  return pars;
+}
+
 Compressor::Compressor() : selectedCompressorID(0), compressorParameters{} {}
 
 void Compressor::parseConfig(std::stringstream& config) {
-    UTILS_DIE_IF(config.str().empty(), "compressor config is empty ");
-    std::string commandline;
-    while (getline(config, commandline, '\n')) {
-        std::vector<std::string> command;
-        std::stringstream commandstream(commandline);
-        std::string commandword;
-        while (commandstream >> commandword) {
-            command.push_back(commandword);
-        }
-        if (command.at(0).at(0) == '#') {                                            // comments
-        } else if (command.at(0).substr(0, sizeof("compressor")) == "compressor") {  // parse compressor settings
-            parseCompressor(command);
-        } else {  // unknown command
-            UTILS_DIE_IF(!command.at(0).empty(), "unknown command");
-        }
-    }
+  CompressorParser::parseConfig(*this, config);
 }
 
 void Compressor::compress(std::stringstream& input, std::stringstream& output, uint8_t compressorID = 0) {
@@ -100,176 +173,279 @@ void Compressor::compress(std::stringstream& input, std::stringstream& output, u
     output << intermediateOut.rdbuf();
 }
 
-class Parameter {
- public:
-    bool read(std::string parameterIn, uint8_t& parameterOut) {
-        if (parameterIn.empty()) return true;
-        bool lastParameter = stripAndIfLast(parameterIn);
-        parameterOut = static_cast<uint8_t>(std::stoi(parameterIn));
-        return lastParameter;
+void Compressor::compress(core::record::annotation_access_unit::TypedData& input,
+                          std::vector<core::record::annotation_access_unit::TypedData>& output,
+                          uint8_t compressorID) {
+  selectedCompressorID = compressorID;
+  auto comp = compressorParameters.at(0);
+  for (auto& compressor : compressorParameters)
+    if (compressor.getCompressorID() == compressorID)
+      comp = compressor;
+  std::map<uint8_t, std::unique_ptr<entropy::base::Encoder>> encoders;
+  auto compressorStepIDs = comp.getCompressorStepIDs();
+  bool firstStep = true;
+  for (auto stepID : compressorStepIDs) {
+    auto& step = comp.getCompressorStep(stepID);
+    encoders[stepID] = entropy::factory::EncoderFactory::createEncoder(step.algorithmID,
+                                                                       step.algorithm_parameters);
+    if (firstStep) {
+      encoders[stepID]->setInput(0, input);
+      firstStep = false;
+    } else {
+      for (auto inVarIndex = 0; inVarIndex < step.in_var_ID.size(); inVarIndex++) {
+        encoders[stepID]->setInput(
+            step.in_var_ID[inVarIndex],
+            encoders[step.prev_step_ID[inVarIndex]]->getOutput(step.prev_out_var_ID[inVarIndex]));
+      }
     }
-    bool read(std::string parameterIn, bool& parameterOut) {
-        if (parameterIn.empty()) return true;
-        bool lastParameter = stripAndIfLast(parameterIn);
-        parameterOut = static_cast<bool>(std::stoi(parameterIn));
-        return lastParameter;
+    encoders[stepID]->encode();
+    for (auto outVarID : comp.getCompressorStep(stepID).completed_out_var_ID) {
+      output.emplace_back(encoders[stepID]->getOutput(outVarID));
     }
-    bool read(std::string parameterIn, core::AlgoID& parameterOut) {
-        if (parameterIn.empty()) return true;
-        bool lastParameter = stripAndIfLast(parameterIn);
-        parameterOut = core::stringToAlgoID(parameterIn);
-        return lastParameter;
-    }
-    bool read(std::string parameterIn, uint16_t& parameterOut) {
-        if (parameterIn.empty()) return true;
-        bool lastParameter = stripAndIfLast(parameterIn);
-        parameterOut = static_cast<uint16_t>(std::stoi(parameterIn));
-        return lastParameter;
-    }
-    bool read(std::string parameterIn, uint32_t& parameterOut) {
-        if (parameterIn.empty()) return true;
-        bool lastParameter = stripAndIfLast(parameterIn);
-        parameterOut = static_cast<uint32_t>(std::stoi(parameterIn));
-        return lastParameter;
-    }
-    bool read(std::string parameterIn, uint64_t& parameterOut) {
-        if (parameterIn.empty()) return true;
-        bool lastParameter = stripAndIfLast(parameterIn);
-        std::istringstream iss(parameterIn);
-        iss >> parameterOut;
-        return lastParameter;
-    }
-    bool read(std::string parameterIn, int8_t& parameterOut) {
-        if (parameterIn.empty()) return true;
-        bool lastParameter = stripAndIfLast(parameterIn);
-        parameterOut = static_cast<int8_t>(std::stoi(parameterIn));
-        return lastParameter;
-    }
-    bool read(std::string parameterIn, int16_t& parameterOut) {
-        if (parameterIn.empty()) return true;
-        bool lastParameter = stripAndIfLast(parameterIn);
-        parameterOut = static_cast<int16_t>(std::stoi(parameterIn));
-        return lastParameter;
-    }
-    bool read(std::string parameterIn, int32_t& parameterOut) {
-        if (parameterIn.empty()) return true;
-        bool lastParameter = stripAndIfLast(parameterIn);
-        parameterOut = static_cast<int32_t>(std::stoi(parameterIn));
-        return lastParameter;
-    }
-    bool read(std::string parameterIn, std::string& parameterOut) {
-        if (parameterIn.empty()) return true;
-        bool lastParameter = stripAndIfLast(parameterIn);
-        parameterOut = parameterIn;
-        return lastParameter;
-    }
-
- private:
-    bool stripAndIfLast(std::string& parameter) {
-        if (parameter.at(0) == '{') parameter.erase(0, 1);
-        if (parameter.back() == '}') {
-            parameter.pop_back();
-            return true;
-        }
-        return false;
-    }
-};
-
-entropy::lzma::LZMAParameters Compressor::readLzmaParameters(std::vector<std::string>& stringpars) {
-    entropy::lzma::LZMAParameters pars;
-    uint8_t index = 0;
-    if (stringpars.empty()) return pars;
-    Parameter parameter;
-    if (parameter.read(stringpars.at(index++), pars.level) || index == stringpars.size() ||
-        parameter.read(stringpars.at(index++), pars.dictSize) || index == stringpars.size() ||
-        parameter.read(stringpars.at(index++), pars.lc) || index == stringpars.size() ||
-        parameter.read(stringpars.at(index++), pars.lp) || index == stringpars.size() ||
-        parameter.read(stringpars.at(index++), pars.pb) || index == stringpars.size() ||
-        parameter.read(stringpars.at(index++), pars.fb) || index == stringpars.size() ||
-        parameter.read(stringpars.at(index++), pars.numThreads)) {}
-    if (stringpars.size() != index)
-        stringpars.erase(stringpars.begin(), stringpars.begin() + index - 1);
-    else
-        stringpars.clear();
-    return pars;
+  }
 }
 
-entropy::bsc::BSCParameters Compressor::readBscParameters(std::vector<std::string>& stringpars) {
-    entropy::bsc::BSCParameters pars;
-    uint8_t index = 0;
-    if (stringpars.empty()) return pars;
-    Parameter parameter;
-    if (parameter.read(stringpars.at(index++), pars.lzpHashSize) || index == stringpars.size() ||
-        parameter.read(stringpars.at(index++), pars.lzpMinLen) || index == stringpars.size() ||
-        parameter.read(stringpars.at(index++), pars.blockSorter) || index == stringpars.size() ||
-        parameter.read(stringpars.at(index++), pars.coder) || index == stringpars.size() ||
-        parameter.read(stringpars.at(index++), pars.features)) {}
-    stringpars.erase(stringpars.begin(), stringpars.begin() + index - 1);
-    return pars;
+// --- CompressorParser::Parameter Implementation ---
+
+void CompressorParser::Parameter::read(const std::string& parameterIn, uint8_t& parameterOut) {
+  if (parameterIn.empty())
+    return;
+  parameterOut = static_cast<uint8_t>(std::stoi(parameterIn));
 }
 
-entropy::zstd::ZSTDParameters Compressor::readZstdParameters(std::vector<std::string>& stringpars) {
-    entropy::zstd::ZSTDParameters pars;
-    uint8_t index = 0;
-    if (stringpars.empty()) return pars;
-    Parameter parameter;
-    if (parameter.read(stringpars.at(index++), pars.use_dictionary_flag) ||
-        parameter.read(stringpars.at(index++), pars.dictionary_size) ||
-        parameter.read(stringpars.at(index++), pars.dictionary)) {}
-    stringpars.erase(stringpars.begin(), stringpars.begin() + index - 1);
-    return pars;
+void CompressorParser::Parameter::read(const std::string& parameterIn, bool& parameterOut) {
+  if (parameterIn.empty())
+    return;
+  parameterOut = static_cast<bool>(std::stoi(parameterIn));
 }
-void Compressor::parseCompressor(std::vector<std::string> commandline) {
-    // compressorID stepID algorithmID {parameter1 parameter2 ... parametern} {invar1 invar2 ... invarn} {outvar1
-    // outvar2
-    // ... outvarn}
 
-    Parameter parameter;
-    uint8_t compressorID = 0;
-    parameter.read(commandline.at(1), compressorID);
-
-    core::record::annotation_parameter_set::compressorStep step;
-    parameter.read(commandline.at(2), step.stepID);
-    parameter.read(commandline.at(3), step.algorithmID);
-
-    size_t index = 4;
-    std::vector<std::string> sub(commandline.begin() + index, commandline.end());
-    switch (step.algorithmID) {
-        case core::AlgoID::LZMA: {
-            entropy::lzma::LZMAParameters parameters = readLzmaParameters(sub);
-            step.useDefaultAlgorithmParameters = parameters.parsAreDefault();
-            step.algorithm_parameters = parameters.convertToAlgorithmParameters();
-            break;
-        }
-        case core::AlgoID::ZSTD: {
-            entropy::zstd::ZSTDParameters parameters = readZstdParameters(sub);
-            step.useDefaultAlgorithmParameters = parameters.parsAreDefault();
-            step.algorithm_parameters = parameters.convertToAlgorithmParameters();
-            break;
-        }
-        case core::AlgoID::BSC: {
-            entropy::bsc::BSCParameters parameters = readBscParameters(sub);
-            step.useDefaultAlgorithmParameters = parameters.parsAreDefault();
-            step.algorithm_parameters = parameters.convertToAlgorithmParameters();
-            break;
-        }
-        default:
-            break;
-    }
-    bool added = false;
-    for (auto& compPar : compressorParameters) {
-        if (compPar.getCompressorID() == compressorID) {
-            compPar.addCompressorStep(step);
-            added = true;
-        }
-    }
-    if (!added) {
-        compressorParameters.emplace_back(compressorID);
-        compressorParameters.back().addCompressorStep(step);
-    }
-
-    // core::AlgoID algorithmID = core::AlgoID.value
+void CompressorParser::Parameter::read(const std::string& parameterIn, core::AlgoID& parameterOut) {
+  if (parameterIn.empty())
+    return;
+  parameterOut = core::stringToAlgoID(parameterIn);
 }
+
+void CompressorParser::Parameter::read(const std::string& parameterIn, uint16_t& parameterOut) {
+  if (parameterIn.empty())
+    return;
+  parameterOut = static_cast<uint16_t>(std::stoi(parameterIn));
+}
+
+void CompressorParser::Parameter::read(const std::string& parameterIn, uint32_t& parameterOut) {
+  if (parameterIn.empty())
+    return;
+  parameterOut = static_cast<uint32_t>(std::stoi(parameterIn));
+}
+
+void CompressorParser::Parameter::read(const std::string& parameterIn, uint64_t& parameterOut) {
+  if (parameterIn.empty())
+    return;
+  std::istringstream iss(parameterIn);
+  iss >> parameterOut;
+}
+
+void CompressorParser::Parameter::read(const std::string& parameterIn, int8_t& parameterOut) {
+  if (parameterIn.empty())
+    return;
+  parameterOut = static_cast<int8_t>(std::stoi(parameterIn));
+}
+
+void CompressorParser::Parameter::read(const std::string& parameterIn, int16_t& parameterOut) {
+  if (parameterIn.empty())
+    return;
+  parameterOut = static_cast<int16_t>(std::stoi(parameterIn));
+}
+
+void CompressorParser::Parameter::read(const std::string& parameterIn, int32_t& parameterOut) {
+  if (parameterIn.empty())
+    return;
+  parameterOut = static_cast<int32_t>(std::stoi(parameterIn));
+}
+
+void CompressorParser::Parameter::read(const std::string& parameterIn, std::string& parameterOut) {
+  if (parameterIn.empty())
+    return;
+  parameterOut = parameterIn;
+}
+
+// --- CompressorParser Static Methods ---
+
+std::vector<std::string> CompressorParser::tokenizeCurlyHashNumber(const std::string& input) {
+  std::vector<std::string> tokens;
+  size_t i = 0;
+  while (i < input.size()) {
+    if (std::isspace(static_cast<unsigned char>(input[i]))) {
+      ++i;
+    } else if (input[i] == '{' || input[i] == '}' || input[i] == '#') {
+      tokens.emplace_back(1, input[i]);
+      ++i;
+    } else if (std::isdigit(static_cast<unsigned char>(input[i])) || input[i] == '-') {
+      size_t start = i;
+      while (i < input.size() &&
+             (std::isdigit(static_cast<unsigned char>(input[i])) || input[i] == '-'))
+        ++i;
+      tokens.emplace_back(input.substr(start, i - start));
+    } else if (std::isalpha(static_cast<unsigned char>(input[i]))) {
+      size_t start = i;
+      while (i < input.size() && std::isalpha(static_cast<unsigned char>(input[i])))
+        ++i;
+      tokens.emplace_back(input.substr(start, i - start));
+    } else {
+      ++i;
+    }
+  }
+  return tokens;
+}
+
+std::vector<std::string> CompressorParser::getAlgoParamsGroup(
+    const std::vector<std::string>& tokens, size_t& idx) {
+  std::vector<std::string> result;
+  if (idx < tokens.size()) {
+    if (tokens.at(idx) != "{")
+      throw std::runtime_error("Expected '{'");
+    ++idx;
+    while (idx < tokens.size() && tokens.at(idx) != "}") {
+      result.push_back(tokens.at(idx));
+      ++idx;
+    }
+    if (idx == tokens.size() || tokens.at(idx) != "}")
+      throw std::runtime_error("Expected '}'");
+    ++idx;
+  }
+  return result;
+}
+
+void CompressorParser::parseInVarGroup(const std::vector<std::string>& tokens, size_t& idx,
+                                       std::vector<uint8_t>& in_var_ID,
+                                       std::vector<uint8_t>& prev_step_ID,
+                                       std::vector<uint8_t>& prev_out_var_ID) {
+  Parameter parameter;
+  if (tokens.at(idx) != "{")
+    throw std::runtime_error("Expected '{' for in-var group");
+  ++idx;
+  while (idx < tokens.size() && tokens.at(idx) == "{") {
+    ++idx;
+    if (idx + 2 >= tokens.size())
+      throw std::runtime_error("Malformed in-var group");
+    parameter.read(tokens.at(idx++), in_var_ID.emplace_back());
+    parameter.read(tokens.at(idx++), prev_step_ID.emplace_back());
+    parameter.read(tokens.at(idx++), prev_out_var_ID.emplace_back());
+    if (tokens.at(idx) != "}")
+      throw std::runtime_error("Expected '}' after in-var triple");
+    ++idx;
+  }
+  if (tokens.at(idx) != "}")
+    throw std::runtime_error("Expected '}' after in-var group");
+  ++idx;
+}
+
+void CompressorParser::parseCompletedOutVarGroup(const std::vector<std::string>& tokens,
+                                                 size_t& idx,
+                                                 std::vector<uint8_t>& completed_out_var_ID) {
+  Parameter parameter;
+  if (tokens.at(idx) != "{")
+    throw std::runtime_error("Expected '{' for completed out-var group");
+  ++idx;
+  while (idx < tokens.size() && tokens.at(idx) != "}") {
+    parameter.read(tokens.at(idx++), completed_out_var_ID.emplace_back());
+  }
+  if (tokens.at(idx) != "}")
+    throw std::runtime_error("Expected '}' after completed out-var group");
+  ++idx;
+}
+
+void CompressorParser::parseConfig(Compressor& compressor, std::stringstream& config) {
+  std::string commandline;
+  while (getline(config, commandline, '\n')) {
+    auto tokens = tokenizeCurlyHashNumber(commandline);
+    if (tokens.empty())
+      continue;
+    if (tokens[0] == "#")
+      continue;
+    if (tokens[0] == "compressor") {
+      parseCompressor(compressor, tokens);
+    }
+  }
+}
+
+void CompressorParser::parseCompressor(Compressor& compressor,
+                                       std::vector<std::string> commandline) {
+  Parameter parameter;
+  uint8_t compressorID = 0;
+  parameter.read(commandline.at(1), compressorID);
+
+  if (compressorID == 0) {
+    auto it = std::find_if(
+        compressor.compressorParameters.begin(), compressor.compressorParameters.end(),
+        [compressorID](const auto& compPar) { return compPar.getCompressorID() == compressorID; });
+    if (it == compressor.compressorParameters.end()) {
+      compressor.compressorParameters.emplace_back(compressorID);
+    }
+    return;
+  }
+  core::record::annotation_parameter_set::compressorStep step;
+  parameter.read(commandline.at(2), step.stepID);
+  parameter.read(commandline.at(3), step.algorithmID);
+
+  size_t index = 4;
+  std::vector<std::string> sub = getAlgoParamsGroup(commandline, index);
+
+  switch (step.algorithmID) {
+    case core::AlgoID::LZMA: {
+      entropy::lzma::LZMAParameters parameters = readLzmaParameters(sub);
+      step.useDefaultAlgorithmParameters = parameters.parsAreDefault();
+      step.algorithm_parameters = parameters.convertToAlgorithmParameters();
+      break;
+    }
+    case core::AlgoID::ZSTD: {
+      entropy::zstd::ZSTDParameters parameters = readZstdParameters(sub);
+      step.useDefaultAlgorithmParameters = parameters.parsAreDefault();
+      step.algorithm_parameters = parameters.convertToAlgorithmParameters();
+      break;
+    }
+    case core::AlgoID::BSC: {
+      entropy::bsc::BSCParameters parameters = readBscParameters(sub);
+      step.useDefaultAlgorithmParameters = parameters.parsAreDefault();
+      step.algorithm_parameters = parameters.convertToAlgorithmParameters();
+      break;
+    }
+    case core::AlgoID::SER: {
+      entropy::ser::SERParameters parameters = readSerParameters(sub);
+      step.useDefaultAlgorithmParameters = parameters.parsAreDefault();
+      step.algorithm_parameters = parameters.convertToAlgorithmParameters();
+      break;
+    }
+    default:
+      break;
+  }
+
+  if (index < commandline.size()) {
+    std::vector<uint8_t> in_var_ID, prev_step_ID, prev_out_var_ID;
+    parseInVarGroup(commandline, index, in_var_ID, prev_step_ID, prev_out_var_ID);
+    step.in_var_ID = in_var_ID;
+    step.prev_step_ID = prev_step_ID;
+    step.prev_out_var_ID = prev_out_var_ID;
+  }
+
+  if (index < commandline.size()) {
+    std::vector<uint8_t> completed_out_var_ID;
+    parseCompletedOutVarGroup(commandline, index, completed_out_var_ID);
+    step.completed_out_var_ID = completed_out_var_ID;
+  }
+
+  bool added = false;
+  for (auto& compPar : compressor.compressorParameters) {
+    if (compPar.getCompressorID() == compressorID) {
+      compPar.addCompressorStep(step);
+      added = true;
+    }
+  }
+  if (!added) {
+    compressor.compressorParameters.emplace_back(compressorID);
+    compressor.compressorParameters.back().addCompressorStep(step);
+  }
+}
+
 
 }  // namespace annotation
 }  // namespace genie
