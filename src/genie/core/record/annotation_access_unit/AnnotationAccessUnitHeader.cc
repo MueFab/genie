@@ -29,7 +29,6 @@ AnnotationAccessUnitHeader::AnnotationAccessUnitHeader()
       tile_index_2_exists(false),
       tile_index_2(0) {}
 
-AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(util::BitReader& reader) { Read(reader); }
 AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(util::BitReader& reader, bool attributeContiguity,
                                                        bool twoDimensional, bool columnMajorTileOrder,
                                                        bool variable_size_tiles, uint8_t ATCoordSize) {
