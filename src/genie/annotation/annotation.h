@@ -28,13 +28,14 @@
 #include "genie/annotation/feature_annotation.h"
 #include "genie/annotation/functional_annotation.h"
 #include "genie/annotation/track_annotation.h"
+#include "genie/annotation/trackproperty_annotation.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum class RecType { SITE_FILE = 0, GENO_FILE, SAMPLE_FILE, FEATURE_FILE, GENE_EXPRESSION_FILE, CM_FILE, FUNCTIONAL_ANNOTATIONS_FILE, TRACK_FILE };
+enum class RecType { SITE_FILE = 0, GENO_FILE, SAMPLE_FILE, FEATURE_FILE, GENE_EXPRESSION_FILE, CM_FILE, FUNCTIONAL_ANNOTATIONS_FILE, TRACK_FILE, TRACK_PROPERTY_FILE };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -53,6 +54,7 @@ class Annotation {
         featureAnnotation.setTileSize(_defaultTileSizeHeight);
         functionalAnnotation.setTileSize(_defaultTileSizeHeight);
         trackAnnotation.setTileSize(_defaultTileSizeHeight);
+        trackPropertyAnnotation.setTileSize(_defaultTileSizeHeight);
     }
 
     void setATType(core::record::annotation_access_unit::AnnotationType ATtype,
@@ -92,8 +94,9 @@ class Annotation {
     SampleAnnotation sampleAnnotation;
     GeneExpressionAnnotation geneExpressionAnnotation;
     FeatureAnnotation featureAnnotation;
-    TrackAnnotation trackAnnotation;
     FunctionalAnnotation functionalAnnotation;
+    TrackAnnotation trackAnnotation;
+    TrackPropertyAnnotation trackPropertyAnnotation;
     CMAnnotation cmAnnotation;
 
     uint32_t defaultTileSizeHeight{0};

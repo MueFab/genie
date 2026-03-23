@@ -40,6 +40,8 @@ set(source_files
 
         track_record/record.cc
 
+        track_property_record/record.cc
+
         variant_genotype_record/record.cc
         variant_genotype_record/format_field.cc
         variant_genotype_record/format_field.h

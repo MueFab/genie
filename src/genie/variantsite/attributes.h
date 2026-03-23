@@ -27,6 +27,7 @@
 #include "genie/core/sample_record/record.h"
 #include "genie/core/functional_annotation_record/record.h"
 #include "genie/core/track_record/record.h"
+#include "genie/core/track_property_record/record.h"
 
 #include "genie/core/record/annotation_access_unit/TypedData.h"
 
@@ -104,6 +105,7 @@ class Attributes {
     void add(std::vector<genie::core::record::sample::SampleFields::Field> fields);
     void add(std::vector<genie::core::record::functional_annotation::Attribute> fields);
     void add(std::vector<genie::core::record::track::Attribute> fields);
+    void add(std::vector<genie::core::record::track_property::TrackProperty> fields);
 
     std::map<std::string, AttributeTile>& getTiles() { return attributeTiles; }
     std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& getInfo() { return info; }

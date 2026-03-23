@@ -88,6 +88,13 @@ void Annotation::startStream(RecType recType, std::string recordInputFileName,
         auto dataunits = trackAnnotation.parseTrack(inputfile);
         annotationParameterSet.push_back(dataunits.annotationParameterSet);
         annotationAccessUnit = dataunits.annotationAccessUnit;
+    } else if (recType == RecType::TRACK_PROPERTY_FILE) {
+        trackPropertyAnnotation.setCompressors(compressors);
+        trackPropertyAnnotation.setTileSize(defaultTileSizeHeight);
+        trackPropertyAnnotation.parseInfoTags(recordInputFileName);
+        auto dataunits = trackPropertyAnnotation.parseTrackProperty(inputfile);
+        annotationParameterSet.push_back(dataunits.annotationParameterSet);
+        annotationAccessUnit = dataunits.annotationAccessUnit;
     } else {  // contact matrix
         cmAnnotation.setCompressors(compressors);
         cmAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
