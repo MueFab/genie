@@ -74,6 +74,13 @@ void Annotation::startStream(RecType recType, std::string recordInputFileName,
         auto dataunits = featureAnnotation.parseFeature(inputfile);
         annotationParameterSet.push_back(dataunits.annotationParameterSet);
         annotationAccessUnit = dataunits.annotationAccessUnit;
+    } else if (recType == RecType::FUNCTIONAL_ANNOTATIONS_FILE) {
+        functionalAnnotation.setCompressors(compressors);
+        functionalAnnotation.setTileSize(defaultTileSizeHeight);
+        functionalAnnotation.parseInfoTags(recordInputFileName);
+        auto dataunits = functionalAnnotation.parseFunctionalAnnotation(inputfile);
+        annotationParameterSet.push_back(dataunits.annotationParameterSet);
+        annotationAccessUnit = dataunits.annotationAccessUnit;
     } else {  // contact matrix
         cmAnnotation.setCompressors(compressors);
         cmAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);

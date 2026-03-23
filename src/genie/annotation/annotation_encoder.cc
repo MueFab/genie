@@ -33,8 +33,6 @@ namespace genie {
 namespace annotation {
 core::record::annotation_parameter_set::AnnotationEncodingParameters AnnotationEncoder::Compose() {
     std::vector<core::record::annotation_parameter_set::filterData> filters;
-    std::vector<std::string> features;
-    std::vector<std::string> ontologyTerms;
 
     core::record::annotation_parameter_set::AnnotationEncodingParameters annotation_encoding_parameters(
         filters, features, ontologyTerms, descriptorConfigurations, compressorParameters, attribute_parameter_set);

@@ -26,7 +26,7 @@ namespace annotation_access_unit {
 
 enum class AnnotationType { VARIANTS = 1, FUNCTIONAL_ANNOTATIONS, GENE_EXPRESSION, CONTACT_MATRICES, TRACKS };
 
-enum class AnnotationSubtype { VCF = 1, HIC = 10, GENE_EXPRESSION = 9 };
+enum class AnnotationSubtype { VCF = 1, GFF = 3, GENE_EXPRESSION = 9, HIC = 10 };
 
 /**
  *  @brief

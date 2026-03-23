@@ -36,6 +36,8 @@ set(source_files
 
         gene_expression_record/record.cc
 
+        functional_annotation_record/record.cc
+
         variant_genotype_record/record.cc
         variant_genotype_record/format_field.cc
         variant_genotype_record/format_field.h

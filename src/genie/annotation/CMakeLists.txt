@@ -10,6 +10,7 @@ set(source_files
         gene_expression_annotation.cc
         feature_annotation.cc
         contact_annotation.cc
+        functional_annotation.cc
         compressors.cc
         parameterset_composer.cc
         annotation_encoder.cc
@@ -31,6 +32,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC genie-lzma)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-zstd)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-ser)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-encoder-factory)
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-functionalannotation)
 
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
