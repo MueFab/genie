@@ -67,7 +67,7 @@ void FunctionalAnnotation::parseInfoTags(std::string& recordInputFileName) {
 
 FunctionalAnnotationUnits FunctionalAnnotation::parseFunctionalAnnotation(std::ifstream& inputfile) {
     functional_annotation::FunctionalAnnotationParser parser(inputfile, infoFields, featureNames, ontologyNames, maxOntologiesPerRecord, defaultTileSizeHeight);
-    uint8_t AG_class = 1;
+    uint8_t AG_class = 0;
     uint8_t AT_ID = 1;
 
     for (const auto& infoField : infoFields) attributeInfo[infoField.ID] = infoField;
