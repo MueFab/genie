@@ -52,7 +52,9 @@ class TrackAnnotation {
         core::AnnotDesc::SEQUENCEID,
         core::AnnotDesc::STARTPOS,
         core::AnnotDesc::ENDPOS,
-        core::AnnotDesc::STRAND};
+        core::AnnotDesc::STRAND,
+        core::AnnotDesc::LINKNAME,
+        core::AnnotDesc::LINKID};
 
     variant_site::AccessUnitComposer accessUnitcomposer;
     core::record::annotation_parameter_set::Record annotationParameterSet;
