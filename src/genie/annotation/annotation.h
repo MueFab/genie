@@ -27,6 +27,7 @@
 #include "genie/annotation/gene_expression_annotation.h"
 #include "genie/annotation/feature_annotation.h"
 #include "genie/annotation/functional_annotation.h"
+#include "genie/annotation/track_annotation.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
@@ -51,6 +52,7 @@ class Annotation {
         geneExpressionAnnotation.setTileSize(_defaultTileSizeHeight, defaultTileSizeWidth);
         featureAnnotation.setTileSize(_defaultTileSizeHeight);
         functionalAnnotation.setTileSize(_defaultTileSizeHeight);
+        trackAnnotation.setTileSize(_defaultTileSizeHeight);
     }
 
     void setATType(core::record::annotation_access_unit::AnnotationType ATtype,
@@ -90,6 +92,7 @@ class Annotation {
     SampleAnnotation sampleAnnotation;
     GeneExpressionAnnotation geneExpressionAnnotation;
     FeatureAnnotation featureAnnotation;
+    TrackAnnotation trackAnnotation;
     FunctionalAnnotation functionalAnnotation;
     CMAnnotation cmAnnotation;
 

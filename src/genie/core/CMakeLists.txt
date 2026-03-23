@@ -38,6 +38,8 @@ set(source_files
 
         functional_annotation_record/record.cc
 
+        track_record/record.cc
+
         variant_genotype_record/record.cc
         variant_genotype_record/format_field.cc
         variant_genotype_record/format_field.h
