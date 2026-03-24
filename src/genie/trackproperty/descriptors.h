@@ -15,7 +15,7 @@
 
 #include "genie/core/constants.h"
 #include "genie/core/track_property_record/record.h"
-#include "genie/trackproperty/tiles.h"
+#include "genie/variantsite/tiles.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,11 +30,11 @@ class Descriptors {
     void write(genie::core::record::track_property::Record trackPropertyRecord);
     void init();
     void writeDanglingBits();
-    Tiles& getTiles() { return tiles; }
+    std::map<genie::core::AnnotDesc, variant_site::TiledStream>& getTiles() { return tiles; }
 
  private:
     uint64_t rowsPerTile;
-    Tiles tiles;
+    std::map<genie::core::AnnotDesc, variant_site::TiledStream> tiles;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

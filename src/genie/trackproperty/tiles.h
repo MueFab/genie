@@ -14,7 +14,7 @@
 #include <string>
 
 #include "genie/core/constants.h"
-#include "genie/variantsite/tile.h"
+#include "genie/variantsite/tiles.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,11 +25,12 @@ namespace track_property {
 
 class Tiles {
  public:
-    variant_site::Tile& operator[](const core::AnnotDesc& desc);
+    variant_site::TiledStream& operator[](const core::AnnotDesc& desc);
     std::map<core::AnnotDesc, std::stringstream> getTile(uint64_t i);
+    std::map<core::AnnotDesc, variant_site::TiledStream>& getMap() { return tiles; }
 
  private:
-    std::map<core::AnnotDesc, variant_site::Tile> tiles;
+    std::map<core::AnnotDesc, variant_site::TiledStream> tiles;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

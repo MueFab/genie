@@ -30,7 +30,7 @@ class TrackPropertyParser {
  public:
     TrackPropertyParser(std::ifstream& inputfile, std::vector<annotation::InfoField> infofields,
                         uint64_t _defaultTileSizeHeight)
-        : descriptors(_defaultTileSizeHeight), attributes(infofields) {
+        : descriptors(_defaultTileSizeHeight) {
         util::BitReader bitreader(inputfile);
         core::record::track_property::Record rec;
 
@@ -42,8 +42,7 @@ class TrackPropertyParser {
         }
         
         descriptors.writeDanglingBits();
-        attributes.writeDanglingBits();
-        numberOfTiles = descriptors.getTiles()[core::AnnotDesc::LINKNAME].getNumberOfTiles();
+        numberOfTiles = descriptors.getTiles()[core::AnnotDesc::LINKNAME].getNrOfTiles();
     }
 
     void processRecord(core::record::track_property::Record& rec);

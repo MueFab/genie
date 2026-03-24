@@ -13,7 +13,7 @@ namespace track_property {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-variant_site::Tile& Tiles::operator[](const core::AnnotDesc& desc) {
+variant_site::TiledStream& Tiles::operator[](const core::AnnotDesc& desc) {
     return tiles[desc];
 }
 
