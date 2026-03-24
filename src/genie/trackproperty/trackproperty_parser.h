@@ -16,6 +16,7 @@
 #include "genie/annotation/json_attribute_parser.h"
 #include "genie/core/track_property_record/record.h"
 #include "genie/trackproperty/descriptors.h"
+#include "genie/util/bit_reader.h"
 #include "genie/util/runtime_exception.h"
 #include "genie/variantsite/attributes.h"
 
@@ -29,32 +30,26 @@ namespace track_property {
 class TrackPropertyParser {
  public:
     TrackPropertyParser(std::ifstream& inputfile, std::vector<annotation::InfoField> infofields,
-                        uint64_t _defaultTileSizeHeight)
-        : descriptors(_defaultTileSizeHeight) {
-        util::BitReader bitreader(inputfile);
-        core::record::track_property::Record rec;
+                        uint64_t _defaultTileSizeHeight);
 
-        descriptors.init();
-
-        // Track properties only has a single record
-        if (rec.Read(bitreader)) {
-            processRecord(rec);
-        }
-        
-        descriptors.writeDanglingBits();
-        numberOfTiles = descriptors.getTiles()[core::AnnotDesc::LINKNAME].getNrOfTiles();
-    }
-
-    void processRecord(core::record::track_property::Record& rec);
-
+    size_t getNumberOfRows() const { return numberOfRows; }
     Descriptors& getDescriptors() { return descriptors; }
     variant_site::Attributes& getAttributes() { return attributes; }
     uint64_t getNrOfTiles() { return numberOfTiles; }
 
  private:
+    core::record::track_property::Record trackPropertyRecord;
+    std::istream& trackPropertyMGrecs;
+    uint64_t rowsPerTile;
+    size_t numberOfRows;
+    std::vector<annotation::InfoField> infoFields;
+    
     Descriptors descriptors;
     variant_site::Attributes attributes;
     uint64_t numberOfTiles{0};
+
+    void init();
+    bool fillRecord(util::BitReader reader);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
