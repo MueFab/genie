@@ -27,7 +27,7 @@
 #include "genie/annotation/gene_expression_annotation.h"
 #include "genie/annotation/feature_annotation.h"
 #include "genie/annotation/functional_annotation.h"
-#include "genie/annotation/track_annotation.h"
+#include "genie/annotation/track_data_annotation.h"
 #include "genie/annotation/trackproperty_annotation.h"
 // -----------------------------------------------------------------------------
 
@@ -95,7 +95,7 @@ class Annotation {
     GeneExpressionAnnotation geneExpressionAnnotation;
     FeatureAnnotation featureAnnotation;
     FunctionalAnnotation functionalAnnotation;
-    TrackAnnotation trackAnnotation;
+    TrackDataAnnotation trackAnnotation;
     TrackPropertyAnnotation trackPropertyAnnotation;
     CMAnnotation cmAnnotation;
 

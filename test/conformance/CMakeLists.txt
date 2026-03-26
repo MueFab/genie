@@ -16,7 +16,7 @@ set(source_files
         gene-expression-conformance-test.cc
         feature-conformance-test.cc
         functional-annotation-conformance-test.cc
-        track-conformance-test.cc
+        track-data-conformance-test.cc
         trackproperty-conformance-test.cc
         helpers.cc
         main.cc

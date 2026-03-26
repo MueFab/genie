@@ -65,6 +65,10 @@ TEST_P(TrackPropertyConformanceTest, TrackPropertyConformancetests) {  // NOLINT
     annotationGenerator.startStream(genie::annotation::RecType::TRACK_PROPERTY_FILE, filepath, filepath + "_output");
 }
 
+// Allow this test to be uninstantiated until input files are available
+GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(TrackPropertyConformanceTest);
+
 // Test case details will be added when example files become available
+// Test effectively disabled - no input files available yet
 INSTANTIATE_TEST_SUITE_P(testallTrackPropertyConformance, TrackPropertyConformanceTest,
                         ::testing::Values());

@@ -11,7 +11,7 @@ set(source_files
         feature_annotation.cc
         contact_annotation.cc
         functional_annotation.cc
-        track_annotation.cc
+        track_data_annotation.cc
         trackproperty_annotation.cc
         compressors.cc
         parameterset_composer.cc

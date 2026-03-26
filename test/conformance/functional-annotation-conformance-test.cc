@@ -68,6 +68,6 @@ TEST_P(FunctionalAnnotationConformanceTest, FunctionalAnnotationConformancetests
     annotationGenerator.startStream(genie::annotation::RecType::FUNCTIONAL_ANNOTATIONS_FILE, filepath, filepath + "_output");
 }
 
-// Test case details will be added when example files become available
 INSTANTIATE_TEST_SUITE_P(testallFunctionalAnnotationConformance, FunctionalAnnotationConformanceTest,
-                        ::testing::Values());
+                        ::testing::Values("/data/records/functional_annotation/Homo_sapiens.GRCh38.95.chr.1000.gtf.func.mgrec"));
+                                          // "/data/records/functional_annotation/Homo_sapiens.GRCh38.95.1000.gff3.func.mgrec"  // Temporarily disabled - crashes, waiting for updated file
