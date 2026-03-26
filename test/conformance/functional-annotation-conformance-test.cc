@@ -69,5 +69,5 @@ TEST_P(FunctionalAnnotationConformanceTest, FunctionalAnnotationConformancetests
 }
 
 INSTANTIATE_TEST_SUITE_P(testallFunctionalAnnotationConformance, FunctionalAnnotationConformanceTest,
-                        ::testing::Values("/data/records/functional_annotation/Homo_sapiens.GRCh38.95.chr.1000.gtf.func.mgrec"));
-                                          // "/data/records/functional_annotation/Homo_sapiens.GRCh38.95.1000.gff3.func.mgrec"  // Temporarily disabled - crashes, waiting for updated file
+                        ::testing::Values("/data/records/functional_annotation/Homo_sapiens.GRCh38.95.chr.1000.gtf.func.mgrec",
+                                          "/data/records/functional_annotation/Homo_sapiens.GRCh38.95.1000.gff3.func.mgrec"));
