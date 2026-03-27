@@ -32,7 +32,10 @@
 #include "genie/annotation/annotation.h"
 #include "helpers.h"
 
-class FunctionalAnnotationConformanceTest : public ::testing::TestWithParam<std::string> {
+using AnnotationSubtype = genie::core::record::annotation_access_unit::AnnotationSubtype;
+using TestParam = std::pair<std::string, AnnotationSubtype>;
+
+class FunctionalAnnotationConformanceTest : public ::testing::TestWithParam<TestParam> {
  protected:
     // Do any necessary setup for your tests here
     FunctionalAnnotationConformanceTest() = default;
@@ -50,7 +53,7 @@ class FunctionalAnnotationConformanceTest : public ::testing::TestWithParam<std:
 
 TEST_P(FunctionalAnnotationConformanceTest, FunctionalAnnotationConformancetests) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filename = GetParam();
+    const auto& [filename, subtype] = GetParam();
     std::string filepath = gitRootDir + filename;
 
     std::string set1 = "compressor 1 0 SER {0} {} {1}";
@@ -64,10 +67,13 @@ TEST_P(FunctionalAnnotationConformanceTest, FunctionalAnnotationConformancetests
 
     annotationGenerator.setCompressorConfig(config);
     annotationGenerator.setTileSize(1000, 3000);
+    annotationGenerator.setATType(genie::core::record::annotation_access_unit::AnnotationType::FUNCTIONAL_ANNOTATIONS,
+                                   subtype);
 
     annotationGenerator.startStream(genie::annotation::RecType::FUNCTIONAL_ANNOTATIONS_FILE, filepath, filepath + "_output");
 }
 
 INSTANTIATE_TEST_SUITE_P(testallFunctionalAnnotationConformance, FunctionalAnnotationConformanceTest,
-                        ::testing::Values("/data/records/functional_annotation/Homo_sapiens.GRCh38.95.chr.1000.gtf.func.mgrec",
-                                          "/data/records/functional_annotation/Homo_sapiens.GRCh38.95.1000.gff3.func.mgrec"));
+                        ::testing::Values(
+                            TestParam{"/data/records/functional_annotation/Homo_sapiens.GRCh38.95.chr.1000.gtf.func.mgrec", AnnotationSubtype::GTF},
+                            TestParam{"/data/records/functional_annotation/Homo_sapiens.GRCh38.95.1000.gff3.func.mgrec", AnnotationSubtype::GFF}));

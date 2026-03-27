@@ -42,6 +42,9 @@ class FunctionalAnnotation {
     void parseInfoTags(std::string& recordInputFileName);
     FunctionalAnnotationUnits parseFunctionalAnnotation(std::ifstream& inputfile);
     void setCompressors(Compressor& _compressors) { compressors = _compressors; }
+    void setAnnotationSubtype(core::record::annotation_access_unit::AnnotationSubtype subtype) {
+        annotationSubtype_ = subtype;
+    }
 
  private:
     std::ifstream recordInput;
@@ -63,6 +66,8 @@ class FunctionalAnnotation {
     std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
+    core::record::annotation_access_unit::AnnotationSubtype annotationSubtype_{
+        core::record::annotation_access_unit::AnnotationSubtype::GFF};
 };
 
 }  // namespace annotation

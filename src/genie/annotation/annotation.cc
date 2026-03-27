@@ -77,6 +77,7 @@ void Annotation::startStream(RecType recType, std::string recordInputFileName,
     } else if (recType == RecType::FUNCTIONAL_ANNOTATIONS_FILE) {
         functionalAnnotation.setCompressors(compressors);
         functionalAnnotation.setTileSize(defaultTileSizeHeight);
+        functionalAnnotation.setAnnotationSubtype(annotationSubtype_);
         functionalAnnotation.parseInfoTags(recordInputFileName);
         auto dataunits = functionalAnnotation.parseFunctionalAnnotation(inputfile);
         annotationParameterSet.push_back(dataunits.annotationParameterSet);

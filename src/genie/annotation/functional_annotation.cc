@@ -86,7 +86,7 @@ FunctionalAnnotationUnits FunctionalAnnotation::parseFunctionalAnnotation(std::i
 
     variant_site::AccessUnitComposer accessUnit;
     accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::FUNCTIONAL_ANNOTATIONS,
-                         core::record::annotation_access_unit::AnnotationSubtype::GFF);
+                         annotationSubtype_);
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;

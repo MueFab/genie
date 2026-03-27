@@ -25,7 +25,7 @@ void Descriptors::write(genie::core::record::track::Record trackRecord) {
     tiles[genie::core::AnnotDesc::SEQUENCEID].write(trackRecord.GetSeqId(), 16);
     tiles[genie::core::AnnotDesc::STARTPOS].write(trackRecord.GetStartPos(), 64);
     tiles[genie::core::AnnotDesc::ENDPOS].write(trackRecord.GetEndPos(), 64);
-    tiles[genie::core::AnnotDesc::STRAND].write(trackRecord.GetStrand(), 8);
+    tiles[genie::core::AnnotDesc::STRAND].write(trackRecord.GetStrand(), 2);
     
     // Write link information if this is a linked record
     if (trackRecord.IsLinkedRecord()) {
