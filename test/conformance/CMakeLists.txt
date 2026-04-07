@@ -15,6 +15,9 @@ set(source_files
         expression-sample-conformance-test.cc
         gene-expression-conformance-test.cc
         feature-conformance-test.cc
+        functional-annotation-conformance-test.cc
+        track-data-conformance-test.cc
+        trackproperty-conformance-test.cc
         helpers.cc
         main.cc
 )
@@ -48,6 +51,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE genie-genotype)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-variantsample)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-feature)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-functionalannotation)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-track)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-trackproperty)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
 
 install(TARGETS ${PROJECT_NAME}
