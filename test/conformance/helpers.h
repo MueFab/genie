@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef TEST_CONFORMANCE_HELPERS_H
-#define TEST_CONFORMANCE_HELPERS_H
+#ifndef TEST_CONFORMANCE_HELPERS_H_
+#define TEST_CONFORMANCE_HELPERS_H_
 #include <fstream>
 #include <string>
 
@@ -33,4 +33,4 @@ class FileIn {
 };
 }  // namespace util_tests
 
-#endif  // TEST_CONFORMANCE_HELPERS_H
+#endif  // TEST_CONFORMANCE_HELPERS_H_

@@ -26,7 +26,7 @@ void Descriptors::write(genie::core::record::functional_annotation::Record funct
     tiles[genie::core::AnnotDesc::STARTPOS].write(functionalAnnotation.GetStartPos(), 64);
     tiles[genie::core::AnnotDesc::ENDPOS].write(functionalAnnotation.GetEndPos(), 64);
     tiles[genie::core::AnnotDesc::STRAND].write(functionalAnnotation.GetStrand(), 2);
-    
+
     // Write feature name as index (uint32) into feature names list in annotation parameter set
     // FEATURENAME descriptor (ID 18) stores the index, not the string itself
     uint32_t featureNameIndex = 0;
@@ -35,11 +35,11 @@ void Descriptors::write(genie::core::record::functional_annotation::Record funct
         featureNameIndex = it->second;
     }
     tiles[genie::core::AnnotDesc::FEATURENAME].write(featureNameIndex, 32);
-    
+
     // Write feature ID as uint32 (ID from an Ontology)
     // FEATUREID descriptor (ID 19) is a 32-bit ontology ID
     tiles[genie::core::AnnotDesc::FEATUREID].write(functionalAnnotation.GetFeatureID(), 32);
-    
+
     // Write ontology names as indices (uint32) into ontology names list in annotation parameter set
     // ONTOLOGYNAME descriptor (ID 20) stores indices, with a fixed number per record
     // If fewer ontologies than maxOntologiesPerRecord, pad with 0xFFFFFFFF (missing value)
@@ -57,7 +57,7 @@ void Descriptors::write(genie::core::record::functional_annotation::Record funct
             tiles[genie::core::AnnotDesc::ONTOLOGYNAME].write(static_cast<uint32_t>(0xFFFFFFFF), 8);
         }
     }
-    
+
     // Write ontology IDs as uint32
     // ONTOLOGYID descriptor (ID 21) is a 32-bit ontology ID, fixed number per record
     // Pad with 0xFFFFFFFF (missing value) when record has fewer ontologies
@@ -69,7 +69,7 @@ void Descriptors::write(genie::core::record::functional_annotation::Record funct
             tiles[genie::core::AnnotDesc::ONTOLOGYID].write(static_cast<uint32_t>(0xFFFFFFFF), 32);
         }
     }
-    
+
     // Write link information if this is a linked record
     if (functionalAnnotation.IsLinkedRecord()) {
         tiles[genie::core::AnnotDesc::LINKNAME].write(functionalAnnotation.GetLinkName());

@@ -41,8 +41,8 @@ class FunctionalAnnotationParser {
     using AttributeData = genie::core::record::annotation_parameter_set::AttributeData;
     using InfoField = genie::annotation::InfoField;
 
-    FunctionalAnnotationParser(std::istream& _annotation_MGrecs, std::vector<genie::annotation::InfoField>& _fields, 
-                              const std::vector<std::string>& _featureNames, 
+    FunctionalAnnotationParser(std::istream& _annotation_MGrecs, std::vector<genie::annotation::InfoField>& _fields,
+                              const std::vector<std::string>& _featureNames,
                               const std::vector<std::string>& _ontologyNames,
                               uint8_t _maxOntologiesPerRecord,
                               uint64_t _rowsPerTile);

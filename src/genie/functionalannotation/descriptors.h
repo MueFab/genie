@@ -30,8 +30,8 @@ namespace functional_annotation {
 
 class Descriptors {
  public:
-    Descriptors() : rowsPerTile(0), rowInTile(0), maxOntologiesPerRecord(0) { init(); }
-    explicit Descriptors(uint64_t _rowsPerTile) : rowsPerTile(_rowsPerTile), rowInTile(0), maxOntologiesPerRecord(0) { init(); }
+    Descriptors() : maxOntologiesPerRecord(0), rowsPerTile(0), rowInTile(0) { init(); }
+    explicit Descriptors(uint64_t _rowsPerTile) : maxOntologiesPerRecord(0), rowsPerTile(_rowsPerTile), rowInTile(0) { init(); }
 
     void setTileSize(uint64_t _rowsPerTile) {
         rowsPerTile = _rowsPerTile;

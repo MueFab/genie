@@ -32,7 +32,7 @@ void TrackDataAnnotation::parseInfoTags(std::string& recordInputFileName) {
     readForTags.open(recordInputFileName, std::ios::in | std::ios::binary);
     util::BitReader bitreader(readForTags);
     core::record::track::Record recs;
-    
+
     while (recs.Read(bitreader)) {
         const auto& attrs = recs.GetAttributes();
         for (const auto& attr : attrs) {

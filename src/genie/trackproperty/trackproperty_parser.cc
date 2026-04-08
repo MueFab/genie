@@ -33,7 +33,7 @@ TrackPropertyParser::TrackPropertyParser(std::ifstream& inputfile, std::vector<a
     util::BitReader reader(trackPropertyMGrecs);
     while (fillRecord(reader)) {
         descriptors.write(trackPropertyRecord);
-        
+
         // Track properties are stored as attributes in the annotation parameter set
         const auto& props = trackPropertyRecord.GetProperties();
         if (!props.empty()) {
@@ -41,7 +41,7 @@ TrackPropertyParser::TrackPropertyParser(std::ifstream& inputfile, std::vector<a
         }
         numberOfRows++;
     }
-    
+
     descriptors.writeDanglingBits();
     numberOfTiles = descriptors.getTiles()[core::AnnotDesc::LINKNAME].getNrOfTiles();
 }

@@ -7,6 +7,10 @@
 #include <gtest/gtest.h>
 #include <cmath>
 #include <fstream>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 #include "genie/core/contact_record/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -14,7 +18,7 @@
 
 void check_row_col_uniqueness(
     genie::core::record::ContactRecord& rec
-){
+) {
     size_t num_entries = rec.GetNumEntries();
 
     auto& starts1 = rec.GetStartPos1();
@@ -26,7 +30,7 @@ void check_row_col_uniqueness(
     std::map<std::pair<uint64_t, uint64_t>, uint32_t> sparse_mat1;
     std::map<std::pair<uint64_t, uint64_t>, uint32_t> sparse_mat2;
 
-    for (auto i_entry = 0u; i_entry< num_entries; i_entry++){
+    for (auto i_entry = 0u; i_entry < num_entries; i_entry++) {
         auto count = counts[i_entry];
         {
             auto row_id = starts1[i_entry];
@@ -64,11 +68,11 @@ TEST(ContactRecord, IntraContactRecord_LR_Raw) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             recs.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         recs.pop_back();
     }
 
@@ -106,7 +110,6 @@ TEST(ContactRecord, IntraContactRecord_LR_Raw) {
 
         check_row_col_uniqueness(recon_rec);
     }
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -123,11 +126,11 @@ TEST(ContactRecord, IntraContactRecord_LR_All) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             recs.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         recs.pop_back();
     }
 
@@ -185,11 +188,11 @@ TEST(ContactRecord, IntraContactRecord_HR_Raw) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             recs.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         recs.pop_back();
     }
 
@@ -201,7 +204,7 @@ TEST(ContactRecord, IntraContactRecord_HR_Raw) {
     ASSERT_EQ(rec.GetChr1Name(), "22");
     ASSERT_EQ(rec.GetChr2ID(), 21u);
     ASSERT_EQ(rec.GetChr2Name(), "22");
-    //TODO: Complete all with the correct values
+    // TODO(Yeremia): Complete all with the correct values
     //    ASSERT_EQ(rec.GetNumEntries(), 9812u);
     //    ASSERT_EQ(rec.getNumNormCounts(), 0u);
     //    ASSERT_EQ(rec.GetStartPos1().front(), 16000000u);
@@ -244,11 +247,11 @@ TEST(ContactRecord, IntraContactRecord_HR_All) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             recs.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         recs.pop_back();
     }
 
@@ -260,7 +263,7 @@ TEST(ContactRecord, IntraContactRecord_HR_All) {
     ASSERT_EQ(rec.GetChr1Name(), "22");
     ASSERT_EQ(rec.GetChr2ID(), 21u);
     ASSERT_EQ(rec.GetChr2Name(), "22");
-    //TODO: Complete all with the correct values
+    // TODO(Yeremia): Complete all with the correct values
     //    ASSERT_EQ(rec.GetNumEntries(), 9812u);
     //    ASSERT_EQ(rec.getNumNormCounts(), 0u);
     //    ASSERT_EQ(rec.GetStartPos1().front(), 16000000u);
@@ -303,11 +306,11 @@ TEST(ContactRecord, InterContactRecord_LR_Raw) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             recs.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         recs.pop_back();
     }
 
@@ -319,7 +322,7 @@ TEST(ContactRecord, InterContactRecord_LR_Raw) {
     ASSERT_EQ(rec.GetChr1Name(), "22");
     ASSERT_EQ(rec.GetChr2ID(), 22u);
     ASSERT_EQ(rec.GetChr2Name(), "X");
-    //TODO: Complete all with the correct values
+    // TODO(Yeremia): Complete all with the correct values
 //    ASSERT_EQ(rec.GetNumEntries(), 59740);
 //    ASSERT_EQ(rec.getNumNormCounts(), 0u);
 //    ASSERT_EQ(rec.GetStartPos1().front(), 16000000u);
@@ -362,11 +365,11 @@ TEST(ContactRecord, InterContactRecord_HR_Raw) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             recs.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         recs.pop_back();
     }
 
@@ -378,7 +381,7 @@ TEST(ContactRecord, InterContactRecord_HR_Raw) {
     ASSERT_EQ(rec.GetChr1Name(), "22");
     ASSERT_EQ(rec.GetChr2ID(), 22u);
     ASSERT_EQ(rec.GetChr2Name(), "X");
-    //TODO: Complete all with the correct values
+    // TODO(Yeremia): Complete all with the correct values
     //    ASSERT_EQ(rec.GetNumEntries(), 59740);
     //    ASSERT_EQ(rec.getNumNormCounts(), 0u);
     //    ASSERT_EQ(rec.GetStartPos1().front(), 16000000u);
@@ -407,4 +410,4 @@ TEST(ContactRecord, InterContactRecord_HR_Raw) {
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

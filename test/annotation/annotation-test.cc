@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include <filesystem>
+#include <iostream>
 #include <string>
 
 #include "helpers.h"
@@ -152,7 +152,7 @@ TEST_P(AnnotationTests, annotationSite) {
     if (std::filesystem::file_size(inputFilename) > 100 * 1024) return;
 
   std::string outputFilename = composeSiteOutputFileName(filePath, testParams);
-                                 
+
   std::filesystem::remove(outputFilename + ".bin");
 
   genie::annotation::Annotation annotationGenerator;
@@ -179,7 +179,7 @@ TEST_P(AnnotationTests, annotationGeno) {
   auto testParams = GetParam();
 
   std::string inputFilename =
-      filePath + testParams.genofile_in;  //"ALL.chrX.10000.geno";
+      filePath + testParams.genofile_in;  // "ALL.chrX.10000.geno";
 
 
   ASSERT_TRUE(std::filesystem::exists(inputFilename));

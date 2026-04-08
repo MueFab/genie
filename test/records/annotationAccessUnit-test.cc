@@ -71,7 +71,7 @@ TEST_F(AnnotationAccessUnitTests, annotationAccessUnitHeader) {  // NOLINT(cert-
     uint8_t ATCoordSize = 3;
     bool is_attribute = false;
     uint16_t attribute_ID = 0;
-  
+
     genie::core::AnnotDesc descriptor_ID =
         genie::core::AnnotDesc ::DESCRIPTION;
     uint64_t n_tiles_per_col = 0;

@@ -23,7 +23,7 @@ namespace genie {
 namespace functional_annotation {
 
 FunctionalAnnotationParser::FunctionalAnnotationParser(std::istream& _annotation_MGrecs, std::vector<genie::annotation::InfoField>& _fields,
-                                     const std::vector<std::string>& _featureNames, 
+                                     const std::vector<std::string>& _featureNames,
                                      const std::vector<std::string>& _ontologyNames,
                                      uint8_t _maxOntologiesPerRecord,
                                      uint64_t _rowsPerTile)
@@ -34,14 +34,14 @@ FunctionalAnnotationParser::FunctionalAnnotationParser(std::istream& _annotation
       fieldWriter{},
       numberOfAttributes(0) {
     init();
-    
+
     // Build feature name to index mapping
     std::map<std::string, uint32_t> featureNameMapping;
     for (size_t i = 0; i < _featureNames.size(); ++i) {
         featureNameMapping[_featureNames[i]] = static_cast<uint32_t>(i);
     }
     descriptors.setFeatureNameMapping(featureNameMapping);
-    
+
     // Build ontology name to index mapping
     std::map<std::string, uint32_t> ontologyNameMapping;
     for (size_t i = 0; i < _ontologyNames.size(); ++i) {
@@ -49,7 +49,7 @@ FunctionalAnnotationParser::FunctionalAnnotationParser(std::istream& _annotation
     }
     descriptors.setOntologyNameMapping(ontologyNameMapping);
     descriptors.setMaxOntologiesPerRecord(_maxOntologiesPerRecord);
-    
+
     descriptors.setTileSize(rowsPerTile);
 
     util::BitReader reader(annotationMGrecs);

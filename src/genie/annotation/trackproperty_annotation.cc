@@ -32,12 +32,12 @@ void TrackPropertyAnnotation::parseInfoTags(std::string& recordInputFileName) {
     readForTags.open(recordInputFileName, std::ios::in | std::ios::binary);
     util::BitReader bitreader(readForTags);
     core::record::track_property::Record rec;
-    
+
     // Track properties only has a single record
     if (rec.Read(bitreader)) {
         // Store track_type from the record to determine annotation subtype
         trackType_ = rec.GetTrackType();
-        
+
         const auto& props = rec.GetProperties();
         for (const auto& prop : props) {
             InfoField infoField(prop.track_property, static_cast<core::DataType>(prop.track_property_type), 1);
@@ -68,7 +68,7 @@ TrackPropertyUnits TrackPropertyAnnotation::parseTrackProperty(std::ifstream& in
 
     // Convert track_type to AnnotationSubtype
     // track_type values: GTF=2, GFF=3, BED=4, BEDGRAPH=5, WIG=6, BIGWIG=7, GENBANK=8
-    core::record::annotation_access_unit::AnnotationSubtype subtype = 
+    core::record::annotation_access_unit::AnnotationSubtype subtype =
         static_cast<core::record::annotation_access_unit::AnnotationSubtype>(trackType_);
 
     variant_site::AccessUnitComposer accessUnit;

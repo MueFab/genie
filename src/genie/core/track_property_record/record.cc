@@ -43,7 +43,7 @@ void Record::Write(util::BitWriter& writer) {
         writer.Write(properties_[i].track_property);
         writer.WriteBits(properties_[i].track_property_type, 8);
         writer.WriteBits(properties_[i].track_property_array_len, 8);
-        
+
         DataType type = static_cast<DataType>(properties_[i].track_property_type);
         writeType.toFile(type, properties_[i].track_property_values, writer);
     }
@@ -71,7 +71,7 @@ bool Record::Read(util::BitReader& reader) {
     properties_.clear();
     properties_.reserve(track_property_count_);
     ArrayType readType;
-    
+
     for (auto i = 0; i < track_property_count_; ++i) {
         TrackProperty prop;
         prop.track_property_len = static_cast<uint8_t>(reader.ReadBits(8));
@@ -81,7 +81,7 @@ bool Record::Read(util::BitReader& reader) {
         }
         prop.track_property_type = static_cast<uint8_t>(reader.ReadBits(8));
         prop.track_property_array_len = static_cast<uint8_t>(reader.ReadBits(8));
-        
+
         DataType type = static_cast<DataType>(prop.track_property_type);
         prop.track_property_values = readType.toArray(type, reader);
         properties_.push_back(prop);

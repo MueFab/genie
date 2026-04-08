@@ -5,7 +5,12 @@
 */
 
 #include <gtest/gtest.h>
+#include <filesystem>
 #include <fstream>
+#include <iostream>
+#include <map>
+#include <string>
+#include <utility>
 #include <vector>
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xarray.hpp>
@@ -16,16 +21,10 @@
 #include "genie/core/contact_record/record.h"
 #include "genie/util/bit_reader.h"
 #include "helpers.h"
-//#include "genie/util/bitwriter.h"
-//#include "genie/util/runtime-exception.h"
-//#include <unistd.h>
-#include <iostream>
-#include <filesystem>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 TEST(ContactCoder, Simple_Coding_ComputeMask) {
-
     std::vector<uint64_t> IDS_VEC = {0, 1, 3, 5};
     auto IDS_NENTRIES = 8u;
     genie::contact::UInt64VecDtype IDS = xt::adapt(IDS_VEC, {IDS_VEC.size()});
@@ -48,7 +47,7 @@ TEST(ContactCoder, Simple_Coding_ComputeMask) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//TODO(yeremia): Create round trip test
+// TODO(yeremia): Create round trip test
 TEST(ContactCoder, Simple_Coding_ComputeMasks) {
     // Intra SCM
     {
@@ -71,8 +70,7 @@ TEST(ContactCoder, Simple_Coding_ComputeMasks) {
             NENTRIES,
             IS_INTRA,
             row_mask,
-            col_mask
-        );
+            col_mask);
 
         ASSERT_TRUE(row_mask == col_mask);
         ASSERT_EQ(row_mask.size(), NENTRIES);
@@ -117,8 +115,7 @@ TEST(ContactCoder, Simple_Coding_ComputeMasks) {
             NCOLS,
             IS_INTRA,
             row_mask,
-            col_mask
-        );
+            col_mask);
 
         ASSERT_TRUE(row_mask != col_mask);
         ASSERT_EQ(row_mask.size(), NROWS);
@@ -171,8 +168,7 @@ TEST(ContactCoder, RoundTrip_Coding_ProcessingUnalignedRegion) {
             NENTRIES,
             IS_INTRA,
             row_mask,
-            col_mask
-        );
+            col_mask);
 
         ASSERT_EQ(row_mask, col_mask);
 
@@ -181,8 +177,7 @@ TEST(ContactCoder, RoundTrip_Coding_ProcessingUnalignedRegion) {
             col_ids,
             IS_INTRA,
             row_mask,
-            col_mask
-        );
+            col_mask);
 
         ASSERT_EQ(row_ids(0), 0u) << "row_ids:" << row_ids << std::endl;
         ASSERT_EQ(row_ids(1), 2u) << "row_ids:" << row_ids << std::endl;
@@ -194,8 +189,7 @@ TEST(ContactCoder, RoundTrip_Coding_ProcessingUnalignedRegion) {
             col_ids,
             IS_INTRA,
             row_mask,
-            col_mask
-        );
+            col_mask);
 
         ASSERT_EQ(row_ids, ROW_IDS);
         ASSERT_EQ(col_ids, COL_IDS);
@@ -226,15 +220,13 @@ TEST(ContactCoder, RoundTrip_Coding_ProcessingUnalignedRegion) {
             NCOLS,
             IS_INTRA,
             row_mask,
-            col_mask
-        );
+            col_mask);
         genie::contact::remove_unaligned(
             row_ids,
             col_ids,
             IS_INTRA,
             row_mask,
-            col_mask
-        );
+            col_mask);
 
         ASSERT_EQ(row_ids(0), 0u) << "row_ids: " << row_ids << std::endl;
         ASSERT_EQ(row_ids(1), 1u) << "row_ids: " << row_ids << std::endl;
@@ -246,8 +238,7 @@ TEST(ContactCoder, RoundTrip_Coding_ProcessingUnalignedRegion) {
             col_ids,
             IS_INTRA,
             row_mask,
-            col_mask
-        );
+            col_mask);
 
         ASSERT_EQ(row_ids, ROW_IDS);
         ASSERT_EQ(col_ids, COL_IDS);
@@ -285,8 +276,7 @@ TEST(ContactCoder, RoundTrip_Coding_SparseDenseRepresentation) {
             COUNTS,
             NROWS,
             NCOLS,
-            tile_mat
-        );
+            tile_mat);
 
         ASSERT_EQ(tile_mat.dimension(), 2);
         ASSERT_EQ(tile_mat.shape(0), 3);
@@ -304,8 +294,7 @@ TEST(ContactCoder, RoundTrip_Coding_SparseDenseRepresentation) {
             tile_mat,
             recon_row_ids,
             recon_col_ids,
-            recon_counts
-        );
+            recon_counts);
 
         recon_row_ids += ROW_ID_OFFSET;
         recon_col_ids += COL_ID_OFFSET;
@@ -339,8 +328,7 @@ TEST(ContactCoder, RoundTrip_Coding_SparseDenseRepresentation) {
             COUNTS,
             NROWS,
             NCOLS,
-            tile_mat
-        );
+            tile_mat);
 
         ASSERT_EQ(tile_mat.dimension(), 2);
         ASSERT_EQ(tile_mat.shape(0), 2);
@@ -357,8 +345,7 @@ TEST(ContactCoder, RoundTrip_Coding_SparseDenseRepresentation) {
             tile_mat,
             recon_row_ids,
             recon_col_ids,
-            recon_counts
-        );
+            recon_counts);
 
         recon_row_ids += ROW_ID_OFFSET;
         recon_col_ids += COL_ID_OFFSET;
@@ -392,8 +379,7 @@ TEST(ContactCoder, RoundTrip_Coding_SparseDenseRepresentation) {
             COUNTS,
             NROWS,
             NCOLS,
-            tile_mat
-        );
+            tile_mat);
 
         ASSERT_EQ(tile_mat.dimension(), 2);
         ASSERT_EQ(tile_mat.shape(0), 3);
@@ -410,8 +396,7 @@ TEST(ContactCoder, RoundTrip_Coding_SparseDenseRepresentation) {
             tile_mat,
             recon_row_ids,
             recon_col_ids,
-            recon_counts
-        );
+            recon_counts);
 
         recon_row_ids += ROW_ID_OFFSET;
         recon_col_ids += COL_ID_OFFSET;
@@ -445,8 +430,7 @@ TEST(ContactCoder, RoundTrip_Coding_SparseDenseRepresentation) {
             COUNTS,
             NROWS,
             NCOLS,
-            tile_mat
-        );
+            tile_mat);
 
         ASSERT_EQ(tile_mat.dimension(), 2);
         ASSERT_EQ(tile_mat.shape(0), 2);
@@ -462,8 +446,7 @@ TEST(ContactCoder, RoundTrip_Coding_SparseDenseRepresentation) {
             tile_mat,
             recon_row_ids,
             recon_col_ids,
-            recon_counts
-        );
+            recon_counts);
 
         recon_row_ids += ROW_ID_OFFSET;
         recon_col_ids += COL_ID_OFFSET;
@@ -476,7 +459,7 @@ TEST(ContactCoder, RoundTrip_Coding_SparseDenseRepresentation) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//TODO(yeremia): Create round trip test
+// TODO(yeremia): Create round trip test
 TEST(ContactCoder, RoundTrip_Coding_DiagonalTransformation) {
     // None
     {
@@ -737,8 +720,7 @@ TEST(ContactCoder, RoundTrip_Coding_CodingCMTile) {
         encode_cm_tile(
             bin_mat,
             CODEC_ID,
-            tile_payload
-        );
+            tile_payload);
 
         ASSERT_EQ(tile_payload.GetNumRows(), NROWS);
         ASSERT_EQ(tile_payload.GetNumCols(), NCOLS);
@@ -746,8 +728,7 @@ TEST(ContactCoder, RoundTrip_Coding_CodingCMTile) {
         decode_cm_tile(
             tile_payload,
             CODEC_ID,
-            recon_bin_mat
-        );
+            recon_bin_mat);
 
         ASSERT_EQ(recon_bin_mat, ORIG_BIN_MAT);
     }
@@ -766,8 +747,7 @@ TEST(ContactCoder, RoundTrip_Coding_CodingCMTile) {
         encode_cm_tile(
             bin_mat,
             CODEC_ID,
-            tile_payload
-        );
+            tile_payload);
 
         ASSERT_EQ(tile_payload.GetNumRows(), NROWS);
         ASSERT_EQ(tile_payload.GetNumCols(), NCOLS);
@@ -775,8 +755,7 @@ TEST(ContactCoder, RoundTrip_Coding_CodingCMTile) {
         decode_cm_tile(
             tile_payload,
             CODEC_ID,
-            recon_bin_mat
-        );
+            recon_bin_mat);
 
         ASSERT_EQ(recon_bin_mat, ORIG_BIN_MAT);
     }
@@ -799,7 +778,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
             RECS.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         RECS.pop_back();
     }
 
@@ -825,7 +804,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -847,8 +826,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -895,8 +873,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
@@ -946,7 +923,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -968,8 +945,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -1022,7 +998,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
+TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
@@ -1034,11 +1010,11 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         genie::util::BitReader bitreader(reader);
 
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             RECS.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         RECS.pop_back();
     }
 
@@ -1049,7 +1025,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         auto REMOVE_UNALIGNED_REGION = false;
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -1063,8 +1039,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -1086,8 +1062,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -1104,8 +1079,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -1116,8 +1090,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
@@ -1152,7 +1125,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         auto REMOVE_UNALIGNED_REGION = true;
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -1166,8 +1139,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -1189,8 +1162,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -1207,8 +1179,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -1219,8 +1190,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
@@ -1253,7 +1223,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
+TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-all-250000-21_21.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
@@ -1265,11 +1235,11 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             RECS.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         RECS.pop_back();
     }
 
@@ -1280,7 +1250,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         auto REMOVE_UNALIGNED_REGION = false;
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -1294,8 +1264,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -1317,8 +1287,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -1335,8 +1304,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -1347,8 +1315,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
@@ -1383,7 +1350,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         auto REMOVE_UNALIGNED_REGION = true;
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -1397,8 +1364,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -1420,8 +1387,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -1438,8 +1404,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -1450,8 +1415,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
@@ -1484,8 +1448,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
-
+TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale) {
     std::vector<genie::core::record::ContactRecord> RECS;
     {
         std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
@@ -1497,11 +1460,11 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         genie::util::BitReader bitreader(reader);
 
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             RECS.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         RECS.pop_back();
     }
 
@@ -1516,11 +1479,11 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         genie::util::BitReader bitreader(reader);
 
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             LR_RECS.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         LR_RECS.pop_back();
     }
 
@@ -1529,7 +1492,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         auto REMOVE_UNALIGNED_REGION = false;
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -1544,8 +1507,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         cm_param.SetTileSize(TILE_SIZE);
         cm_param.UpsertBinSizeMultiplier(MULT);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -1567,8 +1530,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -1585,8 +1547,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -1597,8 +1558,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         auto& LR_REC = LR_RECS.front();
 
@@ -1635,7 +1595,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         auto REMOVE_UNALIGNED_REGION = true;
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -1650,8 +1610,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         cm_param.SetTileSize(TILE_SIZE);
         cm_param.UpsertBinSizeMultiplier(MULT);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -1673,8 +1633,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -1691,8 +1650,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -1703,8 +1661,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         auto& LR_REC = LR_RECS.front();
 
@@ -1754,7 +1711,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
             RECS.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         RECS.pop_back();
     }
 
@@ -1778,7 +1735,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -1800,8 +1757,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -1818,8 +1774,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -1881,7 +1836,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -1903,8 +1858,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -1957,8 +1911,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
     }
 }
 
-TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
-
+TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale) {
     std::vector<genie::core::record::ContactRecord> RECS;
     {
         std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
@@ -1971,11 +1924,11 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         genie::util::BitReader bitreader(reader);
 
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             RECS.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         RECS.pop_back();
     }
 
@@ -1991,11 +1944,11 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         genie::util::BitReader bitreader(reader);
 
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             LR_RECS.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         LR_RECS.pop_back();
     }
 
@@ -2004,7 +1957,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         auto REMOVE_UNALIGNED_REGION = false;
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -2019,8 +1972,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         cm_param.SetTileSize(TILE_SIZE);
         cm_param.UpsertBinSizeMultiplier(MULT);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -2042,8 +1995,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -2060,8 +2012,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -2072,12 +2023,11 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         auto& LR_REC = LR_RECS.front();
 
-        if (recon_rec.GetNumEntries() != LR_REC.GetNumEntries()){
+        if (recon_rec.GetNumEntries() != LR_REC.GetNumEntries()) {
             size_t recon_num_entries = recon_rec.GetNumEntries();
 
             genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.GetStartPos1(), {recon_num_entries});
@@ -2089,7 +2039,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             genie::contact::UInt64VecDtype recon_counts = xt::adapt(recon_rec.GetCounts(), {recon_num_entries});
 
             std::map<std::pair<uint64_t, uint64_t>, uint32_t> recon_sparse_mat;
-            for (auto i_entry = 0u; i_entry<recon_num_entries; i_entry++){
+            for (auto i_entry = 0u; i_entry < recon_num_entries; i_entry++) {
                 auto recon_row_id = recon_row_ids(i_entry);
                 auto recon_col_id = recon_col_ids(i_entry);
                 auto recon_count = recon_counts(i_entry);
@@ -2111,7 +2061,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             genie::contact::UInt64VecDtype lr_counts = xt::adapt(LR_REC.GetCounts(), {lr_num_entries});
 
             std::map<std::pair<uint64_t, uint64_t>, uint32_t> lr_sparse_mat;
-            for (auto i_entry = 0u; i_entry<recon_num_entries; i_entry++){
+            for (auto i_entry = 0u; i_entry < recon_num_entries; i_entry++) {
                 auto lr_row_id = lr_row_ids(i_entry);
                 auto lr_col_id = lr_col_ids(i_entry);
                 auto lr_count = lr_counts(i_entry);
@@ -2134,12 +2084,12 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
                 genie::contact::UInt64VecDtype hr_counts = xt::adapt(REC.GetCounts(), {hr_num_entries});
 
                 std::vector<uint64_t> tmp_counts;
-                for (auto i_entry = 0u; i_entry<hr_num_entries; i_entry++){
+                for (auto i_entry = 0u; i_entry < hr_num_entries; i_entry++) {
                     auto hr_row_id = hr_row_ids(i_entry);
                     auto hr_col_id = hr_col_ids(i_entry);
                     auto hr_count = hr_counts(i_entry);
 
-                    if (hr_row_id == 64 && hr_col_id == 201){
+                    if (hr_row_id == 64 && hr_col_id == 201) {
                         tmp_counts.push_back(hr_count);
                     }
                 }
@@ -2189,7 +2139,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         auto REMOVE_UNALIGNED_REGION = true;
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -2204,8 +2154,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         cm_param.SetTileSize(TILE_SIZE);
         cm_param.UpsertBinSizeMultiplier(MULT);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -2227,8 +2177,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -2245,8 +2194,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -2257,8 +2205,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         auto& LR_REC = LR_RECS.front();
 
@@ -2293,7 +2240,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
+TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_22.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
@@ -2305,11 +2252,11 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             RECS.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         RECS.pop_back();
     }
 
@@ -2319,7 +2266,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto REMOVE_UNALIGNED_REGION = false;
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -2333,8 +2280,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -2356,8 +2303,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -2374,8 +2320,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -2386,8 +2331,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
@@ -2423,7 +2367,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto REMOVE_UNALIGNED_REGION = true;
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -2437,8 +2381,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -2460,8 +2404,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -2478,8 +2421,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -2490,8 +2432,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
@@ -2524,8 +2465,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
-
+TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale) {
     std::vector<genie::core::record::ContactRecord> RECS;
     {
         std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
@@ -2538,11 +2478,11 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         genie::util::BitReader bitreader(reader);
 
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             RECS.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         RECS.pop_back();
     }
 
@@ -2557,11 +2497,11 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         genie::util::BitReader bitreader(reader);
 
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             LR_RECS.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         LR_RECS.pop_back();
     }
 
@@ -2570,7 +2510,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         auto REMOVE_UNALIGNED_REGION = false;
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -2585,8 +2525,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         cm_param.SetTileSize(TILE_SIZE);
         cm_param.UpsertBinSizeMultiplier(MULT);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -2608,8 +2548,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -2626,8 +2565,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -2638,12 +2576,11 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         auto& LR_REC = LR_RECS.front();
 
-        if (recon_rec.GetNumEntries() != LR_REC.GetNumEntries()){
+        if (recon_rec.GetNumEntries() != LR_REC.GetNumEntries()) {
             size_t recon_num_entries = recon_rec.GetNumEntries();
 
             genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.GetStartPos1(), {recon_num_entries});
@@ -2655,7 +2592,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
             genie::contact::UInt64VecDtype recon_counts = xt::adapt(recon_rec.GetCounts(), {recon_num_entries});
 
             std::map<std::pair<uint64_t, uint64_t>, uint32_t> recon_sparse_mat;
-            for (auto i_entry = 0u; i_entry<recon_num_entries; i_entry++){
+            for (auto i_entry = 0u; i_entry < recon_num_entries; i_entry++) {
                 auto recon_row_id = recon_row_ids(i_entry);
                 auto recon_col_id = recon_col_ids(i_entry);
                 auto recon_count = recon_counts(i_entry);
@@ -2677,7 +2614,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
             genie::contact::UInt64VecDtype lr_counts = xt::adapt(LR_REC.GetCounts(), {lr_num_entries});
 
             std::map<std::pair<uint64_t, uint64_t>, uint32_t> lr_sparse_mat;
-            for (auto i_entry = 0u; i_entry<recon_num_entries; i_entry++){
+            for (auto i_entry = 0u; i_entry < recon_num_entries; i_entry++) {
                 auto lr_row_id = lr_row_ids(i_entry);
                 auto lr_col_id = lr_col_ids(i_entry);
                 auto lr_count = lr_counts(i_entry);
@@ -2730,7 +2667,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         auto REMOVE_UNALIGNED_REGION = true;
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -2745,8 +2682,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         cm_param.SetTileSize(TILE_SIZE);
         cm_param.UpsertBinSizeMultiplier(MULT);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -2768,8 +2705,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -2786,8 +2722,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -2798,8 +2733,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         auto& LR_REC = LR_RECS.front();
 
@@ -2837,7 +2771,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
 TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
     {   // Case: Test if the RLE information is correct
         std::vector<bool> test_vector = {true, true, true, true, false, true, false, false};
-        genie::contact::UIntVecDtype test_rl_entries = {4,1,1,2};
+        genie::contact::UIntVecDtype test_rl_entries = {4, 1, 1, 2};
         genie::contact::BinVecDtype dummy_mask = xt::adapt(test_vector);
         genie::contact::RunLengthEncodingData test_rle_data;
 
@@ -2853,7 +2787,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
     {
         // Case: scm_mask_payload with rle data
         std::vector<bool> test_vector = {true, true, true, true, false, true, false, false};
-        genie::contact::UIntVecDtype test_rl_entries = {4,1,1,2};
+        genie::contact::UIntVecDtype test_rl_entries = {4, 1, 1, 2};
         genie::contact::BinVecDtype dummy_mask = xt::adapt(test_vector);
 
         // Get the corresponding RLE encoding data
@@ -2879,7 +2813,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
 
         // various preliminary structural checks
         ASSERT_EQ(test_scm_mask_payload.GetFirstVal(), test_rle_data.firstVal);
-        //ASSERT_EQ(test_scm_mask_payload.GetMaskArray(), test_vector);
+        // ASSERT_EQ(test_scm_mask_payload.GetMaskArray(), test_vector);
         ASSERT_EQ(test_scm_mask_payload.GetTransformID(), test_rle_data.transformID);
         ASSERT_EQ(test_scm_mask_payload.GetRlEntries(), rleEntriesAsVector);
 
@@ -2896,8 +2830,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
         auto recon_obj = genie::contact::SubcontactMatrixMaskPayload(
-            bitreader, static_cast < uint32_t>(test_vector.size())
-        );
+            bitreader, static_cast < uint32_t>(test_vector.size()));
 
         ASSERT_EQ(test_scm_mask_payload.GetFirstVal(), recon_obj.GetFirstVal());
         ASSERT_EQ(test_scm_mask_payload.GetTransformID(),
@@ -2928,7 +2861,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             RECS.emplace_back(bitreader);
         }
         RECS.pop_back();
@@ -2954,7 +2887,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -2977,8 +2910,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -3014,8 +2946,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(scm_payload == recon_scm_payload);
 
@@ -3026,8 +2957,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
@@ -3078,7 +3008,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -3100,8 +3030,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -3162,7 +3091,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto REMOVE_UNALIGNED_REGION = true;
         auto TRANSFORM_MASK = true;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -3176,8 +3105,8 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -3199,8 +3128,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -3217,8 +3145,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -3229,8 +3156,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
@@ -3265,7 +3191,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto REMOVE_UNALIGNED_REGION = true;
         auto TRANSFORM_MASK = true;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -3279,8 +3205,8 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -3302,8 +3228,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -3320,8 +3245,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -3332,8 +3256,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
@@ -3387,7 +3310,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -3409,8 +3332,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -3427,8 +3349,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -3490,7 +3411,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -3512,8 +3433,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -3574,7 +3494,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto REMOVE_UNALIGNED_REGION = true;
         auto TRANSFORM_MASK = true;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -3588,8 +3508,8 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -3611,8 +3531,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -3629,8 +3548,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -3641,8 +3559,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {
@@ -3678,7 +3595,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto REMOVE_UNALIGNED_REGION = true;
         auto TRANSFORM_MASK = true;
         auto ENA_DIAG_TRANSFORM = true;
-        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
         bool NORM_AS_WEIGHT = true;
         bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -3692,8 +3609,8 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         cm_param.SetBinSize(RECS.front().GetBinSize());
         cm_param.SetTileSize(TILE_SIZE);
 
-        for (auto& rec: RECS){
-          cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        for (auto& rec : RECS) {
+            cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
 
             cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                       rec.GetChr1Length());
@@ -3715,8 +3632,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             ENA_BINARIZATION,
             NORM_AS_WEIGHT,
             MULTIPLICATIVE_NORM,
-            CODEC_ID
-        );
+            CODEC_ID);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -3733,8 +3649,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
             bitreader,
             cm_param,
-            scm_param
-        );
+            scm_param);
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
@@ -3745,8 +3660,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             scm_param,
             recon_scm_payload,
             recon_rec,
-            MULT
-        );
+            MULT);
 
         ASSERT_EQ(recon_rec.GetNumEntries(), REC.GetNumEntries());
         {

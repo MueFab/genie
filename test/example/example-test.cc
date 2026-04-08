@@ -1,4 +1,6 @@
 #include <gtest/gtest.h>
+#include <string>
+#include <vector>
 
 class ExampleTestCase : public ::testing::Test {
  protected:
@@ -57,10 +59,10 @@ struct MoreInfo {
 };
 
 TEST_F(ExampleTestCase, ExampleTest) {
-    info info1{ "AC", 8, {{9,0,0,0}} };
-    info info2{ "AF", 11, {{75,89,134,59}} };
-    info info3{ "AFR_AF", 11, {{10,215,35,60}} };
-    info info4{ "CIEND" , 5, {{185,225},{82,0}} };
+    info info1{ "AC", 8, {{9, 0, 0, 0}} };
+    info info2{ "AF", 11, {{75, 89, 134, 59}} };
+    info info3{ "AFR_AF", 11, {{10, 215, 35, 60}} };
+    info info4{ "CIEND", 5, {{185, 225}, {82, 0}} };
     MoreInfo infos;
 
     {

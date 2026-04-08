@@ -5,7 +5,7 @@
  */
 
 #include <memory>
- 
+
 #include "genie/entropy/factory/encoder_factory.h"
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"

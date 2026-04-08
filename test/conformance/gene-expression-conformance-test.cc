@@ -6,6 +6,9 @@
 
 #include <gtest/gtest.h>
 
+#include <iostream>
+#include <string>
+
 #include "genie/annotation/annotation.h"
 
 #include "helpers.h"
@@ -50,5 +53,4 @@ TEST_P(GeneExpressionConformanceTest, GeneExpressionConformanceTests) {
 INSTANTIATE_TEST_SUITE_P(
     testallGeneExpressionConformance, GeneExpressionConformanceTest,
     ::testing::Values(
-        "/data/records/expression/5.4.1-tp01.exp"
-    ));
+        "/data/records/expression/5.4.1-tp01.exp"));

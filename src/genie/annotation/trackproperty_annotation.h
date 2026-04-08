@@ -33,7 +33,7 @@ struct TrackPropertyUnits {
 class TrackPropertyAnnotation {
  public:
     TrackPropertyAnnotation() : defaultTileSizeHeight(0), trackType_(0) {}
-    
+
     void setCompressorConfig(std::stringstream& config) { compressors.parseConfig(config); }
     void setTileSize(uint32_t _defaultTileSizeHeight) { defaultTileSizeHeight = _defaultTileSizeHeight; }
 

@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encoder.h"
+#include "genie/entropy/base/encoder.h"
 
 /// ---------------------------------------------------------------------------------------------------------------------
 

@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <fstream>
+#include <string>
 #include "genie/core/variant_site_record/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -18,7 +19,6 @@ TEST(VariantSiteRecord, test) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::stringstream inputfile;
     genie::core::record::variant_site::Record variantSite;
-
 }
 
 

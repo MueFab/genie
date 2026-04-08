@@ -33,7 +33,7 @@ struct FunctionalAnnotationUnits {
 class FunctionalAnnotation {
  public:
     FunctionalAnnotation() : maxOntologiesPerRecord(0), defaultTileSizeHeight(0) {}
-    
+
     void setCompressorConfig(std::stringstream& config) { compressors.parseConfig(config); }
     void setTileSize(uint32_t _defaultTileSizeHeight) { defaultTileSizeHeight = _defaultTileSizeHeight; }
 

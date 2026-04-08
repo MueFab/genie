@@ -6,11 +6,12 @@
 
 #include <gtest/gtest.h>
 
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
-#include <codecs/include/mpegg-codecs.h>
+#include "codecs/include/mpegg-codecs.h"
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"

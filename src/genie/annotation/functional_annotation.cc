@@ -35,7 +35,7 @@ void FunctionalAnnotation::parseInfoTags(std::string& recordInputFileName) {
     std::set<std::string> uniqueFeatureNames;
     std::set<std::string> uniqueOntologyNames;
     maxOntologiesPerRecord = 0;
-    
+
     while (recs.Read(bitreader)) {
         const auto& attrs = recs.GetAttributes();
         for (const auto& attr : attrs) {

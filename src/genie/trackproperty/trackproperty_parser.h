@@ -43,7 +43,7 @@ class TrackPropertyParser {
     uint64_t rowsPerTile;
     size_t numberOfRows;
     std::vector<annotation::InfoField> infoFields;
-    
+
     Descriptors descriptors;
     variant_site::Attributes attributes;
     uint64_t numberOfTiles{0};

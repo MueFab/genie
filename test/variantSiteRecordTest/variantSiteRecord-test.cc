@@ -6,8 +6,10 @@
 
 #include <gtest/gtest.h>
 
+#include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <string>
 #include "codecs/include/mpegg-codecs.h"
 #include "genie/core/arrayType.h"
 #include "genie/util/string_helpers.h"
@@ -84,12 +86,12 @@ std::string exec(const std::string& cmd) {
         return "<exec(" + cmd + ") failed>";
     }
 
-    const int bufferSize = 256;
-    char buffer[bufferSize];
+    const int kBufferSize = 256;
+    char buffer[kBufferSize];
     std::string result;
 
     while (!feof(pipe)) {
-        if (fgets(buffer, bufferSize, pipe) != nullptr) {
+        if (fgets(buffer, kBufferSize, pipe) != nullptr) {
             result += buffer;
         }
     }

@@ -6,11 +6,12 @@
 
 #include <gtest/gtest.h>
 
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
-#include <codecs/include/mpegg-codecs.h>
+#include "codecs/include/mpegg-codecs.h"
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -45,7 +46,7 @@ struct genoTestValues {
     genoTestValues(uint16_t id, genie::genotype::SortingAlgoID _SortingID, genie::genotype::BinarizationID _binID,
                    genie::genotype::ConcatAxis _concatAxis, bool _transposeMat, genie::core::AlgoID _algID,
                    std::string _filepath)
-        : ID(id),sortingID(_SortingID),
+        : ID(id), sortingID(_SortingID),
           binID(_binID),
           concatAxis(_concatAxis),
           transposeMat(_transposeMat),
@@ -152,4 +153,4 @@ INSTANTIATE_TEST_SUITE_P(
                        "/data/records/conformance/1.3.11.bgz.CASE03"},
         genoTestValues{13, genie::genotype::SortingAlgoID::RANDOM_SORT, genie::genotype::BinarizationID::ROW_BIN,
                        genie::genotype::ConcatAxis::CONCAT_COL_DIR, false, genie::core::AlgoID::JBIG,
-                       "/data/records/conformance/1.3.11.bgz.CASE03"} ));
+                       "/data/records/conformance/1.3.11.bgz.CASE03"}));

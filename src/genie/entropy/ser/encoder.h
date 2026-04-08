@@ -55,6 +55,7 @@ class SEREncoder : public base::Encoder {
     }
 
  protected:
+
  private:
     bool order;
 

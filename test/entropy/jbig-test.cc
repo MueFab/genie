@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <random>
+#include <vector>
 #include "genie/entropy/jbig/encoder.h"
 
 class JBIGTestCase : public ::testing::Test {

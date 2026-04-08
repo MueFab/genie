@@ -12,6 +12,8 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <string>
+#include <utility>
 #include <vector>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xrandom.hpp>
@@ -24,9 +26,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactStructure, RoundTrip_Structure_ContactMatrixTilePayload){
-
-    std::srand((unsigned)std::time(0)); // seed the random number generator
+TEST(ContactStructure, RoundTrip_Structure_ContactMatrixTilePayload) {
+    std::srand((unsigned)std::time(0));  // seed the random number generator
 
     // Test JBIG
     {
@@ -35,7 +36,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixTilePayload){
         auto NCOLS = 200u;
         auto PAYLOAD_SIZE = 128u;
         auto PAYLOAD = std::vector<uint8_t>(PAYLOAD_SIZE);
-        for (auto &v: PAYLOAD){
+        for (auto &v : PAYLOAD) {
             v = static_cast<uint8_t>(std::rand() % 256);
         }
 
@@ -45,8 +46,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixTilePayload){
             CODEC_ID,
             NROWS,
             NCOLS,
-            std::move(payload)
-        );
+            std::move(payload));
 
         ASSERT_EQ(orig_obj.GetCodecID(), CODEC_ID);
         ASSERT_EQ(orig_obj.GetTileNRows(), 0u);
@@ -66,8 +66,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixTilePayload){
         auto bitreader = genie::util::BitReader(reader);
         auto recon_obj = genie::contact::ContactMatrixTilePayload(
             bitreader,
-            tile_payload_size
-        );
+            tile_payload_size);
 
         ASSERT_EQ(recon_obj.GetCodecID(), CODEC_ID);
         ASSERT_EQ(recon_obj.GetTileNRows(), 0u);
@@ -85,7 +84,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixTilePayload){
         auto NCOLS = 200u;
         auto PAYLOAD_SIZE = 128u;
         auto PAYLOAD = std::vector<uint8_t>(PAYLOAD_SIZE);
-        for (auto &v: PAYLOAD){
+        for (auto &v : PAYLOAD) {
             v = static_cast<uint8_t>(std::rand() % 256);
         }
 
@@ -95,8 +94,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixTilePayload){
             CODEC_ID,
             NROWS,
             NCOLS,
-            std::move(payload)
-        );
+            std::move(payload));
 
         ASSERT_EQ(orig_obj.GetCodecID(), CODEC_ID);
         ASSERT_EQ(orig_obj.GetTileNRows(), NROWS);
@@ -116,8 +114,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixTilePayload){
         auto bitreader = genie::util::BitReader(reader);
         auto recon_obj = genie::contact::ContactMatrixTilePayload(
             bitreader,
-            tile_payload_size
-        );
+            tile_payload_size);
 
         ASSERT_EQ(recon_obj.GetCodecID(), CODEC_ID);
         ASSERT_EQ(recon_obj.GetTileNRows(), NROWS);
@@ -127,13 +124,11 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixTilePayload){
 
         ASSERT_TRUE(orig_obj == recon_obj);
     }
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
-
+TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload) {
     // TransformID 0
     {
         auto TRANSFORM_ID = genie::contact::TransformID::ID_0;
@@ -160,11 +155,10 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
             auto bitreader = genie::util::BitReader(reader);
             auto recon_obj = genie::contact::SubcontactMatrixMaskPayload(
                 bitreader,
-                NUM_BIN_ENTRIES
-            );
+                NUM_BIN_ENTRIES);
 
             ASSERT_EQ(recon_obj.GetTransformID(), TRANSFORM_ID);
-            for (auto i = 0u; i < NUM_BIN_ENTRIES; i++){
+            for (auto i = 0u; i < NUM_BIN_ENTRIES; i++) {
                 ASSERT_EQ(recon_obj.GetMaskArray()[i], MASK_ARRAY(i));
             }
             ASSERT_EQ(recon_obj.GetFirstVal(), MASK_ARRAY(0));
@@ -178,8 +172,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
             genie::contact::BinVecDtype orig_mask_arr = genie::contact::BinVecDtype(MASK_ARRAY);
 
             auto orig_obj = genie::contact::SubcontactMatrixMaskPayload(
-                std::move(orig_mask_arr)
-            );
+                std::move(orig_mask_arr));
 
             auto obj_payload = std::stringstream();
             std::ostream& writer = obj_payload;
@@ -192,11 +185,10 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
             auto bitreader = genie::util::BitReader(reader);
             auto recon_obj = genie::contact::SubcontactMatrixMaskPayload(
                 bitreader,
-                NUM_BIN_ENTRIES
-            );
+                NUM_BIN_ENTRIES);
 
             ASSERT_EQ(recon_obj.GetTransformID(), TRANSFORM_ID);
-            for (auto i = 0u; i < NUM_BIN_ENTRIES; i++){
+            for (auto i = 0u; i < NUM_BIN_ENTRIES; i++) {
                 ASSERT_EQ(recon_obj.GetMaskArray()[i], MASK_ARRAY(i));
             }
             ASSERT_EQ(recon_obj.GetFirstVal(), MASK_ARRAY(0));
@@ -215,8 +207,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint8_t>(
             static_cast<uint8_t>(MIN_VAL),
             static_cast<uint8_t>(MAX_VAL),
-            NUM_RL_ENTRIES
-        );
+            NUM_RL_ENTRIES);
         auto NUM_BIN_ENTRIES = static_cast<uint32_t>(xt::sum(RL_ENTRIES)(0));
         auto FIRST_VAL = true;
 
@@ -236,13 +227,12 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto bitreader = genie::util::BitReader(reader);
         auto recon_obj = genie::contact::SubcontactMatrixMaskPayload(
             bitreader,
-            NUM_BIN_ENTRIES
-        );
+            NUM_BIN_ENTRIES);
 
         ASSERT_EQ(recon_obj.GetTransformID(), TRANSFORM_ID);
         ASSERT_FALSE(recon_obj.AnyMaskArray());
         ASSERT_EQ(recon_obj.GetFirstVal(), FIRST_VAL);
-        for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
+        for (auto i = 0u; i < NUM_RL_ENTRIES; i++) {
             ASSERT_EQ(recon_obj.GetRlEntries()[i], RL_ENTRIES(i));
         }
 
@@ -258,8 +248,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint16_t>(
             static_cast<uint16_t>(MIN_VAL),
             static_cast<uint16_t>(MAX_VAL),
-            NUM_RL_ENTRIES
-        );
+            NUM_RL_ENTRIES);
         auto NUM_BIN_ENTRIES = static_cast<uint32_t>(xt::sum(RL_ENTRIES)(0));
         auto FIRST_VAL = true;
 
@@ -278,13 +267,12 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto bitreader = genie::util::BitReader(reader);
         auto recon_obj = genie::contact::SubcontactMatrixMaskPayload(
             bitreader,
-            NUM_BIN_ENTRIES
-        );
+            NUM_BIN_ENTRIES);
 
         ASSERT_EQ(recon_obj.GetTransformID(), TRANSFORM_ID);
         ASSERT_FALSE(recon_obj.AnyMaskArray());
         ASSERT_EQ(recon_obj.GetFirstVal(), FIRST_VAL);
-        for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
+        for (auto i = 0u; i < NUM_RL_ENTRIES; i++) {
             ASSERT_EQ(recon_obj.GetRlEntries()[i], RL_ENTRIES(i));
         }
 
@@ -300,8 +288,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint32_t>(
             static_cast<uint32_t>(MIN_VAL),
             static_cast<uint32_t>(MAX_VAL),
-            NUM_RL_ENTRIES
-        );
+            NUM_RL_ENTRIES);
         auto NUM_BIN_ENTRIES = static_cast<uint32_t>(xt::sum(RL_ENTRIES)(0));
         auto FIRST_VAL = true;
 
@@ -321,13 +308,12 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto bitreader = genie::util::BitReader(reader);
         auto recon_obj = genie::contact::SubcontactMatrixMaskPayload(
             bitreader,
-            NUM_BIN_ENTRIES
-        );
+            NUM_BIN_ENTRIES);
 
         ASSERT_EQ(recon_obj.GetTransformID(), TRANSFORM_ID);
         ASSERT_FALSE(recon_obj.AnyMaskArray());
         ASSERT_EQ(recon_obj.GetFirstVal(), FIRST_VAL);
-        for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
+        for (auto i = 0u; i < NUM_RL_ENTRIES; i++) {
             ASSERT_EQ(recon_obj.GetRlEntries()[i], RL_ENTRIES(i));
         }
 
@@ -337,7 +323,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactStructure, RoundTrip_Structure_ContactMatrixParameter){
+TEST(ContactStructure, RoundTrip_Structure_ContactMatrixParameter) {
     {
         auto MULTS = std::vector<uint32_t>({1, 2, 4, 5});
         uint16_t SAMPLE1_ID = 10u;
@@ -403,7 +389,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixParameter){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
+TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter) {
     // Intra-SCM case
     {
         auto BINARIZATION_MODE = genie::contact::BinarizationMode::ROW_BINARIZATION;
@@ -433,10 +419,9 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
         ORIG_SCM_PARAM.SetChr2ID(CHR2_ID);
         ORIG_SCM_PARAM.SetNumTiles(NTILES_IN_ROW, NTILES_IN_COL);
 
-        for (size_t i = 0u; i<NTILES_IN_ROW; i++){
-            for (size_t j = 0u; j<NTILES_IN_COL; j++){
-
-                if (!(i>j && ORIG_SCM_PARAM.IsIntraSCM())){
+        for (size_t i = 0u; i < NTILES_IN_ROW; i++) {
+            for (size_t j = 0u; j < NTILES_IN_COL; j++) {
+                if (!(i > j && ORIG_SCM_PARAM.IsIntraSCM())) {
                     auto tile_param = genie::contact::TileParameter();
                     tile_param.binarization_mode = BINARIZATION_MODE;
                     tile_param.diag_tranform_mode = DIAG_MODE;
@@ -459,8 +444,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
         auto bitreader = genie::util::BitReader(reader);
         auto recon_obj = genie::contact::SubcontactMatrixParameters(
             bitreader,
-            ORIG_CM_PARAM
-        );
+            ORIG_CM_PARAM);
 
         ASSERT_EQ(recon_obj.GetChr1ID(), CHR1_ID);
         ASSERT_EQ(recon_obj.GetChr2ID(), CHR2_ID);
@@ -468,21 +452,19 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
         ASSERT_EQ(recon_obj.GetNTilesInRow(), NTILES_IN_ROW);
         ASSERT_EQ(recon_obj.GetNTilesInCol(), NTILES_IN_COL);
 
-        for (size_t i = 0u; i<NTILES_IN_ROW; i++){
-            for (size_t j = 0u; j<NTILES_IN_COL; j++){
-                if (!(i>j && orig_obj.IsIntraSCM())){
+        for (size_t i = 0u; i < NTILES_IN_ROW; i++) {
+            for (size_t j = 0u; j < NTILES_IN_COL; j++) {
+                if (!(i > j && orig_obj.IsIntraSCM())) {
                     auto& orig_tile_param = orig_obj.GetTileParameter(i, j);
                     auto& recon_tile_param = orig_obj.GetTileParameter(i, j);
 
                     ASSERT_EQ(
                         orig_tile_param.diag_tranform_mode,
-                        recon_tile_param.diag_tranform_mode
-                    );
+                        recon_tile_param.diag_tranform_mode);
 
                     ASSERT_EQ(
                         orig_tile_param.binarization_mode,
-                        recon_tile_param.binarization_mode
-                    );
+                        recon_tile_param.binarization_mode);
                 }
             }
         }
@@ -521,10 +503,9 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
         ORIG_SCM_PARAM.SetChr2ID(CHR2_ID);
         ORIG_SCM_PARAM.SetNumTiles(NTILES_IN_ROW, NTILES_IN_COL);
 
-        for (size_t i = 0u; i<NTILES_IN_ROW; i++){
-            for (size_t j = 0u; j<NTILES_IN_COL; j++){
-
-                if (!(i>j && ORIG_SCM_PARAM.IsIntraSCM())){
+        for (size_t i = 0u; i < NTILES_IN_ROW; i++) {
+            for (size_t j = 0u; j < NTILES_IN_COL; j++) {
+                if (!(i > j && ORIG_SCM_PARAM.IsIntraSCM())) {
                     auto tile_param = genie::contact::TileParameter();
                     tile_param.binarization_mode = BINARIZATION_MODE;
                     tile_param.diag_tranform_mode = DIAG_MODE;
@@ -547,8 +528,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
         auto bitreader = genie::util::BitReader(reader);
         auto recon_obj = genie::contact::SubcontactMatrixParameters(
             bitreader,
-            ORIG_CM_PARAM
-        );
+            ORIG_CM_PARAM);
 
         ASSERT_EQ(recon_obj.GetChr1ID(), CHR1_ID);
         ASSERT_EQ(recon_obj.GetChr2ID(), CHR2_ID);
@@ -556,21 +536,19 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
         ASSERT_EQ(recon_obj.GetNTilesInRow(), NTILES_IN_ROW);
         ASSERT_EQ(recon_obj.GetNTilesInCol(), NTILES_IN_COL);
 
-        for (size_t i = 0u; i<NTILES_IN_ROW; i++){
-            for (size_t j = 0u; j<NTILES_IN_COL; j++){
-                if (!(i>j && orig_obj.IsIntraSCM())){
+        for (size_t i = 0u; i < NTILES_IN_ROW; i++) {
+            for (size_t j = 0u; j < NTILES_IN_COL; j++) {
+                if (!(i > j && orig_obj.IsIntraSCM())) {
                     auto& orig_tile_param = orig_obj.GetTileParameter(i, j);
                     auto& recon_tile_param = orig_obj.GetTileParameter(i, j);
 
                     ASSERT_EQ(
                         orig_tile_param.diag_tranform_mode,
-                        recon_tile_param.diag_tranform_mode
-                    );
+                        recon_tile_param.diag_tranform_mode);
 
                     ASSERT_EQ(
                         orig_tile_param.binarization_mode,
-                        recon_tile_param.binarization_mode
-                    );
+                        recon_tile_param.binarization_mode);
                 }
             }
         }
@@ -581,7 +559,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactStructure, RoundTrip_Structure_ContactMatrixBinPayload){
+TEST(ContactStructure, RoundTrip_Structure_ContactMatrixBinPayload) {
   const double TOLERANCE = 1e-6;
 
   std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
@@ -602,30 +580,29 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixBinPayload){
   size_t NUM_NORM_METHODS = 7;
 
   std::vector<uint8_t> CHROMS = {
-    21, // 193
-    22  // 206
+    21,  // 193
+    22   // 206
   };
 
   std::vector<uint8_t> LENGTHS = {
-    193, // 193
-    206  // 206
+    193,  // 193
+    206   // 206
   };
 
   std::vector<uint8_t> POSS = {
-    192, // 193
-    204  // 206
+    192,  // 193
+    204   // 206
   };
 
 
   std::vector<std::vector<double>> ORIV_VALS = {
     // GW_KR, GW_VC, INTER_KR, INTER_VC, KR, VC, VC_SQRT
-    {0.561230,  0.579038,  0.781984,  0.952380,  0.564981,  1.311789,  0.679117}, // Chrom 21 idx 192
-    {1.015586,  1.256156,  1.517353,  1.897584,  0.788887,  1.165799,  0.839396} // Chrom 22 idx 204
+    {0.561230,  0.579038,  0.781984,  0.952380,  0.564981,  1.311789,  0.679117},  // Chrom 21 idx 192
+    {1.015586,  1.256156,  1.517353,  1.897584,  0.788887,  1.165799,  0.839396}  // Chrom 22 idx 204
   };
 
   auto chrom_idx = 0u;
-  for (auto& chrom:  CHROMS){
-
+  for (auto& chrom : CHROMS) {
     auto norm_idx = 0u;
 
     genie::contact::ContactMatrixBinPayload bin_payload;
@@ -633,8 +610,9 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixBinPayload){
     bin_payload.SetChrID(CHROMS[chrom_idx]);
     bin_payload.SetBinSizeMultiplier(BIN_SIZE_MULT);
 
-    for (auto& norm_name: NORM_NAMES){
-      std::string filepath = gitRootDir + "/data/records/contact/" + filename + std::to_string(RESOLUTION) + "." + std::to_string(chrom) + "." + norm_name + ".weights";
+    for (auto& norm_name : NORM_NAMES) {
+      std::string filepath = gitRootDir + "/data/records/contact/" + filename +
+        std::to_string(RESOLUTION) + "." + std::to_string(chrom) + "." + norm_name + ".weights";
 
       bin_payload.ReadWeightValuesFromFile(filepath);
 
@@ -654,8 +632,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixBinPayload){
     auto recon_obj = genie::contact::ContactMatrixBinPayload(
         bit_reader,
         static_cast<uint8_t>(NUM_NORM_METHODS),
-        static_cast<uint32_t>(LENGTHS[chrom_idx])
-    );
+        static_cast<uint32_t>(LENGTHS[chrom_idx]));
 
     ASSERT_EQ(bin_payload.GetSampleID(), recon_obj.GetSampleID());
     ASSERT_EQ(bin_payload.GetChrID(), recon_obj.GetChrID());
@@ -664,14 +641,14 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixBinPayload){
     ASSERT_EQ(bin_payload.GetNumNormMethods(), recon_obj.GetNumNormMethods());
     auto orig_weight_values = bin_payload.GetWeightValue();
     auto recon_weight_values = recon_obj.GetWeightValue();
-    for (auto i = 0u; i < bin_payload.GetNumNormMethods(); i++){
+    for (auto i = 0u; i < bin_payload.GetNumNormMethods(); i++) {
       auto orig_norm_weight_values = orig_weight_values[i];
       auto recon_norm_weight_values = recon_weight_values[i];
 
       ASSERT_EQ(orig_norm_weight_values.size(), recon_norm_weight_values.size());
       auto num_entries = orig_norm_weight_values.size();
 
-      for (auto j = 0u; j<num_entries; j++){
+      for (auto j = 0u; j < num_entries; j++) {
         auto orig_weight_value = orig_norm_weight_values[j];
         auto recon_weight_value = recon_norm_weight_values[j];
         auto orig_weight_value_int = *reinterpret_cast<uint64_t*>(&orig_weight_value);
@@ -680,11 +657,10 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixBinPayload){
         ASSERT_EQ(orig_weight_value_int, recon_weight_value_int) << "i:" << i << "j:" << j;
       }
     }
-    ASSERT_TRUE(bin_payload == recon_obj); // TODO(Yeremia): Fix the comparison
+    ASSERT_TRUE(bin_payload == recon_obj);  // TODO(Yeremia): Fix the comparison
 
     chrom_idx++;
   }
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

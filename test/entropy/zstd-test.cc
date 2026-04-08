@@ -6,10 +6,11 @@
 
 #include <gtest/gtest.h>
 #include <random>
+#include <vector>
 #include "genie/entropy/zstd/encoder.h"
 
 class ZSTDTestCase : public ::testing::Test {
-   protected:
+ protected:
     // Do any necessary setup for your tests here
       ZSTDTestCase() = default;
 
@@ -69,7 +70,7 @@ TEST_F(ZSTDTestCase, ZSTDEncodeDecodeTest) {  // NOLINT(cert-err58-cpp)
 
     std::stringstream uncompressed_output;
     encoder.decode(compressed_output, uncompressed_output);
-    
+
     ASSERT_EQ(NrOfInputBytes, uncompressed_output.str().size());
     for (size_t i = 0; i < NrOfInputBytes; ++i)
         EXPECT_EQ(testDataUncompressed.at(i), static_cast<uint8_t>(uncompressed_output.str().at(i)));
@@ -80,5 +81,4 @@ TEST_F(ZSTDTestCase, ZSTDparametersTest) {  // NOLINT(cert-err58-cpp)
 
     auto parameters = zstdParameters.convertToAlgorithmParameters();
     EXPECT_EQ(parameters.getNumberOfPars(), 3);
-
 }
