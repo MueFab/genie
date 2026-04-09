@@ -56,8 +56,11 @@ void Record::Write(util::BitWriter& writer) {
         writer.WriteBits(attributes_[i].attr_tag_len, 8);
         writer.Write(attributes_[i].attr_tag);
         writer.WriteBits(attributes_[i].attr_type, 8);
+        writer.WriteBits(attributes_[i].attr_array_len, 8);
         DataType type = static_cast<DataType>(attributes_[i].attr_type);
-        writeType.toFile(type, attributes_[i].attr_value, writer);
+        for (auto j = 0; j < attributes_[i].attr_array_len; ++j) {
+            writeType.toFile(type, attributes_[i].attr_values[j], writer);
+        }
     }
 
     writer.WriteBits(reserved_, 7);
@@ -117,8 +120,14 @@ bool Record::Read(util::BitReader& reader) {
             reader.ReadAlignedBytes(&attr.attr_tag[0], attr.attr_tag_len);
         }
         attr.attr_type = static_cast<uint8_t>(reader.ReadBits(8));
+        attr.attr_array_len = static_cast<uint8_t>(reader.ReadBits(8));
         DataType type = static_cast<DataType>(attr.attr_type);
-        attr.attr_value = arrayType.toArray(type, reader);
+        attr.attr_values.clear();
+        attr.attr_values.reserve(attr.attr_array_len);
+        for (auto j = 0; j < attr.attr_array_len; ++j) {
+            std::vector<uint8_t> value = arrayType.toArray(type, reader);
+            attr.attr_values.push_back(value);
+        }
         attributes_.push_back(attr);
     }
 

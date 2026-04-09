@@ -179,9 +179,7 @@ void Attributes::add(std::vector<genie::core::record::sample::SampleFields::Fiel
 void Attributes::add(std::vector<genie::core::record::functional_annotation::Attribute> tags) {
   size_t index = 0;
   for (const auto& tag : tags) {
-    std::vector<std::vector<uint8_t>> values;
-    values.push_back(tag.attr_value);
-    attributeTiles[tag.attr_tag].write(values);
+    attributeTiles[tag.attr_tag].write(tag.attr_values);
     attrWritten[tag.attr_tag] = true;
     index++;
   }

@@ -42,7 +42,8 @@ struct Attribute {
     uint8_t attr_tag_len;
     std::string attr_tag;
     uint8_t attr_type;
-    std::vector<uint8_t> attr_value;
+    uint8_t attr_array_len;
+    std::vector<std::vector<uint8_t>> attr_values;
 };
 
 /**
