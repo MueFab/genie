@@ -39,7 +39,11 @@ void FunctionalAnnotation::parseInfoTags(std::string& recordInputFileName) {
     while (recs.Read(bitreader)) {
         const auto& attrs = recs.GetAttributes();
         for (const auto& attr : attrs) {
-            InfoField infoField(attr.attr_tag, static_cast<core::DataType>(attr.attr_type), 1);
+            uint8_t attr_array_len = attributeInfo[attr.attr_tag].Number;
+            if (attr_array_len < attr.attr_array_len) {
+                attr_array_len = attr.attr_array_len;
+            }
+            InfoField infoField(attr.attr_tag, static_cast<core::DataType>(attr.attr_type), attr_array_len);
             attributeInfo[attr.attr_tag] = infoField;
         }
         // Collect unique feature names

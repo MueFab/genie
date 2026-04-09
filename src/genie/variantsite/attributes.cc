@@ -21,6 +21,12 @@ namespace variant_site {
 
 void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
     AddFirst();
+    while (value.size() < info.getArrayLength()) {
+        genie::core::ArrayType def{};
+        auto defaultType = info.getAttributeType();
+        auto defaultValue = def.getDefaultValue(defaultType);
+        value.emplace_back(def.toArray(defaultType, defaultValue));
+    }
     genie::core::ArrayType arraytype;
     for (const auto& onearray : value) {
         arraytype.toFile(info.getAttributeType(), onearray, writers.back());
