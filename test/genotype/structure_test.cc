@@ -10,6 +10,10 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#ifdef GENIE_GENOTYPE_BACKEND_XTENSOR
+#include <xtensor/xarray.hpp>
+#endif
+#include "genie/genotype/genotype_test_helpers.h"
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -17,7 +21,6 @@
 #include "genie/genotype/bin_mat_payload.h"
 #include "genie/genotype/row_col_ids_payload.h"
 #include "genie/genotype/genotype_parameters.h"
-#include "genie/genotype/genotype_test_helpers.h"
 #include "helpers.h"
 
 // -----------------------------------------------------------------------------
