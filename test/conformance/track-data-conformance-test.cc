@@ -67,4 +67,4 @@ TEST_P(TrackDataConformanceTest, TrackDataConformancetests) {  // NOLINT(cert-er
 
 // Test case details will be added when example files become available
 INSTANTIATE_TEST_SUITE_P(testallTrackDataConformance, TrackDataConformanceTest,
-                        ::testing::Values("/data/records/track/trdata.mgrec"));
+                        ::testing::Values("/data/records/track/trfMask_bed.mgrec"));
