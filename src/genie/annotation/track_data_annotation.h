@@ -42,6 +42,9 @@ class TrackDataAnnotation {
     void parseInfoTags(std::string& recordInputFileName);
     TrackUnits parseTrack(std::ifstream& inputfile);
     void setCompressors(Compressor& _compressors) { compressors = _compressors; }
+    void setAnnotationSubtype(core::record::annotation_access_unit::AnnotationSubtype subtype) {
+        annotationSubtype_ = subtype;
+    }
 
  private:
     std::ifstream recordInput;
@@ -61,6 +64,8 @@ class TrackDataAnnotation {
     std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
+    core::record::annotation_access_unit::AnnotationSubtype annotationSubtype_{
+        core::record::annotation_access_unit::AnnotationSubtype::BED};
 };
 
 }  // namespace annotation

@@ -26,7 +26,14 @@ namespace track_property {
 
 class Descriptors {
  public:
-    explicit Descriptors(uint64_t _rowsPerTile) : rowsPerTile(_rowsPerTile) {}
+    Descriptors() : rowsPerTile(0) { init(); }
+    explicit Descriptors(uint64_t _rowsPerTile) : rowsPerTile(_rowsPerTile) { init(); }
+
+    void setTileSize(uint64_t _rowsPerTile) {
+        rowsPerTile = _rowsPerTile;
+        init();
+    }
+
     void write(genie::core::record::track_property::Record trackPropertyRecord);
     void init();
     void writeDanglingBits();

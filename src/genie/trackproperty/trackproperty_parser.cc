@@ -25,10 +25,10 @@ TrackPropertyParser::TrackPropertyParser(std::ifstream& inputfile, std::vector<a
     : trackPropertyMGrecs(inputfile),
       rowsPerTile(_defaultTileSizeHeight),
       numberOfRows(0),
-      infoFields(infofields),
-      descriptors(_defaultTileSizeHeight) {
+      infoFields(std::move(infofields)),
+      numberOfAttributes(0) {
     init();
-    descriptors.init();
+    descriptors.setTileSize(rowsPerTile);
 
     util::BitReader reader(trackPropertyMGrecs);
     while (fillRecord(reader)) {
@@ -47,13 +47,31 @@ TrackPropertyParser::TrackPropertyParser(std::ifstream& inputfile, std::vector<a
 }
 
 void TrackPropertyParser::init() {
-    // Initialize attributes if needed based on infoFields
-    // This can be expanded if attributes need initialization similar to other parsers
+    uint16_t attributeID = 0;
+
+    if (!infoFields.empty()) {
+        std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributeData;
+
+        for (const auto& infoField : infoFields) {
+            AttributeData attribute(
+                static_cast<uint8_t>(infoField.ID.length()),
+                infoField.ID,
+                infoField.Type,
+                infoField.Number,
+                attributeID
+            );
+            attributeData[infoField.ID] = attribute;
+            attributeID++;
+        }
+
+        variant_site::Attributes attr(rowsPerTile, attributeData);
+        attributes = attr;
+        numberOfAttributes = static_cast<uint16_t>(infoFields.size());
+    }
 }
 
 bool TrackPropertyParser::fillRecord(util::BitReader reader) {
-    if (!trackPropertyRecord.Read(reader)) return false;
-    return true;
+    return trackPropertyRecord.Read(reader);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

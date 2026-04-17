@@ -29,7 +29,10 @@
 #include "genie/annotation/annotation.h"
 #include "helpers.h"
 
-class TrackDataConformanceTest : public ::testing::TestWithParam<std::string> {
+using AnnotationSubtype = genie::core::record::annotation_access_unit::AnnotationSubtype;
+using TestParam = std::pair<std::string, AnnotationSubtype>;
+
+class TrackDataConformanceTest : public ::testing::TestWithParam<TestParam> {
  protected:
     // Do any necessary setup for your tests here
     TrackDataConformanceTest() = default;
@@ -47,7 +50,7 @@ class TrackDataConformanceTest : public ::testing::TestWithParam<std::string> {
 
 TEST_P(TrackDataConformanceTest, TrackDataConformancetests) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filename = GetParam();
+    const auto& [filename, subtype] = GetParam();
     std::string filepath = gitRootDir + filename;
 
     std::string set1 = "compressor 1 0 SER {0} {} {1}";
@@ -61,11 +64,15 @@ TEST_P(TrackDataConformanceTest, TrackDataConformancetests) {  // NOLINT(cert-er
 
     annotationGenerator.setCompressorConfig(config);
     annotationGenerator.setTileSize(1000, 3000);
+    annotationGenerator.setATType(genie::core::record::annotation_access_unit::AnnotationType::TRACKS,
+                                   subtype);
 
     annotationGenerator.startStream(genie::annotation::RecType::TRACK_FILE, filepath, filepath + "_output");
 }
 
 // Test case details will be added when example files become available
 INSTANTIATE_TEST_SUITE_P(testallTrackDataConformance, TrackDataConformanceTest,
-                        ::testing::Values("/data/records/track/trfMask_bed.mgrec",
-                      "/data/records/track/Kidney_Genetic_Scorecard_BED_Hg19_Chr1_data.mgrec"));
+                        ::testing::Values(
+                            TestParam{"/data/records/track/trfMask_bed.mgrec", AnnotationSubtype::BED},
+                            TestParam{"/data/records/track/Kidney_Genetic_Scorecard_BED_Hg19_Chr1_data.mgrec", AnnotationSubtype::BED},
+                            TestParam{"/data/records/track/Kidney_Genetic_Scorecard_WIG_Hg19_Chr1_data.mgrec", AnnotationSubtype::WIG}));
