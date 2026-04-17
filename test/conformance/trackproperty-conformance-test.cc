@@ -70,4 +70,5 @@ TEST_P(TrackPropertyConformanceTest, TrackPropertyConformancetests) {  // NOLINT
 
 INSTANTIATE_TEST_SUITE_P(testallTrackPropertyConformance, TrackPropertyConformanceTest,
     ::testing::Values(
-        TestParam{"/data/records/track/Kidney_Genetic_Scorecard_BED_Hg19_Chr1_prop.mgrec", AnnotationSubtype::BED}));
+        TestParam{"/data/records/track/Kidney_Genetic_Scorecard_BED_Hg19_Chr1_prop.mgrec", AnnotationSubtype::BED},
+        TestParam{"/data/records/track/Kidney_Genetic_Scorecard_WIG_Hg19_Chr1_prop.mgrec", AnnotationSubtype::WIG}));

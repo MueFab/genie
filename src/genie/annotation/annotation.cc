@@ -85,6 +85,7 @@ void Annotation::startStream(RecType recType, std::string recordInputFileName,
     } else if (recType == RecType::TRACK_FILE) {
         trackAnnotation.setCompressors(compressors);
         trackAnnotation.setTileSize(defaultTileSizeHeight);
+        trackAnnotation.setAnnotationSubtype(annotationSubtype_);
         trackAnnotation.parseInfoTags(recordInputFileName);
         auto dataunits = trackAnnotation.parseTrack(inputfile);
         annotationParameterSet.push_back(dataunits.annotationParameterSet);
