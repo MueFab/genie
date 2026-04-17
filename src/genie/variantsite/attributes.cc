@@ -217,9 +217,7 @@ void Attributes::add(std::vector<genie::core::record::track::Attribute> tags) {
 void Attributes::add(std::vector<genie::core::record::track_property::TrackProperty> tags) {
   size_t index = 0;
   for (const auto& tag : tags) {
-    std::vector<std::vector<uint8_t>> values;
-    values.push_back(tag.track_property_values);
-    attributeTiles[tag.track_property].write(values);
+    attributeTiles[tag.track_property].write(tag.track_property_values);
     attrWritten[tag.track_property] = true;
     index++;
   }

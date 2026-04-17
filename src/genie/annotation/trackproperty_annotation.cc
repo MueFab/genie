@@ -31,20 +31,31 @@ void TrackPropertyAnnotation::parseInfoTags(std::string& recordInputFileName) {
     std::ifstream readForTags;
     readForTags.open(recordInputFileName, std::ios::in | std::ios::binary);
     util::BitReader bitreader(readForTags);
-    core::record::track_property::Record rec;
-
-    // Track properties only has a single record
-    if (rec.Read(bitreader)) {
-        // Store track_type from the record to determine annotation subtype
-        trackType_ = rec.GetTrackType();
+    
+    // Read all track property records to collect all possible info fields
+    while (bitreader.IsStreamGood()) {
+        core::record::track_property::Record rec;
+        if (!rec.Read(bitreader)) {
+            break;
+        }
+        
+        // Store track_type from the first record to determine annotation subtype
+        if (trackType_ == 0) {
+            trackType_ = rec.GetTrackType();
+        }
 
         const auto& props = rec.GetProperties();
         for (const auto& prop : props) {
-            InfoField infoField(prop.track_property, static_cast<core::DataType>(prop.track_property_type), 1);
-            attributeInfo[prop.track_property] = infoField;
+            // Only add if not already present
+            if (attributeInfo.find(prop.track_property) == attributeInfo.end()) {
+                InfoField infoField(prop.track_property, static_cast<core::DataType>(prop.track_property_type), 
+                                   prop.track_property_array_len);
+                attributeInfo[prop.track_property] = infoField;
+            }
         }
     }
     readForTags.close();
+    
     for (const auto& info : attributeInfo)
         infoFields.emplace_back(info.second.ID, info.second.Type, info.second.Number);
 }
@@ -72,8 +83,8 @@ TrackPropertyUnits TrackPropertyAnnotation::parseTrackProperty(std::ifstream& in
         static_cast<core::record::annotation_access_unit::AnnotationSubtype>(trackType_);
 
     variant_site::AccessUnitComposer accessUnit;
-    // Track properties use FUNCTIONAL_ANNOTATIONS type with subtype from track_type
-    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::FUNCTIONAL_ANNOTATIONS,
+    // Track properties use TRACK_PROPERTY type with subtype from track_type
+    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::TRACKS,
                          subtype);
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());

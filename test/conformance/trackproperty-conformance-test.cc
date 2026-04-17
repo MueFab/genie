@@ -29,7 +29,10 @@
 #include "genie/annotation/annotation.h"
 #include "helpers.h"
 
-class TrackPropertyConformanceTest : public ::testing::TestWithParam<std::string> {
+using AnnotationSubtype = genie::core::record::annotation_access_unit::AnnotationSubtype;
+using TestParam = std::pair<std::string, AnnotationSubtype>;
+
+class TrackPropertyConformanceTest : public ::testing::TestWithParam<TestParam> {
  protected:
     // Do any necessary setup for your tests here
     TrackPropertyConformanceTest() = default;
@@ -47,7 +50,7 @@ class TrackPropertyConformanceTest : public ::testing::TestWithParam<std::string
 
 TEST_P(TrackPropertyConformanceTest, TrackPropertyConformancetests) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filename = GetParam();
+    const auto& [filename, subtype] = GetParam();
     std::string filepath = gitRootDir + filename;
 
     std::string set1 = "compressor 1 0 SER {0} {} {1}";
@@ -65,10 +68,6 @@ TEST_P(TrackPropertyConformanceTest, TrackPropertyConformancetests) {  // NOLINT
     annotationGenerator.startStream(genie::annotation::RecType::TRACK_PROPERTY_FILE, filepath, filepath + "_output");
 }
 
-// Allow this test to be uninstantiated until input files are available
-GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(TrackPropertyConformanceTest);
-
-// Test case details will be added when example files become available
-// Test effectively disabled - no input files available yet
 INSTANTIATE_TEST_SUITE_P(testallTrackPropertyConformance, TrackPropertyConformanceTest,
-                        ::testing::Values());
+    ::testing::Values(
+        TestParam{"/data/records/track/Kidney_Genetic_Scorecard_BED_Hg19_Chr1_prop.mgrec", AnnotationSubtype::BED}));
