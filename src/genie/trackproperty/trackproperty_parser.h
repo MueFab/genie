@@ -29,6 +29,8 @@ namespace track_property {
 
 class TrackPropertyParser {
  public:
+    using AttributeData = core::record::annotation_parameter_set::AttributeData;
+
     TrackPropertyParser(std::ifstream& inputfile, std::vector<annotation::InfoField> infofields,
                         uint64_t _defaultTileSizeHeight);
 
@@ -44,8 +46,10 @@ class TrackPropertyParser {
     size_t numberOfRows;
     std::vector<annotation::InfoField> infoFields;
 
+    std::map<std::string, AttributeData> attributeData;
     Descriptors descriptors;
     variant_site::Attributes attributes;
+    uint16_t numberOfAttributes;
     uint64_t numberOfTiles{0};
 
     void init();
