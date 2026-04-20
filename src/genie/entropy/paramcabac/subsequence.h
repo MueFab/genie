@@ -142,9 +142,9 @@ class Subsequence final {
   /**
    * @brief Deserialization constructor. Reads `Subsequence` data from a JSON
    * object.
-   * @param j The JSON object used for deserialization.
+   * @param idx_j The JSON object used for deserialization.
    */
-  explicit Subsequence(nlohmann::json j);
+  explicit Subsequence(nlohmann::json idx_j);
 
   /**
    * @brief Serializes the subsequence and its configurations to a JSON object.

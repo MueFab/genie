@@ -23,9 +23,9 @@ Manager::Manager(std::istream& fasta, std::istream& fai, std::istream& sha, core
                  std::string path)
     : core::ReferenceSource(mgr), reader(fasta, fai, sha, std::move(path)) {
     auto ref = generateRefHandles();
-    int i = 0;
+    int idx_i = 0;
     for (auto& r : ref) {
-        mgr->addRef(i++, std::move(r));
+        mgr->addRef(idx_i++, std::move(r));
     }
 }
 

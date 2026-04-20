@@ -54,9 +54,9 @@ double LloydMaxQuantizer::calcCentroid(size_t left, size_t right, const Probabil
         right -= 1;
     }
 
-    for (size_t i = left; i <= right; ++i) {
-        sum += pdf[i - pdf.getRangeMin()];
-        weightSum += i * pdf[i - pdf.getRangeMin()];
+    for (size_t idx_i = left; idx_i <= right; ++idx_i) {
+        sum += pdf[idx_i - pdf.getRangeMin()];
+        weightSum += idx_i * pdf[idx_i - pdf.getRangeMin()];
     }
 
     return (sum > THRESHOLD) ? (weightSum / sum) : (std::floor((left + right) / 2.0));
@@ -67,35 +67,35 @@ double LloydMaxQuantizer::calcCentroid(size_t left, size_t right, const Probabil
 void LloydMaxQuantizer::calcBorders(const ProbabilityDistribution& pdf) {
     // Step 1: Init
     double stepSize = pdf.size() / static_cast<double>(steps);
-    for (size_t i = 0; i < steps; ++i) {
-        borders[i] = pdf.getRangeMin() + (i + 1) * stepSize;
-        values[i] = pdf.getRangeMin() + i * stepSize + stepSize / 2.0;
+    for (size_t idx_i = 0; idx_i < steps; ++idx_i) {
+        borders[idx_i] = pdf.getRangeMin() + (idx_i + 1) * stepSize;
+        values[idx_i] = pdf.getRangeMin() + idx_i * stepSize + stepSize / 2.0;
     }
 
     double change = 0.0;
 
     // Step 2: Lloyd's II. algorithm
-    for (int k = 0; k < static_cast<int>(borders.size()); ++k) {
-        double left = (k == 0) ? pdf.getRangeMin() : borders[k - 1];
-        double right = borders[k];
+    for (int idx_k = 0; idx_k < static_cast<int>(borders.size()); ++idx_k) {
+        double left = (idx_k == 0) ? pdf.getRangeMin() : borders[idx_k - 1];
+        double right = borders[idx_k];
 
         // Calc centroid
         double centroid = calcCentroid(static_cast<size_t>(ceil(left)), static_cast<size_t>(floor(right)), pdf);
 
-        change = std::max(change, std::abs(values[k] - centroid));
-        values[k] = centroid;
+        change = std::max(change, std::abs(values[idx_k] - centroid));
+        values[idx_k] = centroid;
 
-        if (k == static_cast<int>(borders.size() - 1)) {
+        if (idx_k == static_cast<int>(borders.size() - 1)) {
             constexpr double EPSILON = 0.05;
             if (change < EPSILON) {
                 break;
             }
-            k = -1;
+            idx_k = -1;
             change = 0.0;
             continue;
         }
 
-        borders[k] = (values[k] + values[k + 1]) / 2;
+        borders[idx_k] = (values[idx_k] + values[idx_k + 1]) / 2;
     }
 }
 

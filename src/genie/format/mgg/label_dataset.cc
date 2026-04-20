@@ -32,7 +32,7 @@ LabelDataset::LabelDataset(util::BitReader& reader) {
     auto num_regions = reader.read<uint8_t>();
 
     /// data encapsulated in Class dataset_region
-    for (uint8_t i = 0; i < num_regions; ++i) {
+    for (uint8_t idx_i = 0; idx_i < num_regions; ++idx_i) {
         dataset_regions.emplace_back(reader);
     }
 }

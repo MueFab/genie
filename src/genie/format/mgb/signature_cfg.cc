@@ -26,7 +26,7 @@ SignatureCfg::SignatureCfg(util::BitReader& reader, uint8_t _U_signature_size, u
                                          : boost::optional<uint8_t>(boost::none)),
       base_bits(_base_bits) {
     auto num_signatures = reader.read<uint16_t>();
-    for (uint16_t i = 0; i < num_signatures; ++i) {
+    for (uint16_t idx_i = 0; idx_i < num_signatures; ++idx_i) {
         size_t len = 0;
         if (U_signature_size != boost::none) {
             len = *U_signature_size;
@@ -56,11 +56,11 @@ void SignatureCfg::addSignature(uint64_t _U_cluster_signature, uint8_t length) {
 
 void SignatureCfg::write(util::BitWriter& writer) const {
     writer.write(U_cluster_signature.size(), 16);
-    for (size_t i = 0; i < U_cluster_signature.size(); ++i) {
+    for (size_t idx_i = 0; idx_i < U_cluster_signature.size(); ++idx_i) {
         if (U_signature_size != boost::none) {
-            writer.write(U_cluster_signature[i], base_bits * *U_signature_size);
+            writer.write(U_cluster_signature[idx_i], base_bits * *U_signature_size);
         } else {
-            writer.write(U_cluster_signature[i], base_bits * U_cluster_signature_length[i]);
+            writer.write(U_cluster_signature[idx_i], base_bits * U_cluster_signature_length[idx_i]);
         }
     }
 }

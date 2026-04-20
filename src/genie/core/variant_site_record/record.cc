@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/record/annotation_parameter_set/record.h"
+#include "genie/core/parameter/annotation/record.h"
 
 #include <algorithm>
 #include <cstring>
@@ -44,9 +44,9 @@ void Record::Write(genie::util::BitWriter& writer) {
   writer.Write(ref_);
 
   writer.WriteBits(alt_count_, 8);
-  for (auto i = 0; i < alt_count_; ++i) {
-    writer.WriteBits(alt_len_[i], 32);
-    writer.Write(altern_[i]);
+  for (auto idx_i = 0; idx_i < alt_count_; ++idx_i) {
+    writer.WriteBits(alt_len_[idx_i], 32);
+    writer.Write(altern_[idx_i]);
   }
   writer.WriteBits(depth_, 32);
   writer.WriteBits(seq_qual_, 32);
@@ -57,15 +57,15 @@ void Record::Write(genie::util::BitWriter& writer) {
 
   auto info_tag = info_.GetFields();
   writer.WriteBits(static_cast<uint8_t>(info_tag.size()), 8);
-  for (auto i = 0u; i < info_tag.size(); ++i) {
-    writer.WriteBits(info_tag[i].tag.size(), 8);
-    writer.Write(info_tag[i].tag);
-    writer.WriteBits(static_cast<uint8_t>(info_tag[i].type), 8);
-    writer.WriteBits(info_tag[i].values.size(), 8);
+  for (auto idx_i = 0u; idx_i < info_tag.size(); ++idx_i) {
+    writer.WriteBits(info_tag[idx_i].tag.size(), 8);
+    writer.Write(info_tag[idx_i].tag);
+    writer.WriteBits(static_cast<uint8_t>(info_tag[idx_i].type), 8);
+    writer.WriteBits(info_tag[idx_i].values.size(), 8);
     ArrayType writeType;
-    for (auto j = 0u; j < info_tag[i].values.size(); ++j) {
-      writeType.toFile(info_tag[i].type, info_tag.at(i).values.at(j), writer);
-      if (info_tag[i].type == DataType::STRING)
+    for (auto idx_j = 0u; idx_j < info_tag[idx_i].values.size(); ++idx_j) {
+      writeType.toFile(info_tag[idx_i].type, info_tag.at(idx_i).values.at(idx_j), writer);
+      if (info_tag[idx_i].type == DataType::STRING)
         writer.WriteReserved(8);
     }
   }
@@ -105,7 +105,7 @@ bool Record::Read(genie::util::BitReader& reader) {
     reader.ReadAlignedBytes(&ref_[0], ref_len_);
   }
   alt_count_ = static_cast<uint8_t>(reader.ReadBits(8));
-  for (auto i = 0; i < alt_count_; ++i) {
+  for (auto idx_i = 0; idx_i < alt_count_; ++idx_i) {
     alt_len_.push_back(static_cast<uint32_t>(reader.ReadBits(32)));
     std::string altlist(alt_len_.back(), 0);
     for (auto& item : altlist)

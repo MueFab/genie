@@ -18,8 +18,8 @@
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-#include "genie/core/record/annotation_access_unit/record.h"
-#include "genie/core/record/annotation_parameter_set/record.h"
+#include "genie/core/access_unit/annotation/record.h"
+#include "genie/core/parameter/annotation/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -94,8 +94,8 @@ class Record {
   RawReference rawReference_;
   ParameterSet parameterSet_;
   AccessUnit access_unit_;
-  genie::core::record::annotation_access_unit::Record annotation_access_unit_;
-  genie::core::record::annotation_parameter_set::Record annotation_parameter_set_;
+  genie::core::access_unit::annotation::Record annotation_access_unit_;
+  genie::core::parameter::annotation::Record annotation_parameter_set_;
 
  public:
   /**
@@ -125,13 +125,13 @@ class Record {
    * @brief Constructs a record with annotation access unit data
    * @param annotation_access_unit The annotation access unit data
    */
-  explicit Record(annotation_access_unit::Record& annotation_access_unit);
+  explicit Record(access_unit::annotation::Record& annotation_access_unit);
 
   /**
    * @brief Constructs a record with annotation parameter set data
    * @param annotation_parameter_set The annotation parameter set data
    */
-  explicit Record(annotation_parameter_set::Record& annotation_parameter_set);
+  explicit Record(parameter::annotation::Record& annotation_parameter_set);
 
   /**
    * @brief Writes the complete record to a writer

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.9.0)
+cmake_minimum_required(VERSION 3.5)
 project(Test)
 
 set(TEST_RESOURCES_PATH   ${CMAKE_CURRENT_SOURCE_DIR}/resources)

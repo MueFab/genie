@@ -23,7 +23,7 @@
 #include "genie/core/writer.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
-#include "genie/genotype/parameterset_composer.h"
+#include "genie/annotation/parameterset_composer.h"
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_parameters.h"
 #include "genie/likelihood/likelihood_payload.h"
@@ -121,30 +121,30 @@ void encodeVariantSite(const std::string& _inputFileName,
   for (auto& tile : tile_descriptorStream) descrList.push_back(tile.first);
 
   genie::variant_site::ParameterSetComposer encodeParameters;
-  genie::core::record::annotation_parameter_set::Record annotationParameterSet =
+  genie::core::parameter::annotation::Record annotationParameterSet =
       encodeParameters.setParameterSet(descrList, info,
                                        parser.getNumberOfRows(), AT_ID);
 
-  std::vector<genie::core::record::annotation_access_unit::Record>
+  std::vector<genie::core::access_unit::annotation::Record>
       annotationAccessUnit(parser.getNrOfTiles());
 
   genie::variant_site::AccessUnitComposer accessUnit;
   // uint8_t AT_ID = 1;
 
-  for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
+  for (uint64_t idx_i = 0; idx_i < parser.getNrOfTiles(); ++idx_i) {
     std::map<genie::core::AnnotDesc, std::stringstream> desc;
     for (auto& desctile : tile_descriptorStream) {
-      desc[desctile.first] << desctile.second.getTile(i).rdbuf();
+      desc[desctile.first] << desctile.second.getTile(idx_i).rdbuf();
     }
 
     std::map<std::string,
-             genie::core::record::annotation_access_unit::TypedData>
+             genie::core::access_unit::annotation::TypedData>
         attr;
     for (auto& attrtile : tile_attributeStream) {
-      attr[attrtile.first] = attrtile.second.getTypedTile(i);
+      attr[attrtile.first] = attrtile.second.getTypedTile(idx_i);
     }
     accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet,
-                             annotationAccessUnit.at(i), AG_class, AT_ID,
+                             annotationAccessUnit.at(idx_i), AG_class, AT_ID,
                              (uint8_t)0);
   }
 
@@ -241,12 +241,12 @@ void encodeVariantGenotype(const std::string& _input_fpath,
   uint8_t AG_class = 0;
 
   std::map<std::string,
-           genie::core::record::annotation_parameter_set::AttributeData>
+           genie::core::parameter::annotation::AttributeData>
       info;
-  genie::genotype::ParameterSetComposer genotypeParameterSet;
+  genie::annotation::ParameterSetComposer genotypeParameterSet;
   genotypeParameterSet.setGenotypeParameters(genotypeParameters);
   genotypeParameterSet.setLikelihoodParameters(likelihoodParameters);
-  genie::core::record::annotation_parameter_set::Record annotationParameterSet =
+  genie::core::parameter::annotation::Record annotationParameterSet =
       genotypeParameterSet.Build(AT_ID, info,
                                  {static_cast<uint32_t>(recs.size()), 3000});
 
@@ -254,10 +254,10 @@ void encodeVariantGenotype(const std::string& _input_fpath,
 
   //--------------------------------------------------
   std::map<std::string,
-           genie::core::record::annotation_parameter_set::AttributeData>
+           genie::core::parameter::annotation::AttributeData>
       attributesInfo = info;  // datablock.attributeInfo;
 
-  std::map<std::string, genie::core::record::annotation_access_unit::TypedData>
+  std::map<std::string, genie::core::access_unit::annotation::TypedData>
       attributeTDStream;
   /* for (auto formatdata : datablock.attributeData) {
     auto& info = attributesInfo[formatdata.first];
@@ -288,12 +288,12 @@ void encodeVariantGenotype(const std::string& _input_fpath,
   }
 
   // add LINK_ID default values
-  /* for (auto i = 0u; i < BLOCK_SIZE && i < recs.size(); ++i) {
+  /* for (auto idx_i = 0u; idx_i < BLOCK_SIZE && idx_i < recs.size(); ++idx_i) {
       const char val = '\xFF';
       descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
   }*/
   genie::variant_site::AccessUnitComposer accessUnitcomposer;
-  genie::core::record::annotation_access_unit::Record annotationAccessUnit;
+  genie::core::access_unit::annotation::Record annotationAccessUnit;
 
   accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream,
                                    attributesInfo, annotationParameterSet,

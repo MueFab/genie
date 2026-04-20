@@ -28,7 +28,7 @@ LabelList::LabelList(util::BitReader& reader) {
     // num_labels u(16)
     auto num_labels = reader.readBypassBE<uint16_t>();
 
-    for (size_t i = 0; i < num_labels; ++i) {
+    for (size_t idx_i = 0; idx_i < num_labels; ++idx_i) {
         read_box(reader, false);
     }
     UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");

@@ -11,7 +11,7 @@
 namespace genie {
 namespace format {
 namespace mgg {
-namespace annotation_access_unit {
+namespace annotation {
 
 AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(
     bool _is_tranport_mode,
@@ -57,7 +57,7 @@ AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_access_unit
+}  // namespace annotation
 }  // namespace mgg
 }  // namespace format
 }  // namespace genie

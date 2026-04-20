@@ -24,6 +24,9 @@
 #include "genie/genotype/genotype_coder.h"
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_payload.h"
+#include "genie/core/parameter/annotation/attribute_data.h"
+#include "genie/core/parameter/annotation/record.h"
+#include "genie/core/access_unit/annotation/record.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
@@ -31,8 +34,8 @@ namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
 struct GenoUnits {
-  core::record::annotation_parameter_set::Record annotationParameterSet;
-  std::vector<core::record::annotation_access_unit::Record>
+  core::parameter::annotation::Record annotationParameterSet;
+  std::vector<core::access_unit::annotation::Record>
       annotationAccessUnit;
 };
 
@@ -62,7 +65,7 @@ class GenoAnnotation {
                genie::genotype::GenotypePayload>
         genotypeData;*/
     std::map<std::string,
-             std::tuple<core::record::annotation_parameter_set::AttributeData,
+             std::tuple<core::parameter::annotation::AttributeData,
                         std::vector<std::vector<std::vector<AttrType>>>>>
         attributes;
     // genie::genotype::EncodingBlock genotypeDatablock;
@@ -80,7 +83,7 @@ class GenoAnnotation {
         uint32_t _numSamples, uint8_t _formatCount,
         std::map<
             std::string,
-            std::tuple<core::record::annotation_parameter_set::AttributeData,
+            std::tuple<core::parameter::annotation::AttributeData,
                        std::vector<std::vector<std::vector<AttrType>>>>>
             attributes);
 
@@ -95,7 +98,7 @@ class GenoAnnotation {
         uint32_t _numSamples, uint8_t _formatCount,
         std::map<
             std::string,
-            std::tuple<core::record::annotation_parameter_set::AttributeData,
+            std::tuple<core::parameter::annotation::AttributeData,
                        std::vector<std::vector<std::vector<AttrType>>>>>
             _attributes);
   };
@@ -126,7 +129,7 @@ class GenoAnnotation {
       genie::core::AlgoID::JBIG};
   genie::annotation::Compressor compressors;
 
-  std::map<std::string, core::record::annotation_parameter_set::AttributeData>
+  std::map<std::string, core::parameter::annotation::AttributeData>
       attrInfo;
   std::map<std::string, std::vector<std::vector<std::vector<AttrType>>>>
       attrValues;

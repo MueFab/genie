@@ -50,8 +50,8 @@ void TransformMergeCoding(const paramcabac::Subsequence& sub_seq_cfg,
   }
 
   // split
-  for (uint64_t i = 0; i < symbols_count; i++) {
-    uint64_t symbol_value = symbols.Get(i);
+  for (uint64_t idx_i = 0; idx_i < symbols_count; idx_i++) {
+    uint64_t symbol_value = symbols.Get(idx_i);
     const int64_t signed_symbol_value = paramcabac::StateVars::GetSignedValue(
         symbol_value, symbols.GetWordSize());
 
@@ -71,7 +71,7 @@ void TransformMergeCoding(const paramcabac::Subsequence& sub_seq_cfg,
         is_negative = false;
       }
 
-      (*transformed_sub_seqs)[ts].Set(i, transformed_symbol);
+      (*transformed_sub_seqs)[ts].Set(idx_i, transformed_symbol);
     }
   }
 
@@ -97,11 +97,11 @@ void InverseTransformMergeCoding(
   const uint64_t symbols_count = (*transformed_sub_seqs)[0].Size();
   util::DataBlock symbols(symbols_count, 4);
 
-  for (uint64_t i = 0; i < symbols_count; i++) {
+  for (uint64_t idx_i = 0; idx_i < symbols_count; idx_i++) {
     uint64_t symbol_value = 0;
     bool is_negative = false;
     for (uint64_t ts = 0; ts < sub_seq_count; ts++) {
-      uint64_t decoded_transformed_symbol = (*transformed_sub_seqs)[ts].Get(i);
+      uint64_t decoded_transformed_symbol = (*transformed_sub_seqs)[ts].Get(idx_i);
       if (static_cast<int64_t>(decoded_transformed_symbol) < 0) {
         decoded_transformed_symbol =
             -static_cast<int64_t>(decoded_transformed_symbol);
@@ -117,7 +117,7 @@ void InverseTransformMergeCoding(
       symbol_value = static_cast<uint64_t>(symbol_value_signed);
     }
 
-    symbols.Set(i, symbol_value);
+    symbols.Set(idx_i, symbol_value);
   }
 
   transformed_sub_seqs->resize(1);

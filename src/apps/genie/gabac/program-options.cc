@@ -7,7 +7,7 @@
 #include "apps/genie/gabac/program-options.h"
 #include <cassert>
 #include <fstream>
-#include "cli11/CLI11.hpp"
+#include "cli11/CLI11_RESTORED.hpp"
 #include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

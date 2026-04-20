@@ -46,8 +46,8 @@ void Sha256File::write(std::ostream& file, const std::vector<std::pair<std::stri
 std::string Sha256File::hex2bytes(const std::string& hex) {
     int len = static_cast<int>(hex.length());
     std::string newString;
-    for (int i = 0; i < len; i += 2) {
-        std::string byte = hex.substr(i, 2);
+    for (int idx_i = 0; idx_i < len; idx_i += 2) {
+        std::string byte = hex.substr(idx_i, 2);
         char chr = static_cast<char>(static_cast<int>(strtol(byte.c_str(), nullptr, 16)));
         newString.push_back(chr);
     }

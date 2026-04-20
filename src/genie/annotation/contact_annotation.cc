@@ -84,19 +84,19 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
     variant_site::AccessUnitComposer accessUnitcomposer;
     accessUnitcomposer.setCompressors(compressors);
 
-    std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attributeTDStream;
-    std::map<std::string, core::record::annotation_parameter_set::AttributeData> attributeInfo;
+    std::map<std::string, genie::core::access_unit::annotation::TypedData> attributeTDStream;
+    std::map<std::string, core::parameter::annotation::AttributeData> attributeInfo;
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
     util::BitWriter writer(&descriptorStream[genie::core::AnnotDesc::CONTACT]);
     scm_payload.Write(writer);
-    core::record::annotation_access_unit::Record annotationAccessUnit;
+    core::access_unit::annotation::Record annotationAccessUnit;
     // add LINK_ID default values
     uint64_t linkIdRowCnt = 0;
-    for (auto j = 0u; j < defaultTileSizeHeight && linkIdRowCnt < RECS.size(); ++j, ++linkIdRowCnt) {
+    for (auto idx_j = 0u; idx_j < defaultTileSizeHeight && linkIdRowCnt < RECS.size(); ++idx_j, ++linkIdRowCnt) {
         const char val = '\xFF';
         descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
     }
-    accessUnitcomposer.setATtype(core::record::annotation_access_unit::AnnotationType::CONTACT_MATRICES, 10);
+    accessUnitcomposer.setATtype(core::access_unit::annotation::AnnotationType::CONTACT_MATRICES, 10);
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream, attributeInfo,
                                      dataunits.annotationParameterSet,
                                      annotationAccessUnit, AG_class, AT_ID, 0);

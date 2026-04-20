@@ -35,8 +35,8 @@ double SoftclipSpreader::push(double score, size_t softclips) {
         forwardSpread.emplace_back(clipped + 1, score);
 
         // Change past positions
-        for (auto i = static_cast<int>(buffer.size() - clipped); i < static_cast<int>(buffer.size()); ++i) {
-            buffer[i] += score;
+        for (auto idx_i = static_cast<int>(buffer.size() - clipped); idx_i < static_cast<int>(buffer.size()); ++idx_i) {
+            buffer[idx_i] += score;
         }
     }
 

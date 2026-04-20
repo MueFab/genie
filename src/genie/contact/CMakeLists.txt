@@ -1,4 +1,4 @@
-project("genie-contact")
+project("genie-contact-local")
 
 set(source_files
         consts.h
@@ -8,8 +8,10 @@ set(source_files
         contact_matrix_parameters.cc
         contact_matrix_tile_payload.cc
         contact_matrix_bin_payload.cc
+        contact_coder.cc
 )
 
+<<<<<<< HEAD
 if(GENIE_CONTACT_BACKEND STREQUAL "xtensor")
     set(XTENSOR_USE_XSIMD 0)
     set(XTENSOR_USE_TBB 0)
@@ -24,6 +26,8 @@ else()
     list(APPEND source_files contact_coder_std.cc)
 endif()
 
+=======
+>>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
 add_library(${PROJECT_NAME} ${source_files})
 
 if(GENIE_CONTACT_BACKEND STREQUAL "xtensor")
@@ -55,8 +59,9 @@ if(GENIE_CONTACT_BACKEND STREQUAL "xtensor")
     target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
 
 elseif(GENIE_CONTACT_BACKEND STREQUAL "eigen")
+    find_package(Eigen REQUIRED)
     target_compile_definitions(${PROJECT_NAME} PUBLIC GENIE_CONTACT_BACKEND_EIGEN)
-    target_link_libraries(${PROJECT_NAME} PUBLIC eigen)
+    target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
 endif()
 
 if(MSVC)
@@ -69,10 +74,11 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wall")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wshadow")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wextra")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wundef")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wconversion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wdouble-promotion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=conversion")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=sign-conversion")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=maybe-uninitialized")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-strict-aliasing")
 endif()
 
@@ -80,6 +86,7 @@ endif()
 if(GENIE_CONTACT_BACKEND STREQUAL "xtensor")
     target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
 endif()
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-backend)
 target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-core)
 #target_link_libraries(${PROJECT_NAME} PUBLIC mpeggCodecs-shared)

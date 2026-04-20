@@ -16,7 +16,7 @@
 //#include "codecs/api/mpegg_utils.h"
 #include "codecs/include/mpegg-codecs.h"
 #include "genie/core/arrayType.h"
-#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
+#include "genie/core/parameter/annotation/algorithm_parameters.h"
 #include "genie/entropy/lzma/encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -53,24 +53,27 @@ void LZMAEncoder::encode(std::stringstream &input, std::stringstream &output) {
     if (ret != 0) {
         std::cerr << "error with lzma compression\n";
     }
-    for (size_t i = 0; i < compSize; ++i) output << compressedBuffer[i];
+    for (size_t idx_i = 0; idx_i < compSize; ++idx_i) output << compressedBuffer[idx_i];
     if (compressedBuffer) free(compressedBuffer);
     if (inputBuffer) free(inputBuffer);
 }
 
 void LZMAEncoder::decode(std::stringstream &input, std::stringstream &output) {
-    const size_t srcLen = input.str().size();
-    unsigned char *destination;
-    size_t destLen = srcLen;
-    int ret = mpegg_lzma_decompress(&destination, &destLen, (const unsigned char *)input.str().c_str(), srcLen);
+    const std::string str = input.str();
+    const size_t srcLen = str.size();
+    unsigned char *destination = nullptr;
+    size_t destLen = 0;
+    int ret = mpegg_lzma_decompress(&destination, &destLen, (const unsigned char *)str.c_str(), srcLen);
     if (ret != 0) {
         std::cerr << "error with decompression\n";
     }
-    output.write((const char *)destination, destLen);
-    if (destination) free(destination);
+    if (destination && destLen > 0) {
+        output.write((const char *)destination, destLen);
+        free(destination);
+    }
 }
 
-genie::core::record::annotation_parameter_set::AlgorithmParameters LZMAParameters::convertToAlgorithmParameters()
+genie::core::parameter::annotation::AlgorithmParameters LZMAParameters::convertToAlgorithmParameters()
     const {
     uint8_t n_pars = 7;
     std::vector<uint8_t> par_ID{1, 2, 3, 4, 5, 6, 7};
@@ -86,32 +89,32 @@ genie::core::record::annotation_parameter_set::AlgorithmParameters LZMAParameter
     std::vector<std::vector<uint8_t>> par_array_dims(n_pars, std::vector<uint8_t>(1, 0));
     std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val;
 
-    for (auto i = 0; i < n_pars; ++i) {
-        if (par_type.at(i) == core::DataType::UINT8) {
-            par_val.push_back(core::record::annotation_parameter_set::parameterToVector<uint8_t>(
-                {static_cast<uint8_t>(values.at(i))}, par_type.at(i), par_num_array_dims.at(i), par_array_dims.at(i)));
+    for (auto idx_i = 0; idx_i < n_pars; ++idx_i) {
+        if (par_type.at(idx_i) == core::DataType::UINT8) {
+            par_val.push_back(core::parameter::annotation::parameterToVector<uint8_t>(
+                {static_cast<uint8_t>(values.at(idx_i))}, par_type.at(idx_i), par_num_array_dims.at(idx_i), par_array_dims.at(idx_i)));
         }
-        if (par_type.at(i) == core::DataType::UINT16) {
-            par_val.push_back(core::record::annotation_parameter_set::parameterToVector<uint16_t>(
-                {static_cast<uint16_t>(values.at(i))}, par_type.at(i), par_num_array_dims.at(i), par_array_dims.at(i)));
+        if (par_type.at(idx_i) == core::DataType::UINT16) {
+            par_val.push_back(core::parameter::annotation::parameterToVector<uint16_t>(
+                {static_cast<uint16_t>(values.at(idx_i))}, par_type.at(idx_i), par_num_array_dims.at(idx_i), par_array_dims.at(idx_i)));
         }
-        if (par_type.at(i) == core::DataType::UINT32) {
-            par_val.push_back(core::record::annotation_parameter_set::parameterToVector<uint32_t>(
-                {static_cast<uint32_t>(values.at(i))}, par_type.at(i), par_num_array_dims.at(i), par_array_dims.at(i)));
+        if (par_type.at(idx_i) == core::DataType::UINT32) {
+            par_val.push_back(core::parameter::annotation::parameterToVector<uint32_t>(
+                {static_cast<uint32_t>(values.at(idx_i))}, par_type.at(idx_i), par_num_array_dims.at(idx_i), par_array_dims.at(idx_i)));
         }
     }
 
-    return genie::core::record::annotation_parameter_set::AlgorithmParameters(
+    return genie::core::parameter::annotation::AlgorithmParameters(
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 }
 
-genie::core::record::annotation_parameter_set::CompressorParameterSet LZMAParameters::compressorParameterSet(
+genie::core::parameter::annotation::CompressorParameterSet LZMAParameters::compressorParameterSet(
     uint8_t compressor_ID) const {
     std::vector<genie::core::AlgoID> LZMAalgorithm_ID{genie::core::AlgoID::LZMA};
     uint8_t n_compressor_steps = 1;
     std::vector<uint8_t> compressor_step_ID{0};
     std::vector<bool> use_default_pars{true};
-    std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
+    std::vector<genie::core::parameter::annotation::AlgorithmParameters> algorithm_parameters;
     std::vector<uint8_t> n_in_vars{0};
     std::vector<std::vector<uint8_t>> in_var_ID{{0}};
     std::vector<std::vector<uint8_t>> prev_step_ID;
@@ -119,7 +122,7 @@ genie::core::record::annotation_parameter_set::CompressorParameterSet LZMAParame
     std::vector<uint8_t> n_completed_out_vars{0};
     std::vector<std::vector<uint8_t>> completed_out_var_ID;
 
-    return genie::core::record::annotation_parameter_set::CompressorParameterSet(
+    return genie::core::parameter::annotation::CompressorParameterSet(
         compressor_ID, n_compressor_steps, compressor_step_ID, LZMAalgorithm_ID, use_default_pars, algorithm_parameters,
         n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars, completed_out_var_ID);
 }

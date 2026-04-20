@@ -76,8 +76,8 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
                 genie::util::make_unique<genie::core::record::alignment_split::Unpaired>());
             break;
     }
-    for (size_t i = 1; i < sequences.size(); ++i) {
-        decodeAdditional(std::get<1>(clip_offset), std::move(sequences[i]), std::move(cigars[i]),
+    for (size_t idx_i = 1; idx_i < sequences.size(); ++idx_i) {
+        decodeAdditional(std::get<1>(clip_offset), std::move(sequences[idx_i]), std::move(cigars[idx_i]),
                          uint16_t(meta.position[1] - meta.position[0]), state);
     }
 
@@ -104,8 +104,8 @@ Decoder::SegmentMeta Decoder::readSegmentMeta() {
     }
 
     auto deletions = numberDeletions(meta.num_segments);
-    for (size_t i = 0; i < meta.num_segments; ++i) {
-        meta.length[i] = (length ? length : container.pull(core::gen_sub::kReadLength) + 1) + deletions[i];
+    for (size_t idx_i = 0; idx_i < meta.num_segments; ++idx_i) {
+        meta.length[idx_i] = (length ? length : container.pull(core::gen_sub::kReadLength) + 1) + deletions[idx_i];
     }
     return meta;
 }
@@ -176,7 +176,7 @@ std::string Decoder::contractECigar(const std::string &cigar_long) {
                 result += std::to_string(count);
                 result += cur_tok;
             } else {
-                for (size_t i = 0; i < count; ++i) {
+                for (size_t idx_i = 0; idx_i < count; ++idx_i) {
                     result += cur_tok;
                 }
             }
@@ -195,7 +195,7 @@ std::string Decoder::contractECigar(const std::string &cigar_long) {
         result += std::to_string(count);
         result += cur_tok;
     } else {
-        for (size_t i = 0; i < count; ++i) {
+        for (size_t idx_i = 0; idx_i < count; ++idx_i) {
             result += cur_tok;
         }
     }
@@ -329,7 +329,7 @@ std::tuple<size_t, size_t> Decoder::decodeClips(std::vector<std::string> &sequen
                                         : cigar_extended[record_no].find_first_not_of(']');
             size_t seq_position = end ? sequences[record_no].length() : 0;
             sequences[record_no].insert(seq_position, softClip);
-            for (size_t i = 0; i < softClip.size(); ++i) {
+            for (size_t idx_i = 0; idx_i < softClip.size(); ++idx_i) {
                 cigar_extended[record_no][cigar_position++] = ')';
             }
 

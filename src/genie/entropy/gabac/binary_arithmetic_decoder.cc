@@ -74,7 +74,7 @@ unsigned int BinaryArithmeticDecoder::DecodeBinsEp(unsigned int num_bins) {
     value_ = (value_ << 8u) +
              (bit_input_stream_.ReadByte() << (8u + num_bits_needed_));
     scaled_range = range_ << 15u;
-    for (int i = 0; i < 8; i++) {
+    for (int idx_i = 0; idx_i < 8; idx_i++) {
       bins <<= 1;
       scaled_range >>= 1;
       if (value_ >= scaled_range) {
@@ -92,7 +92,7 @@ unsigned int BinaryArithmeticDecoder::DecodeBinsEp(unsigned int num_bins) {
     num_bits_needed_ -= 8;
   }
   scaled_range = range_ << (num_bins + 7);
-  for (unsigned int i = 0; i < num_bins; i++) {
+  for (unsigned int idx_i = 0; idx_i < num_bins; idx_i++) {
     bins <<= 1;
     scaled_range >>= 1;
     if (value_ >= scaled_range) {

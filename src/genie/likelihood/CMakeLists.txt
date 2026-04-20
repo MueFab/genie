@@ -1,10 +1,25 @@
-project("genie-likelihood")
+project("genie-likelihood-local")
 
+<<<<<<< HEAD
+=======
+set(XTENSOR_USE_XSIMD 0)
+set(XTENSOR_USE_TBB 0)
+
+if(GENIE_LIKELIHOOD_BACKEND STREQUAL "xtensor")
+    find_package(xtl REQUIRED)
+    find_package(xtensor REQUIRED)
+elseif(GENIE_LIKELIHOOD_BACKEND STREQUAL "eigen")
+    find_package(Eigen3 REQUIRED)
+endif()
+
+>>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
 set(source_files
-        likelihood_parameters.cc
-        likelihood_payload.cc
+    likelihood_parameters.cc
+    likelihood_payload.cc
+    likelihood_coder.cc
 )
 
+<<<<<<< HEAD
 if(GENIE_LIKELIHOOD_BACKEND STREQUAL "xtensor")
     set(XTENSOR_USE_XSIMD 0)
     set(XTENSOR_USE_TBB 0)
@@ -19,6 +34,8 @@ else()
     list(APPEND source_files likelihood_coder_std.cc)
 endif()
 
+=======
+>>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
 add_library(${PROJECT_NAME} ${source_files})
 
 if(GENIE_LIKELIHOOD_BACKEND STREQUAL "xtensor")
@@ -48,9 +65,14 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=sign-conversion")
 endif ()
 
+<<<<<<< HEAD
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-core)
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 foreach(dir ${dirs})
     message(STATUS "dir='${dir}'")
 endforeach()
+=======
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-backend)
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-core)
+>>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)

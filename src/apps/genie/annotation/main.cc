@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "cli11/CLI11_RESTORED.hpp"
 #include "apps/genie/annotation/code.h"
 #include "apps/genie/annotation/program-options.h"
 

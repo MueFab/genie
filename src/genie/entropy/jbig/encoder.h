@@ -16,7 +16,7 @@
 #endif
 #include <sstream>
 #include <codecs/include/mpegg-codecs.h>
-#include "genie/core/record/annotation_parameter_set/record.h"
+#include "genie/core/parameter/annotation/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,8 +48,8 @@ class JBIGparameters {
           two_line_template(_two_line_template) {}
 
 
-    genie::core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
-    genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet(
+    genie::core::parameter::annotation::AlgorithmParameters convertToAlgorithmParameters() const;
+    genie::core::parameter::annotation::CompressorParameterSet compressorParameterSet(
         uint8_t compressor_ID) const;
 };
 // ---------------------------------------------------------------------------------------------------------------------

@@ -22,7 +22,7 @@
 namespace genie {
 namespace format {
 namespace mgg {
-namespace annotation_access_unit {
+namespace annotation {
 
 class AnnotationAccessUnitHeader : public GenInfo {
  public:
@@ -77,7 +77,7 @@ class AnnotationAccessUnitHeader : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_access_unit
+}  // namespace annotation
 }  // namespace mgg
 }  // namespace format
 }  // namespace genie

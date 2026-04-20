@@ -31,7 +31,7 @@ const core::parameter::EncodingSet& DataUnitFactory::getParams(size_t id) const 
 
 boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
     core::parameter::DataUnit::DataUnitType type;
-    int i = 0;
+    int idx_i = 0;
     do {
         type = bitReader.read<core::parameter::DataUnit::DataUnitType>();
         size_t pos = bitReader.getPos();
@@ -48,7 +48,7 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                     std::cerr << "Found ref(raw) " << ref.getSeqID() << ":[" << ref.getStart() << ", " << ref.getEnd()
                               << "] ..." << std::endl;
                     refmgr->validateRefID(ref.getSeqID());
-                    refmgr->addRef(i++,
+                    refmgr->addRef(idx_i++,
                                    util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
                                                                      ref.getEnd() + 1, importer, pos, true));
                     pos += (ref.getEnd() - ref.getStart() + 1);
@@ -69,7 +69,7 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                     refmgr->validateRefID(ref.getSeqID());
                     std::cerr << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", "
                               << ref.getEnd() << "] ..." << std::endl;
-                    refmgr->addRef(i++,
+                    refmgr->addRef(idx_i++,
                                    util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
                                                                      ref.getEnd() + 1, importer, pos, false));
                     bitReader.skip(ret.getPayloadSize());

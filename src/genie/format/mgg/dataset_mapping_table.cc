@@ -53,7 +53,7 @@ DataSetMappingTable::DataSetMappingTable(util::BitReader& reader) {
     auto length = reader.readBypassBE<uint64_t>();
     dataset_id = reader.readBypassBE<uint16_t>();
     size_t num_data_streams = (length - 14) / 3;
-    for (size_t i = 0; i < num_data_streams; ++i) {
+    for (size_t idx_i = 0; idx_i < num_data_streams; ++idx_i) {
         streams.emplace_back(reader);
     }
     UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");

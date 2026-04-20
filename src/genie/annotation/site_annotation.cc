@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "genie/core/record/annotation_access_unit/TypedData.h"
+#include "genie/core/access_unit/annotation/typed_data.h"
 #include "genie/variantsite/accessunit_composer.h"
 
 #include "genie/core/arrayType.h"
@@ -67,24 +67,24 @@ SiteUnits SiteAnnotation::parseSite(std::ifstream& inputfile) {
     genie::variant_site::ParameterSetComposer encodeParameters;
 
     genie::variant_site::AccessUnitComposer accessUnit;
-    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::VARIANTS, 1);
+    accessUnit.setATtype(core::access_unit::annotation::AnnotationType::VARIANTS, 1);
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;
     auto& descrStream = parser.getDescriptors().getTiles();
 
-    std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attr;
-    for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
+    std::map<std::string, genie::core::access_unit::annotation::TypedData> attr;
+    for (uint64_t idx_i = 0; idx_i < parser.getNrOfTiles(); ++idx_i) {
         std::map<genie::core::AnnotDesc, std::stringstream> desc;
         for (auto& desctile : descrStream) {
-            desc[desctile.first] << desctile.second.getTile(i).rdbuf();
+            desc[desctile.first] << desctile.second.getTile(idx_i).rdbuf();
         }
         for (auto& attrtile : parser.getAttributes().getTiles()) {
-            attr[attrtile.first] = attrtile.second.getTypedTile(i);
+            attr[attrtile.first] = attrtile.second.getTypedTile(idx_i);
         }
 
         accessUnit.setAccessUnit(desc, attr, parser.getAttributes().getInfo(), annotationParameterSet,
-                                 annotationAccessUnit.at(i), AG_class, AT_ID, rowIndex);
+                                 annotationAccessUnit.at(idx_i), AG_class, AT_ID, rowIndex);
         rowIndex++;
     }
 

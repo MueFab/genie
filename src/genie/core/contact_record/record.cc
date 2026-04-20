@@ -76,44 +76,44 @@ ContactRecord::ContactRecord(util::BitReader& reader) {
   auto num_norm_counts = reader.ReadAlignedInt<uint8_t>();
 
   norm_count_names_.resize(num_norm_counts);
-  for (auto i = 0; i < num_norm_counts; i++) {
-    norm_count_names_[i].resize(reader.ReadAlignedInt<uint8_t>());
-    reader.ReadAlignedBytes(&norm_count_names_[i][0], norm_count_names_[i].size());
+  for (auto idx_i = 0; idx_i < num_norm_counts; idx_i++) {
+    norm_count_names_[idx_i].resize(reader.ReadAlignedInt<uint8_t>());
+    reader.ReadAlignedBytes(&norm_count_names_[idx_i][0], norm_count_names_[idx_i].size());
   }
 
   start_pos1_.resize(num_entries);
-  for (size_t i = 0; i < num_entries; i++) {
-    start_pos1_[i] = reader.ReadAlignedInt<uint64_t>();
+  for (size_t idx_i = 0; idx_i < num_entries; idx_i++) {
+    start_pos1_[idx_i] = reader.ReadAlignedInt<uint64_t>();
   }
 
   end_pos1_.resize(num_entries);
-  for (size_t i = 0; i < num_entries; i++) {
-    end_pos1_[i] = reader.ReadAlignedInt<uint64_t>();
+  for (size_t idx_i = 0; idx_i < num_entries; idx_i++) {
+    end_pos1_[idx_i] = reader.ReadAlignedInt<uint64_t>();
   }
 
   start_pos2_.resize(num_entries);
-  for (size_t i = 0; i < num_entries; i++) {
-    start_pos2_[i] = reader.ReadAlignedInt<uint64_t>();
+  for (size_t idx_i = 0; idx_i < num_entries; idx_i++) {
+    start_pos2_[idx_i] = reader.ReadAlignedInt<uint64_t>();
   }
 
   end_pos2_.resize(num_entries);
-  for (size_t i = 0; i < num_entries; i++) {
-    end_pos2_[i] = reader.ReadAlignedInt<uint64_t>();
+  for (size_t idx_i = 0; idx_i < num_entries; idx_i++) {
+    end_pos2_[idx_i] = reader.ReadAlignedInt<uint64_t>();
   }
 
   counts_.resize(num_entries);
-  for (size_t i = 0; i < num_entries; i++) {
-    counts_[i] = reader.ReadAlignedInt<uint32_t>();
+  for (size_t idx_i = 0; idx_i < num_entries; idx_i++) {
+    counts_[idx_i] = reader.ReadAlignedInt<uint32_t>();
   }
 
   norm_counts_.resize(num_norm_counts);
-  for (size_t j = 0; j < num_norm_counts; j++) {
-    norm_counts_[j].resize(num_entries);
-    for (size_t i = 0; i < num_entries; i++) {
+  for (size_t idx_j = 0; idx_j < num_norm_counts; idx_j++) {
+    norm_counts_[idx_j].resize(num_entries);
+    for (size_t idx_i = 0; idx_i < num_entries; idx_i++) {
       auto tmp_val = reader.ReadAlignedInt<uint64_t>();
       double norm_count;
       std::memcpy(&norm_count, &tmp_val, sizeof(norm_count));
-      norm_counts_[j][i] = norm_count;
+      norm_counts_[idx_j][idx_i] = norm_count;
     }
   }
 
@@ -429,9 +429,9 @@ void ContactRecord::Write(util::BitWriter& writer) const {
   writer.WriteBypassBE(GetNumEntries());
   writer.WriteBypassBE(GetNumNormCounts());
 
-  for (auto i = 0; i < GetNumNormCounts(); i++) {
-    writer.WriteBypassBE(static_cast<uint8_t>(norm_count_names_[i].length()));
-    writer.WriteAlignedBytes(norm_count_names_[i].data(), norm_count_names_[i].length());
+  for (auto idx_i = 0; idx_i < GetNumNormCounts(); idx_i++) {
+    writer.WriteBypassBE(static_cast<uint8_t>(norm_count_names_[idx_i].length()));
+    writer.WriteAlignedBytes(norm_count_names_[idx_i].data(), norm_count_names_[idx_i].length());
   }
 
   for (const auto& v : start_pos1_) {

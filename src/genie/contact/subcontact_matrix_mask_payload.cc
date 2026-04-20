@@ -24,18 +24,18 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
     if (transform_ID_ == TransformID::ID_0){
 #if defined(GENIE_CONTACT_BACKEND_XTENSOR)
         BinVecDtype tmp_mask_array = xt::empty<bool>({num_bin_entries}); // Not part of the spec
-        for (auto i = 0u; i<num_bin_entries; i++){
-            tmp_mask_array[i] = reader.Read<bool>(MASK_ARR_BLEN);
+        for (auto idx_i = 0u; idx_i<num_bin_entries; idx_i++){
+            tmp_mask_array[idx_i] = reader.Read<bool>(MASK_ARR_BLEN);
         }
 #elif defined(GENIE_CONTACT_BACKEND_EIGEN)
         BinVecDtype tmp_mask_array(num_bin_entries);
-        for (auto i = 0u; i<num_bin_entries; i++){
-            tmp_mask_array(i) = reader.Read<bool>(MASK_ARR_BLEN);
+        for (auto idx_i = 0u; idx_i<num_bin_entries; idx_i++){
+            tmp_mask_array(idx_i) = reader.Read<bool>(MASK_ARR_BLEN);
         }
 #else
         BinVecDtype tmp_mask_array(num_bin_entries);
-        for (auto i = 0u; i<num_bin_entries; i++){
-            tmp_mask_array[i] = reader.Read<bool>(MASK_ARR_BLEN);
+        for (auto idx_i = 0u; idx_i<num_bin_entries; idx_i++){
+            tmp_mask_array[idx_i] = reader.Read<bool>(MASK_ARR_BLEN);
         }
 #endif
         SetMaskArray(tmp_mask_array);
@@ -53,27 +53,27 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
 #endif
 
         if (transform_ID_ == TransformID::ID_1){
-            for (auto i = 0u; i<num_rl_entries; i++){
+            for (auto idx_i = 0u; idx_i<num_rl_entries; idx_i++){
 #if defined(GENIE_CONTACT_BACKEND_EIGEN)
-                tmp_rl_entries(i) = reader.Read<uint8_t>();
+                tmp_rl_entries(idx_i) = reader.Read<uint8_t>();
 #else
-                tmp_rl_entries[i] = reader.Read<uint8_t>();
+                tmp_rl_entries[idx_i] = reader.Read<uint8_t>();
 #endif
             }
         } else if (transform_ID_ == TransformID::ID_2){
-            for (auto i = 0u; i<num_rl_entries; i++){
+            for (auto idx_i = 0u; idx_i<num_rl_entries; idx_i++){
 #if defined(GENIE_CONTACT_BACKEND_EIGEN)
-                tmp_rl_entries(i) = reader.Read<uint16_t>();
+                tmp_rl_entries(idx_i) = reader.Read<uint16_t>();
 #else
-                tmp_rl_entries[i] = reader.Read<uint16_t>();
+                tmp_rl_entries[idx_i] = reader.Read<uint16_t>();
 #endif
             }
         } else if (transform_ID_ == TransformID::ID_3){
-            for (auto i = 0u; i<num_rl_entries; i++){
+            for (auto idx_i = 0u; idx_i<num_rl_entries; idx_i++){
 #if defined(GENIE_CONTACT_BACKEND_EIGEN)
-                tmp_rl_entries(i) = reader.Read<uint32_t>();
+                tmp_rl_entries(idx_i) = reader.Read<uint32_t>();
 #else
-                tmp_rl_entries[i] = reader.Read<uint32_t>();
+                tmp_rl_entries[idx_i] = reader.Read<uint32_t>();
 #endif
             }
         } else {
@@ -189,7 +189,7 @@ void SubcontactMatrixMaskPayload::SetMaskArray(
         UTILS_DIE_IF(opt_array->size() == 0, "Invalid opt_array size!");
         auto& array = opt_array.value();
         std::vector<bool> std_array(array.size());
-        for(int i=0; i<array.size(); ++i) std_array[i] = array(i);
+        for(int idx_i=0; idx_i<array.size(); ++idx_i) std_array[idx_i] = array(idx_i);
         first_val_ = std_array[0];
         mask_array_ = std::move(std_array);
 #else
@@ -288,9 +288,9 @@ void SubcontactMatrixMaskPayload::Write(util::BitWriter &writer) const{
         UTILS_DIE_IF(!mask_array_.has_value(), "mask_array_ is missing?");
         auto num_bin_entries = mask_array_->size();
 
-        for (auto i = 0u; i < num_bin_entries; i++){
+        for (auto idx_i = 0u; idx_i < num_bin_entries; idx_i++){
             auto _mask_array = mask_array_.value();
-            uint64_t val = mask_array_->at(i);
+            uint64_t val = mask_array_->at(idx_i);
             onmem_writer.WriteBits(val, 1);
         }
     } else {
@@ -298,9 +298,9 @@ void SubcontactMatrixMaskPayload::Write(util::BitWriter &writer) const{
         onmem_writer.WriteBits(first_val_, FIRST_VAL_BLEN);
         auto num_rl_entries = rl_entries_->size();
         onmem_writer.WriteBits(num_rl_entries, NUM_RL_ENTRIES_BLEN);
-        for (auto i = 0u; i < num_rl_entries; i++){
+        for (auto idx_i = 0u; idx_i < num_rl_entries; idx_i++){
             auto nbits = static_cast<uint8_t>(4u << static_cast<uint8_t>(transform_ID_));
-            auto val = static_cast<uint64_t>(rl_entries_->at(i));
+            auto val = static_cast<uint64_t>(rl_entries_->at(idx_i));
             onmem_writer.WriteBits(val, nbits);
         }
     }

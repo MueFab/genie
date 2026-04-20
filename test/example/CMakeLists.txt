@@ -1,10 +1,8 @@
-project("example-tests")
+project("genie-test-example")
 
-set(source_files
-        example-test.cc
-        main.cc
-)
+file(GLOB source_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
 
-add_executable(example-tests ${source_files})
+add_executable(${PROJECT_NAME} ${source_files})
 
-target_link_libraries(example-tests PRIVATE gtest_main)
+target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main genie-core genie-util)
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

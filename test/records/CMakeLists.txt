@@ -1,19 +1,8 @@
 project("genie-test-records")
 
-set(source_files
-        helpers.cc
-        variant_genotype-test.cc
-        variant_site-test.cc
-        annotationAccessUnit-test.cc
-        blockTests.cc
-        contact-test.cc
-)
+file(GLOB source_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
 
 add_executable(${PROJECT_NAME} ${source_files})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
-
-install(TARGETS ${PROJECT_NAME}
-        RUNTIME DESTINATION "usr/bin")
+target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main genie-core genie-util)
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

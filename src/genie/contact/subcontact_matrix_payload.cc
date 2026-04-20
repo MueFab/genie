@@ -96,9 +96,9 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
 
     SetNumTiles(ntiles_in_row, ntiles_in_col);
 
-    for (auto i = 0u; i< GetNTilesInRow(); i++){
-        for (auto j = 0u; j< GetNTilesInCol(); j++){
-            if (!IsIntraScm() || i <= j){
+    for (auto idx_i = 0u; idx_i< GetNTilesInRow(); idx_i++){
+        for (auto idx_j = 0u; idx_j< GetNTilesInCol(); idx_j++){
+            if (!IsIntraScm() || idx_i <= idx_j){
 
                 auto tile_payload_size = reader.ReadAlignedInt<uint32_t>();
                 auto tile_payload = ContactMatrixTilePayload(reader, tile_payload_size);
@@ -106,7 +106,7 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
                     tile_payload_size != tile_payload.GetSize(),
                     "Invalid tile_payload size!"
                 );
-                SetTilePayload(i, j, std::move(tile_payload));
+                SetTilePayload(idx_i, idx_j, std::move(tile_payload));
             }
 
         }
@@ -324,11 +324,11 @@ size_t SubcontactMatrixPayload::GetSize() const{
 
     auto ntiles_in_row = GetNTilesInRow();
     auto ntiles_in_col = GetNTilesInCol();
-    for (auto i = 0u; i< ntiles_in_row; i++){
-        for (auto j = 0u; j< ntiles_in_col; j++){
-            if (!IsIntraScm() || i<=j){
+    for (auto idx_i = 0u; idx_i< ntiles_in_row; idx_i++){
+        for (auto idx_j = 0u; idx_j< ntiles_in_col; idx_j++){
+            if (!IsIntraScm() || idx_i<=idx_j){
                 size += TILE_PAYLOAD_SIZE_LEN;
-                size += tile_payloads_[i][j].GetSize();
+                size += tile_payloads_[idx_i][idx_j].GetSize();
             }
         }
     }
@@ -356,10 +356,10 @@ void SubcontactMatrixPayload::Write(util::BitWriter &writer) const{
     writer.WriteBypassBE(chr1_ID_);
     writer.WriteBypassBE(chr2_ID_);
 
-    for (auto i = 0u; i< GetNTilesInRow(); i++){
-        for (auto j = 0u; j< GetNTilesInCol(); j++){
-            if (!IsIntraScm() || i<=j){
-                auto& tile_payload = tile_payloads_[i][j];
+    for (auto idx_i = 0u; idx_i< GetNTilesInRow(); idx_i++){
+        for (auto idx_j = 0u; idx_j< GetNTilesInCol(); idx_j++){
+            if (!IsIntraScm() || idx_i<=idx_j){
+                auto& tile_payload = tile_payloads_[idx_i][idx_j];
                 auto tile_payload_size = tile_payload.GetSize();
 
                 writer.WriteBypassBE(static_cast<uint32_t>(tile_payload_size));

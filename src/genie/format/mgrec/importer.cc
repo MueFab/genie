@@ -81,7 +81,7 @@ bool Importer::PumpRetrieve(core::Classifier* _classifier) {
     util::Watch watch;
     core::record::Chunk chunk;
     bool seqid_valid = false;
-    for (size_t i = 0; i < blockSize; ++i) {
+    for (size_t idx_i = 0; idx_i < blockSize; ++idx_i) {
         if (bufferedRecord) {
             chunk.setRefID(bufferedRecord->getAlignmentSharedData().getSeqID());
             seqid_valid = true;

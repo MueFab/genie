@@ -43,8 +43,8 @@ TransformedParameters::TransformedParameters(util::BitReader& reader) {
     case TransformIdSubseq::MERGE_CODING:
       merge_coding_subseq_count_ = reader.Read<uint8_t>(4);
       merge_coding_shift_size_.resize(*merge_coding_subseq_count_);
-      for (int i = 0; i < *merge_coding_subseq_count_; i++) {
-        merge_coding_shift_size_[i] = reader.Read<uint8_t>(5);
+      for (int idx_i = 0; idx_i < *merge_coding_subseq_count_; idx_i++) {
+        merge_coding_shift_size_[idx_i] = reader.Read<uint8_t>(5);
       }
       break;
     default:
@@ -135,8 +135,8 @@ void TransformedParameters::write(util::BitWriter& writer) const {
   if (merge_coding_subseq_count_) {
     writer.WriteBits(*merge_coding_subseq_count_, 4);
   }
-  for (auto& i : merge_coding_shift_size_) {
-    writer.WriteBits(i, 5);
+  for (auto& idx_i : merge_coding_shift_size_) {
+    writer.WriteBits(idx_i, 5);
   }
 }
 

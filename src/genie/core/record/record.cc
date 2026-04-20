@@ -326,11 +326,11 @@ void Record::SetAlignment(const size_t id, AlignmentBox&& b) {
 std::pair<size_t, size_t> Record::GetTemplatePosition() const {
   std::pair ret = {GetPosition(0, 0),
                    GetPosition(0, 0) + GetMappedLength(0, 0)};
-  for (size_t i = 0; i < GetAlignments().front().GetAlignmentSplits().size();
-       ++i) {
-    auto pos = GetPosition(0, i);
+  for (size_t idx_i = 0; idx_i < GetAlignments().front().GetAlignmentSplits().size();
+       ++idx_i) {
+    auto pos = GetPosition(0, idx_i);
     ret.first = std::min(ret.first, pos);
-    ret.second = std::max(ret.second, pos + GetMappedLength(0, i));
+    ret.second = std::max(ret.second, pos + GetMappedLength(0, idx_i));
   }
   return ret;
 }

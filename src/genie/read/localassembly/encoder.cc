@@ -38,13 +38,13 @@ void Encoder::printDebug(const LAEncodingState& state, const std::string& ref1, 
     state.refCoder.printWindow();
     std::cerr << "pair!" << std::endl;
     std::cerr << "ref1: " << std::endl;
-    for (size_t i = 0; i < r.getAlignments().front().getPosition() - state.refCoder.getWindowBorder(); ++i) {
+    for (size_t idx_i = 0; idx_i < r.getAlignments().front().getPosition() - state.refCoder.getWindowBorder(); ++idx_i) {
         std::cerr << " ";
     }
     std::cerr << ref1 << std::endl;
 
     std::cerr << "ref2: " << std::endl;
-    for (size_t i = 0; i < r.getAlignments().front().getPosition() - state.refCoder.getWindowBorder(); ++i) {
+    for (size_t idx_i = 0; idx_i < r.getAlignments().front().getPosition() - state.refCoder.getWindowBorder(); ++idx_i) {
         std::cerr << " ";
     }
     std::cerr << ref2 << std::endl;

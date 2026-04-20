@@ -53,7 +53,7 @@ class InfoFields {
   void Read(genie::util::BitReader& reader) {
     auto alt_count = static_cast<uint8_t>(reader.ReadBits(8));
     fields_.reserve(alt_count * 16);
-    for (auto i = 0; i < alt_count; ++i) {
+    for (auto idx_i = 0; idx_i < alt_count; ++idx_i) {
       auto alt_len = static_cast<uint8_t>(reader.ReadBits(8));
       std::string alttag(alt_len, 0);
       for (auto& tag : alttag)
@@ -62,7 +62,7 @@ class InfoFields {
       auto arrayLength = reader.ReadAlignedInt<uint8_t>();
       ArrayType arrayType;
       std::vector<CustomType> values;
-      for (auto j = 0; j < arrayLength; ++j) {
+      for (auto idx_j = 0; idx_j < arrayLength; ++idx_j) {
         std::vector<uint8_t> value = arrayType.toArray(alt_type, reader);
         values.push_back(value);
       }

@@ -1,0 +1,2 @@
+add_subdirectory(genotype_record)
+add_subdirectory(site_record)

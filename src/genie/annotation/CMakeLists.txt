@@ -1,7 +1,5 @@
 project("genie-annotation")
 
-
-
 set(source_files
         annotation.cc
 		geno_annotation.cc
@@ -13,8 +11,20 @@ set(source_files
 		json_attribute_parser.cc
 )
 
+add_library(${PROJECT_NAME} ${source_files})
 
-add_library(genie-annotation ${source_files})
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # GNU Compiler Collection
+    target_compile_options(${PROJECT_NAME} PRIVATE "-pedantic")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-fno-common")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wall")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wshadow")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wextra")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wundef")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wconversion")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wdouble-promotion")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=conversion")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=maybe-uninitialized")
+endif ()
 
 if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
@@ -26,7 +36,11 @@ target_link_libraries(${PROJECT_NAME} PUBLIC genie-core)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-bsc)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-lzma)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-zstd)
+<<<<<<< HEAD
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-genotype)
+=======
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-vsite)
+>>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 foreach(dir ${dirs})

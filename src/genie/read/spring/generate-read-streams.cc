@@ -22,7 +22,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/access_unit.h"
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/core/read_encoder.h"
 #include "genie/read/spring/generate-read-streams.h"
@@ -72,73 +72,73 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
     } else {
         seq_end = seq_start = data.pos_arr[start_read_num];
         // find last read in AU that's aligned
-        uint64_t i = start_read_num;
-        for (; i < end_read_num; i++) {
-            if (data.flag_arr[i] == false) break;
-            seq_end = std::max(seq_end, data.pos_arr[i] + data.read_length_arr[i]);
+        uint64_t idx_i = start_read_num;
+        for (; idx_i < end_read_num; idx_i++) {
+            if (data.flag_arr[idx_i] == false) break;
+            seq_end = std::max(seq_end, data.pos_arr[idx_i] + data.read_length_arr[idx_i]);
         }
     }
     if (seq_start != seq_end) {
         // not all unaligned
         raw_au.get(core::gen_sub::kReadLength).push(seq_end - seq_start - 1);  // rlen
         raw_au.get(core::gen_sub::kRtype).push(5);                       // rtype
-        for (uint64_t i = seq_start; i < seq_end; i++)
+        for (uint64_t idx_i = seq_start; idx_i < seq_end; idx_i++)
             raw_au.get(core::gen_sub::kUnalignedReads)
-                .push(GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut[data.seq[i]]);  // ureads
+                .push(GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut[data.seq[idx_i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
-    for (uint64_t i = start_read_num; i < end_read_num; i++) {
-        if (data.flag_arr[i] == true) {
-            raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[i] - 1);          // rlen
-            raw_au.get(core::gen_sub::kReverseComplement).push(rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
-            if (i == start_read_num) {
+    for (uint64_t idx_i = start_read_num; idx_i < end_read_num; idx_i++) {
+        if (data.flag_arr[idx_i] == true) {
+            raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[idx_i] - 1);          // rlen
+            raw_au.get(core::gen_sub::kReverseComplement).push(rc_to_int[(uint8_t)data.RC_arr[idx_i]]);  // rcomp
+            if (idx_i == start_read_num) {
                 // Note: In order non-preserving mode, if the first read of
                 // the block is a singleton, then the rest are too.
                 raw_au.get(core::gen_sub::kPositionFirst).push(0);  // pos
-                prevpos = data.pos_arr[i];
+                prevpos = data.pos_arr[idx_i];
             } else {
-                diffpos = data.pos_arr[i] - prevpos;
+                diffpos = data.pos_arr[idx_i] - prevpos;
                 raw_au.get(core::gen_sub::kPositionFirst).push(diffpos);  // pos
-                prevpos = data.pos_arr[i];
+                prevpos = data.pos_arr[idx_i];
             }
-            if (data.noise_len_arr[i] == 0) {
+            if (data.noise_len_arr[idx_i] == 0) {
                 raw_au.get(core::gen_sub::kRtype).push(1);  // rtype = P
             } else {
                 raw_au.get(core::gen_sub::kRtype).push(3);  // rtype = M
                 uint16_t curr_noise_pos = 0;
-                for (uint16_t j = 0; j < data.noise_len_arr[i]; j++) {
-                    curr_noise_pos += data.noisepos_arr[data.pos_in_noise_arr[i] + j];
+                for (uint16_t idx_j = 0; idx_j < data.noise_len_arr[idx_i]; idx_j++) {
+                    curr_noise_pos += data.noisepos_arr[data.pos_in_noise_arr[idx_i] + idx_j];
                     raw_au.get(core::gen_sub::kMismatchPosTerminator).push(0);  // mmpos
-                    if (j == 0)
-                        raw_au.get(core::gen_sub::kMismatchPosDelta).push(data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
+                    if (idx_j == 0)
+                        raw_au.get(core::gen_sub::kMismatchPosDelta).push(data.noisepos_arr[data.pos_in_noise_arr[idx_i] + idx_j]);
                     else
                         raw_au.get(core::gen_sub::kMismatchPosDelta)
-                            .push(data.noisepos_arr[data.pos_in_noise_arr[i] + j] - 1);  // decoder adds +1
+                            .push(data.noisepos_arr[data.pos_in_noise_arr[idx_i] + idx_j] - 1);  // decoder adds +1
                     raw_au.get(core::gen_sub::kMismatchType).push(0);                       // mmtype = Substitution
                     raw_au.get(core::gen_sub::kMismatchTypeSubstBase)
                         .push(GetAlphabetProperties(core::AlphabetId::kAcgtn)
-                                  .inverseLut[data.noise_arr[data.pos_in_noise_arr[i] + j]]);
+                                  .inverseLut[data.noise_arr[data.pos_in_noise_arr[idx_i] + idx_j]]);
                     raw_au.pushDependency(core::gen_sub::kMismatchTypeSubstBase,
                                           GetAlphabetProperties(core::AlphabetId::kAcgtn)
-                                              .inverseLut[data.seq[data.pos_arr[i] + curr_noise_pos]]);
+                                              .inverseLut[data.seq[data.pos_arr[idx_i] + curr_noise_pos]]);
                 }
                 raw_au.get(core::gen_sub::kMismatchPosTerminator).push(1);
             }
         } else {
             raw_au.get(core::gen_sub::kRtype).push(5);                           // rtype
-            raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[i] - 1);  // rlen
-            for (uint64_t j = 0; j < data.read_length_arr[i]; j++) {
+            raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[idx_i] - 1);  // rlen
+            for (uint64_t idx_j = 0; idx_j < data.read_length_arr[idx_i]; idx_j++) {
                 raw_au.get(core::gen_sub::kUnalignedReads)
                     .push(GetAlphabetProperties(core::AlphabetId::kAcgtn)
-                              .inverseLut[data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
+                              .inverseLut[data.unaligned_arr[data.pos_arr[idx_i] + idx_j]]);  // ureads
             }
             raw_au.get(core::gen_sub::kPositionFirst).push(seq_end - prevpos);  // pos
             raw_au.get(core::gen_sub::kReverseComplement).push(0);                              // rcomp
-            raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[i] - 1);     // rlen
+            raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[idx_i] - 1);     // rlen
             raw_au.get(core::gen_sub::kRtype).push(1);                              // rtype = P
             prevpos = seq_end;
-            seq_end = prevpos + data.read_length_arr[i];
+            seq_end = prevpos + data.read_length_arr[idx_i];
         }
     }
 }
@@ -263,7 +263,7 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
             num_noise_in_curr_read++;
             f_noise.get(noise_char);
         }
-        for (uint16_t i = 0; i < num_noise_in_curr_read; i++) {
+        for (uint16_t idx_i = 0; idx_i < num_noise_in_curr_read; idx_i++) {
             f_noisepos.read(reinterpret_cast<char *>(&noisepos), sizeof(uint16_t));
             data->noisepos_arr[current_pos_noisepos_arr] = noisepos;
             current_pos_noisepos_arr++;
@@ -289,14 +289,14 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     std::ifstream f_unaligned(file_unaligned, std::ios::binary);
     std::string unaligned_read;
     uint64_t pos_in_unaligned_arr = 0;
-    for (uint32_t i = 0; i < num_reads_unaligned; i++) {
+    for (uint32_t idx_i = 0; idx_i < num_reads_unaligned; idx_i++) {
         read_dnaN_from_bits(unaligned_read, f_unaligned);
         std::memcpy(data->unaligned_arr.data() + pos_in_unaligned_arr, &unaligned_read[0], unaligned_read.size());
         pos_in_unaligned_arr += unaligned_read.size();
     }
     f_unaligned.close();
     uint64_t current_pos_in_unaligned_arr = 0;
-    for (uint32_t i = 0; i < num_reads_unaligned; i++) {
+    for (uint32_t idx_i = 0; idx_i < num_reads_unaligned; idx_i++) {
         f_readlength.read(reinterpret_cast<char *>(&read_length), sizeof(uint16_t));
         data->read_length_arr[order] = read_length;
         data->pos_arr[order] = current_pos_in_unaligned_arr;
@@ -403,7 +403,7 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
             num_noise_in_curr_read++;
             f_noise.get(noise_char);
         }
-        for (uint16_t i = 0; i < num_noise_in_curr_read; i++) {
+        for (uint16_t idx_i = 0; idx_i < num_noise_in_curr_read; idx_i++) {
             f_noisepos.read(reinterpret_cast<char *>(&noisepos), sizeof(uint16_t));
             data->noisepos_arr[current_pos_noisepos_arr] = noisepos;
             current_pos_noisepos_arr++;
@@ -428,7 +428,7 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     std::ifstream f_unaligned(file_unaligned, std::ios::binary);
     std::string unaligned_read;
     uint64_t pos_in_unaligned_arr = 0;
-    for (uint32_t i = 0; i < num_reads_unaligned; i++) {
+    for (uint32_t idx_i = 0; idx_i < num_reads_unaligned; idx_i++) {
         read_dnaN_from_bits(unaligned_read, f_unaligned);
         std::memcpy(data->unaligned_arr.data() + pos_in_unaligned_arr, &unaligned_read[0], unaligned_read.size());
         pos_in_unaligned_arr += unaligned_read.size();
@@ -436,7 +436,7 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     f_unaligned.close();
 
     uint64_t current_pos_in_unaligned_arr = 0;
-    for (uint32_t i = 0; i < num_reads_unaligned; i++) {
+    for (uint32_t idx_i = 0; idx_i < num_reads_unaligned; idx_i++) {
         f_order.read(reinterpret_cast<char *>(&order), sizeof(uint32_t));
         data->order_arr[ind++] = order;
         f_readlength.read(reinterpret_cast<char *>(&read_length), sizeof(uint16_t));
@@ -486,8 +486,8 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
     std::vector<bool> already_seen(data.cp.num_reads, false);
     std::vector<uint32_t> to_push_at_end_of_block;
 
-    for (uint32_t i = 0; i < data.cp.num_reads; i++) {
-        uint32_t current = data.order_arr[i];
+    for (uint32_t idx_i = 0; idx_i < data.cp.num_reads; idx_i++) {
+        uint32_t current = data.order_arr[idx_i];
         if (num_records_current_block == 0) {
             // first read of block
             if (!data.flag_arr[current])
@@ -543,19 +543,19 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
                     current_block_seq_end = uint32_t(data.pos_arr[current] + data.read_length_arr[current]);
             }
         }
-        if (num_records_current_block == data.cp.num_reads_per_block || i == data.cp.num_reads - 1) {
+        if (num_records_current_block == data.cp.num_reads_per_block || idx_i == data.cp.num_reads - 1) {
             // block done
             // put in the reads in to_push_at_end_of_block vector and clear the vector
-            for (uint32_t j : to_push_at_end_of_block) {
-                bdata->block_num[j] = current_block_num;
-                bdata->genomic_record_index[j] = num_records_current_block++;
-                bdata->read_index_genomic_record.push_back(j);
+            for (uint32_t idx_j : to_push_at_end_of_block) {
+                bdata->block_num[idx_j] = current_block_num;
+                bdata->genomic_record_index[idx_j] = num_records_current_block++;
+                bdata->read_index_genomic_record.push_back(idx_j);
             }
             to_push_at_end_of_block.clear();
             bdata->block_end.push_back(bdata->block_start.back() + num_records_current_block);
             bdata->block_seq_end.push_back(current_block_seq_end);
 
-            if (i != data.cp.num_reads - 1) {
+            if (idx_i != data.cp.num_reads - 1) {
                 // start new block
                 num_records_current_block = 0;
                 current_block_num++;
@@ -584,10 +584,10 @@ void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata
     // store block start and end positions (differs from the block_start and end
     // because here we measure in terms of quality values rather than records
     uint32_t quality_block_pos = 0;
-    for (uint32_t i = 0; i < bdata.block_start.size(); i++) {
+    for (uint32_t idx_i = 0; idx_i < bdata.block_start.size(); idx_i++) {
         f_blocks_quality.write(reinterpret_cast<char *>(&quality_block_pos), sizeof(uint32_t));
-        for (uint32_t j = bdata.block_start[i]; j < bdata.block_end[i]; j++) {
-            uint32_t current = bdata.read_index_genomic_record[j];
+        for (uint32_t idx_j = bdata.block_start[idx_i]; idx_j < bdata.block_end[idx_i]; idx_j++) {
+            uint32_t current = bdata.read_index_genomic_record[idx_j];
             uint32_t pair = (current < num_reads / 2) ? (current + num_reads / 2) : (current - num_reads / 2);
             if ((bdata.block_num[current] == bdata.block_num[pair]) &&
                 (bdata.genomic_record_index[pair] == bdata.genomic_record_index[current])) {
@@ -610,13 +610,13 @@ void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata
     std::ofstream f_blocks_id(file_blocks_id, std::ios::binary);
     // store block start and end positions (measured in terms of records since 1
     // record = 1 id)
-    for (uint32_t i = 0; i < bdata.block_start.size(); i++) {
-        f_blocks_id.write(reinterpret_cast<const char *>(&bdata.block_start[i]), sizeof(uint32_t));
-        f_blocks_id.write(reinterpret_cast<const char *>(&bdata.block_end[i]), sizeof(uint32_t));
-        std::ofstream f_order_id(file_order_id + "." + std::to_string(i), std::ios::binary);
+    for (uint32_t idx_i = 0; idx_i < bdata.block_start.size(); idx_i++) {
+        f_blocks_id.write(reinterpret_cast<const char *>(&bdata.block_start[idx_i]), sizeof(uint32_t));
+        f_blocks_id.write(reinterpret_cast<const char *>(&bdata.block_end[idx_i]), sizeof(uint32_t));
+        std::ofstream f_order_id(file_order_id + "." + std::to_string(idx_i), std::ios::binary);
         // store order
-        for (uint32_t j = bdata.block_start[i]; j < bdata.block_end[i]; j++) {
-            uint32_t current = bdata.read_index_genomic_record[j];
+        for (uint32_t idx_j = bdata.block_start[idx_i]; idx_j < bdata.block_end[idx_i]; idx_j++) {
+            uint32_t current = bdata.read_index_genomic_record[idx_j];
             uint32_t pair = (current < num_reads / 2) ? (current + num_reads / 2) : (current - num_reads / 2);
             // just write the min of current and pair
             uint32_t min_index = (current > pair) ? pair : current;
@@ -655,19 +655,19 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
         // not all unaligned
         raw_au.get(core::gen_sub::kReadLength).push(seq_end - seq_start - 1);  // rlen
         raw_au.get(core::gen_sub::kRtype).push(5);                       // rtype
-        for (uint64_t i = seq_start; i < seq_end; i++)
+        for (uint64_t idx_i = seq_start; idx_i < seq_end; idx_i++)
             raw_au.get(core::gen_sub::kUnalignedReads)
-                .push(GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut[data.seq[i]]);  // ureads
+                .push(GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut[data.seq[idx_i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
-    for (uint32_t i = bdata.block_start[cur_block_num]; i < bdata.block_end[cur_block_num]; i++) {
-        uint32_t current = bdata.read_index_genomic_record[i];
+    for (uint32_t idx_i = bdata.block_start[cur_block_num]; idx_i < bdata.block_end[cur_block_num]; idx_i++) {
+        uint32_t current = bdata.read_index_genomic_record[idx_i];
         uint32_t pair =
             (current < data.cp.num_reads / 2) ? (current + data.cp.num_reads / 2) : (current - data.cp.num_reads / 2);
 
         if (data.flag_arr[current] == true) {
-            if (i == bdata.block_start[cur_block_num]) {
+            if (idx_i == bdata.block_start[cur_block_num]) {
                 // Note: In order non-preserving mode, if the first read of
                 // the block is a singleton, then the rest are too.
                 raw_au.get(core::gen_sub::kPositionFirst).push(0);  // pos
@@ -686,15 +686,15 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                 raw_au.get(core::gen_sub::kRtype).push(5);  // rtype
                 raw_au.get(core::gen_sub::kReadLength)
                     .push(data.read_length_arr[current] + data.read_length_arr[pair] - 1);  // rlen
-                for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
+                for (uint64_t idx_j = 0; idx_j < data.read_length_arr[current]; idx_j++) {
                     raw_au.get(core::gen_sub::kUnalignedReads)
                         .push(GetAlphabetProperties(core::AlphabetId::kAcgtn)
-                                  .inverseLut[data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
+                                  .inverseLut[data.unaligned_arr[data.pos_arr[current] + idx_j]]);  // ureads
                 }
-                for (uint64_t j = 0; j < data.read_length_arr[pair]; j++) {
+                for (uint64_t idx_j = 0; idx_j < data.read_length_arr[pair]; idx_j++) {
                     raw_au.get(core::gen_sub::kUnalignedReads)
                         .push(GetAlphabetProperties(core::AlphabetId::kAcgtn)
-                                  .inverseLut[data.unaligned_arr[data.pos_arr[pair] + j]]);  // ureads
+                                  .inverseLut[data.unaligned_arr[data.pos_arr[pair] + idx_j]]);  // ureads
                 }
                 raw_au.get(core::gen_sub::kPositionFirst).push(seq_end - prevpos);     // pos
                 raw_au.get(core::gen_sub::kReverseComplement).push(0);                                 // rcomp
@@ -718,22 +718,22 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                     raw_au.get(core::gen_sub::kRtype).push(1);  // rtype = P
                 } else {
                     raw_au.get(core::gen_sub::kRtype).push(3);  // rtype = M
-                    for (int k = 0; k < 2; k++) {
-                        uint32_t index = k ? pair : current;
+                    for (int idx_k = 0; idx_k < 2; idx_k++) {
+                        uint32_t index = idx_k ? pair : current;
                         uint16_t curr_noise_pos = 0;
-                        for (uint16_t j = 0; j < data.noise_len_arr[index]; j++) {
-                            curr_noise_pos += data.noisepos_arr[data.pos_in_noise_arr[index] + j];
+                        for (uint16_t idx_j = 0; idx_j < data.noise_len_arr[index]; idx_j++) {
+                            curr_noise_pos += data.noisepos_arr[data.pos_in_noise_arr[index] + idx_j];
                             raw_au.get(core::gen_sub::kMismatchPosTerminator).push(0);  // mmpos
-                            if (j == 0)
+                            if (idx_j == 0)
                                 raw_au.get(core::gen_sub::kMismatchPosDelta)
-                                    .push(data.noisepos_arr[data.pos_in_noise_arr[index] + j]);  // mmpos
+                                    .push(data.noisepos_arr[data.pos_in_noise_arr[index] + idx_j]);  // mmpos
                             else
                                 raw_au.get(core::gen_sub::kMismatchPosDelta)
-                                    .push(data.noisepos_arr[data.pos_in_noise_arr[index] + j] - 1);  // mmpos
+                                    .push(data.noisepos_arr[data.pos_in_noise_arr[index] + idx_j] - 1);  // mmpos
                             raw_au.get(core::gen_sub::kMismatchType).push(0);  // mmtype = Substitution
                             raw_au.get(core::gen_sub::kMismatchTypeSubstBase)
                                 .push(GetAlphabetProperties(core::AlphabetId::kAcgtn)
-                                          .inverseLut[data.noise_arr[data.pos_in_noise_arr[index] + j]]);
+                                          .inverseLut[data.noise_arr[data.pos_in_noise_arr[index] + idx_j]]);
                             raw_au.pushDependency(core::gen_sub::kMismatchTypeSubstBase,
                                                   GetAlphabetProperties(core::AlphabetId::kAcgtn)
                                                       .inverseLut[data.seq[data.pos_arr[index] + curr_noise_pos]]);
@@ -757,19 +757,19 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                 } else {
                     raw_au.get(core::gen_sub::kRtype).push(3);  // rtype = M
                     uint16_t curr_noise_pos = 0;
-                    for (uint16_t j = 0; j < data.noise_len_arr[current]; j++) {
-                        curr_noise_pos += data.noisepos_arr[data.pos_in_noise_arr[current] + j];
+                    for (uint16_t idx_j = 0; idx_j < data.noise_len_arr[current]; idx_j++) {
+                        curr_noise_pos += data.noisepos_arr[data.pos_in_noise_arr[current] + idx_j];
                         raw_au.get(core::gen_sub::kMismatchPosTerminator).push(0);  // mmpos
-                        if (j == 0)
+                        if (idx_j == 0)
                             raw_au.get(core::gen_sub::kMismatchPosDelta)
-                                .push(data.noisepos_arr[data.pos_in_noise_arr[current] + j]);  // mmpos
+                                .push(data.noisepos_arr[data.pos_in_noise_arr[current] + idx_j]);  // mmpos
                         else
                             raw_au.get(core::gen_sub::kMismatchPosDelta)
-                                .push(data.noisepos_arr[data.pos_in_noise_arr[current] + j] - 1);  // mmpos
+                                .push(data.noisepos_arr[data.pos_in_noise_arr[current] + idx_j] - 1);  // mmpos
                         raw_au.get(core::gen_sub::kMismatchType).push(0);  // mmtype = Substitution
                         raw_au.get(core::gen_sub::kMismatchTypeSubstBase)
                             .push(GetAlphabetProperties(core::AlphabetId::kAcgtn)
-                                      .inverseLut[data.noise_arr[data.pos_in_noise_arr[current] + j]]);
+                                      .inverseLut[data.noise_arr[data.pos_in_noise_arr[current] + idx_j]]);
                         raw_au.pushDependency(core::gen_sub::kMismatchTypeSubstBase,
                                               GetAlphabetProperties(core::AlphabetId::kAcgtn)
                                                   .inverseLut[data.seq[data.pos_arr[current] + curr_noise_pos]]);
@@ -779,10 +779,10 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
             } else {
                 raw_au.get(core::gen_sub::kRtype).push(5);                                 // rtype
                 raw_au.get(core::gen_sub::kReadLength).push(data.read_length_arr[current] - 1);  // rlen
-                for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
+                for (uint64_t idx_j = 0; idx_j < data.read_length_arr[current]; idx_j++) {
                     raw_au.get(core::gen_sub::kUnalignedReads)
                         .push(GetAlphabetProperties(core::AlphabetId::kAcgtn)
-                                  .inverseLut[data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
+                                  .inverseLut[data.unaligned_arr[data.pos_arr[current] + idx_j]]);  // ureads
                 }
                 raw_au.get(core::gen_sub::kPositionFirst).push(seq_end - prevpos);     // pos
                 raw_au.get(core::gen_sub::kReverseComplement).push(0);                                 // rcomp

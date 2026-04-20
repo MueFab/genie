@@ -45,7 +45,7 @@ std::string LocalReference::preprocess(const std::string &read, const std::strin
         }
         switch (cigar_pos) {
             case '=':
-                for (size_t i = 0; i < count; ++i) {
+                for (size_t idx_i = 0; idx_i < count; ++idx_i) {
                     if (read_pos >= read.length()) {
                         UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
                     }
@@ -65,7 +65,7 @@ std::string LocalReference::preprocess(const std::string &read, const std::strin
             case '*':
             case '/':
             case '%':
-                for (size_t i = 0; i < count; ++i) {
+                for (size_t idx_i = 0; idx_i < count; ++idx_i) {
                     result += '0';
                 }
                 break;
@@ -129,8 +129,8 @@ void LocalReference::addRead(const core::record::Record &s) {
 
 std::string LocalReference::generateRef(uint32_t offset, uint32_t len) {
     std::string ref;
-    for (uint32_t i = offset; i < offset + len; ++i) {
-        ref += majorityVote(i);
+    for (uint32_t idx_i = offset; idx_i < offset + len; ++idx_i) {
+        ref += majorityVote(idx_i);
     }
     return ref;
 }
@@ -192,10 +192,10 @@ char LocalReference::majorityVote(uint32_t abs_position) {
     std::map<char, uint16_t> votes;
 
     // Collect all alignments
-    for (size_t i = 0; i < sequences.size(); ++i) {
-        int64_t distance = abs_position - sequence_positions[i];
-        if (distance >= 0 && uint64_t(distance) < sequences[i].length()) {
-            char c = sequences[i][distance];
+    for (size_t idx_i = 0; idx_i < sequences.size(); ++idx_i) {
+        int64_t distance = abs_position - sequence_positions[idx_i];
+        if (distance >= 0 && uint64_t(distance) < sequences[idx_i].length()) {
+            char c = sequences[idx_i][distance];
             if (c != '0') {
                 votes[c]++;
             }
@@ -224,12 +224,12 @@ char LocalReference::majorityVote(uint32_t abs_position) {
 void LocalReference::printWindow() const {
     uint64_t minPos = getWindowBorder();
 
-    for (size_t i = 0; i < sequences.size(); ++i) {
-        uint64_t totalOffset = sequence_positions[i] - minPos;
+    for (size_t idx_i = 0; idx_i < sequences.size(); ++idx_i) {
+        uint64_t totalOffset = sequence_positions[idx_i] - minPos;
         for (size_t s = 0; s < totalOffset; ++s) {
             std::cerr << ".";
         }
-        std::cerr << sequences[i] << std::endl;
+        std::cerr << sequences[idx_i] << std::endl;
     }
 }
 

@@ -43,20 +43,20 @@ void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
     // suffix attached when paired end data but only one output fastq file
     bool second_read_flag = false;  // true when we are handling second read
 
-    for (const auto &i : data.getData()) {
+    for (const auto &idx_i : data.getData()) {
         auto file_ptr = file.data();
         second_read_flag = false;
-        if (!i.isRead1First()) {
+        if (!idx_i.isRead1First()) {
             second_read_flag = true;
             if (num_files == 2) file_ptr = &file.back();
         }
-        for (const auto &rec : i.getSegments()) {
+        for (const auto &rec : idx_i.getSegments()) {
             // ID
-            size_name += i.getName().size();
+            size_name += idx_i.getName().size();
             constexpr const char *ID_TOKEN = "@";
             (*file_ptr)->write(ID_TOKEN, 1);
-            (*file_ptr)->write(i.getName().c_str(), i.getName().length());
-            if (i.getNumberOfTemplateSegments() == 2 && num_files == 1)
+            (*file_ptr)->write(idx_i.getName().c_str(), idx_i.getName().length());
+            if (idx_i.getNumberOfTemplateSegments() == 2 && num_files == 1)
                 (*file_ptr)->write(readname_suffix[second_read_flag], 2);
             (*file_ptr)->write("\n", 1);
 
@@ -83,7 +83,7 @@ void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
             (*file_ptr)->write("\n", 1);
             second_read_flag = !second_read_flag;
             if (num_files == 2) {
-                if (i.isRead1First()) {
+                if (idx_i.isRead1First()) {
                     file_ptr++;
                 } else {
                     file_ptr--;

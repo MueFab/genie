@@ -60,7 +60,7 @@ ContactMatrixParameters::ContactMatrixParameters(
 
 ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     auto num_samples = reader.ReadAlignedInt<uint16_t>();
-    for (uint16_t i = 0; i<num_samples; i++){
+    for (uint16_t idx_i = 0; idx_i<num_samples; idx_i++){
         auto ID = reader.ReadAlignedInt<uint16_t>();
 
         std::string name;
@@ -76,7 +76,7 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     }
 
     auto num_chrs = reader.ReadAlignedInt<uint8_t>();
-    for (uint8_t i = 0; i<num_chrs; i++){
+    for (uint8_t idx_i = 0; idx_i<num_chrs; idx_i++){
         auto ID = reader.ReadAlignedInt<uint8_t>();
         std::string name;
         name.resize(reader.ReadAlignedInt<uint8_t>());
@@ -95,12 +95,12 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     bin_size_ = reader.ReadAlignedInt<uint32_t>();
     tile_size_ = reader.ReadAlignedInt<uint32_t>();
     auto num_interval_mults = reader.ReadAlignedInt<uint8_t>();
-    for (uint8_t i = 0; i<num_interval_mults; i++){
+    for (uint8_t idx_i = 0; idx_i<num_interval_mults; idx_i++){
       bin_size_multipliers_.push_back(reader.ReadAlignedInt<uint32_t>());
     }
 
     auto num_norm_methods = reader.ReadAlignedInt<uint8_t>();
-    for (uint8_t i = 0; i<num_norm_methods; i++){
+    for (uint8_t idx_i = 0; idx_i<num_norm_methods; idx_i++){
         auto ID = reader.ReadAlignedInt<uint8_t>();
         std::string name;
         name.resize(reader.ReadAlignedInt<uint8_t>());
@@ -117,7 +117,7 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     }
 
     auto num_norm_matrices = reader.ReadAlignedInt<uint8_t>();
-    for (uint8_t i = 0; i<num_norm_matrices; i++){
+    for (uint8_t idx_i = 0; idx_i<num_norm_matrices; idx_i++){
         auto ID = reader.ReadAlignedInt<uint8_t>();
         std::string name;
         name.resize(reader.ReadAlignedInt<uint8_t>());
@@ -132,7 +132,7 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     }
 
 //    auto num_scm = reader.ReadAlignedInt<uint16_t>();
-//    for (uint16_t i = 0; i<num_scm; i++){
+//    for (uint16_t idx_i = 0; idx_i<num_scm; idx_i++){
 //        auto chr1_ID_ = reader.ReadAlignedInt<uint8_t>();
 //        auto chr2_ID_ = reader.ReadAlignedInt<uint8_t>();
 

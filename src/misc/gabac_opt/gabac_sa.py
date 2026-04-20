@@ -29,8 +29,8 @@ class SimulatedAnnealingForGabac(object):
     
     Pseudo-code:
         Let s = s0  -- initial state
-        For k = 0 through kmax (exclusive):
-            T ← temperature(k , kmax)
+        For idx_k = 0 through kmax (exclusive):
+            T ← temperature(idx_k , kmax)
             Pick a random neighbour state , s_next ← neighbour(s)
             ∆E ← E(s) - E(s_next) 
             If P(∆E , T) ≥ random(0, 1), move to the new state:
@@ -98,9 +98,9 @@ class SimulatedAnnealingForGabac(object):
 
     def _temperature(
             self,
-            k,
+            idx_k,
     ):
-        return (1 - k / self.kmax) * self.kt
+        return (1 - idx_k / self.kmax) * self.kt
 
     def start(self):
         s = self.s0
@@ -111,8 +111,8 @@ class SimulatedAnnealingForGabac(object):
         best_el = el
         best_E = E
 
-        for k in range(self.kmax):
-            T = self._temperature(k)
+        for idx_k in range(self.kmax):
+            T = self._temperature(idx_k)
 
             while True:
                 new_s = self.gc.mutate_nparams(s, nparams=self.mutation_nparam)
@@ -138,15 +138,15 @@ class SimulatedAnnealingForGabac(object):
 
             dE = new_E - E
 
-            self.result[k + 1, 0] = enc_length
-            self.result[k + 1, 3] = new_E
-            self.result[k + 1, 6] = enc_time
-            self.result[k + 1, 7] = enc_time + self.result[k, 7]
+            self.result[idx_k + 1, 0] = enc_length
+            self.result[idx_k + 1, 3] = new_E
+            self.result[idx_k + 1, 6] = enc_time
+            self.result[idx_k + 1, 7] = enc_time + self.result[idx_k, 7]
 
             if dE > 0.0:
                 if self.verbose:
                     print('E{:3d}: {:.3f} dE {:.02e} T {:.2e} '.format(
-                        k, new_E, dE, T
+                        idx_k, new_E, dE, T
                     ), end='')
 
                 if np.exp(-dE / T) > random.random():
@@ -169,30 +169,30 @@ class SimulatedAnnealingForGabac(object):
             else:
                 if self.verbose:
                     print('E{:3d}: {:.3f} dE {:.02e} (<) '.format(
-                        k, new_E, dE
+                        idx_k, new_E, dE
                     ))
 
                 s = new_s
                 el = enc_length
                 E = new_E
 
-            self.result[k + 1, 1] = el
-            self.result[k + 1, 4] = E
+            self.result[idx_k + 1, 1] = el
+            self.result[idx_k + 1, 4] = E
 
             if E < best_E:
                 best_s = s
                 best_el = el
                 best_E = E
 
-            self.result[k + 1, 2] = best_el
-            self.result[k + 1, 5] = best_E
+            self.result[idx_k + 1, 2] = best_el
+            self.result[idx_k + 1, 5] = best_E
 
         return best_s, best_E
 
     def show_plot(self):
         plt.plot(np.arange(self.kmax + 1), self.result[:, 3], 'b')
         plt.plot(np.arange(self.kmax + 1), self.result[:, 4], 'r')
-        plt.plot(np.arange(self.kmax + 1), self.result[:, 5], 'k')
+        plt.plot(np.arange(self.kmax + 1), self.result[:, 5], 'idx_k')
         plt.show()
 
     def result_as_csv(self, path, filename):

@@ -36,7 +36,7 @@ void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
 
         std::vector<uint32_t> arrayDims;
         arrayDims.push_back(static_cast<uint32_t>(rowInTile+1));
-        for (uint8_t i = 1; i < info.getArrayLength(); ++i) arrayDims.push_back(static_cast<uint32_t>(2));
+        for (uint8_t idx_i = 1; idx_i < info.getArrayLength(); ++idx_i) arrayDims.push_back(static_cast<uint32_t>(2));
         typedTiles.emplace_back(info.getAttributeType(), info.getArrayLength(), arrayDims);
         tiles.emplace_back("");
         writers.emplace_back(&tiles.back());
@@ -50,7 +50,7 @@ void AttributeTile::writeMissing() {
     auto defaultType = info.getAttributeType();
     auto defaultValue = def.getDefaultValue(defaultType);
     std::vector<std::vector<uint8_t>> value;
-    for (uint8_t i = 0; i < info.getArrayLength(); ++i) value.emplace_back(def.toArray(defaultType, defaultValue));
+    for (uint8_t idx_i = 0; idx_i < info.getArrayLength(); ++idx_i) value.emplace_back(def.toArray(defaultType, defaultValue));
     write(value);
 }
 
@@ -61,10 +61,10 @@ std::vector<std::stringstream> AttributeTile::convertTilesToTypedData() {
     uint8_t numArrayDims = info.getArrayLength();
     std::vector<uint32_t> arrayDims;
     arrayDims.push_back(static_cast<uint32_t>(rowInTile));
-    for (uint8_t i = 1; i < numArrayDims; ++i) arrayDims.push_back(static_cast<uint32_t>(2));
+    for (uint8_t idx_i = 1; idx_i < numArrayDims; ++idx_i) arrayDims.push_back(static_cast<uint32_t>(2));
 
     for (auto& tile : tiles) {
-        genie::core::record::annotation_access_unit::TypedData typedData(TypeId, numArrayDims, arrayDims);
+        genie::core::access_unit::annotation::TypedData typedData(TypeId, numArrayDims, arrayDims);
         util::BitReader reader(tile);
         typedData.convertToTypedData(reader);
         TypedTiles.emplace_back("");
@@ -83,7 +83,7 @@ void AttributeTile::AddFirst() {
     if (typedTiles.empty()) {
         std::vector<uint32_t> arrayDims;
         arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
-        for (uint8_t i = 1; i < info.getArrayLength(); ++i) arrayDims.push_back(static_cast<uint32_t>(2));
+        for (uint8_t idx_i = 1; idx_i < info.getArrayLength(); ++idx_i) arrayDims.push_back(static_cast<uint32_t>(2));
         typedTiles.emplace_back(info.getAttributeType(), info.getArrayLength(), arrayDims);
     }
 }

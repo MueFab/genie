@@ -12,11 +12,11 @@
 
 #include <tuple>
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/access_unit.h"
 #include "genie/core/module.h"
 #include "genie/core/parameter/descriptor_present/decoder.h"
-#include "genie/core/record/annotation_access_unit/record.h"
-#include "genie/core/record/annotation_parameter_set/record.h"
+#include "genie/core/access_unit/annotation/record.h"
+#include "genie/core/parameter/annotation/record.h"
 
 // -----------------------------------------------------------------------------
 
@@ -25,8 +25,8 @@ namespace genie::core {
 class EntropyEncoderAnnotation {
  public:
     virtual ~EntropyEncoderAnnotation() = default;
-    virtual core::record::annotation_access_unit::Record process(
-        core::record::annotation_parameter_set::DescriptorConfiguration& desc) = 0;
+    virtual core::access_unit::annotation::Record process(
+        core::parameter::annotation::DescriptorConfiguration& desc) = 0;
 };
 
 /**

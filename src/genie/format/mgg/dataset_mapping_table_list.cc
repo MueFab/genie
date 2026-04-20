@@ -42,7 +42,7 @@ DataSetMappingTableList::DataSetMappingTableList(util::BitReader& reader) {
     auto length = reader.readBypassBE<uint64_t>();
     dataset_group_ID = reader.readBypassBE<uint8_t>();
     size_t num_SIDs = (length - 13) / 2;
-    for (size_t i = 0; i < num_SIDs; ++i) {
+    for (size_t idx_i = 0; idx_i < num_SIDs; ++idx_i) {
         dataset_mapping_table_SID.emplace_back(reader.readBypassBE<uint16_t>());
     }
     UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");

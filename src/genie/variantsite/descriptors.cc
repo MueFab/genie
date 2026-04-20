@@ -34,8 +34,8 @@ void Descriptors::write(genie::core::record::variant_site::Record variantSite) {
     const auto& altArray = variantSite.GetAlt();
     // look for <DEL>
     bool foundDel = false;
-    for (auto i = 0; i < variantSite.GetAltCount(); ++i) {
-        const auto& altern = altArray[i];
+    for (auto idx_i = 0; idx_i < variantSite.GetAltCount(); ++idx_i) {
+        const auto& altern = altArray[idx_i];
         if (!altern.find("<DEL>")) {
             foundDel = true;
         }
@@ -43,12 +43,12 @@ void Descriptors::write(genie::core::record::variant_site::Record variantSite) {
 
   std::vector<uint8_t> altern;
   if (!foundDel) {
-    for (auto i = 0; i < variantSite.GetAltCount(); ++i) {
-      const auto& altString = altArray[i];
+    for (auto idx_i = 0; idx_i < variantSite.GetAltCount(); ++idx_i) {
+      const auto& altString = altArray[idx_i];
       for (const auto& alt : altString) {
         altern.emplace_back(AlternTranslate(alt));
       }
-      if (i + 1 < variantSite.GetAltCount()) altern.emplace_back(alternEndLine);
+      if (idx_i + 1 < variantSite.GetAltCount()) altern.emplace_back(alternEndLine);
     }
   }
   altern.emplace_back(alternEnd);

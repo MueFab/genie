@@ -1,0 +1,133 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <cstdint>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/core/constants.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+
+#include "genie/core/arrayType.h"
+#include "genie/core/parameter/annotation/algorithm_parameters.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+namespace genie {
+namespace core {
+namespace parameter {
+namespace annotation {
+AlgorithmParameters::AlgorithmParameters()
+    : n_pars(0), par_ID{}, par_type{}, par_num_array_dims{}, par_array_dims{}, par_val{} {}
+
+AlgorithmParameters::AlgorithmParameters(util::BitReader& reader) { read(reader); }
+
+AlgorithmParameters::AlgorithmParameters(
+    uint8_t n_pars, std::vector<uint8_t> par_ID, std::vector<core::DataType> par_type,
+    std::vector<uint8_t> par_num_array_dims, std::vector<std::vector<uint8_t>> par_array_dims,
+    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val)
+    : n_pars(n_pars),
+      par_ID(par_ID),
+      par_type(par_type),
+      par_num_array_dims(par_num_array_dims),
+      par_array_dims(par_array_dims),
+      par_val(par_val) {}
+
+void AlgorithmParameters::read(util::BitReader& reader) {
+    par_val.resize(0);
+
+    n_pars = static_cast<uint8_t>(reader.ReadBits(4));
+    par_array_dims.resize(n_pars);
+    par_ID.resize(n_pars);
+    par_type.resize(n_pars);
+    par_num_array_dims.resize(n_pars);
+
+    ArrayType types;
+
+    for (auto idx_i = 0; idx_i < n_pars; ++idx_i) {
+        par_ID[idx_i] = (static_cast<uint8_t>(reader.ReadBits(4)));
+        par_type[idx_i] = (static_cast<core::DataType>(reader.ReadBits(8)));
+        par_num_array_dims[idx_i] = (static_cast<uint8_t>(reader.ReadBits(2)));
+        for (auto idx_j = 0; idx_j < par_num_array_dims[idx_i]; ++idx_j) {
+            par_array_dims[idx_i].push_back(static_cast<uint8_t>(reader.ReadBits(8)));
+        }
+        par_val.emplace_back(resizeVector(par_num_array_dims[idx_i], par_array_dims[idx_i]));
+        for (auto& d1 : par_val[idx_i])
+            for (auto& d2 : d1)
+                for (auto& d3 : d2) d3 = types.toArray(par_type[idx_i], reader);
+    }
+}
+
+void AlgorithmParameters::write(core::Writer& writer) const {
+    ArrayType types;
+    writer.Write(n_pars, 4);
+    for (auto idx_i = 0; idx_i < n_pars; ++idx_i) {
+      writer.Write(par_ID[idx_i], 4);
+        writer.Write(static_cast<uint8_t>(par_type[idx_i]), 8);
+        writer.Write(par_num_array_dims[idx_i], 2);
+        for (auto idx_j = 0; idx_j < par_num_array_dims[idx_i]; ++idx_j) {
+          writer.Write(par_array_dims[idx_i][idx_j], 8);
+        }
+        for (auto idx_j : par_val[idx_i])
+            for (auto idx_k : idx_j)
+                for (auto l : idx_k) types.toFile(par_type[idx_i], l, writer);
+    }
+}
+
+void AlgorithmParameters::write(util::BitWriter& writer) const {
+  ArrayType types;
+  writer.WriteBits(n_pars, 4);
+  for (auto idx_i = 0; idx_i < n_pars; ++idx_i) {
+    writer.WriteBits(par_ID[idx_i], 4);
+    writer.WriteBits(static_cast<uint8_t>(par_type[idx_i]), 8);
+    writer.WriteBits(par_num_array_dims[idx_i], 2);
+    for (auto idx_j = 0; idx_j < par_num_array_dims[idx_i]; ++idx_j) {
+      writer.WriteBits(par_array_dims[idx_i][idx_j], 8);
+    }
+    for (auto idx_j : par_val[idx_i])
+      for (auto idx_k : idx_j)
+        for (auto l : idx_k) types.toFile(par_type[idx_i], l, writer);
+  }
+}
+
+size_t AlgorithmParameters::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.GetBitsWritten();
+}
+
+std::vector<std::vector<std::vector<std::vector<uint8_t>>>> AlgorithmParameters::resizeVector(
+    uint8_t num_array_dims, std::vector<uint8_t> array_dims) {
+    if (num_array_dims > array_dims.size()) return std::vector<std::vector<std::vector<std::vector<uint8_t>>>>();
+    uint8_t idx_j = 1;
+    uint8_t idx_k = 1;
+    uint8_t l = 1;
+    if (array_dims.size() != 0) idx_j = array_dims.at(0) + 1;
+    if (num_array_dims > 0) idx_k = array_dims.at(1) + 1;
+    if (num_array_dims == 2) l = array_dims.at(2) + 1;
+
+    //      [idx_j]        [idx_k]         [l]      [type]
+    std::vector<std::vector<std::vector<std::vector<uint8_t>>>> temp(
+        idx_j, std::vector<std::vector<std::vector<uint8_t>>>(
+               idx_k, std::vector<std::vector<uint8_t>>(l, std::vector<uint8_t>())));
+    return temp;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace annotation
+}  // namespace parameter
+}  // namespace core
+}  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

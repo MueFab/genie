@@ -50,18 +50,18 @@ std::string buildcontig(std::list<contig_reads> &current_contig, const uint32_t 
         }
         count.insert(count.end(), to_insert, {0, 0, 0, 0});
         currentsize = currentsize + to_insert;
-        for (int64_t i = 0; i < (*current_contig_it).read_length; i++)
-            count[currentpos + i][chartolong[(uint8_t)(*current_contig_it).read[i]]] += 1;
+        for (int64_t idx_i = 0; idx_i < (*current_contig_it).read_length; idx_i++)
+            count[currentpos + idx_i][chartolong[(uint8_t)(*current_contig_it).read[idx_i]]] += 1;
     }
     std::string ref(count.size(), 'A');
-    for (size_t i = 0; i < count.size(); i++) {
+    for (size_t idx_i = 0; idx_i < count.size(); idx_i++) {
         int64_t max = 0, indmax = 0;
-        for (int64_t j = 0; j < 4; j++)
-            if (count[i][j] > max) {
-                max = count[i][j];
-                indmax = j;
+        for (int64_t idx_j = 0; idx_j < 4; idx_j++)
+            if (count[idx_i][idx_j] > max) {
+                max = count[idx_i][idx_j];
+                indmax = idx_j;
             }
-        ref[i] = longtochar[indmax];
+        ref[idx_i] = longtochar[indmax];
     }
     return ref;
 }
@@ -80,12 +80,12 @@ void writecontig(const std::string &ref, std::list<contig_reads> &current_contig
     for (; current_contig_it != current_contig.end(); ++current_contig_it) {
         currentpos = (int64_t)(*current_contig_it).pos;
         prevj = 0;
-        for (int64_t j = 0; j < (*current_contig_it).read_length; j++)
-            if ((*current_contig_it).read[j] != ref[currentpos + j]) {
-                f_noise << (*current_contig_it).read[j];
-                pos_var = (uint16_t)(j - prevj);
+        for (int64_t idx_j = 0; idx_j < (*current_contig_it).read_length; idx_j++)
+            if ((*current_contig_it).read[idx_j] != ref[currentpos + idx_j]) {
+                f_noise << (*current_contig_it).read[idx_j];
+                pos_var = (uint16_t)(idx_j - prevj);
                 f_noisepos.write(reinterpret_cast<char *>(&pos_var), sizeof(uint16_t));
-                prevj = j;
+                prevj = idx_j;
             }
         f_noise << "\n";
         abs_current_pos = abs_pos + currentpos;
@@ -126,22 +126,22 @@ void correct_order(uint32_t *order_s, const encoder_global &eg) {
     uint32_t numreads_total = eg.numreads + eg.numreads_s + eg.numreads_N;
     bool *read_flag_N = new bool[numreads_total]();
     // bool array indicating N reads
-    for (uint32_t i = 0; i < eg.numreads_N; i++) {
-        read_flag_N[order_s[eg.numreads_s + i]] = true;
+    for (uint32_t idx_i = 0; idx_i < eg.numreads_N; idx_i++) {
+        read_flag_N[order_s[eg.numreads_s + idx_i]] = true;
     }
 
     uint32_t *cumulative_N_reads = new uint32_t[eg.numreads + eg.numreads_s];
     // number of reads occuring before pos in clean reads
     uint32_t pos_in_clean = 0, num_N_reads_till_now = 0;
-    for (uint32_t i = 0; i < numreads_total; i++) {
-        if (read_flag_N[i] == true)
+    for (uint32_t idx_i = 0; idx_i < numreads_total; idx_i++) {
+        if (read_flag_N[idx_i] == true)
             num_N_reads_till_now++;
         else
             cumulative_N_reads[pos_in_clean++] = num_N_reads_till_now;
     }
 
     // First correct the order for singletons
-    for (uint32_t i = 0; i < eg.numreads_s; i++) order_s[i] += cumulative_N_reads[order_s[i]];
+    for (uint32_t idx_i = 0; idx_i < eg.numreads_s; idx_i++) order_s[idx_i] += cumulative_N_reads[order_s[idx_i]];
 
     // Now correct for clean reads (this is stored on file)
     for (int tid = 0; tid < eg.num_thr; tid++) {

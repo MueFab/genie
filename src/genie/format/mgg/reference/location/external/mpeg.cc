@@ -43,7 +43,7 @@ MPEG::MPEG(genie::util::BitReader& reader, size_t seq_count, genie::core::MpegMi
         reader.readBypass(ref_checksum);
     } else {
         ref_checksum.clear();
-        for (size_t i = 0; i < seq_count; ++i) {
+        for (size_t idx_i = 0; idx_i < seq_count; ++idx_i) {
             seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
             reader.readBypass(seq_checksums.back());
         }
@@ -63,7 +63,7 @@ MPEG::MPEG(genie::util::BitReader& reader, uint8_t _reserved, std::string _uri, 
         reader.readBypass(ref_checksum);
     } else {
         ref_checksum.clear();
-        for (size_t i = 0; i < seq_count; ++i) {
+        for (size_t idx_i = 0; idx_i < seq_count; ++idx_i) {
             seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
             reader.readBypass(seq_checksums.back());
         }

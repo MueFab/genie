@@ -85,7 +85,7 @@ if __name__ == "__main__":
     parser.add_argument('-a', '--algorithm', required=True, type=str,
                         help='Algorithm used for searching the best config')
     # parser.add_argument('--transform', required=True, type=int, help='Gabac Transform')
-    parser.add_argument('-i', '--input', required=True, type=str, help='Path to data')
+    parser.add_argument('-idx_i', '--input', required=True, type=str, help='Path to data')
     parser.add_argument('-r', '--result', required=True, type=str, help='Path to result')
 
     args = parser.parse_args()

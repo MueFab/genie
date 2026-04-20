@@ -136,7 +136,7 @@ VariantGenotype::VariantGenotype(util::BitReader& reader)
 
    // std::cout << "format_count...";
     auto format_count = reader.ReadAlignedInt<uint8_t>();
-    for (uint8_t i = 0; i < format_count; i++) {
+    for (uint8_t idx_i = 0; idx_i < format_count; idx_i++) {
         format_.emplace_back(reader, sample_count_);
     }
 
@@ -346,7 +346,7 @@ FormatField::FormatField(util::BitReader& bitreader, uint32_t _sample_count) : s
         for (auto& oneValue : formatArray) {
             oneValue = arrayType.toArray(type_, bitreader);
             //   oneValue = temp;
-            //   for (auto i = temp.size(); i > 0; --i) oneValue.at(i - 1) = temp.at(temp.size() - i);
+            //   for (auto idx_i = temp.size(); idx_i > 0; --idx_i) oneValue.at(idx_i - 1) = temp.at(temp.size() - idx_i);
         }
     }
 }

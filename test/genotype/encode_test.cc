@@ -15,7 +15,7 @@
 #include "genie/core/variant_genotype_record/record.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
-#include "genie/genotype/genotype_test_helpers.h"
+#include "genotype_test_helpers.h"
 #include "genie/util/bit_reader.h"
 #include "helpers.h"
 
@@ -44,11 +44,11 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
         genie::genotype::transform_max_value(allele_mat, no_ref_flag, not_avail_flag);
         ASSERT_FALSE(no_ref_flag);
         ASSERT_FALSE(not_avail_flag);
-        ASSERT_TRUE(genie::genotype::equal(allele_mat, orig_allele_mat));
+        ASSERT_TRUE(genie::backend::mats_equal(allele_mat, orig_allele_mat));
         ASSERT_TRUE(genie::genotype::amin(allele_mat) == 0);
 
         genie::genotype::inverse_transform_max_val(allele_mat, no_ref_flag, not_avail_flag);
-        ASSERT_TRUE(genie::genotype::equal(allele_mat, orig_allele_mat));
+        ASSERT_TRUE(genie::backend::mats_equal(allele_mat, orig_allele_mat));
         ASSERT_TRUE(genie::genotype::amin(allele_mat) == 0);
     }
 
@@ -64,11 +64,11 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
         genie::genotype::transform_max_value(allele_mat, no_ref_flag, not_avail_flag);
         ASSERT_TRUE(no_ref_flag);
         ASSERT_FALSE(not_avail_flag);
-        ASSERT_FALSE(genie::genotype::equal(allele_mat, orig_allele_mat));
+        ASSERT_FALSE(genie::backend::mats_equal(allele_mat, orig_allele_mat));
         ASSERT_TRUE(genie::genotype::amin(allele_mat) == 0);
 
         genie::genotype::inverse_transform_max_val(allele_mat, no_ref_flag, not_avail_flag);
-        ASSERT_TRUE(genie::genotype::equal(allele_mat, orig_allele_mat));
+        ASSERT_TRUE(genie::backend::mats_equal(allele_mat, orig_allele_mat));
         ASSERT_TRUE(genie::genotype::amin(allele_mat) == NO_REF_VAL);
     }
 
@@ -84,11 +84,11 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
         genie::genotype::transform_max_value(allele_mat, no_ref_flag, not_avail_flag);
         ASSERT_FALSE(no_ref_flag);
         ASSERT_TRUE(not_avail_flag);
-        ASSERT_FALSE(genie::genotype::equal(allele_mat, orig_allele_mat));
+        ASSERT_FALSE(genie::backend::mats_equal(allele_mat, orig_allele_mat));
         ASSERT_TRUE(genie::genotype::amin(allele_mat) == 0);
 
         genie::genotype::inverse_transform_max_val(allele_mat, no_ref_flag, not_avail_flag);
-        ASSERT_TRUE(genie::genotype::equal(allele_mat, orig_allele_mat));
+        ASSERT_TRUE(genie::backend::mats_equal(allele_mat, orig_allele_mat));
         ASSERT_TRUE(genie::genotype::amin(allele_mat) == NOT_AVAIL_VAL);
     }
 
@@ -107,11 +107,11 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
         genie::genotype::transform_max_value(allele_mat, no_ref_flag, not_avail_flag);
         ASSERT_TRUE(no_ref_flag);
         ASSERT_TRUE(not_avail_flag);
-        ASSERT_FALSE(genie::genotype::equal(allele_mat, orig_allele_mat));
+        ASSERT_FALSE(genie::backend::mats_equal(allele_mat, orig_allele_mat));
         ASSERT_TRUE(genie::genotype::amin(allele_mat) == 0);
 
         genie::genotype::inverse_transform_max_val(allele_mat, no_ref_flag, not_avail_flag);
-        ASSERT_TRUE(genie::genotype::equal(allele_mat, orig_allele_mat));
+        ASSERT_TRUE(genie::backend::mats_equal(allele_mat, orig_allele_mat));
         ASSERT_TRUE(genie::genotype::amin(allele_mat) == NOT_AVAIL_VAL);
     }
 }
@@ -135,13 +135,13 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
 
         genie::genotype::binarize_bit_plane(allele_mat, bin_mats, num_bit_planes, concat_axis_mode);
 
-        ASSERT_EQ(bin_mats.size(), 3);
-        ASSERT_EQ(num_bit_planes, 3);
+        ASSERT_TRUE((bin_mats.size()) == (3));
+        ASSERT_TRUE((num_bit_planes) == (3));
 
         genie::genotype::Int8MatDtype recon_allele_mat;
         genie::genotype::debinarize_bit_plane(bin_mats, num_bit_planes, concat_axis_mode, recon_allele_mat);
 
-        ASSERT_TRUE(genie::genotype::equal(ORIG_ALLELE_MAT, recon_allele_mat));
+        ASSERT_TRUE(genie::backend::mats_equal(ORIG_ALLELE_MAT, recon_allele_mat));
     }
 
     // Check CONCAT_ROW_DIR
@@ -151,13 +151,13 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
 
         genie::genotype::binarize_bit_plane(allele_mat, bin_mats, num_bit_planes, genie::genotype::ConcatAxis::CONCAT_ROW_DIR);
 
-        ASSERT_EQ(bin_mats.size(), 1);
-        ASSERT_EQ(num_bit_planes, 3);
+        ASSERT_TRUE((bin_mats.size()) == (1));
+        ASSERT_TRUE((num_bit_planes) == (3));
 
         genie::genotype::Int8MatDtype recon_allele_mat;
         genie::genotype::debinarize_bit_plane(bin_mats, num_bit_planes, genie::genotype::ConcatAxis::CONCAT_ROW_DIR, recon_allele_mat);
 
-        ASSERT_TRUE(genie::genotype::equal(ORIG_ALLELE_MAT, recon_allele_mat));
+        ASSERT_TRUE(genie::backend::mats_equal(ORIG_ALLELE_MAT, recon_allele_mat));
     }
 
     // Check CONCAT_COL_DIR
@@ -167,13 +167,13 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
 
         genie::genotype::binarize_bit_plane(allele_mat, bin_mats, num_bit_planes, genie::genotype::ConcatAxis::CONCAT_COL_DIR);
 
-        ASSERT_EQ(bin_mats.size(), 1);
-        ASSERT_EQ(num_bit_planes, 3);
+        ASSERT_TRUE((bin_mats.size()) == (1));
+        ASSERT_TRUE((num_bit_planes) == (3));
 
         genie::genotype::Int8MatDtype recon_allele_mat;
         genie::genotype::debinarize_bit_plane(bin_mats, num_bit_planes, genie::genotype::ConcatAxis::CONCAT_COL_DIR, recon_allele_mat);
 
-        ASSERT_TRUE(genie::genotype::equal(ORIG_ALLELE_MAT, recon_allele_mat));
+        ASSERT_TRUE(genie::backend::mats_equal(ORIG_ALLELE_MAT, recon_allele_mat));
     }
 }
 
@@ -196,15 +196,15 @@ TEST(Genotype, RoundTrip_BinarizeRowBin_BinaryMatrix) {
 
   genie::genotype::binarize_row_bin(allele_mat, bin_mats, amax_vec);
 
-  ASSERT_EQ(bin_mats.size(), 1);
-  ASSERT_EQ(genie::genotype::get_nrows(bin_mats[0]), BIN_NROWS);
-  ASSERT_EQ(genie::genotype::get_ncols(bin_mats[0]), NCOLS);
-  ASSERT_EQ(amax_vec.size(), NROWS);
-  ASSERT_EQ(genie::genotype::sum(amax_vec), BIN_NROWS);
+  ASSERT_TRUE((bin_mats.size()) == (1));
+  ASSERT_TRUE((genie::genotype::get_nrows(bin_mats[0])) == (BIN_NROWS));
+  ASSERT_TRUE((genie::genotype::get_ncols(bin_mats[0])) == (NCOLS));
+  ASSERT_TRUE((amax_vec.size()) == (NROWS));
+  ASSERT_TRUE((genie::genotype::sum(amax_vec)) == (BIN_NROWS));
 
   genie::genotype::debinarize_row_bin(bin_mats, amax_vec, allele_mat);
 
-  ASSERT_TRUE(genie::genotype::equal(allele_mat, ALLELE_MAT));
+  ASSERT_TRUE(genie::backend::mats_equal(allele_mat, ALLELE_MAT));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -225,13 +225,13 @@ TEST(Genotype, RoundTrip_BinarizeRowBin) {
 
         genie::genotype::binarize_row_bin(allele_mat, bin_mats, amax_vec);
 
-        ASSERT_EQ(bin_mats.size(), 1);
-        ASSERT_EQ(amax_vec.size(), NROWS);
-        ASSERT_EQ(genie::genotype::sum(amax_vec), genie::genotype::get_nrows(bin_mats.front()));
+        ASSERT_TRUE((bin_mats.size()) == (1));
+        ASSERT_TRUE((amax_vec.size()) == (NROWS));
+        ASSERT_TRUE((genie::genotype::sum(amax_vec)) == (genie::genotype::get_nrows(bin_mats.front())));
 
         genie::genotype::debinarize_row_bin(bin_mats, amax_vec, allele_mat);
 
-        ASSERT_TRUE(genie::genotype::equal(allele_mat, orig_allele_mat));
+        ASSERT_TRUE(genie::backend::mats_equal(allele_mat, orig_allele_mat));
     }
 }
 
@@ -249,16 +249,16 @@ TEST(Genotype, RoundTrip_RandomSort) {
 
     // Sort rows
     {
-        bin_mat = genie::genotype::random_matrix<bool>(NROWS, NCOLS, 0, MAX_ALLELE_VAL);
+        bin_mat = genie::genotype::random_matrix<bool>(NROWS, NCOLS, false, true);
         orig_bin_mat = bin_mat;
 
         genie::genotype::sort_bin_mat(bin_mat, row_ids, col_ids, genie::genotype::SortingAlgoID::RANDOM_SORT, genie::genotype::SortingAlgoID::NO_SORTING);
 
-        ASSERT_EQ(row_ids.size(), genie::genotype::get_nrows(bin_mat));
-        ASSERT_EQ(col_ids.size(), 1);
+        ASSERT_TRUE((row_ids.size()) == (genie::genotype::get_nrows(bin_mat)));
+        ASSERT_TRUE((col_ids.size()) == (1));
 
         genie::genotype::invert_sort_bin_mat(bin_mat, row_ids, col_ids);
-        ASSERT_TRUE(genie::genotype::equal(bin_mat, orig_bin_mat));
+        ASSERT_TRUE(genie::backend::mats_equal(bin_mat, orig_bin_mat));
     }
 
     // Sort cols
@@ -268,11 +268,11 @@ TEST(Genotype, RoundTrip_RandomSort) {
 
         genie::genotype::sort_bin_mat(bin_mat, row_ids, col_ids, genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::SortingAlgoID::RANDOM_SORT);
 
-        ASSERT_EQ(row_ids.size(), 1);
-        ASSERT_EQ(col_ids.size(), genie::genotype::get_ncols(bin_mat));
+        ASSERT_TRUE((row_ids.size()) == (1));
+        ASSERT_TRUE((col_ids.size()) == (genie::genotype::get_ncols(bin_mat)));
 
         genie::genotype::invert_sort_bin_mat(bin_mat, row_ids, col_ids);
-        ASSERT_TRUE(genie::genotype::equal(bin_mat, orig_bin_mat));
+        ASSERT_TRUE(genie::backend::mats_equal(bin_mat, orig_bin_mat));
     }
 
     // Sort rows and cols
@@ -288,11 +288,11 @@ TEST(Genotype, RoundTrip_RandomSort) {
             genie::genotype::SortingAlgoID::RANDOM_SORT
         );
 
-        ASSERT_EQ(row_ids.size(), genie::genotype::get_nrows(bin_mat));
-        ASSERT_EQ(col_ids.size(), genie::genotype::get_ncols(bin_mat));
+        ASSERT_TRUE((row_ids.size()) == (genie::genotype::get_nrows(bin_mat)));
+        ASSERT_TRUE((col_ids.size()) == (genie::genotype::get_ncols(bin_mat)));
 
         genie::genotype::invert_sort_bin_mat(bin_mat, row_ids, col_ids);
-        ASSERT_TRUE(genie::genotype::equal(bin_mat, orig_bin_mat));
+        ASSERT_TRUE(genie::backend::mats_equal(bin_mat, orig_bin_mat));
     }
 }
 
@@ -311,9 +311,9 @@ TEST(Genotype, Serializer) {
     size_t payload_len;
     genie::genotype::bin_mat_to_bytes(bin_mat, &payload, payload_len);
 
-    ASSERT_EQ(ORIG_PAYLOAD_LEN, payload_len);
+    ASSERT_TRUE((ORIG_PAYLOAD_LEN) == (payload_len));
     for (size_t i = 0; i < payload_len; i++) {
-        ASSERT_EQ(*(payload + i), *(ORIG_PAYLOAD + i));
+        ASSERT_TRUE(*(payload + i) == *(ORIG_PAYLOAD + i));
     }
     free(payload);
 }
@@ -339,20 +339,20 @@ TEST(Genotype, RoundTrip_JBIG) {
 
     mpegg_jbig_compress_default(&compressed_data, &compressed_data_len, ORIG_PAYLOAD, ORIG_PAYLOAD_LEN, ORIG_NROWS, ORIG_NCOLS);
 
-    ASSERT_EQ(ORIG_COMPRESSED_PAYLOAD_LEN, compressed_data_len);
+    ASSERT_TRUE((ORIG_COMPRESSED_PAYLOAD_LEN) == (compressed_data_len));
     for (size_t i = 0; i < compressed_data_len; ++i) {
-        EXPECT_EQ(ORIG_COMPRESSED_PAYLOAD[i], compressed_data[i]);
+        EXPECT_TRUE((ORIG_COMPRESSED_PAYLOAD[i]) == (compressed_data[i]));
     }
 
     uint8_t* payload;
     size_t payload_len;
     mpegg_jbig_decompress_default(&payload, &payload_len, compressed_data, compressed_data_len, &nrows, &ncols);
 
-    ASSERT_EQ(nrows, ORIG_NROWS);
-    ASSERT_EQ(ncols, ORIG_NCOLS);
-    ASSERT_EQ(ORIG_PAYLOAD_LEN, payload_len);
+    ASSERT_TRUE((nrows) == (ORIG_NROWS));
+    ASSERT_TRUE((ncols) == (ORIG_NCOLS));
+    ASSERT_TRUE((ORIG_PAYLOAD_LEN) == (payload_len));
     for (size_t i = 0; i < payload_len; i++) {
-        ASSERT_EQ(*(payload + i), *(ORIG_PAYLOAD + i)) << "index:" << i;
+        ASSERT_TRUE(*(payload + i) == *(ORIG_PAYLOAD + i)) << "index:" << i;
     }
 
     free(compressed_data);
@@ -366,7 +366,7 @@ TEST(Genotype, RoundTrip_EncodeAndSortBinMat) {
   size_t NCOLS = 5;
   int8_t MAX_ALLELE_VAL = 2;
 
-  genie::genotype::BinMatDtype ORIG_BIN_MAT = genie::genotype::random_matrix<bool>(NROWS, NCOLS, 0, MAX_ALLELE_VAL);
+  genie::genotype::BinMatDtype ORIG_BIN_MAT = genie::genotype::random_matrix<bool>(NROWS, NCOLS, false, true);
   genie::genotype::BinMatDtype bin_mat;
 
   const std::array<genie::genotype::SortingAlgoID, 2> sorting_methods = {
@@ -404,7 +404,7 @@ TEST(Genotype, RoundTrip_EncodeAndSortBinMat) {
           genie::genotype::BinMatDtype recon_bin_mat;
           genie::genotype::decode_and_inverse_sort_bin_mat(recon_obj, recon_bin_mat, CODEC_ID, sort_rows_flag, sort_cols_flag);
 
-          ASSERT_EQ(ORIG_BIN_MAT, recon_bin_mat);
+          ASSERT_TRUE((ORIG_BIN_MAT) == (recon_bin_mat));
         }
       }
   }
@@ -419,7 +419,7 @@ TEST(Genotype, RoundTrip_CASE12) {
   std::vector<genie::core::record::VariantGenotype> RECS;
   {
     std::ifstream reader(filepath, std::ios::binary);
-    ASSERT_EQ(reader.fail(), false);
+    ASSERT_TRUE((reader.fail()) == (false));
     genie::util::BitReader bitreader(reader);
     while (bitreader.IsStreamGood()) {
       RECS.emplace_back(bitreader);
@@ -479,8 +479,8 @@ TEST(Genotype, RoundTrip_JBIG_RandomMatrix) {
             genie::genotype::BinMatDtype decoded_phasing_mat;
             genie::genotype::decode_genotype(params, payload, decoded_allele_mat, decoded_phasing_mat);
 
-            ASSERT_TRUE(genie::genotype::equal(original_allele_mat, decoded_allele_mat));
-            ASSERT_TRUE(genie::genotype::equal(original_phasing_mat, decoded_phasing_mat));
+            ASSERT_TRUE(genie::backend::mats_equal(original_allele_mat, decoded_allele_mat));
+            ASSERT_TRUE(genie::backend::mats_equal(original_phasing_mat, decoded_phasing_mat));
         }
     }
 }
@@ -610,6 +610,6 @@ TEST(Genotype, CrossBackend_GoldenMaster) {
     std::string generatedStr = buffer.str();
     std::vector<uint8_t> generatedBytes(generatedStr.begin(), generatedStr.end());
 
-    ASSERT_EQ(goldenBytes.size(), generatedBytes.size()) << "Payload size mismatch!";
-    ASSERT_EQ(goldenBytes, generatedBytes) << "Payload content mismatch!";
+    ASSERT_TRUE((goldenBytes.size()) == (generatedBytes.size())) << "Payload size mismatch!";
+    ASSERT_TRUE((goldenBytes) == (generatedBytes)) << "Payload content mismatch!";
 }

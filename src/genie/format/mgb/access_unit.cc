@@ -61,7 +61,7 @@ void AccessUnit::debugPrint(const core::parameter::EncodingSet &ps) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::loadPayload(util::BitReader &bitReader) {
-    for (size_t i = 0; i < header.getNumBlocks(); ++i) {
+    for (size_t idx_i = 0; idx_i < header.getNumBlocks(); ++idx_i) {
         blocks.emplace_back(qv_payloads, bitReader);
     }
 }
@@ -203,15 +203,15 @@ void AccessUnit::write(util::BitWriter &writer) const {
     bits += TYPE_SIZE_SIZE;
     uint64_t bytes = bits / 8;
 
-    for (auto &i : blocks) {
-        bytes += i.getWrittenSize();
+    for (auto &idx_i : blocks) {
+        bytes += idx_i.getWrittenSize();
     }
 
     // Now size is known, write to final destination
     writer.write(bytes, 29);
     writer.writeBypass(&ss);
-    for (auto &i : blocks) {
-        i.write(writer);
+    for (auto &idx_i : blocks) {
+        idx_i.write(writer);
     }
 }
 

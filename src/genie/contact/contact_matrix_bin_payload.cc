@@ -80,12 +80,12 @@ ContactMatrixBinPayload::ContactMatrixBinPayload(
   bin_size_multiplier_ = bit_reader.Read<uint32_t>();
 
   weight_value_.resize(num_norm_methods);
-  for (size_t i = 0; i < num_norm_methods; ++i) {
-    weight_value_[i].resize(num_bin_entries);
+  for (size_t idx_i = 0; idx_i < num_norm_methods; ++idx_i) {
+    weight_value_[idx_i].resize(num_bin_entries);
 
-    for (size_t j = 0; j < num_bin_entries; ++j) {
+    for (size_t idx_j = 0; idx_j < num_bin_entries; ++idx_j) {
       auto weight_value = bit_reader.ReadAlignedInt<uint64_t>();
-      weight_value_[i][j] = *reinterpret_cast<double*>(&weight_value);
+      weight_value_[idx_i][idx_j] = *reinterpret_cast<double*>(&weight_value);
     }
   }
 }
@@ -102,17 +102,17 @@ bool ContactMatrixBinPayload::operator==(const ContactMatrixBinPayload& other) c
   }
 
   // Compare each element, treating NaN as equal
-  for (size_t i = 0; i < weight_value_.size(); ++i) {
-    if (weight_value_[i].size() != other.weight_value_[i].size()) {
+  for (size_t idx_i = 0; idx_i < weight_value_.size(); ++idx_i) {
+    if (weight_value_[idx_i].size() != other.weight_value_[idx_i].size()) {
       return false;
     }
-    for (size_t j = 0; j < weight_value_[i].size(); ++j) {
+    for (size_t idx_j = 0; idx_j < weight_value_[idx_i].size(); ++idx_j) {
       // Check if both are NaN or both are equal
-      if (std::isnan(weight_value_[i][j]) && std::isnan(other.weight_value_[i][j])) {
+      if (std::isnan(weight_value_[idx_i][idx_j]) && std::isnan(other.weight_value_[idx_i][idx_j])) {
         continue;
       }
-      if (!std::isnan(weight_value_[i][j]) && !std::isnan(other.weight_value_[i][j]) &&
-          weight_value_[i][j] != other.weight_value_[i][j]) {
+      if (!std::isnan(weight_value_[idx_i][idx_j]) && !std::isnan(other.weight_value_[idx_i][idx_j]) &&
+          weight_value_[idx_i][idx_j] != other.weight_value_[idx_i][idx_j]) {
         return false;
       }
     }

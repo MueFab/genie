@@ -6,7 +6,7 @@
 
 #include "genie/name/tokenizer/tokenizer.h"
 #include <utility>
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/access_unit.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -171,24 +171,24 @@ void push32bigEndian(core::AccessUnit::Subsequence& seq, uint32_t value) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void TokenState::encode(const std::vector<SingleToken>& tokens, core::AccessUnit::Descriptor& streams) {
-    for (uint16_t i = 0; i < tokens.size(); ++i) {
-        //   while (streams.size() <= i) {
+    for (uint16_t idx_i = 0; idx_i < tokens.size(); ++idx_i) {
+        //   while (streams.size() <= idx_i) {
         //       streams.emplace_back(getTokenInfo(Tokens::DZLEN).paramSeq + 1, util::DataBlock(0, 4));
         //   }
-        streams.getTokenType(i, TYPE_SEQ).push((uint8_t)tokens[i].token);
-        if (getTokenInfo(tokens[i].token).paramSeq == 0) {
+        streams.getTokenType(idx_i, TYPE_SEQ).push((uint8_t)tokens[idx_i].token);
+        if (getTokenInfo(tokens[idx_i].token).paramSeq == 0) {
             continue;
         }
 
-        if (tokens[i].token == Tokens::STRING) {
-            for (const auto& c : tokens[i].paramString) {
-                streams.getTokenType(i, (uint8_t)tokens[i].token).push(c);
+        if (tokens[idx_i].token == Tokens::STRING) {
+            for (const auto& c : tokens[idx_i].paramString) {
+                streams.getTokenType(idx_i, (uint8_t)tokens[idx_i].token).push(c);
             }
-            streams.getTokenType(i, (uint8_t)tokens[i].token).push('\0');
-        } else if (getTokenInfo(tokens[i].token).paramSeq == sizeof(uint32_t)) {
-            push32bigEndian(streams.getTokenType(i, (uint8_t)tokens[i].token), tokens[i].param);
+            streams.getTokenType(idx_i, (uint8_t)tokens[idx_i].token).push('\0');
+        } else if (getTokenInfo(tokens[idx_i].token).paramSeq == sizeof(uint32_t)) {
+            push32bigEndian(streams.getTokenType(idx_i, (uint8_t)tokens[idx_i].token), tokens[idx_i].param);
         } else {
-            streams.getTokenType(i, (uint8_t)tokens[i].token).push(tokens[i].param);
+            streams.getTokenType(idx_i, (uint8_t)tokens[idx_i].token).push(tokens[idx_i].param);
         }
     }
 }

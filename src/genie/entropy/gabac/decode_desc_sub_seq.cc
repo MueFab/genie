@@ -89,16 +89,16 @@ uint64_t DecodeDescSubsequence(const IoConfiguration& io_conf,
       // Loop through the transformed sequences
       std::vector<util::DataBlock> transformed_sub_sequences(
           num_transform_configs);
-      for (size_t i = 0; i < num_transform_configs; i++) {
+      for (size_t idx_i = 0; idx_i < num_transform_configs; idx_i++) {
         const uint8_t word_size =
-            i == num_transform_configs - 1 ? io_conf.output_word_size : 1;
-        transformed_sub_sequences[i].SetWordSize(word_size);
+            idx_i == num_transform_configs - 1 ? io_conf.output_word_size : 1;
+        transformed_sub_sequences[idx_i].SetWordSize(word_size);
       }
-      for (size_t i = 0; i < num_transform_configs; i++) {
+      for (size_t idx_i = 0; idx_i < num_transform_configs; idx_i++) {
         util::DataBlock decoded_transformed_sub_sequences;
         uint64_t payload_size_remaining = 0;
 
-        if (i < num_transform_configs - 1) {
+        if (idx_i < num_transform_configs - 1) {
           sub_sequence_payload_size_used += StreamHandler::ReadUInt(
               *io_conf.input_stream, payload_size_remaining, 4);
         } else {
@@ -123,14 +123,14 @@ uint64_t DecodeDescSubsequence(const IoConfiguration& io_conf,
                                    &decoded_transformed_sub_sequences);
 
           const uint8_t word_size =
-              i == num_transform_configs - 1 ? io_conf.output_word_size : 1;
+              idx_i == num_transform_configs - 1 ? io_conf.output_word_size : 1;
           // Decoding
           sub_sequence_payload_size_used += DecodeTransformSubSeq(
-              sub_sequence_cfg.GetTransformSubSeqCfg(static_cast<uint8_t>(i)),
+              sub_sequence_cfg.GetTransformSubSeqCfg(static_cast<uint8_t>(idx_i)),
               static_cast<unsigned int>(num_transformed_symbols),
               &decoded_transformed_sub_sequences, word_size,
               !dependency.Empty() ? &dependency : nullptr);
-          transformed_sub_sequences[i].Swap(&decoded_transformed_sub_sequences);
+          transformed_sub_sequences[idx_i].Swap(&decoded_transformed_sub_sequences);
         }
       }
 

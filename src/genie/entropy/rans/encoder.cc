@@ -14,7 +14,7 @@ void RANSEncoder::encode(std::istream& input, std::ostream& output, bool is_tabl
     param.num_symbols = static_cast<uint32_t>(in_bytes.size());
 
     Rans64EncSymbol esyms[256];
-    for (int i = 0; i < 256; ++i) Rans64EncSymbolInit(&esyms[i], param.stats.cum_freqs[i], param.stats.freqs[i], PROB_BITS);
+    for (int idx_i = 0; idx_i < 256; ++idx_i) Rans64EncSymbolInit(&esyms[idx_i], param.stats.cum_freqs[idx_i], param.stats.freqs[idx_i], PROB_BITS);
 
     uint8_t flag_byte = is_table_stored ? 1 : 0;
     output.write(reinterpret_cast<const char*>(&flag_byte), sizeof(flag_byte));
@@ -24,8 +24,8 @@ void RANSEncoder::encode(std::istream& input, std::ostream& output, bool is_tabl
         output.write(reinterpret_cast<const char*>(param.stats.cum_freqs), sizeof(param.stats.cum_freqs));
         std::vector<uint8_t> cum2sym(param.stats.cum_freqs[256]);
         for (int s = 0; s < 256; ++s)
-            for (uint32_t i = param.stats.cum_freqs[s]; i < param.stats.cum_freqs[s + 1]; ++i)
-                cum2sym[i] = static_cast<uint8_t>(s);
+            for (uint32_t idx_i = param.stats.cum_freqs[s]; idx_i < param.stats.cum_freqs[s + 1]; ++idx_i)
+                cum2sym[idx_i] = static_cast<uint8_t>(s);
         output.write(reinterpret_cast<const char*>(cum2sym.data()), cum2sym.size());
     }
 
@@ -35,9 +35,9 @@ void RANSEncoder::encode(std::istream& input, std::ostream& output, bool is_tabl
     for (auto& rans : rans_states) Rans64EncInit(&rans);
 
     uint32_t* ptr = out_end;
-    for (size_t i = in_bytes.size(); i > 0;)
-        for (size_t j = 0; j < num_interleavings && i > 0; ++j)
-            Rans64EncPutSymbol(&rans_states[j], &ptr, &esyms[in_bytes[--i]], PROB_BITS);
+    for (size_t idx_i = in_bytes.size(); idx_i > 0;)
+        for (size_t idx_j = 0; idx_j < num_interleavings && idx_i > 0; ++idx_j)
+            Rans64EncPutSymbol(&rans_states[idx_j], &ptr, &esyms[in_bytes[--idx_i]], PROB_BITS);
 
     for (auto& rans : rans_states) Rans64EncFlush(&rans, &ptr);
 

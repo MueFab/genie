@@ -26,7 +26,7 @@ namespace mgg {
  */
 class Block : public Box {
  private:
-    BlockHeader header;     //!< @brief
+    block_header.header;     //!< @brief
     core::Payload payload;  //!< @brief
 
  public:

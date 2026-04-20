@@ -37,7 +37,7 @@ Fasta::Fasta(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo)
 // ---------------------------------------------------------------------------------------------------------------------
 
 Fasta::Fasta(genie::util::BitReader& reader, size_t seq_count) : External(reader) {
-    for (size_t i = 0; i < seq_count; ++i) {
+    for (size_t idx_i = 0; idx_i < seq_count; ++idx_i) {
         seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
         reader.readBypass(seq_checksums.back());
     }
@@ -48,7 +48,7 @@ Fasta::Fasta(genie::util::BitReader& reader, size_t seq_count) : External(reader
 Fasta::Fasta(genie::util::BitReader& reader, uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo,
              size_t seq_count)
     : External(_reserved, std::move(_uri), algo, RefType::FASTA_REF) {
-    for (size_t i = 0; i < seq_count; ++i) {
+    for (size_t idx_i = 0; idx_i < seq_count; ++idx_i) {
         seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
         reader.readBypass(seq_checksums.back());
     }

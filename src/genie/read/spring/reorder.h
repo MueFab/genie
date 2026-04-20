@@ -132,7 +132,7 @@ void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths, const r
  * @param remainingreads
  * @param read
  * @param dict
- * @param k
+ * @param idx_k
  * @param rev
  * @param shift
  * @param ref_len
@@ -146,7 +146,7 @@ bool search_match(const std::bitset<bitset_size> &ref, std::bitset<bitset_size> 
                   omp_lock *dict_lock, omp_lock *read_lock,
 #endif
                   std::bitset<bitset_size> **mask, uint16_t *read_lengths, bool *remainingreads,
-                  std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t &k, const bool rev, const int shift,
+                  std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t &idx_k, const bool rev, const int shift,
                   const int &ref_len, const reorder_global<bitset_size> &rg);
 
 /**

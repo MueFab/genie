@@ -71,8 +71,8 @@ void QualEncoder::quantizeUntil(uint64_t pos) {
 
 void QualEncoder::encodeRecords(std::vector<EncodingRecord> records) {
     for (auto& r : records) {
-        for (size_t i = 0; i < r.positions.size(); ++i) {
-            encodeMappedQual(r.qvalues[i], r.cigars[i], r.positions[i]);
+        for (size_t idx_i = 0; idx_i < r.positions.size(); ++idx_i) {
+            encodeMappedQual(r.qvalues[idx_i], r.cigars[idx_i], r.positions[idx_i]);
         }
     }
 }
@@ -86,8 +86,8 @@ void QualEncoder::addMappedRecordToBlock(EncodingRecord& record) {
 
         out->codeBooks.clear();
         out->stepindices.clear();
-        for (int i = 0; i < NR_QUANTIZERS; ++i) {
-            const auto& map = quantizers_[i].inverseLut();
+        for (int idx_i = 0; idx_i < NR_QUANTIZERS; ++idx_i) {
+            const auto& map = quantizers_[idx_i].inverseLut();
             out->codeBooks.emplace_back();
             out->stepindices.emplace_back();
             for (const auto& pair : map) {
@@ -154,7 +154,7 @@ void QualEncoder::encodeMappedQual(const std::string& qvalues, const std::string
                 /* fall through */
             case '=':
                 // Encode opLen quality values with computed quantizer indices
-                for (size_t i = 0; i < opLen; i++) {
+                for (size_t idx_i = 0; idx_i < opLen; idx_i++) {
                     uint8_t q = uint8_t(qvalues[qualIdx++]) - qualityValueOffset_;
                     uint8_t quantizerIndex = out->quantizerIndices[quantizerIndicesIdx++];
                     uint8_t qualityValueIndex = uint8_t(quantizers_.at(quantizerIndex).valueToIndex(q));
@@ -164,7 +164,7 @@ void QualEncoder::encodeMappedQual(const std::string& qvalues, const std::string
             case '+':
             case ')':
                 // Encode opLen quality values with max quantizer index
-                for (size_t i = 0; i < opLen; i++) {
+                for (size_t idx_i = 0; idx_i < opLen; idx_i++) {
                     auto q = static_cast<uint8_t>(qvalues[qualIdx++]) - qualityValueOffset_;
                     uint8_t qualityValueIndex = uint8_t(quantizers_.at(NR_QUANTIZERS - 1).valueToIndex(q));
                     out->stepindices.at(static_cast<size_t>(NR_QUANTIZERS)).push_back(qualityValueIndex);

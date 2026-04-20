@@ -139,7 +139,7 @@ L0:
 // -----------------------------------------------------------------------------
 
 [[maybe_unused]] void BitInputStream::SkipBytes(const unsigned int num_bytes) {
-  for (unsigned int i = 0; i < num_bytes; i++) {
+  for (unsigned int idx_i = 0; idx_i < num_bytes; idx_i++) {
     ReadIn(&reader_);
   }
 }

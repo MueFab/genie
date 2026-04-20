@@ -1,0 +1,129 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+#ifndef SRC_GENIE_CORE_PARAMETER_ANNOTATION_ANNOTATION_ENCODING_PARAMETERS_H_
+#define SRC_GENIE_CORE_PARAMETER_ANNOTATION_ANNOTATION_ENCODING_PARAMETERS_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/core/constants.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+
+#include "attribute_parameter_set.h"
+#include "compressor_parameter_set.h"
+#include "descriptor_configuration.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+namespace genie {
+namespace core {
+namespace parameter {
+namespace annotation {
+
+struct filterData {
+    std::string filter_ID;
+    std::string description;
+};
+
+class TypedData {
+ public:
+    uint8_t data_type_ID;
+    uint8_t num_array_dims;
+    uint32_t n_elements = 1;
+    std::vector<uint32_t> array_dims;
+    std::vector<uint64_t> data_block;
+};
+class AnnotationEncodingParameters {
+ private:
+    uint8_t n_filter;
+    std::vector<uint8_t> filter_ID_len;
+    std::vector<std::string> filter_ID;
+    std::vector<uint16_t> desc_len;
+    std::vector<std::string> description;
+
+    uint8_t n_features_names;
+    std::vector<uint8_t> feature_name_len;
+    std::vector<std::string> feature_name;
+
+    uint8_t n_ontology_terms;
+    std::vector<uint8_t> ontology_term_name_len;
+    std::vector<std::string> ontology_term_name;
+
+    uint8_t n_descriptors;
+    std::vector<DescriptorConfiguration> descriptor_configuration;
+
+    uint8_t n_compressors;
+    std::vector<CompressorParameterSet> compressor_parameter_set;
+
+    uint8_t n_attributes;
+    std::vector<AttributeParameterSet> attribute_parameter_set;
+
+ public:
+    AnnotationEncodingParameters();
+    AnnotationEncodingParameters(std::vector<filterData> filterData, std::vector<std::string> features,
+                                 std::vector<std::string> ontologyTerms,
+                                 std::vector<DescriptorConfiguration> descriptorConfigurations,
+                                 std::vector<CompressorParameterSet> compressorParameterSets,
+                                 std::vector<AttributeParameterSet> attributeParameterSets);
+
+    AnnotationEncodingParameters(uint8_t n_filter, std::vector<uint8_t> filter_ID_len,
+                                 std::vector<std::string> filter_ID, std::vector<uint16_t> desc_len,
+                                 std::vector<std::string> description, uint8_t n_features_names,
+                                 std::vector<uint8_t> feature_name_len, std::vector<std::string> feature_name,
+                                 uint8_t n_ontology_terms, std::vector<uint8_t> ontology_term_name_len,
+                                 std::vector<std::string> ontology_term_name, uint8_t n_descriptors,
+                                 std::vector<DescriptorConfiguration> descriptor_configuration, uint8_t n_compressors,
+                                 std::vector<CompressorParameterSet> compressor_parameter_set, uint8_t n_attributes,
+                                 std::vector<AttributeParameterSet> attribute_parameter_set);
+
+    void read(util::BitReader& reader);
+    void write(core::Writer& writer) const;
+    void write(util::BitWriter& writer) const;
+    size_t getSize(core::Writer& writesize) const;
+
+    uint8_t getNumberOfFilters() const { return n_filter; }
+    std::vector<uint8_t> getFilterIDLengths() const { return filter_ID_len; }
+    std::vector<std::string> getFilterIDs() const { return filter_ID; }
+    std::vector<uint16_t> getDescriptionLengths() const { return desc_len; }
+    std::vector<std::string> getDescriptions() const { return description; }
+
+    uint8_t getNumberofFeatures() const { return n_features_names; }
+    std::vector<uint8_t> getFeatureNameLengths() const { return feature_name_len; }
+    std::vector<std::string> getFeatureNames() const { return feature_name; }
+
+    uint8_t getNumberOfOntologyTerms() const { return n_ontology_terms; }
+    std::vector<uint8_t> getOntologyTermNameLengths() const { return ontology_term_name_len; }
+    std::vector<std::string> getOntologyTermName() const { return ontology_term_name; }
+
+    uint8_t getNumberOfDescriptors() const { return n_descriptors; }
+    std::vector<DescriptorConfiguration> getDescriptorConfigurations() const { return descriptor_configuration; }
+
+    uint8_t getNumberOfCompressors() const { return n_compressors; }
+    std::vector<CompressorParameterSet> getCompressorParameterSets() const { return compressor_parameter_set; }
+
+    uint8_t getNumberOfAttributes() const { return n_attributes; }
+    std::vector<AttributeParameterSet> getAttributeParameterSets() const { return attribute_parameter_set; }
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace annotation
+}  // namespace parameter
+}  // namespace core
+}  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#endif  // SRC_GENIE_CORE_PARAMETER_ANNOTATION_ANNOTATION_ENCODING_PARAMETERS_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

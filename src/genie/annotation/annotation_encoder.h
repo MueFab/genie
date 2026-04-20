@@ -19,10 +19,10 @@
 #include "genie/core/writer.h"
 
 #include "genie/annotation/compressors.h"
-#include "genie/core/record/annotation_parameter_set/AnnotationEncodingParameters.h"
-#include "genie/core/record/annotation_parameter_set/AttributeData.h"
-#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
-#include "genie/core/record/annotation_parameter_set/record.h"
+#include "genie/core/parameter/annotation/annotation_encoding_parameters.h"
+#include "genie/core/parameter/annotation/attribute_data.h"
+#include "genie/core/parameter/annotation/descriptor_configuration.h"
+#include "genie/core/parameter/annotation/record.h"
 
 
 #include "genie/entropy/bsc/encoder.h"
@@ -37,10 +37,10 @@ namespace annotation {
 
 class AnnotationEncoder {
  public:
-    core::record::annotation_parameter_set::AnnotationEncodingParameters Compose();
+    core::parameter::annotation::AnnotationEncodingParameters Compose();
 
     void setDescriptorParameters(genie::core::AnnotDesc ID, genie::core::AlgoID encoding) {
-        genie::core::record::annotation_parameter_set::AlgorithmParameters algpars;
+        genie::core::parameter::annotation::AlgorithmParameters algpars;
         switch (encoding) {
             case genie::core::AlgoID::LZMA: {
                 genie::entropy::lzma::LZMAParameters lzmaParameters;
@@ -67,7 +67,7 @@ class AnnotationEncoder {
     }
 
     void setDescriptorParameters(genie::core::AnnotDesc ID, genie::core::AlgoID encoding,
-                                 genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmPars) {
+                                 genie::core::parameter::annotation::AlgorithmParameters algorithmPars) {
         descriptorConfigurations.emplace_back(ID, encoding, algorithmPars);
     }
 
@@ -77,7 +77,7 @@ class AnnotationEncoder {
         }
     }
 
-    void setAttributes(std::map<std::string, core::record::annotation_parameter_set::AttributeData>& info);
+    void setAttributes(std::map<std::string, core::parameter::annotation::AttributeData>& info);
 
     void setGenotypeParameters(genotype::GenotypeParameters _parameters) {
         descriptorConfigurations.emplace_back(_parameters);
@@ -95,9 +95,9 @@ class AnnotationEncoder {
     }
 
  private:
-    std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptorConfigurations;
-    std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressorParameters;
-    std::vector<core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set;
+    std::vector<genie::core::parameter::annotation::DescriptorConfiguration> descriptorConfigurations;
+    std::vector<genie::core::parameter::annotation::CompressorParameterSet> compressorParameters;
+    std::vector<core::parameter::annotation::AttributeParameterSet> attribute_parameter_set;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

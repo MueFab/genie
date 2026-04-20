@@ -24,17 +24,17 @@ using ClassType = core::record::ClassType;
 
 paramqv1::Codebook codebookFromVector(const std::vector<unsigned char>& vec) {
     paramqv1::Codebook codebook(vec[0], vec[1]);
-    for (size_t i = 2; i < vec.size(); ++i) {
-        codebook.addEntry(vec[i]);
+    for (size_t idx_i = 2; idx_i < vec.size(); ++idx_i) {
+        codebook.addEntry(vec[idx_i]);
     }
     return codebook;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::GenSubIndex get_qv_steps(size_t i) {
-    UTILS_DIE_IF(i > 7, "QV_STEPS index out of range");
-    return std::make_pair(core::GenDesc::kQv, (uint16_t)i + 2);
+core::GenSubIndex get_qv_steps(size_t idx_i) {
+    UTILS_DIE_IF(idx_i > 7, "QV_STEPS index out of range");
+    return std::make_pair(core::GenDesc::kQv, (uint16_t)idx_i + 2);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -129,8 +129,8 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
     desc.add(core::AccessUnit::Subsequence(util::DataBlock(&output.quantizerIndices), core::gen_sub::kQvCodebook));
 
     // fill QV_STEPS_0-7
-    for (size_t i = 0; i < output.stepindices.size(); ++i) {
-        desc.add(core::AccessUnit::Subsequence(util::DataBlock(&output.stepindices[i]), get_qv_steps(i)));
+    for (size_t idx_i = 0; idx_i < output.stepindices.size(); ++idx_i) {
+        desc.add(core::AccessUnit::Subsequence(util::DataBlock(&output.stepindices[idx_i]), get_qv_steps(idx_i)));
     }
 }
 

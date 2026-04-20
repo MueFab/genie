@@ -53,9 +53,9 @@ std::string SamRecord::getCigarString(bam1_t* sam_alignment) {
     auto cigar_ptr = bam_get_cigar(sam_alignment);
 
     std::string cigar;
-    for (uint32_t i = 0; i < n_cigar; i++) {
-        char cigar_op = bam_cigar_opchr(bam_cigar_op(cigar_ptr[i]));
-        auto cigar_op_len = bam_cigar_oplen(cigar_ptr[i]);
+    for (uint32_t idx_i = 0; idx_i < n_cigar; idx_i++) {
+        char cigar_op = bam_cigar_opchr(bam_cigar_op(cigar_ptr[idx_i]));
+        auto cigar_op_len = bam_cigar_oplen(cigar_ptr[idx_i]);
         cigar += std::to_string(cigar_op_len) + cigar_op;
     }
     return cigar;
@@ -67,8 +67,8 @@ std::string SamRecord::getSeqString(bam1_t* sam_alignment) {
     auto seq_len = sam_alignment->core.l_qseq;
     auto seq_ptr = bam_get_seq(sam_alignment);
     std::string tmp_seq(seq_len, ' ');
-    for (auto i = 0; i < seq_len; i++) {
-        tmp_seq[i] = fourBitBase2Char(bam_seqi(seq_ptr, i));
+    for (auto idx_i = 0; idx_i < seq_len; idx_i++) {
+        tmp_seq[idx_i] = fourBitBase2Char(bam_seqi(seq_ptr, idx_i));
     }
 
     return tmp_seq;
@@ -80,8 +80,8 @@ std::string SamRecord::getQualString(bam1_t* sam_alignment) {
     auto seq_len = sam_alignment->core.l_qseq;
     auto qual_ptr = bam_get_qual(sam_alignment);
     std::string tmp_qual(seq_len, ' ');
-    for (auto i = 0; i < seq_len; i++) {
-        tmp_qual[i] = static_cast<char>(qual_ptr[i] + 33);
+    for (auto idx_i = 0; idx_i < seq_len; idx_i++) {
+        tmp_qual[idx_i] = static_cast<char>(qual_ptr[idx_i] + 33);
     }
     return tmp_qual;
 }

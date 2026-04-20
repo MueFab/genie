@@ -59,35 +59,35 @@ std::vector<SingleToken> patch(const std::vector<SingleToken>& oldString, const 
     } else if (newString.front().token != Tokens::DIFF) {
         UTILS_DIE("First token is neither DUP nor DIFF");
     }
-    for (size_t i = 0; i < newString.size(); ++i) {
-        if (i >= oldString.size()) {
-            UTILS_DIE_IF(newString[i].token == Tokens::DELTA || newString[i].token == Tokens::DELTA0 ||
-                             newString[i].token == Tokens::MATCH,
+    for (size_t idx_i = 0; idx_i < newString.size(); ++idx_i) {
+        if (idx_i >= oldString.size()) {
+            UTILS_DIE_IF(newString[idx_i].token == Tokens::DELTA || newString[idx_i].token == Tokens::DELTA0 ||
+                             newString[idx_i].token == Tokens::MATCH,
                          "Found MATCH/DELTA but no token to match");
-            ret[i] = newString[i];
+            ret[idx_i] = newString[idx_i];
             continue;
         }
-        switch (newString[i].token) {
+        switch (newString[idx_i].token) {
             case Tokens::MATCH:
-                UTILS_DIE_IF(oldString[i].token == Tokens::DUP || oldString[i].token == Tokens::DELTA ||
-                                 oldString[i].token == Tokens::DELTA0 || oldString[i].token == Tokens::MATCH ||
-                                 oldString[i].token == Tokens::MATCH,
+                UTILS_DIE_IF(oldString[idx_i].token == Tokens::DUP || oldString[idx_i].token == Tokens::DELTA ||
+                                 oldString[idx_i].token == Tokens::DELTA0 || oldString[idx_i].token == Tokens::MATCH ||
+                                 oldString[idx_i].token == Tokens::MATCH,
                              "Found MATCH but no token to match");
-                ret[i] = oldString[i];
+                ret[idx_i] = oldString[idx_i];
                 break;
             case Tokens::DELTA:
-                UTILS_DIE_IF(oldString[i].token != Tokens::DIGITS, "Found DELTA but no digits");
-                ret[i] = SingleToken(Tokens::DIGITS, oldString[i].param + newString[i].param, "");
+                UTILS_DIE_IF(oldString[idx_i].token != Tokens::DIGITS, "Found DELTA but no digits");
+                ret[idx_i] = SingleToken(Tokens::DIGITS, oldString[idx_i].param + newString[idx_i].param, "");
                 break;
             case Tokens::DELTA0:
-                UTILS_DIE_IF(oldString[i].token != Tokens::DIGITS0, "Found DELTA0 but no digits");
-                ret[i] = SingleToken(Tokens::DIGITS0, oldString[i].param + newString[i].param, "");
+                UTILS_DIE_IF(oldString[idx_i].token != Tokens::DIGITS0, "Found DELTA0 but no digits");
+                ret[idx_i] = SingleToken(Tokens::DIGITS0, oldString[idx_i].param + newString[idx_i].param, "");
                 break;
             case Tokens::DIFF:
             case Tokens::DUP:
-                UTILS_DIE_IF(i != 0, "Found DIFF or DUP after first token");  // Fall through
+                UTILS_DIE_IF(idx_i != 0, "Found DIFF or DUP after first token");  // Fall through
             default:
-                ret[i] = newString[i];
+                ret[idx_i] = newString[idx_i];
         }
     }
     return ret;

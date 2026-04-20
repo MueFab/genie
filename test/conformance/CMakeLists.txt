@@ -6,43 +6,11 @@ set(XTENSOR_USE_TBB 0)
 find_package(xtl REQUIRED)
 find_package(xtensor REQUIRED)
 
-message(STATUS "xtensor: ${xtensor_INCLUDE_DIRS}")
-
-set(source_files
-        site-conformance-test.cc
-        geno-conformance-test.cc
-        helpers.cc
-        main.cc
-)
+file(GLOB source_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
 
 add_executable(${PROJECT_NAME} ${source_files})
 
-if(MSVC)
-    set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
-endif()
+target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main xtensor xtensor::optimize genie-core genie-annotation genie-util genie-genotype-local genie-vsite genie-jbig)
 
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # GNU Compiler Collection
-    target_compile_options(${PROJECT_NAME} PRIVATE "-pedantic")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-fno-common")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wall")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wshadow")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wextra")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wundef")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wconversion")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wdouble-promotion")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=conversion")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=maybe-uninitialized")
-endif ()
-
-target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main)
-target_link_libraries(${PROJECT_NAME} PRIVATE xtensor xtensor::optimize)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-annotation)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-genotype)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
-
-install(TARGETS ${PROJECT_NAME}
-        RUNTIME DESTINATION "usr/bin")
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION "usr/bin")
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

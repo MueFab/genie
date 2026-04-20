@@ -35,25 +35,25 @@ def print_array(arr):
 
 
 def print_block(block):
-    for i in range(block.values_size):
-        # print("{: 2d}".format(libgabac.gabac_data_block_get(ct.byref(block), i)), end='')
-        libc.printf(b"%lu ", libgabac.gabac_data_block_get(ct.byref(block), i))
+    for idx_i in range(block.values_size):
+        # print("{: 2d}".format(libgabac.gabac_data_block_get(ct.byref(block), idx_i)), end='')
+        libc.printf(b"%lu ", libgabac.gabac_data_block_get(ct.byref(block), idx_i))
     # print()
     libc.printf(b"\n")
 
 
 def get_block_values(block):
     values = ""
-    for i in range(block.values_size):
-        values += "{:02d}".format(libgabac.gabac_data_block_get(ct.byref(block), i))
+    for idx_i in range(block.values_size):
+        values += "{:02d}".format(libgabac.gabac_data_block_get(ct.byref(block), idx_i))
     return values
 
 
 def are_blocks_equal(block1, block2):
     if block1.values_size == block2.values_size:
-        for i in range(block1.values_size):
-            if libgabac.gabac_data_block_get(ct.byref(block1), i) != libgabac.gabac_data_block_get(ct.byref(block2), i):
-                print(i)
+        for idx_i in range(block1.values_size):
+            if libgabac.gabac_data_block_get(ct.byref(block1), idx_i) != libgabac.gabac_data_block_get(ct.byref(block2), idx_i):
+                print(idx_i)
                 return False
         return True
     else:

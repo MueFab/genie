@@ -129,10 +129,10 @@ class BinarizationParameters final {
   /**
    * @brief Constructs a `BinarizationParameters` object from a JSON
    * representation.
-   * @param j JSON object containing the binarization parameters.
+   * @param idx_j JSON object containing the binarization parameters.
    * @param bin_id The binarization type identifier.
    */
-  BinarizationParameters(nlohmann::json j, BinarizationId bin_id);
+  BinarizationParameters(nlohmann::json idx_j, BinarizationId bin_id);
 
   /**
    * @brief Converts the `BinarizationParameters` object to a JSON

@@ -37,19 +37,19 @@ static int combinationsWithRepetitions(std::vector<std::string>* genoAlphabet, c
             return 1;
         }
         std::string tmp;
-        for (int i = 0; i < len; i++) {
-            tmp += alleleAlphabet[got[i]];
+        for (int idx_i = 0; idx_i < len; idx_i++) {
+            tmp += alleleAlphabet[got[idx_i]];
         }
         genoAlphabet->push_back(tmp);
         return 1;
     }
 
     int count = 0;
-    for (int i = at; i < maxTypes; i++) {
+    for (int idx_i = at; idx_i < maxTypes; idx_i++) {
         if (got) {
-            got[nChosen] = i;
+            got[nChosen] = idx_i;
         }
-        count += combinationsWithRepetitions(genoAlphabet, alleleAlphabet, got, nChosen + 1, len, i, maxTypes);
+        count += combinationsWithRepetitions(genoAlphabet, alleleAlphabet, got, nChosen + 1, len, idx_i, maxTypes);
     }
 
     return count;
@@ -209,8 +209,8 @@ void Genotyper::computeGenotypeLikelihoods(const std::string& seqPileup, const s
         itr = 0;
         for (auto const& genotype : genotypeAlphabet_) {
             double p = 0.0;
-            for (int i = 0; i < polyploidy_; i++) {
-                p += (y == genotype[i]) ? pStrike : pError;
+            for (int idx_i = 0; idx_i < polyploidy_; idx_i++) {
+                p += (y == genotype[idx_i]) ? pStrike : pError;
             }
             p /= polyploidy_;
 

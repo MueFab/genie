@@ -122,9 +122,9 @@ class Binarization final {
 
   /**
    * @brief Constructs a `Binarization` object from a JSON representation.
-   * @param j JSON object containing the binarization configuration.
+   * @param idx_j JSON object containing the binarization configuration.
    */
-  explicit Binarization(nlohmann::json j);
+  explicit Binarization(nlohmann::json idx_j);
 
   /**
    * @brief Converts the `Binarization` object to a JSON representation.

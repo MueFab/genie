@@ -80,12 +80,12 @@ AmaxPayload::AmaxPayload(genie::util::BitReader& reader) {
   nbits_per_elem_ = static_cast<uint8_t>(reader.ReadBits(4));
 
   amax_elements_.resize(nelems);
-  for (size_t i = 0; i < nelems; ++i) {
+  for (size_t idx_i = 0; idx_i < nelems; ++idx_i) {
     auto is_one_flag = reader.Read<bool>(1);
     if (is_one_flag) {
-      amax_elements_[i] = 1;
+      amax_elements_[idx_i] = 1;
     } else {
-      amax_elements_[i] = reader.Read<uint64_t>(nbits_per_elem_) + 1;
+      amax_elements_[idx_i] = reader.Read<uint64_t>(nbits_per_elem_) + 1;
     }
   }
 

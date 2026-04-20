@@ -160,7 +160,7 @@ GenotypePayload::GenotypePayload(
     num_variants_payloads = num_bit_planes_;
   }
 
-  for (auto i=0u; i< num_variants_payloads; i++) {
+  for (auto idx_i=0u; idx_i< num_variants_payloads; idx_i++) {
     variants_payloads_.emplace_back(
       reader,
       parameters.GetVariantsCodecID(),
@@ -386,9 +386,9 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
 //    }
 //
 //    // Initialize row IDs payloads
-//    for (size_t i = 0; i < datablock.allele_row_ids_vect.size(); ++i) {
-//      auto& alleleRowIDs = datablock.allele_row_ids_vect[i];
-//      auto shape = datablock.allele_bin_mat_vect[i].shape();
+//    for (size_t idx_i = 0; idx_i < datablock.allele_row_ids_vect.size(); ++idx_i) {
+//      auto& alleleRowIDs = datablock.allele_row_ids_vect[idx_i];
+//      auto shape = datablock.allele_bin_mat_vect[idx_i].shape();
 //      auto nrows = static_cast<uint32_t>(shape[0]);
 //      auto nBitsPerElem = static_cast<uint32_t>(std::ceil(std::log2(nrows)));
 //
@@ -397,9 +397,9 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
 //    }
 //
 //    // Initialize column IDs payloads
-//    for (size_t i = 0; i < datablock.allele_col_ids_vect.size(); ++i) {
-//      auto& alleleColIDs = datablock.allele_col_ids_vect[i];
-//      auto shape = datablock.allele_bin_mat_vect[i].shape();
+//    for (size_t idx_i = 0; idx_i < datablock.allele_col_ids_vect.size(); ++idx_i) {
+//      auto& alleleColIDs = datablock.allele_col_ids_vect[idx_i];
+//      auto shape = datablock.allele_bin_mat_vect[idx_i].shape();
 //      auto ncols = static_cast<uint32_t>(shape[1]);
 //      auto nBitsPerElem = static_cast<uint32_t>(std::ceil(std::log2(ncols)));
 //
@@ -429,22 +429,22 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
 //        ? genotype_parameters_.GetNumBitPlanes()
 //        : 1;
 //
-//    for (auto i = 0; i < num_variants_payloads; ++i) {
+//    for (auto idx_i = 0; idx_i < num_variants_payloads; ++idx_i) {
 //        std::stringstream tempstream;
 //        core::Writer writesize(&tempstream);
-//        variants_payloads_[i].WriteCompressed(writesize);
+//        variants_payloads_[idx_i].WriteCompressed(writesize);
 //        auto variantssize = tempstream.str().size();
 //        writer.Write(variantssize, 32);
-//        variants_payloads_[i].WriteCompressed(writer);
+//        variants_payloads_[idx_i].WriteCompressed(writer);
 //        auto variantsPayloadsParams =
 //            genotype_parameters_.GsetVariantsPayloadParams();
-//        if (variantsPayloadsParams[i].sort_rows_flag) {
+//        if (variantsPayloadsParams[idx_i].sort_rows_flag) {
 //            uint32_t size = sort_variants_row_ids_payload[indecRowIds].GetSize();
 //            writer.Write(size, 32);
 //            sort_variants_row_ids_payload[indecRowIds].Write(writer);
 //            ++indecRowIds;
 //        }
-//        if (variantsPayloadsParams[i].sort_cols_flag) {
+//        if (variantsPayloadsParams[idx_i].sort_cols_flag) {
 //            auto size = sort_variants_col_ids_payload[indecColIds].GetSize();
 //            writer.Write(size, 32);
 //            sort_variants_col_ids_payload[indecColIds].Write(writer);

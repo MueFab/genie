@@ -30,10 +30,10 @@ DecoderRegular::DecoderRegular()
 
 DecoderRegular::DecoderRegular(core::GenDesc desc)
     : core::parameter::desc_pres::DecoderRegular(kModeCabac) {
-  for (size_t i = 0;
-       i < core::GetDescriptors()[static_cast<uint8_t>(desc)].sub_seqs.size();
-       ++i) {
-    descriptor_subsequence_cfgs_.emplace_back(static_cast<uint16_t>(i), false);
+  for (size_t idx_i = 0;
+       idx_i < core::GetDescriptors()[static_cast<uint8_t>(desc)].sub_seqs.size();
+       ++idx_i) {
+    descriptor_subsequence_cfgs_.emplace_back(static_cast<uint16_t>(idx_i), false);
   }
 }
 
@@ -42,7 +42,7 @@ DecoderRegular::DecoderRegular(core::GenDesc desc)
 DecoderRegular::DecoderRegular(core::GenDesc desc, util::BitReader& reader)
     : core::parameter::desc_pres::DecoderRegular(kModeCabac) {
   const uint8_t num_descriptor_subsequence_cfgs = reader.Read<uint8_t>() + 1;
-  for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
+  for (size_t idx_i = 0; idx_i < num_descriptor_subsequence_cfgs; ++idx_i) {
     descriptor_subsequence_cfgs_.emplace_back(false, desc, reader);
   }
 }
@@ -85,8 +85,8 @@ DecoderRegular::create(core::GenDesc desc, util::BitReader& reader) {
 void DecoderRegular::Write(util::BitWriter& writer) const {
   Decoder::Write(writer);
   writer.WriteBits(descriptor_subsequence_cfgs_.size() - 1, 8);
-  for (auto& i : descriptor_subsequence_cfgs_) {
-    i.write(writer);
+  for (auto& idx_i : descriptor_subsequence_cfgs_) {
+    idx_i.write(writer);
   }
 }
 
@@ -103,8 +103,8 @@ bool DecoderRegular::Equals(const Decoder* dec) const {
 DecoderTokenType::DecoderTokenType()
     : core::parameter::desc_pres::DecoderTokenType(kModeCabac),
       rle_guard_tokentype_(0) {
-  for (uint16_t i = 0; i < 2; ++i) {
-    descriptor_subsequence_cfgs_.emplace_back(i, true);
+  for (uint16_t idx_i = 0; idx_i < 2; ++idx_i) {
+    descriptor_subsequence_cfgs_.emplace_back(idx_i, true);
   }
 }
 
@@ -114,7 +114,7 @@ DecoderTokenType::DecoderTokenType(core::GenDesc desc, util::BitReader& reader)
     : core::parameter::desc_pres::DecoderTokenType(kModeCabac) {
   constexpr uint8_t num_descriptor_subsequence_cfgs = 2;
   rle_guard_tokentype_ = reader.Read<uint8_t>();
-  for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
+  for (size_t idx_i = 0; idx_i < num_descriptor_subsequence_cfgs; ++idx_i) {
     descriptor_subsequence_cfgs_.emplace_back(true, desc, reader);
   }
 }
@@ -158,8 +158,8 @@ DecoderTokenType::create(core::GenDesc desc, util::BitReader& reader) {
 void DecoderTokenType::Write(util::BitWriter& writer) const {
   Decoder::Write(writer);
   writer.WriteBits(rle_guard_tokentype_, 8);
-  for (auto& i : descriptor_subsequence_cfgs_) {
-    i.write(writer);
+  for (auto& idx_i : descriptor_subsequence_cfgs_) {
+    idx_i.write(writer);
   }
 }
 

@@ -16,8 +16,8 @@ namespace fasta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(std::string _name, size_t length, Manager* m)
-    : core::Reference(std::move(_name), 0, length), mgr(m) {}
+Reference::Reference(std::string _name, size_t length, Manager* dim_m)
+    : core::Reference(std::move(_name), 0, length), mgr(dim_m) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

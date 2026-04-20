@@ -52,7 +52,7 @@ uint64_t Reader::ReadAsBIcabac(const std::vector<unsigned int>& bin_params) {
   const unsigned int cm = bin_params[3];
   const unsigned int c_length = bin_params[0];
   auto scan = m_context_models_.begin() + cm;
-  for (size_t i = c_length; i > 0; i--) {
+  for (size_t idx_i = c_length; idx_i > 0; idx_i--) {
     bins = bins << 1u | m_dec_bin_cabac_.DecodeBin(&*scan++);
   }
   return bins;
@@ -61,40 +61,40 @@ uint64_t Reader::ReadAsBIcabac(const std::vector<unsigned int>& bin_params) {
 // -----------------------------------------------------------------------------
 
 uint64_t Reader::ReadAsTUbypass(const std::vector<unsigned int>& bin_params) {
-  unsigned int i = 0;
+  unsigned int idx_i = 0;
   const unsigned int c_max = bin_params[0];
-  while (i < c_max) {
+  while (idx_i < c_max) {
     if (m_dec_bin_cabac_.DecodeBinsEp(1) == 0) break;
-    i++;
+    idx_i++;
   }
-  return i;
+  return idx_i;
 }
 
 // -----------------------------------------------------------------------------
 
 uint64_t Reader::ReadAsTUcabac(const std::vector<unsigned int>& bin_params) {
-  unsigned int i = 0;
+  unsigned int idx_i = 0;
   const unsigned int cm = bin_params[3];
   const unsigned int c_max = bin_params[0];
   auto scan = m_context_models_.begin() + cm;
-  while (i < c_max) {
+  while (idx_i < c_max) {
     if (m_dec_bin_cabac_.DecodeBin(&*scan) == 0) break;
-    i++;
+    idx_i++;
     ++scan;
   }
-  return i;
+  return idx_i;
 }
 
 // -----------------------------------------------------------------------------
 
 uint64_t Reader::ReadAsEGbypass(const std::vector<unsigned int>&) {
   unsigned int bins = 0;
-  unsigned int i = 0;
+  unsigned int idx_i = 0;
   while (ReadAsBIbypass(std::vector<unsigned int>({1})) == 0) {
-    i++;
+    idx_i++;
   }
-  if (i != 0) {
-    bins = 1u << i | m_dec_bin_cabac_.DecodeBinsEp(i);
+  if (idx_i != 0) {
+    bins = 1u << idx_i | m_dec_bin_cabac_.DecodeBinsEp(idx_i);
   } else {
     return 0;
   }
@@ -106,14 +106,14 @@ uint64_t Reader::ReadAsEGbypass(const std::vector<unsigned int>&) {
 uint64_t Reader::ReadAsEGcabac(const std::vector<unsigned int>& bin_params) {
   const unsigned int cm = bin_params[3];
   auto scan = m_context_models_.begin() + cm;
-  unsigned int i = 0;
+  unsigned int idx_i = 0;
   while (m_dec_bin_cabac_.DecodeBin(&*scan) == 0) {
     ++scan;
-    i++;
+    idx_i++;
   }
   unsigned int bins = 0;
-  if (i != 0) {
-    bins = 1u << i | m_dec_bin_cabac_.DecodeBinsEp(i);
+  if (idx_i != 0) {
+    bins = 1u << idx_i | m_dec_bin_cabac_.DecodeBinsEp(idx_i);
   } else {
     return 0;
   }
@@ -149,9 +149,9 @@ uint64_t Reader::ReadAsSutUbypass(const std::vector<unsigned int>& bin_params) {
 
   uint64_t value = 0;
 
-  for (uint32_t i = 0; i < output_sym_size; i += split_unit_size) {
+  for (uint32_t idx_i = 0; idx_i < output_sym_size; idx_i += split_unit_size) {
     uint64_t val = 0;
-    uint32_t c_max = i == 0 && output_sym_size % split_unit_size
+    uint32_t c_max = idx_i == 0 && output_sym_size % split_unit_size
                          ? (1u << output_sym_size % split_unit_size) - 1
                          : (1u << split_unit_size) - 1;
     val = ReadAsTUbypass(std::vector({c_max}));
@@ -171,9 +171,9 @@ uint64_t Reader::ReadAsSutUcabac(const std::vector<unsigned int>& bin_params) {
   uint32_t cm = bin_params[3];
   uint64_t value = 0;
 
-  for (uint32_t i = 0; i < output_sym_size; i += split_unit_size) {
+  for (uint32_t idx_i = 0; idx_i < output_sym_size; idx_i += split_unit_size) {
     uint64_t val = 0;
-    uint32_t c_max = i == 0 && output_sym_size % split_unit_size
+    uint32_t c_max = idx_i == 0 && output_sym_size % split_unit_size
                          ? (1u << output_sym_size % split_unit_size) - 1
                          : (1u << split_unit_size) - 1;
     val = ReadAsTUcabac(std::vector<unsigned int>({c_max, 0, 0, cm}));

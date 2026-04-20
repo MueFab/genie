@@ -57,7 +57,7 @@ AccessUnit::AccessUnit(util::BitReader& reader, const std::map<size_t, core::par
         }
     } while (true);
     if (block_header) {
-        for (size_t i = 0; i < header.getHeader().getNumBlocks(); ++i) {
+        for (size_t idx_i = 0; idx_i < header.getHeader().getNumBlocks(); ++idx_i) {
             blocks.emplace_back(reader);
         }
     }

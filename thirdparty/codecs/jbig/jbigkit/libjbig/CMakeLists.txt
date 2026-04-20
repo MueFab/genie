@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5)
 
 project(jbigkit
         VERSION 2.1 # JBIGKIT version

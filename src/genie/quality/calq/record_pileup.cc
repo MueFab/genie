@@ -42,7 +42,7 @@ std::string RecordPileup::preprocess(const std::string &read, const std::string 
         }
         switch (cigar_pos) {
             case '=':
-                for (size_t i = 0; i < count; ++i) {
+                for (size_t idx_i = 0; idx_i < count; ++idx_i) {
                     if (read_pos >= read.length()) {
                         UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
                     }
@@ -62,7 +62,7 @@ std::string RecordPileup::preprocess(const std::string &read, const std::string 
             case '*':
             case '/':
             case '%':
-                for (size_t i = 0; i < count; ++i) {
+                for (size_t idx_i = 0; idx_i < count; ++idx_i) {
                     result += '0';
                 }
                 break;
@@ -85,12 +85,12 @@ void RecordPileup::addRecord(EncodingRecord &r) {
 
     records.emplace_back(r);
 
-    for (size_t i = 0; i < r.cigars.size(); ++i) {
-        auto seq_processed = preprocess(r.sequences[i], r.cigars[i]);
-        auto qual_processed = preprocess(r.qvalues[i], r.cigars[i]);
+    for (size_t idx_i = 0; idx_i < r.cigars.size(); ++idx_i) {
+        auto seq_processed = preprocess(r.sequences[idx_i], r.cigars[idx_i]);
+        auto qual_processed = preprocess(r.qvalues[idx_i], r.cigars[idx_i]);
 
-        this->minPos = std::min(this->minPos, r.positions[i]);
-        this->maxPos = std::max(this->maxPos, r.positions[i] + seq_processed.length() - 1);
+        this->minPos = std::min(this->minPos, r.positions[idx_i]);
+        this->maxPos = std::max(this->maxPos, r.positions[idx_i] + seq_processed.length() - 1);
 
         preprocessed_qvalues.back().emplace_back(std::move(qual_processed));
         preprocessed_sequences.back().emplace_back(std::move(seq_processed));
@@ -104,11 +104,11 @@ std::pair<std::string, std::string> RecordPileup::getPileup(uint64_t pos) {
 
     std::string seqs, quals;
 
-    for (uint64_t i = 0; i < this->records.size(); ++i) {
-        for (uint64_t read_i = 0; read_i < records[i].positions.size(); ++read_i) {
-            const auto pos_read = records[i].positions[read_i];
-            const auto &seq = preprocessed_sequences[i][read_i];
-            const auto &qual = preprocessed_qvalues[i][read_i];
+    for (uint64_t idx_i = 0; idx_i < this->records.size(); ++idx_i) {
+        for (uint64_t read_i = 0; read_i < records[idx_i].positions.size(); ++read_i) {
+            const auto pos_read = records[idx_i].positions[read_i];
+            const auto &seq = preprocessed_sequences[idx_i][read_i];
+            const auto &qual = preprocessed_qvalues[idx_i][read_i];
 
             if ((pos < pos_read) || (pos > pos_read + seq.size() - 1)) {
                 continue;

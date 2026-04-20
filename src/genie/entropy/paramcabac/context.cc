@@ -43,7 +43,7 @@ Context::Context(const uint8_t output_symbol_size,
                  const uint8_t coding_subsym_size, util::BitReader& reader) {
   adaptive_mode_flag_ = reader.Read<bool>(1);
   num_contexts_ = reader.Read<uint16_t>();
-  for (size_t i = 0; i < num_contexts_; ++i) {
+  for (size_t idx_i = 0; idx_i < num_contexts_; ++idx_i) {
     context_initialization_value_.emplace_back(reader.Read<uint8_t>(7));
   }
   if (coding_subsym_size < output_symbol_size) {
@@ -64,8 +64,8 @@ void Context::AddContextInitializationValue(
 void Context::write(util::BitWriter& writer) const {
   writer.WriteBits(adaptive_mode_flag_, 1);
   writer.WriteBits(num_contexts_, 16);
-  for (auto& i : context_initialization_value_) {
-    writer.WriteBits(i, 7);
+  for (auto& idx_i : context_initialization_value_) {
+    writer.WriteBits(idx_i, 7);
   }
   if (share_subsym_ctx_flag_) {
     writer.WriteBits(*share_subsym_ctx_flag_, 1);
@@ -105,15 +105,15 @@ bool Context::operator==(const Context& ctx) const {
 
 // -----------------------------------------------------------------------------
 
-Context::Context(nlohmann::json j) : num_contexts_(0) {
-  adaptive_mode_flag_ = static_cast<bool>(j["adaptive_mode_flag"]);
-  if (j.contains("context_initialization_value")) {
-    for (const auto& i : j["context_initialization_value"]) {
-      context_initialization_value_.emplace_back(i);
+Context::Context(nlohmann::json idx_j) : num_contexts_(0) {
+  adaptive_mode_flag_ = static_cast<bool>(idx_j["adaptive_mode_flag"]);
+  if (idx_j.contains("context_initialization_value")) {
+    for (const auto& idx_i : idx_j["context_initialization_value"]) {
+      context_initialization_value_.emplace_back(idx_i);
     }
   }
-  if (j.contains("share_subsym_ctx_flag")) {
-    share_subsym_ctx_flag_ = j["share_subsym_ctx_flag"];
+  if (idx_j.contains("share_subsym_ctx_flag")) {
+    share_subsym_ctx_flag_ = idx_j["share_subsym_ctx_flag"];
   }
 }
 

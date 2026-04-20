@@ -1,11 +1,11 @@
-project("genie-genotype")
+project("genie-genotype-local")
 
 set(source_files
         amax_payload.cc
         bin_mat_payload.cc
+        genotype_coder.cc
         genotype_parameters.cc
         genotype_payload.cc
-        parameterset_composer.cc
         row_col_ids_payload.cc
         sorted_bin_mat_payload.cc
 )
@@ -30,6 +30,7 @@ if(GENIE_GENOTYPE_BACKEND STREQUAL "xtensor")
     target_compile_definitions(${PROJECT_NAME} PUBLIC GENIE_GENOTYPE_BACKEND_XTENSOR)
     target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
 elseif(GENIE_GENOTYPE_BACKEND STREQUAL "eigen")
+    find_package(Eigen REQUIRED)
     target_compile_definitions(${PROJECT_NAME} PUBLIC GENIE_GENOTYPE_BACKEND_EIGEN)
     target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
 else()
@@ -52,6 +53,8 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=conversion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=maybe-uninitialized")
 endif ()
+
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-backend)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
 #target_link_libraries(${PROJECT_NAME} PUBLIC mpeggCodecs-shared)

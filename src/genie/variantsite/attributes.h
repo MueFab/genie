@@ -18,13 +18,13 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/record/annotation_parameter_set/AttributeData.h"
+#include "genie/core/parameter/annotation/attribute_data.h"
 #include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 
 #include "genie/core/variant_site_record/record.h"
 
-#include "genie/core/record/annotation_access_unit/TypedData.h"
+#include "genie/core/access_unit/annotation/typed_data.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -36,7 +36,7 @@ namespace variant_site {
 
 class AttributeTile {
  public:
-    AttributeTile(uint64_t _rowsPerTile, genie::core::record::annotation_parameter_set::AttributeData _info)
+    AttributeTile(uint64_t _rowsPerTile, genie::core::parameter::annotation::AttributeData _info)
         : rowsPerTile(_rowsPerTile), info(_info), tiles{}, rowInTile(0) {}
     AttributeTile() : rowsPerTile(0), info{}, tiles{}, rowInTile(0) {}
 
@@ -52,7 +52,7 @@ class AttributeTile {
     }
 
     void setCompressedData(uint64_t tilenr, std::stringstream& compressedData);
-    core::record::annotation_access_unit::TypedData& getTypedTile(uint64_t tilenr) {
+    core::access_unit::annotation::TypedData& getTypedTile(uint64_t tilenr) {
         return typedTiles.at(tilenr);
     }
 
@@ -72,8 +72,8 @@ class AttributeTile {
 
  private:
     uint64_t rowsPerTile;
-    genie::core::record::annotation_parameter_set::AttributeData info;
-    std::vector< genie::core::record::annotation_access_unit::TypedData> typedTiles;
+    genie::core::parameter::annotation::AttributeData info;
+    std::vector< genie::core::access_unit::annotation::TypedData> typedTiles;
     std::vector<std::stringstream> tiles;
     std::vector<genie::core::Writer> writers;
     uint64_t rowInTile;
@@ -86,7 +86,7 @@ class Attributes {
     Attributes() : rowsPerTile(0) {}
 
     Attributes(uint64_t _rowsPerTile,
-               std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> _info)
+               std::map<std::string, genie::core::parameter::annotation::AttributeData> _info)
         : rowsPerTile(_rowsPerTile), info(_info), attrWritten{} {
         initAttributeTiles();
     }
@@ -95,7 +95,7 @@ class Attributes {
     void add(std::map<std::string, genie::core::record::variant_site::Info_tag> tags, std::map<std::string, std::vector<std::vector<uint8_t>>> infoValues);
 
     std::map<std::string, AttributeTile>& getTiles() { return attributeTiles; }
-    std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& getInfo() { return info; }
+    std::map<std::string, genie::core::parameter::annotation::AttributeData>& getInfo() { return info; }
 
     Attributes(Attributes& other);
 
@@ -103,7 +103,7 @@ class Attributes {
 
  private:
     uint64_t rowsPerTile;
-    std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> info;
+    std::map<std::string, genie::core::parameter::annotation::AttributeData> info;
     std::map<std::string, AttributeTile> attributeTiles;
     std::map<std::string, bool> attrWritten;
 

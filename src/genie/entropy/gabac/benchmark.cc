@@ -266,16 +266,16 @@ ConfigSearchTransformedSeq::ConfigSearchTransformedSeq(
     output_bits_++;
   }
   // Split sizes 2^0 to 2^4
-  for (int i = 0; i < 4; ++i) {
+  for (int idx_i = 0; idx_i < 4; ++idx_i) {
     binarizations_.emplace_back();
     // Split at binarization level (1) or as sub symbol (0)
-    for (int j = 0; j < 2; ++j) {
+    for (int idx_j = 0; idx_j < 2; ++idx_j) {
       binarizations_.back().emplace_back();
 
-      const uint8_t split_size = static_cast<uint8_t>(1) << i;
+      const uint8_t split_size = static_cast<uint8_t>(1) << idx_i;
       uint8_t coding_size = output_bits_ / split_size;
 
-      if (j == 0) {
+      if (idx_j == 0) {
         coding_size = 0;
       }
       binarizations_.back().back().emplace_back(range,
@@ -407,9 +407,9 @@ std::string ResultFull::ToCsv(const std::string& filename) const {
       ret += ";";
     }
   }
-  for (int i = 0;
-       i < 3 - static_cast<int>(config.GetTransformSubSeqConfigs().size());
-       ++i) {
+  for (int idx_i = 0;
+       idx_i < 3 - static_cast<int>(config.GetTransformSubSeqConfigs().size());
+       ++idx_i) {
     ret += ";;;;;;";
   }
   return filename + ";" + ret;
@@ -422,14 +422,14 @@ std::string ResultFull::GetCsvHeader() const {
   desc +=
       "File;Compressed Size;Compression "
       "time;Transformation;TransformationParam;";
-  for (size_t i = 0; i < config.GetTransformSubSeqConfigs().size(); ++i) {
+  for (size_t idx_i = 0; idx_i < config.GetTransformSubSeqConfigs().size(); ++idx_i) {
     desc +=
         "Coding order;Symbol size;Sub symbol Size;Sub symbol "
         "transformation;Binarization;BinParam;";
   }
-  for (int i = 0;
-       i < 3 - static_cast<int>(config.GetTransformSubSeqConfigs().size());
-       ++i) {
+  for (int idx_i = 0;
+       idx_i < 3 - static_cast<int>(config.GetTransformSubSeqConfigs().size());
+       ++idx_i) {
     desc +=
         "Coding order;Symbol size;Sub symbol Size;Sub symbol "
         "transformation;Binarization;BinParam;";
@@ -468,15 +468,15 @@ ResultFull BenchmarkFull(const std::string& input_file,
     std::vector<ResultTransformed> trans_results;
 
     // Optimize transformed sequences independently
-    for (size_t i = 0; i < transformed_sub_seqs.size(); ++i) {
+    for (size_t idx_i = 0; idx_i < transformed_sub_seqs.size(); ++idx_i) {
       UTILS_LOG(util::Logger::Severity::INFO,
-                "Optimizing subsequence " + std::to_string(i) + "...");
+                "Optimizing subsequence " + std::to_string(idx_i) + "...");
       trans_results.emplace_back(OptimizeTransformedSequence(
-          config.GetTransformedSeqs()[i], desc, transformed_sub_seqs[i],
-          time_weight, i == transformed_sub_seqs.size() - 1,
-          config.GetTransform(), config.GetTransformParam(), i, input_file));
+          config.GetTransformedSeqs()[idx_i], desc, transformed_sub_seqs[idx_i],
+          time_weight, idx_i == transformed_sub_seqs.size() - 1,
+          config.GetTransform(), config.GetTransformParam(), idx_i, input_file));
       auto tmp = trans_results.back().config;
-      cfg.SetTransformSubSeqCfg(i, std::move(tmp));
+      cfg.SetTransformSubSeqCfg(idx_i, std::move(tmp));
     }
 
     // Sum up compressed sizes and times
@@ -675,10 +675,10 @@ paramcabac::Subsequence ConfigSearch::CreateConfig(
   std::vector<paramcabac::TransformedSubSeq> tss;
   for (auto& p : params_[transformation_.GetIndex(transformation_search_idx_)]
                      .GetTransformedSeqs()) {
-    constexpr size_t i = 0;
+    constexpr size_t idx_i = 0;
     tss.emplace_back(p.CreateConfig(
         descriptor_subsequence,
-        i == params_[transformation_.GetIndex(transformation_search_idx_)]
+        idx_i == params_[transformation_.GetIndex(transformation_search_idx_)]
                      .GetTransformedSeqs()
                      .size() -
                  1));

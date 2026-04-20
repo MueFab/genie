@@ -11,8 +11,11 @@
 #include <list>
 #include <tuple>
 //#include <optional>
+<<<<<<< HEAD
 //#include <xtensor/xarray.hpp>
 //#include <xtensor/xtensor.hpp>
+=======
+>>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
 #include "contact_types.h"
 #include "genie/core/constants.h"
 #include "genie/core/contact_record/record.h"
