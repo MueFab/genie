@@ -12,6 +12,7 @@
 #include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "genie/core/arrayType.h"
 #include "genie/core/record/annotation_parameter_set/record.h"

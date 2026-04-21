@@ -7,6 +7,7 @@
 #include "genie/trackproperty/trackproperty_parser.h"
 
 #include <algorithm>
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>
@@ -58,8 +59,7 @@ void TrackPropertyParser::init() {
                 infoField.ID,
                 infoField.Type,
                 infoField.Number,
-                attributeID
-            );
+                attributeID);
             attributeData[infoField.ID] = attribute;
             attributeID++;
         }
