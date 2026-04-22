@@ -8,6 +8,7 @@
 
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "codecs/include/mpegg-codecs.h"
