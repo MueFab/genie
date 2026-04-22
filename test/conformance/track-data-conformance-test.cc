@@ -63,7 +63,7 @@ TEST_P(TrackDataConformanceTest, TrackDataConformancetests) {  // NOLINT(cert-er
     genie::annotation::Annotation annotationGenerator;
 
     annotationGenerator.setCompressorConfig(config);
-    annotationGenerator.setTileSize(1000, 3000);
+    annotationGenerator.setTileSize(2000, 3000);
     annotationGenerator.setATType(genie::core::record::annotation_access_unit::AnnotationType::TRACKS,
                                    subtype);
 
@@ -75,4 +75,5 @@ INSTANTIATE_TEST_SUITE_P(testallTrackDataConformance, TrackDataConformanceTest,
                         ::testing::Values(
                             TestParam{"/data/records/track/trfMask_bed.mgrec", AnnotationSubtype::BED},
                             TestParam{"/data/records/track/Kidney_Genetic_Scorecard_BED_Hg19_Chr1_data.mgrec", AnnotationSubtype::BED},
-                            TestParam{"/data/records/track/Kidney_Genetic_Scorecard_WIG_Hg19_Chr1_data.mgrec", AnnotationSubtype::WIG}));
+                            TestParam{"/data/records/track/Kidney_Genetic_Scorecard_WIG_Hg19_Chr1_data.mgrec", AnnotationSubtype::WIG},
+                            TestParam{"/data/records/track/Kidney_Genetic_Scorecard_INT_Hg19_Chr1_data.mgrec", AnnotationSubtype::BED}));

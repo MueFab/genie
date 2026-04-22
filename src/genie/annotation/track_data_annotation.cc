@@ -32,8 +32,10 @@ void TrackDataAnnotation::parseInfoTags(std::string& recordInputFileName) {
     readForTags.open(recordInputFileName, std::ios::in | std::ios::binary);
     util::BitReader bitreader(readForTags);
     core::record::track::Record recs;
+    numberOfRecords = 0;
 
     while (recs.Read(bitreader)) {
+        numberOfRecords++;
         const auto& attrs = recs.GetAttributes();
         for (const auto& attr : attrs) {
             InfoField infoField(attr.attr_tag, static_cast<core::DataType>(attr.attr_type), 1);
@@ -43,6 +45,13 @@ void TrackDataAnnotation::parseInfoTags(std::string& recordInputFileName) {
     readForTags.close();
     for (const auto& info : attributeInfo)
         infoFields.emplace_back(info.second.ID, info.second.Type, info.second.Number);
+
+    // Adjust tile size based on number of records if needed
+    // If we have a very small number of records, use a smaller tile size
+    // to avoid creating unnecessary empty tiles
+    if (numberOfRecords > 0 && defaultTileSizeHeight > numberOfRecords) {
+        defaultTileSizeHeight = static_cast<uint32_t>(numberOfRecords);
+    }
 }
 
 TrackUnits TrackDataAnnotation::parseTrack(std::ifstream& inputfile) {

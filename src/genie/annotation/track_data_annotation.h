@@ -46,6 +46,8 @@ class TrackDataAnnotation {
         annotationSubtype_ = subtype;
     }
 
+    uint64_t getNumberOfRecords() const { return numberOfRecords; }
+
  private:
     std::ifstream recordInput;
     Compressor compressors;
@@ -64,6 +66,7 @@ class TrackDataAnnotation {
     std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
+    uint64_t numberOfRecords{0};
     core::record::annotation_access_unit::AnnotationSubtype annotationSubtype_{
         core::record::annotation_access_unit::AnnotationSubtype::BED};
 };
