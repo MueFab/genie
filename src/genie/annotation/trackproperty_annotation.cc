@@ -31,14 +31,14 @@ void TrackPropertyAnnotation::parseInfoTags(std::string& recordInputFileName) {
     std::ifstream readForTags;
     readForTags.open(recordInputFileName, std::ios::in | std::ios::binary);
     util::BitReader bitreader(readForTags);
-    
+
     // Read all track property records to collect all possible info fields
     while (bitreader.IsStreamGood()) {
         core::record::track_property::Record rec;
         if (!rec.Read(bitreader)) {
             break;
         }
-        
+
         // Store track_type from the first record to determine annotation subtype
         if (trackType_ == 0) {
             trackType_ = rec.GetTrackType();
@@ -48,14 +48,14 @@ void TrackPropertyAnnotation::parseInfoTags(std::string& recordInputFileName) {
         for (const auto& prop : props) {
             // Only add if not already present
             if (attributeInfo.find(prop.track_property) == attributeInfo.end()) {
-                InfoField infoField(prop.track_property, static_cast<core::DataType>(prop.track_property_type), 
+                InfoField infoField(prop.track_property, static_cast<core::DataType>(prop.track_property_type),
                                    prop.track_property_array_len);
                 attributeInfo[prop.track_property] = infoField;
             }
         }
     }
     readForTags.close();
-    
+
     for (const auto& info : attributeInfo)
         infoFields.emplace_back(info.second.ID, info.second.Type, info.second.Number);
 }
