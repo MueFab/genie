@@ -51,4 +51,4 @@ TEST_P(ExpressionSampleConformanceTest, ExpressionSampleConformancetests) {  // 
 }
 
 INSTANTIATE_TEST_SUITE_P(testallExpressionSampleConformance, ExpressionSampleConformanceTest,
-                        ::testing::Values("/data/records/expression/5.4.1-tp01.sample"));
+    ::testing::Values("/data/records/expression/5.4.1-tp01.sample"));

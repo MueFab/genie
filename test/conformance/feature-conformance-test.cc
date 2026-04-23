@@ -71,4 +71,4 @@ TEST_P(FeatureConformanceTest, FeatureConformancetests) {  // NOLINT(cert-err58-
 }
 
 INSTANTIATE_TEST_SUITE_P(testallFeatureConformance, FeatureConformanceTest,
-                        ::testing::Values("/data/records/expression/5.4.1-tp01.feat"));
+    ::testing::Values("/data/records/expression/5.4.1-tp01.feat"));

@@ -73,8 +73,6 @@ TEST_P(TrackDataConformanceTest, TrackDataConformancetests) {  // NOLINT(cert-er
 
 // Test case details will be added when example files become available
 INSTANTIATE_TEST_SUITE_P(testallTrackDataConformance, TrackDataConformanceTest,
-                        ::testing::Values(
-                            TestParam{"/data/records/track/trfMask_bed.mgrec", AnnotationSubtype::BED},
-                            TestParam{"/data/records/track/Kidney_Genetic_Scorecard_BED_Hg19_Chr1_data.mgrec", AnnotationSubtype::BED},
-                            TestParam{"/data/records/track/Kidney_Genetic_Scorecard_WIG_Hg19_Chr1_data.mgrec", AnnotationSubtype::WIG},
-                            TestParam{"/data/records/track/Kidney_Genetic_Scorecard_INT_Hg19_Chr1_data.mgrec", AnnotationSubtype::BED}));
+    ::testing::Values(
+        TestParam{"/data/records/track/TD01_snATAC_-_Endo_Lympho_data.mgrec", AnnotationSubtype::WIG},
+        TestParam{"/data/records/track/TD02_concat_KGS_Hg19_Chr1_50_data.mgrec", AnnotationSubtype::BED}));

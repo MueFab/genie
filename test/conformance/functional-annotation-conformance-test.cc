@@ -74,7 +74,10 @@ TEST_P(FunctionalAnnotationConformanceTest, FunctionalAnnotationConformancetests
     annotationGenerator.startStream(genie::annotation::RecType::FUNCTIONAL_ANNOTATIONS_FILE, filepath, filepath + "_output");
 }
 
-INSTANTIATE_TEST_SUITE_P(testallFunctionalAnnotationConformance, FunctionalAnnotationConformanceTest,
-                        ::testing::Values(
-                            TestParam{"/data/records/functional_annotation/Homo_sapiens.GRCh38.95.chr.1000.gtf.func.mgrec", AnnotationSubtype::GTF},
-                            TestParam{"/data/records/functional_annotation/Homo_sapiens.GRCh38.95.1000.gff3.func.mgrec", AnnotationSubtype::GFF}));
+INSTANTIATE_TEST_SUITE_P(
+    testallFunctionalAnnotationConformance, FunctionalAnnotationConformanceTest,
+    ::testing::Values(
+        TestParam{"/data/records/functional_annotation/FA01_Homo_sapiens.GRCh38.95.chr.gtf.mgrec", AnnotationSubtype::GTF},
+        TestParam{"/data/records/functional_annotation/FA02_Homo_sapiens.GRCh38.95.chr.gtf.mgrec", AnnotationSubtype::GTF},
+        TestParam{"/data/records/functional_annotation/FA03_Homo_sapiens.GRCh38.95.gff3.mgrec", AnnotationSubtype::GFF},
+        TestParam{"/data/records/functional_annotation/FA04_Homo_sapiens.GRCh38.95.gff3.mgrec", AnnotationSubtype::GFF}));

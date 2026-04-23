@@ -71,6 +71,6 @@ TEST_P(SiteConformanceTest, SiteConformancetests) {  // NOLINT(cert-err58-cpp)
 }
 
 INSTANTIATE_TEST_SUITE_P(testallsiteConformance, SiteConformanceTest,
-                        ::testing::Values("/data/records/conformance/1.3.5.bgz.CASE01.site",
-                                          "/data/records/conformance/1.3.11.bgz.CASE03.site",
-                                          "/data/records/conformance/1.3.11.bgz.CASE04.site"));
+    ::testing::Values("/data/records/conformance/1.3.5.bgz.CASE01.site",
+                      "/data/records/conformance/1.3.11.bgz.CASE03.site",
+                      "/data/records/conformance/1.3.11.bgz.CASE04.site"));
