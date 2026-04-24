@@ -10,25 +10,43 @@
 #include <vector>
 #include <sstream>
 #include "likelihood_types.h"
-#include "genie/core/variant_genotype_record/record.h"
+#include "genie/core/record/variant/record.h"
 #include "likelihood_parameters.h"
 
 namespace genie::likelihood {
     struct EncodingOptions;
-    struct EncodingBlock;
     class LikelihoodPayload;
+}
+
+namespace genie::likelihood::detail {
+struct LikelihoodEncodingBlock {
+    uint32_t nrows;
+    uint32_t ncols;
+    std::stringstream serialized_mat;
+    std::stringstream serialized_arr;
+    
+    // STD specific members
+    UInt32MatDtype likelihood_mat;
+    UInt32ArrDtype lut;
+    UInt32MatDtype idx_mat;
+    
+    uint32_t nelems;
+    core::DataType dtype_id = core::DataType::UINT32;
+
+    LikelihoodEncodingBlock() : nrows(0), ncols(0), nelems(0) {}
+};
 }
 
 namespace genie::likelihood::detail::eigen {
 
 void extract_likelihoods(
     const EncodingOptions& opt,
-    EncodingBlock& block,
+    LikelihoodEncodingBlock& block,
     std::vector<core::record::VariantGenotype>& recs);
 
-void transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block);
+void transform_likelihood_mat(const EncodingOptions& opt, LikelihoodEncodingBlock& block);
 
-void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block);
+void inverse_transform_likelihood_mat(const EncodingOptions& opt, LikelihoodEncodingBlock& block);
 
 void transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, uint32_t& nelems, UInt32MatDtype& idx_mat,
                    core::DataType& dtype_id);

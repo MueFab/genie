@@ -13,11 +13,11 @@
 #include <vector>
 
 #include "genie/annotation/annotation.h"
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/util/runtime_exception.h"
 
 #include "genie/contact/contact_coder.h"
-#include "genie/core/contact_record/record.h"
+#include "genie/core/record/contact/record.h"
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"

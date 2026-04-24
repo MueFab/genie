@@ -10,20 +10,6 @@
 #include <cstdint>
 #include <vector>
 
-<<<<<<< HEAD
-namespace genie::contact {
-
-// Pure C++ types for records, parameter sets and blocks
-using BinVecDtype = std::vector<bool>;
-using BinMatDtype = std::vector<std::vector<bool>>;
-using UInt8VecDtype = std::vector<uint8_t>;
-using UIntVecDtype = std::vector<uint32_t>;
-using UIntMatDtype = std::vector<std::vector<uint32_t>>;
-using UInt64VecDtype = std::vector<uint64_t>;
-using Int64VecDtype = std::vector<int64_t>;
-using DoubleVecDtype = std::vector<double>;
-using MatShapeDtype = std::vector<size_t>;
-=======
 #if defined(GENIE_CONTACT_BACKEND_XTENSOR)
 #include <xtensor/xtensor.hpp>
 #elif defined(GENIE_CONTACT_BACKEND_EIGEN)
@@ -66,7 +52,6 @@ using MatShapeDtype = ::genie::backend::genie_std_impl::MatShapeDtype;
 using Int64VecDtype = std::vector<int64_t>;
 using DoubleVecDtype = std::vector<double>;
 #endif
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
 
 enum class TransformID : uint8_t {
     ID_0 = 0,
@@ -77,7 +62,7 @@ enum class TransformID : uint8_t {
 
 struct RunLengthEncodingData {
   bool firstVal;
-  UIntVecDtype rl_entries;
+  std::vector<uint32_t> rl_entries;
   uint32_t maxCount;
   TransformID transformID;
 };

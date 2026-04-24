@@ -5,15 +5,7 @@
 
 namespace genie::backend::genie_std_impl {
 
-using BinVecDtype = ::genie::backend::genie_std_impl::BinVecDtype;
-using BinMatDtype = ::genie::backend::genie_std_impl::BinMatDtype;
-using UInt8VecDtype = ::genie::backend::genie_std_impl::UInt8VecDtype;
-using UInt8MatDtype = ::genie::backend::genie_std_impl::UInt8MatDtype;
-using UIntVecDtype = ::genie::backend::genie_std_impl::UIntVecDtype;
-using UIntMatDtype = ::genie::backend::genie_std_impl::UIntMatDtype;
-using UInt64VecDtype = ::genie::backend::genie_std_impl::UInt64VecDtype;
-using Int8MatDtype = ::genie::backend::genie_std_impl::Int8MatDtype;
-using MatShapeDtype = ::genie::backend::genie_std_impl::MatShapeDtype;
+// Aliases already defined in types.h within this namespace
 
 void sort_sparse_mat_inplace(
     UInt64VecDtype& row_ids,

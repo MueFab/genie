@@ -124,9 +124,9 @@ void serialize_mat(
     util::BitWriter writer(&payload);
     for (size_t idx_i = 0; idx_i < nrows; idx_i++) {
         for (size_t idx_j = 0; idx_j < ncols; idx_j++) {
-            if (dtype_id == 0) // UINT8
+            if (dtype_id == static_cast<uint32_t>(core::DataType::UINT8))
                 writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(mat(idx_i, idx_j)));
-            else if (dtype_id == 1) // UINT16
+            else if (dtype_id == static_cast<uint32_t>(core::DataType::UINT16))
                 writer.WriteBypassBE<uint16_t>(static_cast<uint16_t>(mat(idx_i, idx_j)));
             else
                 writer.WriteBypassBE<uint32_t>(mat(idx_i, idx_j));
@@ -157,9 +157,9 @@ void deserialize_mat(
     mat = xt::empty<uint32_t>({nrows, ncols});
     for (size_t idx_i = 0; idx_i < nrows; idx_i++) {
         for (size_t idx_j = 0; idx_j < ncols; idx_j++) {
-            if (dtype_id == 0) // UINT8
+            if (dtype_id == static_cast<uint32_t>(core::DataType::UINT8))
                 mat(idx_i, idx_j) = reader.ReadAlignedInt<uint8_t>();
-            else if (dtype_id == 1) // UINT16
+            else if (dtype_id == static_cast<uint32_t>(core::DataType::UINT16))
                 mat(idx_i, idx_j) = reader.ReadAlignedInt<uint16_t>();
             else
                 mat(idx_i, idx_j) = reader.ReadAlignedInt<uint32_t>();

@@ -1,7 +1,7 @@
 project("genie-test-core")
 
 set(source_files
-        ndarray-test.cc
+        ndarray_test.cc
 )
 
 add_executable(${PROJECT_NAME} ${source_files})

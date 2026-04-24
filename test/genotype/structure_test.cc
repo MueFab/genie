@@ -649,4 +649,4 @@ TEST(GenotypeStructure, RoundTrip_Structure_GenotypePayload) {
 //    EXPECT_EQ(orig_payload.GetPhasesPayload().value(),
 //              recon_payload.GetPhasesPayload().value());
 //  }
-//}
+}

@@ -55,8 +55,8 @@ TEST_F(payloadStreamTests, testcopy) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    genie::core::parameter::annotation::DescriptorID descriptorID =
-        genie::core::parameter::annotation::DescriptorID::ATTRIBUTE;
+    genie::core::AnnotDesc descriptorID =
+        genie::core::AnnotDesc::ATTRIBUTE;
 
     std::stringstream generic_payload;
     for (uint8_t i = 1; i < 200; ++i) {

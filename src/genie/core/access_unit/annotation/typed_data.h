@@ -18,7 +18,7 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
 #include "genie/genotype/genotype_parameters.h"

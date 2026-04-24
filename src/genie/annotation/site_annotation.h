@@ -14,12 +14,12 @@
 #include <vector>
 #include "genie/annotation/json_attribute_parser.h"
 #include "genie/core/constants.h"
-#include "genie/variantsite/accessunit_composer.h"
-#include "genie/variantsite/parameterset_composer.h"
-#include "genie/variantsite/variantsite_parser.h"
+#include "genie/annotation/accessunit_composer.h"
+#include "genie/annotation/parameterset_composer.h"
+#include "genie/annotation/variantsite_parser.h"
 
 #include "genie/annotation/compressors.h"
-#include "genie/core/data_unit_record/record.h"
+#include "genie/core/record/data_unit/record.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {

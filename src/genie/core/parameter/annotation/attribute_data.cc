@@ -10,7 +10,7 @@
 #include <string>
 #include <utility>
 
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"

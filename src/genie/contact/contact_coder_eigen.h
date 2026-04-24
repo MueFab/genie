@@ -2,7 +2,7 @@
 #define GENIE_CONTACT_CONTACT_CODER_EIGEN_H
 
 #include "contact_types.h"
-#include "genie/core/contact_record/record.h"
+#include "genie/core/record/contact/record.h"
 #include "subcontact_matrix_parameters.h"
 #include "subcontact_matrix_payload.h"
 #include "contact_matrix_parameters.h"
@@ -48,21 +48,8 @@ void decode_scm_mask_payload(
     BinVecDtype& mask
 );
 
-void remove_unaligned(
-    UInt64VecDtype& row_ids,
-    UInt64VecDtype& col_ids,
-    bool is_intra_tile,
-    const BinVecDtype& row_mask,
-    const BinVecDtype& col_mask
-);
+// remove_unaligned and insert_unaligned are declared in contact_coder.h
 
-void insert_unaligned(
-    UInt64VecDtype& row_ids,
-    UInt64VecDtype& col_ids,
-    bool is_intra_tile,
-    BinVecDtype& row_mask,
-    BinVecDtype& col_mask
-);
 
 void sparse_to_dense(
     const UInt64VecDtype& row_ids,

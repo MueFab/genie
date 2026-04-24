@@ -77,7 +77,7 @@ GenotypePayload::GenotypePayload(const GenotypePayload& other) {
   phases_value_ = other.phases_value_;
   num_bit_planes_ = other.num_bit_planes_;
   variants_payloads_ = other.variants_payloads_;
-  
+
   if (other.variants_amax_payload_.has_value()) {
     variants_amax_payload_ = std::make_optional(other.variants_amax_payload_.value());
   } else {
@@ -119,7 +119,7 @@ GenotypePayload& GenotypePayload::operator=(const GenotypePayload& other) {
     phases_value_ = other.phases_value_;
     num_bit_planes_ = other.num_bit_planes_;
     variants_payloads_ = other.variants_payloads_;
-    
+
     if (other.variants_amax_payload_.has_value()) {
       variants_amax_payload_ = std::make_optional(other.variants_amax_payload_.value());
     } else {

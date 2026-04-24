@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/util/runtime_exception.h"
 
 

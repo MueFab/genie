@@ -57,7 +57,7 @@ void transform_max_value(
 ) {
     no_ref_flag = ::genie::backend::any_equal(allele_mat, static_cast<int8_t>(-1));
     not_avail_flag = ::genie::backend::any_equal(allele_mat, static_cast<int8_t>(-2));
-    
+
     int8_t current_max = ::genie::backend::max_coeff(allele_mat);
     if (current_max < 0) current_max = 0;
 
@@ -94,7 +94,7 @@ void binarize_bit_plane(
 ) {
     size_t nrows = ::genie::backend::get_mat_shape(allele_mat, 0);
     size_t ncols = ::genie::backend::get_mat_shape(allele_mat, 1);
-    
+
     if (nrows == 0) {
         num_bit_planes = 1;
         bin_mats.clear();
@@ -289,7 +289,7 @@ void sort_matrix(
 ) {
     size_t n_ids = ::genie::backend::get_arr_size(ids);
     if (n_ids == 0 || ::genie::backend::get_mat_shape(bin_mat, 0) == 0) return;
-    
+
     if (axis == 0) {
         size_t ncols = ::genie::backend::get_mat_shape(bin_mat, 1);
         BinMatDtype temp;
@@ -325,17 +325,17 @@ void random_sort_bin_mat(
     size_t n = ::genie::backend::get_mat_shape(bin_mat, axis);
     std::vector<uint32_t> p(n);
     std::iota(p.begin(), p.end(), 0);
-    
+
     static std::random_device rd;
     static std::mt19937 g(rd());
     std::shuffle(p.begin(), p.end(), g);
-    
+
     UIntVecDtype p_vec;
     ::genie::backend::resize_arr(p_vec, n);
     for(size_t idx_i=0; idx_i<n; ++idx_i) ::genie::backend::set_arr_element(p_vec, idx_i, p[idx_i]);
-    
+
     sort_matrix(bin_mat, p_vec, axis);
-    
+
     ::genie::backend::resize_arr(ids, n);
     for (uint32_t idx_i = 0; idx_i < n; ++idx_i) {
         ::genie::backend::set_arr_element(ids, p[idx_i], idx_i);

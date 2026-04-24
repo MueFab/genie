@@ -14,13 +14,14 @@
 #include <vector>
 
 #include "genie/core/access_unit/annotation/typed_data.h"
-#include "genie/variantsite/accessunit_composer.h"
+#include "genie/annotation/accessunit_composer.h"
 
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/util/runtime_exception.h"
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
+#include "genie/annotation/vsite_parameterset_composer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

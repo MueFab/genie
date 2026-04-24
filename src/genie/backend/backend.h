@@ -136,7 +136,11 @@ auto get_mat_element(const T& mat, size_t row, size_t col) {
     if constexpr (detail::has_shape<T>::value) {
         return mat(row, col);
     } else if constexpr (detail::has_rows<T>::value) {
+#ifdef GENIE_HAS_EIGEN_BACKEND
         return mat(static_cast<std::ptrdiff_t>(row), static_cast<std::ptrdiff_t>(col));
+#else
+        return typename T::value_type(0);
+#endif
     } else {
         if constexpr (detail::is_2d_vector<T>::value) {
             return mat[row][col];
@@ -151,7 +155,9 @@ void set_mat_element(T& mat, size_t row, size_t col, V val) {
     if constexpr (detail::has_shape<T>::value) {
         mat(row, col) = val;
     } else if constexpr (detail::has_rows<T>::value) {
+#ifdef GENIE_HAS_EIGEN_BACKEND
         mat(static_cast<std::ptrdiff_t>(row), static_cast<std::ptrdiff_t>(col)) = val;
+#endif
     } else {
         if constexpr (detail::is_2d_vector<T>::value) {
             mat[row][col] = val;
@@ -166,7 +172,9 @@ void resize_mat(T& mat, const S& shape) {
         mat = ::xt::empty<typename T::value_type>(shape);
 #endif
     } else if constexpr (detail::has_rows<T>::value) {
+#ifdef GENIE_HAS_EIGEN_BACKEND
         mat.resize(static_cast<Eigen::Index>(shape[0]), static_cast<Eigen::Index>(shape[1]));
+#endif
     } else {
         mat.assign(shape[0], std::vector<typename T::value_type::value_type>(shape[1], 0));
     }
@@ -207,7 +215,9 @@ void resize_arr(T& arr, size_t nelems) {
         arr = ::xt::empty<typename T::value_type>({nelems});
 #endif
     } else if constexpr (detail::has_rows<T>::value) {
+#ifdef GENIE_HAS_EIGEN_BACKEND
         arr.resize(static_cast<Eigen::Index>(nelems));
+#endif
     } else {
         arr.resize(nelems);
     }
@@ -218,7 +228,11 @@ auto get_arr_element(const T& arr, size_t idx) {
     if constexpr (detail::has_shape<T>::value) {
         return arr(idx);
     } else if constexpr (detail::has_rows<T>::value) {
+#ifdef GENIE_HAS_EIGEN_BACKEND
         return arr(static_cast<Eigen::Index>(idx));
+#else
+        return typename T::value_type(0);
+#endif
     } else {
         return arr[idx];
     }
@@ -229,7 +243,9 @@ void set_arr_element(T& arr, size_t idx, V val) {
     if constexpr (detail::has_shape<T>::value) {
         arr(idx) = val;
     } else if constexpr (detail::has_rows<T>::value) {
+#ifdef GENIE_HAS_EIGEN_BACKEND
         arr(static_cast<Eigen::Index>(idx)) = val;
+#endif
     } else {
         arr[idx] = val;
     }
@@ -253,7 +269,9 @@ void clear_arr(T& arr) {
         arr = ::xt::empty<typename T::value_type>({0});
 #endif
     } else if constexpr (detail::has_rows<T>::value) {
+#ifdef GENIE_HAS_EIGEN_BACKEND
         arr.resize(0);
+#endif
     } else {
         arr.clear();
     }
@@ -271,9 +289,11 @@ void append_arr_element(T& arr, const V& val) {
         arr(current_size) = val;
 #endif
     } else if constexpr (detail::has_rows<T>::value) {
+#ifdef GENIE_HAS_EIGEN_BACKEND
         auto current_size = arr.size();
         arr.conservativeResize(current_size + 1);
         arr(current_size) = val;
+#endif
     } else {
         arr.push_back(val);
     }
@@ -300,7 +320,9 @@ void fill_arr(T& arr, size_t start, size_t end, const V& val) {
     if constexpr (detail::has_shape<T>::value) {
         for (size_t idx_i = start; idx_i < end; ++idx_i) arr(idx_i) = val;
     } else if constexpr (detail::has_rows<T>::value) {
+#ifdef GENIE_HAS_EIGEN_BACKEND
         for (size_t idx_i = start; idx_i < end; ++idx_i) arr(static_cast<std::ptrdiff_t>(idx_i)) = val;
+#endif
     } else {
         std::fill(arr.begin() + start, arr.begin() + end, val);
     }

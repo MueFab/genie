@@ -50,8 +50,8 @@ if(GENIE_GENOTYPE_BACKEND STREQUAL "xtensor")
     target_link_libraries(${PROJECT_NAME} PRIVATE xtensor xtensor::optimize)
 endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-genotype)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-genotype-local)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
 
 install(TARGETS ${PROJECT_NAME}

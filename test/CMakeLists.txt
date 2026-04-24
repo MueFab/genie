@@ -1,3 +1,4 @@
+add_subdirectory(core)
 add_subdirectory(variant)
 add_subdirectory(example)
 add_subdirectory(records)

@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "arrayType.h"
+#include "array_type.h"
 #include <cstring>
 #include <iostream>
 #include "genie/util/bit_reader.h"

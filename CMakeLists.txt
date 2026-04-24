@@ -99,8 +99,6 @@ endif()
 if(NOT DEFINED GENIE_LIKELIHOOD_BACKEND)
     set(GENIE_LIKELIHOOD_BACKEND ${GENIE_BACKEND})
 endif()
-<<<<<<< HEAD
-
 if(GENIE_CONTACT_BACKEND STREQUAL "std")
     add_definitions(-DGENIE_CONTACT_BACKEND_STD)
 elseif(GENIE_CONTACT_BACKEND STREQUAL "eigen")
@@ -124,8 +122,7 @@ elseif(GENIE_LIKELIHOOD_BACKEND STREQUAL "eigen")
 else()
     add_definitions(-DGENIE_LIKELIHOOD_BACKEND_XTENSOR)
 endif()
-=======
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
+
 
 message(STATUS "")
 message(STATUS "******** Options ********")

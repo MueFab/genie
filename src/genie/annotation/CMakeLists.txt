@@ -9,6 +9,12 @@ set(source_files
 		parameterset_composer.cc
 		annotation_encoder.cc
 		json_attribute_parser.cc
+		variantsite_parser.cc
+		vsite_parameterset_composer.cc
+		accessunit_composer.cc
+		vsite_attributes.cc
+		vsite_descriptors.cc
+		vsite_tiles.cc
 )
 
 add_library(${PROJECT_NAME} ${source_files})
@@ -36,11 +42,11 @@ target_link_libraries(${PROJECT_NAME} PUBLIC genie-core)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-bsc)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-lzma)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-zstd)
-<<<<<<< HEAD
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-jbig)
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-contact)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-genotype)
-=======
-target_link_libraries(${PROJECT_NAME} PUBLIC genie-vsite)
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-likelihood)
+
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 foreach(dir ${dirs})

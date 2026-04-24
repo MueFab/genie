@@ -15,7 +15,7 @@
 
 //#include "codecs/api/mpegg_utils.h"
 #include "codecs/include/mpegg-codecs.h"
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/core/parameter/annotation/algorithm_parameters.h"
 #include "genie/entropy/lzma/encoder.h"
 

@@ -51,7 +51,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC genie-jbig)
 
 # Link optional dependencies and aggressively export include paths
 if(HAS_XTENSOR)
-    target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
+    target_link_libraries(${PROJECT_NAME} PUBLIC xtensor)
     if (xtensor_INCLUDE_DIRS)
         target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${xtensor_INCLUDE_DIRS})
     endif()

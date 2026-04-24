@@ -28,30 +28,25 @@ set(source_files
         record/alignment_box.cc
         record/alignment.cc
 
-        variant_site_record/record.cc
+        record/variant/record.cc
+        record/variant/format_field.cc
 
-        variant_genotype_record/record.cc
-        variant_genotype_record/format_field.cc
-        variant_genotype_record/format_field.h
-
-        linked_record/linked_record.h
         linked_record/linked_record.cc
 
-        contact_record/record.cc
-
-        data_unit_record/record.cc
+        record/site/record.cc
+        record/data_unit/record.cc
 
         access_unit/annotation/record.cc
         access_unit/annotation/block.cc
         access_unit/annotation/block_header.cc
         access_unit/annotation/block_payload.cc
+        access_unit/annotation/block_payload_stream.cc
         access_unit/annotation/annotation_access_unit_header.cc
         access_unit/annotation/typed_data.cc
 
         parameter/annotation/record.cc
         parameter/annotation/attribute_parameter_set.cc
         parameter/annotation/algorithm_parameters.cc
-        parameter/annotation/contact_matrix_parameters.cc
         parameter/annotation/tile_configuration.cc
         parameter/annotation/tile_structure.cc
         parameter/annotation/descriptor_configuration.cc
@@ -59,7 +54,7 @@ set(source_files
         parameter/annotation/annotation_encoding_parameters.cc
         parameter/annotation/attribute_data.cc
 
-        arrayType.cc
+        array_type.cc
         writer.cc
 
         stats/perf_stats.cc
@@ -105,10 +100,34 @@ set(source_files
         api.cc
         c_api.cc
         payload.cc
-        ndarray.cc
+        record/contact/record.cc
 )
 
-add_library(${PROJECT_NAME} ${source_files})
+# Unified coder files
+list(APPEND source_files
+)
+
+# Convert remaining relative paths to absolute
+set(absolute_source_files "")
+foreach(f IN LISTS source_files)
+    if(IS_ABSOLUTE "${f}")
+        list(APPEND absolute_source_files "${f}")
+    else()
+        list(APPEND absolute_source_files "${CMAKE_CURRENT_LIST_DIR}/${f}")
+    endif()
+endforeach()
+
+# Convert remaining relative paths to absolute
+set(absolute_source_files "")
+foreach(f IN LISTS source_files)
+    if(IS_ABSOLUTE "${f}")
+        list(APPEND absolute_source_files "${f}")
+    else()
+        list(APPEND absolute_source_files "${CMAKE_CURRENT_LIST_DIR}/${f}")
+    endif()
+endforeach()
+
+add_library(${PROJECT_NAME} ${absolute_source_files})
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # GNU Compiler Collection
     target_compile_options(${PROJECT_NAME} PRIVATE "-pedantic")
@@ -123,12 +142,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=maybe-uninitialized")
 endif ()
 
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-util genie-backend)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC genie-util)
-target_link_libraries(${PROJECT_NAME} PUBLIC genie-likelihood-local)
-target_link_libraries(${PROJECT_NAME} PUBLIC genie-contact-local)
-
-get_filename_component(THIS_DIR ./ ABSOLUTE)
 get_filename_component(TOP_DIR ../../ ABSOLUTE)
-message("topdir='${TOP_DIR}'")
 target_include_directories(${PROJECT_NAME} PUBLIC "${TOP_DIR}")

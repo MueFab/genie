@@ -12,7 +12,7 @@
 #include <tuple>
 
 #include "genie/core/constants.h"
-#include "genie/core/variant_genotype_record/record.h"
+#include "genie/core/record/variant/record.h"
 #include "genie/backend/backend.h"
 #include "genotype_parameters.h"
 #include "genotype_payload.h"
@@ -20,11 +20,7 @@
 
 namespace genie::genotype {
 
-// Type Aliases (unified)
-using BinMatDtype = ::genie::backend::BinMatDtype;
-using Int8MatDtype = ::genie::backend::Int8MatDtype;
-using UIntVecDtype = ::genie::backend::UIntVecDtype;
-using UInt8MatDtype = ::genie::backend::UInt8MatDtype;
+// Type Aliases (unified in genotype_types.h)
 
 struct EncodingOptions {
     uint32_t block_size = 0;

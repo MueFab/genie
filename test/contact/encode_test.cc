@@ -9,7 +9,7 @@
 #include <vector>
 #include "genie/contact/contact_coder.h"
 #include "contact_test_helpers.h"
-#include "genie/core/contact_record/record.h"
+#include "genie/core/record/contact/record.h"
 #include "genie/util/bit_reader.h"
 #include "helpers.h"
 #include <iostream>
@@ -168,12 +168,23 @@ TEST(ContactCoder, RoundTrip_Coding_ProcessingUnalignedRegion) {
 
         ASSERT_TRUE(genie::contact::equal(row_mask, col_mask));
 
+        genie::contact::UIntVecDtype dummy_counts;
+        ::genie::backend::assign_arr(dummy_counts, ::genie::backend::get_arr_size(row_ids), (uint32_t)1);
+        size_t row_aligned_count = 0;
+        size_t col_aligned_count = 0;
         genie::contact::remove_unaligned(
             row_ids,
             col_ids,
+            dummy_counts,
             IS_INTRA,
             row_mask,
-            col_mask
+            col_mask,
+            0,
+            NENTRIES,
+            0,
+            NENTRIES,
+            row_aligned_count,
+            col_aligned_count
         );
 
         ASSERT_EQ(genie::contact::get(row_ids, 0), 0u);
@@ -186,7 +197,11 @@ TEST(ContactCoder, RoundTrip_Coding_ProcessingUnalignedRegion) {
             col_ids,
             IS_INTRA,
             row_mask,
-            col_mask
+            col_mask,
+            0,
+            NENTRIES,
+            0,
+            NENTRIES
         );
 
         ASSERT_TRUE(genie::contact::equal(row_ids, ROW_IDS));
@@ -220,12 +235,23 @@ TEST(ContactCoder, RoundTrip_Coding_ProcessingUnalignedRegion) {
             row_mask,
             col_mask
         );
+        genie::contact::UIntVecDtype dummy_counts;
+        ::genie::backend::assign_arr(dummy_counts, ::genie::backend::get_arr_size(row_ids), (uint32_t)1);
+        size_t row_aligned_count = 0;
+        size_t col_aligned_count = 0;
         genie::contact::remove_unaligned(
             row_ids,
             col_ids,
+            dummy_counts,
             IS_INTRA,
             row_mask,
-            col_mask
+            col_mask,
+            0,
+            NROWS,
+            0,
+            NCOLS,
+            row_aligned_count,
+            col_aligned_count
         );
 
         ASSERT_EQ(genie::contact::get(row_ids, 0), 0u);
@@ -238,7 +264,11 @@ TEST(ContactCoder, RoundTrip_Coding_ProcessingUnalignedRegion) {
             col_ids,
             IS_INTRA,
             row_mask,
-            col_mask
+            col_mask,
+            0,
+            NROWS,
+            0,
+            NCOLS
         );
 
         ASSERT_TRUE(genie::contact::equal(row_ids, ROW_IDS));
@@ -872,47 +902,27 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -1064,47 +1074,27 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 }
@@ -1211,47 +1201,27 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -1334,47 +1304,27 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 }
@@ -1481,47 +1431,27 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -1604,47 +1534,27 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 }
@@ -1771,47 +1681,27 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         {
             auto START1 = genie::contact::create_vector(LR_REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(LR_REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(LR_REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(LR_REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(LR_REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -1897,47 +1787,27 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         {
             auto START1 = genie::contact::create_vector(LR_REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(LR_REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(LR_REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(LR_REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(LR_REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 }
@@ -2036,52 +1906,28 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             genie::contact::UInt64VecDtype recon_start1 =
                 genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             genie::contact::UInt64VecDtype recon_start2 =
                 genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-//            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
-//            ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
-            recon_end2 = genie::contact::sort(recon_end2);
-            END2 = genie::contact::sort(END2);
-            auto mask = genie::contact::equal(recon_end2, END2);
-            ASSERT_TRUE(genie::contact::all(mask));
+            ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -2155,48 +2001,28 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             genie::contact::UInt64VecDtype recon_start1 =
                 genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             genie::contact::UInt64VecDtype recon_start2 =
                 genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 }
@@ -2323,31 +2149,18 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             size_t recon_num_entries = recon_rec.GetNumEntries();
 
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            genie::contact::UInt64VecDtype recon_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
-
-            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-            genie::contact::UInt64VecDtype recon_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
-=======
             genie::contact::UInt64VecDtype recon_row_ids = genie::contact::divide(genie::contact::divide(recon_start1, cm_param.GetBinSize()), MULT);
 
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             genie::contact::UInt64VecDtype recon_col_ids = genie::contact::divide(genie::contact::divide(recon_start2, cm_param.GetBinSize()), MULT);
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
 
             auto recon_counts = genie::contact::create_vector(recon_rec.GetCounts());
 
             std::map<std::pair<uint64_t, uint64_t>, uint32_t> recon_sparse_mat;
             for (auto i_entry = 0u; i_entry<recon_num_entries; i_entry++){
-<<<<<<< HEAD
-                auto recon_row_id = recon_row_ids[i_entry];
-                auto recon_col_id = recon_col_ids[i_entry];
-                auto recon_count = recon_counts[i_entry];
-=======
                 auto recon_row_id = genie::contact::get(recon_row_ids, i_entry);
                 auto recon_col_id = genie::contact::get(recon_col_ids, i_entry);
                 auto recon_count = genie::contact::get(recon_counts, i_entry);
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
                 auto recon_row_col_id_pair = std::pair<uint64_t, uint64_t>(recon_row_id, recon_col_id);
 
                 auto it = recon_sparse_mat.find(recon_row_col_id_pair);
@@ -2358,31 +2171,18 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             size_t lr_num_entries = LR_REC.GetNumEntries();
 
             auto lr_start1 = genie::contact::create_vector(LR_REC.GetStartPos1());
-<<<<<<< HEAD
-            genie::contact::UInt64VecDtype lr_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
-
-            auto lr_start2 = genie::contact::create_vector(LR_REC.GetStartPos2());
-            genie::contact::UInt64VecDtype lr_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
-=======
             genie::contact::UInt64VecDtype lr_row_ids = genie::contact::divide(genie::contact::divide(recon_start1, cm_param.GetBinSize()), MULT);
 
             auto lr_start2 = genie::contact::create_vector(LR_REC.GetStartPos2());
             genie::contact::UInt64VecDtype lr_col_ids = genie::contact::divide(genie::contact::divide(recon_start2, cm_param.GetBinSize()), MULT);
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
 
             auto lr_counts = genie::contact::create_vector(LR_REC.GetCounts());
 
             std::map<std::pair<uint64_t, uint64_t>, uint32_t> lr_sparse_mat;
             for (auto i_entry = 0u; i_entry<recon_num_entries; i_entry++){
-<<<<<<< HEAD
-                auto lr_row_id = lr_row_ids[i_entry];
-                auto lr_col_id = lr_col_ids[i_entry];
-                auto lr_count = lr_counts[i_entry];
-=======
                 auto lr_row_id = genie::contact::get(lr_row_ids, i_entry);
                 auto lr_col_id = genie::contact::get(lr_col_ids, i_entry);
                 auto lr_count = genie::contact::get(lr_counts, i_entry);
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
                 auto lr_row_col_id_pair = std::pair<uint64_t, uint64_t>(lr_row_id, lr_col_id);
 
                 auto it = lr_sparse_mat.find(lr_row_col_id_pair);
@@ -2394,31 +2194,18 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
                 size_t hr_num_entries = REC.GetNumEntries();
 
                 auto hr_start1 = genie::contact::create_vector(REC.GetStartPos1());
-<<<<<<< HEAD
-                genie::contact::UInt64VecDtype hr_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
-
-                auto hr_start2 = genie::contact::create_vector(REC.GetStartPos2());
-                genie::contact::UInt64VecDtype hr_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
-=======
                 genie::contact::UInt64VecDtype hr_row_ids = genie::contact::divide(genie::contact::divide(recon_start1, cm_param.GetBinSize()), MULT);
 
                 auto hr_start2 = genie::contact::create_vector(REC.GetStartPos2());
                 genie::contact::UInt64VecDtype hr_col_ids = genie::contact::divide(genie::contact::divide(recon_start2, cm_param.GetBinSize()), MULT);
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
 
                 auto hr_counts = genie::contact::create_vector(REC.GetCounts());
 
                 std::vector<uint64_t> tmp_counts;
                 for (auto i_entry = 0u; i_entry<hr_num_entries; i_entry++){
-<<<<<<< HEAD
-                    auto hr_row_id = hr_row_ids[i_entry];
-                    auto hr_col_id = hr_col_ids[i_entry];
-                    auto hr_count = hr_counts[i_entry];
-=======
                     auto hr_row_id = genie::contact::get(hr_row_ids, i_entry);
                     auto hr_col_id = genie::contact::get(hr_col_ids, i_entry);
                     auto hr_count = genie::contact::get(hr_counts, i_entry);
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
 
                     if (hr_row_id == 64 && hr_col_id == 201){
                         tmp_counts.push_back(hr_count);
@@ -2441,47 +2228,27 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         {
             auto START1 = genie::contact::create_vector(LR_REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(LR_REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(LR_REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(LR_REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(LR_REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -2567,47 +2334,27 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         {
             auto START1 = genie::contact::create_vector(LR_REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(LR_REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(LR_REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(LR_REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(LR_REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 }
@@ -2719,38 +2466,22 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -2833,47 +2564,27 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 }
@@ -3001,31 +2712,18 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
             size_t recon_num_entries = recon_rec.GetNumEntries();
 
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            genie::contact::UInt64VecDtype recon_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
-
-            auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-            genie::contact::UInt64VecDtype recon_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
-=======
             genie::contact::UInt64VecDtype recon_row_ids = genie::contact::divide(genie::contact::divide(recon_start1, cm_param.GetBinSize()), MULT);
 
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
             genie::contact::UInt64VecDtype recon_col_ids = genie::contact::divide(genie::contact::divide(recon_start2, cm_param.GetBinSize()), MULT);
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
 
             auto recon_counts = genie::contact::create_vector(recon_rec.GetCounts());
 
             std::map<std::pair<uint64_t, uint64_t>, uint32_t> recon_sparse_mat;
             for (auto i_entry = 0u; i_entry<recon_num_entries; i_entry++){
-<<<<<<< HEAD
-                auto recon_row_id = recon_row_ids[i_entry];
-                auto recon_col_id = recon_col_ids[i_entry];
-                auto recon_count = recon_counts[i_entry];
-=======
                 auto recon_row_id = genie::contact::get(recon_row_ids, i_entry);
                 auto recon_col_id = genie::contact::get(recon_col_ids, i_entry);
                 auto recon_count = genie::contact::get(recon_counts, i_entry);
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
                 auto recon_row_col_id_pair = std::pair<uint64_t, uint64_t>(recon_row_id, recon_col_id);
 
                 auto it = recon_sparse_mat.find(recon_row_col_id_pair);
@@ -3036,31 +2734,18 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
             size_t lr_num_entries = LR_REC.GetNumEntries();
 
             auto lr_start1 = genie::contact::create_vector(LR_REC.GetStartPos1());
-<<<<<<< HEAD
-            genie::contact::UInt64VecDtype lr_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
-
-            auto lr_start2 = genie::contact::create_vector(LR_REC.GetStartPos2());
-            genie::contact::UInt64VecDtype lr_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
-=======
             genie::contact::UInt64VecDtype lr_row_ids = genie::contact::divide(genie::contact::divide(recon_start1, cm_param.GetBinSize()), MULT);
 
             auto lr_start2 = genie::contact::create_vector(LR_REC.GetStartPos2());
             genie::contact::UInt64VecDtype lr_col_ids = genie::contact::divide(genie::contact::divide(recon_start2, cm_param.GetBinSize()), MULT);
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
 
             auto lr_counts = genie::contact::create_vector(LR_REC.GetCounts());
 
             std::map<std::pair<uint64_t, uint64_t>, uint32_t> lr_sparse_mat;
             for (auto i_entry = 0u; i_entry<recon_num_entries; i_entry++){
-<<<<<<< HEAD
-                auto lr_row_id = lr_row_ids[i_entry];
-                auto lr_col_id = lr_col_ids[i_entry];
-                auto lr_count = lr_counts[i_entry];
-=======
                 auto lr_row_id = genie::contact::get(lr_row_ids, i_entry);
                 auto lr_col_id = genie::contact::get(lr_col_ids, i_entry);
                 auto lr_count = genie::contact::get(lr_counts, i_entry);
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
                 auto lr_row_col_id_pair = std::pair<uint64_t, uint64_t>(lr_row_id, lr_col_id);
 
                 auto it = lr_sparse_mat.find(lr_row_col_id_pair);
@@ -3081,47 +2766,27 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         {
             auto START1 = genie::contact::create_vector(LR_REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(LR_REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(LR_REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(LR_REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(LR_REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -3207,47 +2872,27 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         {
             auto START1 = genie::contact::create_vector(LR_REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(LR_REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(LR_REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(LR_REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(LR_REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 }
@@ -3452,47 +3097,27 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -3566,47 +3191,27 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -3695,47 +3300,27 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -3818,47 +3403,27 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -3940,39 +3505,23 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             genie::contact::UInt64VecDtype recon_start1 =
                 genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             genie::contact::UInt64VecDtype recon_start2 =
                 genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-//            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
 //            ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
             recon_end2 = genie::contact::sort(recon_end2);
             END2 = genie::contact::sort(END2);
             auto mask = genie::contact::equal(recon_end2, END2);
@@ -3981,11 +3530,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -4059,48 +3604,28 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             genie::contact::UInt64VecDtype recon_start1 =
                 genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             genie::contact::UInt64VecDtype recon_start2 =
                 genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -4193,38 +3718,22 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 
@@ -4307,47 +3816,27 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         {
             auto START1 = genie::contact::create_vector(REC.GetStartPos1());
             auto recon_start1 = genie::contact::create_vector(recon_rec.GetStartPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start1), genie::contact::sort(START1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start1), genie::contact::sort(START1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END1 = genie::contact::create_vector(REC.GetEndPos1());
             auto recon_end1 = genie::contact::create_vector(recon_rec.GetEndPos1());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end1), genie::contact::sort(END1));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end1), genie::contact::sort(END1));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto START2 = genie::contact::create_vector(REC.GetStartPos2());
             auto recon_start2 = genie::contact::create_vector(recon_rec.GetStartPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_start2), genie::contact::sort(START2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_start2), genie::contact::sort(START2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto END2 = genie::contact::create_vector(REC.GetEndPos2());
             auto recon_end2 = genie::contact::create_vector(recon_rec.GetEndPos2());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_end2), genie::contact::sort(END2));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_end2), genie::contact::sort(END2));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
         {
             auto COUNT = genie::contact::create_vector(REC.GetCounts());
             auto recon_count = genie::contact::create_vector(recon_rec.GetCounts());
-<<<<<<< HEAD
-            ASSERT_EQ(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
-=======
             ASSERT_CM_EQUAL(genie::contact::sort(recon_count), genie::contact::sort(COUNT));
->>>>>>> 8577ee64 (refactor(test): standardize infrastructure, resolve linker dependencies, and align naming conventions)
         }
     }
 }

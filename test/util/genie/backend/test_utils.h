@@ -114,12 +114,28 @@ inline bool equal(const T1& a, const T2& b) {
         if constexpr (detail::has_shape<T1>::value && detail::has_shape<T2>::value) {
             if (a.shape() != b.shape()) return false;
             return xt::all(xt::equal(a, b));
+        } else if constexpr (detail::has_shape<T1>::value && !detail::has_shape<T2>::value) {
+            if (a.size() != b.size()) return false;
+            for(size_t i=0; i<a.size(); ++i) if(a(i) != b[i]) return false;
+            return true;
+        } else if constexpr (!detail::has_shape<T1>::value && detail::has_shape<T2>::value) {
+            if (a.size() != b.size()) return false;
+            for(size_t i=0; i<a.size(); ++i) if(a[i] != b(i)) return false;
+            return true;
         } else
 #endif
 #ifdef GENIE_HAS_EIGEN_BACKEND
         if constexpr (detail::has_rows<T1>::value && detail::has_rows<T2>::value) {
             if (a.size() != b.size()) return false;
             return (a.array() == b.array()).all();
+        } else if constexpr (detail::has_rows<T1>::value && !detail::has_rows<T2>::value) {
+            if (a.size() != b.size()) return false;
+            for(int i=0; i<a.size(); ++i) if(a(i) != b[i]) return false;
+            return true;
+        } else if constexpr (!detail::has_rows<T1>::value && detail::has_rows<T2>::value) {
+            if (a.size() != b.size()) return false;
+            for(int i=0; i<b.size(); ++i) if(a[i] != b(i)) return false;
+            return true;
         } else
 #endif
         {

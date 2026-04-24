@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <vector>
+#include "genie/core/constants.h"
 
 // Forward declarations or includes outside the namespace
 // Synchronize and robustly define backend availability macros

@@ -107,7 +107,7 @@ class SubcontactMatrixMaskPayload{
     SubcontactMatrixMaskPayload(
         TransformID _transform_ID,
         bool _first_val,
-        UIntVecDtype& _rl_entries
+        const std::vector<uint32_t>& _rl_entries
     );
 
     /**
@@ -212,7 +212,13 @@ class SubcontactMatrixMaskPayload{
     void SetRlEntries(
         TransformID _transform_ID,
         bool _first_val,
-        const std::optional<UIntVecDtype>& _rl_entries
+        const std::optional<std::vector<uint32_t>>& _rl_entries
+    );
+
+    void SetRlEntries(
+        TransformID _transform_ID,
+        bool _first_val,
+        const UIntVecDtype& _rl_entries
     );
 
     /**

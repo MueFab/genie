@@ -39,11 +39,11 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main)
 if(GENIE_LIKELIHOOD_BACKEND STREQUAL "xtensor")
-    target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
+    target_link_libraries(${PROJECT_NAME} PUBLIC xtensor)
 endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-likelihood)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-likelihood-local)
 target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-lzma)
 

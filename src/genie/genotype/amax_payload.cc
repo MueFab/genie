@@ -20,7 +20,7 @@ AmaxPayload::AmaxPayload()
 
 // -----------------------------------------------------------------------------
 
-AmaxPayload::AmaxPayload(std::vector<uint64_t>&& amax_elements, 
+AmaxPayload::AmaxPayload(std::vector<uint64_t>&& amax_elements,
                          std::optional<uint8_t> nbits_per_elem)
     : amax_elements_{std::move(amax_elements)} {
   UTILS_DIE_IF(amax_elements_.empty(), "amax_elements cannot be empty!");

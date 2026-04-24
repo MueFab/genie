@@ -265,3 +265,15 @@ NDArray<T> operator/(const NDArray<T>& lhs, const NDArray<T>& rhs) {
 // -----------------------------------------------------------------------------
 
 }
+template class genie::core::NDArray<int>;
+template class genie::core::NDArrayFactory<int>;
+template class genie::core::NDArray<uint16_t>;
+template class genie::core::NDArrayFactory<uint16_t>;
+template class genie::core::NDArray<uint32_t>;
+template class genie::core::NDArrayFactory<uint32_t>;
+template class genie::core::NDArray<uint64_t>;
+template class genie::core::NDArrayFactory<uint64_t>;
+template class genie::core::NDArray<float>;
+template class genie::core::NDArrayFactory<float>;
+template class genie::core::NDArray<double>;
+template class genie::core::NDArrayFactory<double>;

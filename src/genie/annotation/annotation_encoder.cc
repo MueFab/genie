@@ -25,7 +25,7 @@
 #include "genie/entropy/zstd/encoder.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/likelihood/likelihood_parameters.h"
-#include "genie/variantsite/parameterset_composer.h"
+#include "genie/annotation/parameterset_composer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

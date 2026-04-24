@@ -25,13 +25,13 @@
 #include "genie/core/access_unit/annotation/typed_data.h"
 #include "genie/core/access_unit/annotation/record.h"
 #include "genie/core/parameter/annotation/record.h"
-#include "genie/core/data_unit_record/record.h"
-#include "genie/core/variant_genotype_record/record.h"
-#include "genie/variantsite/accessunit_composer.h"
+#include "genie/core/record/data_unit/record.h"
+#include "genie/core/record/variant/record.h"
+#include "genie/annotation/accessunit_composer.h"
 
 #include "genie/annotation/annotation.h"
-#include "genie/variantsite/parameterset_composer.h"
-#include "genie/variantsite/variantsite_parser.h"
+#include "genie/annotation/parameterset_composer.h"
+#include "genie/annotation/variantsite_parser.h"
 #include "helpers.h"
 
 class SiteConformanceTest : public ::testing::TestWithParam<std::string> {

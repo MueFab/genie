@@ -166,7 +166,7 @@ void LikelihoodPayload::write(util::BitWriter& writer) const {
         std::string str = payloadStream.str();
         writer.WriteBits(str.size(), 32);
         for (unsigned char c : str) writer.WriteBits(c, 8);
-        
+
         if (transform_flag) {
             std::string addStr = additionalPayloadStream.str();
             writer.WriteBits(addStr.size(), 32);

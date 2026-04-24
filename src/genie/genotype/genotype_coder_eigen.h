@@ -6,7 +6,7 @@
 #include <Eigen/Dense>
 #include "genotype_parameters.h"
 #include "genotype_payload.h"
-#include "genie/core/variant_genotype_record/record.h"
+#include "genie/core/record/variant/record.h"
 #include "genotype_types.h"
 
 namespace genie::genotype::detail::eigen {

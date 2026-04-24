@@ -51,7 +51,6 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
 #else
         UIntVecDtype tmp_rl_entries(num_rl_entries);
 #endif
-
         if (transform_ID_ == TransformID::ID_1){
             for (auto idx_i = 0u; idx_i<num_rl_entries; idx_i++){
 #if defined(GENIE_CONTACT_BACKEND_EIGEN)
@@ -104,18 +103,12 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
 SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
     TransformID _transform_ID,
     bool _first_val,
-    UIntVecDtype& _rl_entries
+    const std::vector<uint32_t>& _rl_entries
 )
     : transform_ID_(_transform_ID), mask_array_(), first_val_(_first_val)
 {
     UTILS_DIE_IF(_transform_ID == TransformID::ID_0, "Invalid transform_ID_!");
-#if defined(GENIE_CONTACT_BACKEND_XTENSOR)
-    rl_entries_ = std::vector<uint32_t>(_rl_entries.begin(), _rl_entries.end());
-#elif defined(GENIE_CONTACT_BACKEND_EIGEN)
-    rl_entries_ = std::vector<uint32_t>(_rl_entries.data(), _rl_entries.data() + _rl_entries.size());
-#else
     rl_entries_ = _rl_entries;
-#endif
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -218,7 +211,7 @@ void SubcontactMatrixMaskPayload::SetMaskArray(
 void SubcontactMatrixMaskPayload::SetRlEntries(
     TransformID _transform_ID,
     bool _first_val,
-    const std::optional<UIntVecDtype>& _rl_entries
+    const std::optional<std::vector<uint32_t>>& _rl_entries
 ) {
     UTILS_DIE_IF(_transform_ID == TransformID::ID_0, "transform_ID_ 0 is not allowed here!");
     transform_ID_ = _transform_ID;
@@ -228,28 +221,31 @@ void SubcontactMatrixMaskPayload::SetRlEntries(
     }
 
     if (_rl_entries.has_value()){
-#if defined(GENIE_CONTACT_BACKEND_XTENSOR)
-        UTILS_DIE_IF(_rl_entries->shape(0) == 0, "Invalid opt_array size!");
-
-        auto& array = _rl_entries.value();
-        auto std_array = std::vector<uint32_t>(array.begin(), array.end());
-        first_val_ = _first_val;
-        rl_entries_ = std::move(std_array);
-#elif defined(GENIE_CONTACT_BACKEND_EIGEN)
-        UTILS_DIE_IF(_rl_entries->size() == 0, "Invalid opt_array size!");
-        auto& array = _rl_entries.value();
-        auto std_array = std::vector<uint32_t>(array.data(), array.data() + array.size());
-        first_val_ = _first_val;
-        rl_entries_ = std::move(std_array);
-#else
-        UTILS_DIE_IF(_rl_entries->empty(), "Invalid opt_array size!");
         first_val_ = _first_val;
         rl_entries_ = _rl_entries;
-#endif
     } else {
       first_val_ = false;
       rl_entries_ = {};
     }
+}
+
+void SubcontactMatrixMaskPayload::SetRlEntries(
+    TransformID _transform_ID,
+    bool _first_val,
+    const UIntVecDtype& _rl_entries
+) {
+#if defined(GENIE_CONTACT_BACKEND_EIGEN)
+    std::vector<uint32_t> std_rl_entries(_rl_entries.size());
+    for(int i=0; i<_rl_entries.size(); ++i) std_rl_entries[i] = _rl_entries(i);
+    SetRlEntries(_transform_ID, _first_val, std::optional<std::vector<uint32_t>>(std::move(std_rl_entries)));
+#elif defined(GENIE_CONTACT_BACKEND_XTENSOR)
+    std::vector<uint32_t> std_rl_entries(_rl_entries.begin(), _rl_entries.end());
+    SetRlEntries(_transform_ID, _first_val, std::optional<std::vector<uint32_t>>(std::move(std_rl_entries)));
+#else
+    // For STD backend, UIntVecDtype IS std::vector<uint32_t>. 
+    // We must call the version that takes std::optional<std::vector<uint32_t>>.
+    SetRlEntries(_transform_ID, _first_val, std::optional<std::vector<uint32_t>>(_rl_entries));
+#endif
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

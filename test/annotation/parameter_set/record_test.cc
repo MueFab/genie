@@ -6,7 +6,7 @@
 #include <iostream>
 #include "random_record_fill_in.h"
 // #include "genie/contact/contact_matrix_parameters.h"
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/core/parameter/annotation/record.h"
 #include "genie/core/writer.h"
 #include "genie/likelihood/likelihood_parameters.h"

@@ -4,7 +4,7 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/core/access_unit/annotation/block.h"
 #include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"

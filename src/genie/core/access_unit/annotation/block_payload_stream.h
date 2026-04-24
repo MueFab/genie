@@ -20,7 +20,7 @@
 
 #include "genie/core/constants.h"
 #include "genie/core/parameter/annotation/descriptor_configuration.h"
-#include "genie/core/parameter/annotation/GenotypeParameters.h"
+#include "genie/genotype/genotype_parameters.h"
 #include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -34,14 +34,14 @@ namespace annotation {
 
 class BlockPayloadStream {
  private:
-    genie::core::parameter::annotation::DescriptorID descriptor_ID;
+    genie::core::AnnotDesc descriptor_ID;
     uint32_t block_payload_size;
     std::stringstream generic_payload;
 
  public:
     BlockPayloadStream();
 
-    BlockPayloadStream(genie::core::parameter::annotation::DescriptorID _descriptorID,
+    BlockPayloadStream(genie::core::AnnotDesc _descriptorID,
                        uint32_t _block_payload_size, const std::stringstream& _generic_payload);
 
     BlockPayloadStream(const BlockPayloadStream& bp);

@@ -14,7 +14,7 @@
 #include "consts.h"
 #include "contact_matrix_parameters.h"
 #include "genie/core/constants.h"
-#include "genie/core/contact_record/record.h"
+#include "genie/core/record/contact/record.h"
 #include "subcontact_matrix_parameters.h"
 #include "subcontact_matrix_payload.h"
 #include "contact_types.h"
@@ -106,9 +106,16 @@ void decode_scm_mask_payload(
 void remove_unaligned(
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
+    UIntVecDtype& counts,
     bool is_intra_tile,
     const BinVecDtype& row_mask,
-    const BinVecDtype& col_mask
+    const BinVecDtype& col_mask,
+    size_t row_offset,
+    size_t row_size,
+    size_t col_offset,
+    size_t col_size,
+    size_t& row_aligned_count,
+    size_t& col_aligned_count
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -121,7 +128,11 @@ void insert_unaligned(
     UInt64VecDtype& col_ids,
     bool is_intra_tile,
     const BinVecDtype& row_mask,
-    const BinVecDtype& col_mask
+    const BinVecDtype& col_mask,
+    size_t row_offset,
+    size_t row_size,
+    size_t col_offset,
+    size_t col_size
 );
 
 // ---------------------------------------------------------------------------------------------------------------------

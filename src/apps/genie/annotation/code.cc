@@ -18,20 +18,20 @@
 #include <vector>
 
 #include "filesystem/filesystem.hpp"
-#include "genie/core/data_unit_record/record.h"
-#include "genie/core/variant_genotype_record/record.h"
+#include "genie/core/record/data_unit/record.h"
+#include "genie/core/record/variant/record.h"
 #include "genie/core/writer.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
-#include "genie/annotation/parameterset_composer.h"
+#include "genie/annotation/accessunit_composer.h"
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_parameters.h"
 #include "genie/likelihood/likelihood_payload.h"
 #include "genie/util/runtime_exception.h"
 #include "genie/util/string_helpers.h"
-#include "genie/variantsite/accessunit_composer.h"
-#include "genie/variantsite/parameterset_composer.h"
-#include "genie/variantsite/variantsite_parser.h"
+#include "genie/annotation/parameterset_composer.h"
+#include "genie/annotation/vsite_parameterset_composer.h"
+#include "genie/annotation/variantsite_parser.h"
 // ---------------------------------------------------------------------------------------------------------------------
 #ifdef _WIN32
 #include <windows.h>

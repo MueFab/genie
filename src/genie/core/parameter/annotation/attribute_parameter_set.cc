@@ -16,7 +16,7 @@
 #include "genie/util/bit_writer.h"
 
 #include "attribute_parameter_set.h"
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
