@@ -23,10 +23,18 @@
 #include "subcontact_matrix_payload.h"
 #include "subcontact_matrix_mask_payload.h"
 #include "genie/backend/backend.h"
+#include <unordered_map>
 
 namespace genie::contact {
 
 namespace detail {
+
+struct PairHash {
+    size_t operator()(const std::pair<size_t, size_t>& p) const {
+        return p.first * 31 + p.second;
+    }
+};
+
 inline void assign_vec_to_arr(UInt64VecDtype& dest, const std::vector<uint64_t>& src) {
     ::genie::backend::resize_arr(dest, src.size());
     for (size_t i = 0; i < src.size(); ++i) {
@@ -705,12 +713,7 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
     size_t total_entries_in_tiles = 0;
     const size_t n = ::genie::backend::get_arr_size(row_ids);
 
-    struct TileData {
-        std::vector<uint64_t> rows;
-        std::vector<uint64_t> cols;
-        std::vector<uint32_t> counts;
-    };
-    std::map<std::pair<size_t, size_t>, TileData> tile_map;
+    std::unordered_map<std::pair<size_t, size_t>, size_t, detail::PairHash> tile_counts;
 
     for(size_t i=0; i<n; ++i) {
         uint64_t r = ::genie::backend::get_arr_element(row_ids, i);
@@ -721,33 +724,54 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
 
         size_t i_tile = r / tile_size;
         size_t j_tile = c / tile_size;
+        ++tile_counts[{i_tile, j_tile}];
+    }
 
-        auto& td = tile_map[{i_tile, j_tile}];
-        td.rows.push_back(r - i_tile * tile_size);
-        td.cols.push_back(c - j_tile * tile_size);
-        td.counts.push_back(::genie::backend::get_arr_element(counts, i));
+    std::unordered_map<std::pair<size_t, size_t>, std::vector<uint64_t>, detail::PairHash> tile_rows;
+    std::unordered_map<std::pair<size_t, size_t>, std::vector<uint64_t>, detail::PairHash> tile_cols;
+    std::unordered_map<std::pair<size_t, size_t>, std::vector<uint32_t>, detail::PairHash> tile_counts_data;
+
+    for (auto& [key, count] : tile_counts) {
+        tile_rows[key].reserve(count);
+        tile_cols[key].reserve(count);
+        tile_counts_data[key].reserve(count);
+    }
+
+    for(size_t i=0; i<n; ++i) {
+        uint64_t r = ::genie::backend::get_arr_element(row_ids, i);
+        uint64_t c = ::genie::backend::get_arr_element(col_ids, i);
+
+        if (r >= chr1_num_bin_entries || c >= chr2_num_bin_entries) continue;
+        if (is_intra_scm && r > c) continue;
+
+        size_t i_tile = r / tile_size;
+        size_t j_tile = c / tile_size;
+        auto key = std::make_pair(i_tile, j_tile);
+        tile_rows[key].push_back(r - i_tile * tile_size);
+        tile_cols[key].push_back(c - j_tile * tile_size);
+        tile_counts_data[key].push_back(::genie::backend::get_arr_element(counts, i));
     }
 
     for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++) {
         for (size_t j_tile = 0u; j_tile < ntiles_in_col; j_tile++) {
             if (i_tile > j_tile && is_intra_scm) continue;
 
-            auto it = tile_map.find({i_tile, j_tile});
-            if (it == tile_map.end()) {
+            auto key = std::make_pair(i_tile, j_tile);
+            auto it = tile_counts.find(key);
+            if (it == tile_counts.end()) {
                 scm_payload.SetTilePayload(i_tile, j_tile, ContactMatrixTilePayload(codec_ID, 0, 0, std::vector<uint8_t>{}));
                 scm_param.SetTileParameter(i_tile, j_tile, {DiagonalTransformMode::NONE, BinarizationMode::ROW_BINARIZATION});
                 continue;
             }
 
-            auto& td = it->second;
-            const size_t tile_count = td.counts.size();
+            const size_t tile_count = it->second;
             total_entries_in_tiles += tile_count;
 
             UInt64VecDtype t_row_ids, t_col_ids;
             UIntVecDtype t_counts;
-            detail::assign_vec_to_arr(t_row_ids, td.rows);
-            detail::assign_vec_to_arr(t_col_ids, td.cols);
-            detail::assign_vec_to_arr(t_counts, td.counts);
+            detail::assign_vec_to_arr(t_row_ids, tile_rows[key]);
+            detail::assign_vec_to_arr(t_col_ids, tile_cols[key]);
+            detail::assign_vec_to_arr(t_counts, tile_counts_data[key]);
 
             size_t row_count = tile_size;
             size_t col_count = tile_size;
@@ -769,10 +793,10 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
             UIntMatDtype tile_mat;
             sparse_to_dense(t_row_ids, t_col_ids, t_counts, row_count, col_count, tile_mat);
             if (mode != DiagonalTransformMode::NONE) diag_transform(tile_mat, mode);
-            
+
             BinMatDtype bin_mat;
             transform_row_bin(tile_mat, bin_mat);
-            
+
             ContactMatrixTilePayload tile_pay;
             encode_cm_tile(bin_mat, codec_ID, tile_pay);
             scm_payload.SetTilePayload(i_tile, j_tile, std::move(tile_pay));
