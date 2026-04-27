@@ -20,3 +20,5 @@
 | 2026-04-15-unify-contact-coder | 2026-04-15 | Unify Contact Module Coder | Done |
 | 2026-04-15-unify-genotype-coder | 2026-04-15 | Unify Genotype Module Coder | Done |
 | 2026-04-27-optimize-append-arr-element | 2026-04-27 | Optimize append_arr_element in Contact Coder (O(n²) → O(n)) | Done |
+| 2026-04-27-optimize-contact-loop | 2026-04-27 | Optimize contact loop (remove dead code, cache sizes) | Done |
+| 2026-04-27-parallelize-contact-tiles | 2026-04-27 | Parallelize contact tile encoding with OpenMP | Pending |

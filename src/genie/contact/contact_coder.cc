@@ -686,17 +686,8 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
         }
     }
 
-            size_t n = ::genie::backend::get_arr_size(row_ids);
-            size_t unique_bins = 0;
-            std::set<std::pair<uint64_t, uint64_t>> bins;
-            for(size_t i=0; i<n; ++i) {
-                uint64_t r = ::genie::backend::get_arr_element(row_ids, i);
-                uint64_t c = ::genie::backend::get_arr_element(col_ids, i);
-                bins.insert({r, c});
-            }
-            unique_bins = bins.size();
-        
     size_t total_entries_in_tiles = 0;
+    const size_t n = ::genie::backend::get_arr_size(row_ids);
 
     for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++) {
         for (size_t j_tile = 0u; j_tile < ntiles_in_col; j_tile++) {
@@ -710,7 +701,6 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
             std::vector<uint64_t> tmp_cols;
             std::vector<uint32_t> tmp_counts;
 
-            size_t n = ::genie::backend::get_arr_size(row_ids);
             for(size_t i=0; i<n; ++i) {
                 uint64_t r = ::genie::backend::get_arr_element(row_ids, i);
                 uint64_t c = ::genie::backend::get_arr_element(col_ids, i);
@@ -721,18 +711,19 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
                 }
             }
 
+            const size_t tile_count = tmp_counts.size();
+            total_entries_in_tiles += tile_count;
+
             UInt64VecDtype t_row_ids, t_col_ids;
             UIntVecDtype t_counts;
-            ::genie::backend::resize_arr(t_row_ids, tmp_rows.size());
-            ::genie::backend::resize_arr(t_col_ids, tmp_cols.size());
-            ::genie::backend::resize_arr(t_counts, tmp_counts.size());
-            for(size_t i=0; i<tmp_rows.size(); ++i) {
+            ::genie::backend::resize_arr(t_row_ids, tile_count);
+            ::genie::backend::resize_arr(t_col_ids, tile_count);
+            ::genie::backend::resize_arr(t_counts, tile_count);
+            for(size_t i=0; i<tile_count; ++i) {
                 ::genie::backend::set_arr_element(t_row_ids, i, tmp_rows[i]);
                 ::genie::backend::set_arr_element(t_col_ids, i, tmp_cols[i]);
                 ::genie::backend::set_arr_element(t_counts, i, tmp_counts[i]);
             }
-
-            total_entries_in_tiles += ::genie::backend::get_arr_size(t_counts);
 
             size_t row_count = tile_size;
             size_t col_count = tile_size;
