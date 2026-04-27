@@ -14,3 +14,8 @@
 | 2026-01-22-refactor-likelihood-backends | 2026-01-22 | Refactor Likelihood Module for Multi-Backend Support | Done |
 | 2026-01-22-fix-likelihood-compression-segfaults | 2026-01-22 | Fix Likelihood Compression and Segmentation Faults | Done |
 | 2026-04-27-fix-likelihood-integrity | 2026-04-27 | Fix Likelihood Entropy Coding & Bitstream Integrity | Done |
+| 2026-04-15-refactor-backend-dispatchers | 2026-04-15 | Genomic Backend Dispatchers | Done |
+| 2026-04-17-standardize-tests-final | 2026-04-17 | Finalize Test Suite Standardization | Done |
+| 2026-04-27-repo-health-check | 2026-04-27 | Initial Repository Health Check | Done |
+| 2026-04-15-unify-contact-coder | 2026-04-15 | Unify Contact Module Coder | Done |
+| 2026-04-15-unify-genotype-coder | 2026-04-15 | Unify Genotype Module Coder | Done |

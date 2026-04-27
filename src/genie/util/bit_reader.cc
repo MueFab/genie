@@ -89,8 +89,7 @@ uint64_t BitReader::ReadBits(uint8_t num_bits) {
   }
 
   num_bits -= num_held_bits_;
-  result_bits = held_bits_ & ~(kByteMask << num_held_bits_);
-  result_bits <<= num_bits;
+  result_bits = (num_bits < 64u ? (uint64_t(held_bits_ & ~(kByteMask << num_held_bits_)) << num_bits) : 0u);
 
   const uint64_t aligned_word = LoadAlignedWord(num_bits);
   const auto num_next_held_bits =

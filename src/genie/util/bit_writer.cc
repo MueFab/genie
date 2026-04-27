@@ -58,7 +58,7 @@ void BitWriter::WriteBits(uint64_t bits, uint8_t numBits) {
 
     // topword serves to justify heldBits to align with the MSB of bits
     uint64_t topword = uint64_t(numBits - numNextHeldBits) & uint64_t(~((1u << 3u) - 1u));
-    uint64_t writeBits = (m_heldBits << topword);
+    uint64_t writeBits = (topword < 64u ? (m_heldBits << topword) : 0u);
     writeBits |= (bits >> numNextHeldBits);
 
     // Write everything

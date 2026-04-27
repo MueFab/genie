@@ -86,7 +86,7 @@ TEST_F(TileStructureTests, TileStructurevalues) {  // NOLINT(cert-err58-cpp)
     std::vector<std::vector<uint64_t>> end_index{{5}, {6}, {7}, {8}};
     std::vector<uint64_t> tile_size;
     genie::core::parameter::annotation::TileStructure tileStructure(
-        two_dimensional, ATCoordSize, variable_size_tiles, n_tiles, start_index, end_index, tile_size);
+        ATCoordSize, two_dimensional, variable_size_tiles, n_tiles, start_index, end_index, tile_size);
     EXPECT_TRUE(tileStructure.isVariableSizeTiles());
     EXPECT_EQ(tileStructure.getALLEndIndices().size(), n_tiles);
     EXPECT_EQ(tileStructure.getAllStartIndices()[0], start_index[0]);
