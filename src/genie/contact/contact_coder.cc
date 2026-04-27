@@ -26,6 +26,22 @@
 
 namespace genie::contact {
 
+namespace detail {
+inline void assign_vec_to_arr(UInt64VecDtype& dest, const std::vector<uint64_t>& src) {
+    ::genie::backend::resize_arr(dest, src.size());
+    for (size_t i = 0; i < src.size(); ++i) {
+        ::genie::backend::set_arr_element(dest, i, src[i]);
+    }
+}
+inline void assign_vec_to_arr(UIntVecDtype& dest, const std::vector<uint32_t>& src) {
+    ::genie::backend::resize_arr(dest, src.size());
+    for (size_t i = 0; i < src.size(); ++i) {
+        ::genie::backend::set_arr_element(dest, i, src[i]);
+    }
+}
+
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 void set_rle_information_from_mask(
@@ -729,14 +745,9 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
 
             UInt64VecDtype t_row_ids, t_col_ids;
             UIntVecDtype t_counts;
-            ::genie::backend::resize_arr(t_row_ids, tile_count);
-            ::genie::backend::resize_arr(t_col_ids, tile_count);
-            ::genie::backend::resize_arr(t_counts, tile_count);
-            for(size_t i=0; i<tile_count; ++i) {
-                ::genie::backend::set_arr_element(t_row_ids, i, td.rows[i]);
-                ::genie::backend::set_arr_element(t_col_ids, i, td.cols[i]);
-                ::genie::backend::set_arr_element(t_counts, i, td.counts[i]);
-            }
+            detail::assign_vec_to_arr(t_row_ids, td.rows);
+            detail::assign_vec_to_arr(t_col_ids, td.cols);
+            detail::assign_vec_to_arr(t_counts, td.counts);
 
             size_t row_count = tile_size;
             size_t col_count = tile_size;
