@@ -706,19 +706,32 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
             comp_start_end_ids(chr1_num_bin_entries, tile_size, i_tile, start1, end1);
             comp_start_end_ids(chr2_num_bin_entries, tile_size, j_tile, start2, end2);
 
-            UInt64VecDtype t_row_ids, t_col_ids;
-            UIntVecDtype t_counts;
-            
+            std::vector<uint64_t> tmp_rows;
+            std::vector<uint64_t> tmp_cols;
+            std::vector<uint32_t> tmp_counts;
+
             size_t n = ::genie::backend::get_arr_size(row_ids);
             for(size_t i=0; i<n; ++i) {
                 uint64_t r = ::genie::backend::get_arr_element(row_ids, i);
                 uint64_t c = ::genie::backend::get_arr_element(col_ids, i);
                 if (r >= start1 && r < end1 && c >= start2 && c < end2) {
-                    ::genie::backend::append_arr_element(t_row_ids, r - start1);
-                    ::genie::backend::append_arr_element(t_col_ids, c - start2);
-                    ::genie::backend::append_arr_element(t_counts, ::genie::backend::get_arr_element(counts, i));
+                    tmp_rows.push_back(r - start1);
+                    tmp_cols.push_back(c - start2);
+                    tmp_counts.push_back(::genie::backend::get_arr_element(counts, i));
                 }
             }
+
+            UInt64VecDtype t_row_ids, t_col_ids;
+            UIntVecDtype t_counts;
+            ::genie::backend::resize_arr(t_row_ids, tmp_rows.size());
+            ::genie::backend::resize_arr(t_col_ids, tmp_cols.size());
+            ::genie::backend::resize_arr(t_counts, tmp_counts.size());
+            for(size_t i=0; i<tmp_rows.size(); ++i) {
+                ::genie::backend::set_arr_element(t_row_ids, i, tmp_rows[i]);
+                ::genie::backend::set_arr_element(t_col_ids, i, tmp_cols[i]);
+                ::genie::backend::set_arr_element(t_counts, i, tmp_counts[i]);
+            }
+
             total_entries_in_tiles += ::genie::backend::get_arr_size(t_counts);
 
             size_t row_count = tile_size;
