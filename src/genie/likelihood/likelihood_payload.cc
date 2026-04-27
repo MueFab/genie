@@ -154,6 +154,7 @@ void LikelihoodPayload::setAdditionalPayload(const std::vector<uint8_t>& _payloa
 void LikelihoodPayload::write(util::BitWriter& writer) const {
     writer.WriteBits(nrows, 32);
     writer.WriteBits(ncols, 32);
+    writer.WriteBits(transform_flag ? 1 : 0, 8);
 
     if (!payload.empty()) {
         writer.WriteBits(payload.size(), 32);
@@ -178,6 +179,7 @@ void LikelihoodPayload::write(util::BitWriter& writer) const {
 void LikelihoodPayload::read(util::BitReader& reader) {
     nrows = static_cast<uint32_t>(reader.ReadBits(32));
     ncols = static_cast<uint32_t>(reader.ReadBits(32));
+    transform_flag = reader.ReadBits(8) != 0;
 
     uint32_t payload_size = static_cast<uint32_t>(reader.ReadBits(32));
     payload.resize(payload_size);

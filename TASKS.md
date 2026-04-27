@@ -12,4 +12,5 @@
 | 2026-01-22-finalize-temp-integration | 2026-01-22 | Finalize temp_part6 Integration | Done |
 | 2026-01-22-implement-likelihood-bitwriter | 2026-01-22 | Implement BitWriter/BitReader for LikelihoodPayload | Done |
 | 2026-01-22-refactor-likelihood-backends | 2026-01-22 | Refactor Likelihood Module for Multi-Backend Support | Done |
-| 2026-01-22-fix-likelihood-compression-segfaults | 2026-01-22 | Fix Likelihood Compression and Segmentation Faults | Pending |
+| 2026-01-22-fix-likelihood-compression-segfaults | 2026-01-22 | Fix Likelihood Compression and Segmentation Faults | Done |
+| 2026-04-27-fix-likelihood-integrity | 2026-04-27 | Fix Likelihood Entropy Coding & Bitstream Integrity | Done |

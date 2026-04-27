@@ -213,8 +213,12 @@ void encode_likelihood(std::vector<core::record::VariantGenotype>& recs, Likelih
     payload.setNCols(block.ncols);
     payload.setTransformFlag(transform_flag);
 
+    entropy::lzma::LZMAEncoder encoder;
+    std::stringstream compressed_mat;
+    encoder.encode(block.serialized_mat, compressed_mat);
+
     std::vector<uint8_t> mat_data;
-    std::string s_mat = block.serialized_mat.str();
+    std::string s_mat = compressed_mat.str();
     mat_data.assign(s_mat.begin(), s_mat.end());
     payload.setPayload(std::move(mat_data));
 
@@ -250,7 +254,16 @@ void decode_likelihood(const LikelihoodParameters& params, LikelihoodPayload& pa
 
     EncodingOptions opt{block.nrows, transform_flag};
 
-    deserialize_block(payload.getPayload(), payload.getAdditionalPayload(), block, transform_flag);
+    entropy::lzma::LZMAEncoder encoder;
+    std::stringstream compressed_mat(std::string(payload.getPayload().begin(), payload.getPayload().end()));
+    std::stringstream decompressed_mat;
+    encoder.decode(compressed_mat, decompressed_mat);
+
+    std::vector<uint8_t> mat_bytes;
+    std::string s_mat = decompressed_mat.str();
+    mat_bytes.assign(s_mat.begin(), s_mat.end());
+
+    deserialize_block(mat_bytes, payload.getAdditionalPayload(), block, transform_flag);
     inverse_transform_likelihood_mat(opt, block);
 
     uint32_t num_samples = recs.front().GetSampleCount();

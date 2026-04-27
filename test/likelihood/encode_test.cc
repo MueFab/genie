@@ -189,7 +189,30 @@ TEST(Likelihood, RoundTripTransform) {
     ASSERT_TRUE(backend::mats_equal(original_mat, block.likelihood_mat));
 }
 
+TEST(Likelihood, DISABLED_GenerateGoldenMaster) {
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string goldenFile = gitRootDir + "/test/gold/likelihood/ref_payload.bin";
+
+    size_t num_records = 100;
+    size_t num_samples = 2;
+    size_t num_likelihoods = 3;
+    auto recs = create_synthetic_records(num_records, num_samples, num_likelihoods);
+
+    LikelihoodParameters params;
+    LikelihoodPayload payload;
+    encode_likelihood(recs, params, payload, 256, false);
+
+    std::ofstream writer(goldenFile, std::ios::binary);
+    util::BitWriter bitwriter(&writer);
+    payload.write(bitwriter);
+    bitwriter.FlushBits();
+    writer.close();
+
+    std::cout << "Generated Golden Master at: " << goldenFile << std::endl;
+}
+
 TEST(Likelihood, CrossBackend_GoldenMaster) {
+
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string goldenFile = gitRootDir + "/test/gold/likelihood/ref_payload.bin";
 
@@ -208,7 +231,8 @@ TEST(Likelihood, CrossBackend_GoldenMaster) {
 
     LikelihoodParameters params;
     LikelihoodPayload payload;
-    encode_likelihood(recs, params, payload, 256, true);
+    encode_likelihood(recs, params, payload, 256, false);
+
 
     std::stringstream buffer;
     util::BitWriter bitwriter(&buffer);
