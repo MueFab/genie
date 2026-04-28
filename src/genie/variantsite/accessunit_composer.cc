@@ -11,8 +11,8 @@
 #include <string>
 #include <vector>
 
-#include "genie/core/record/annotation_access_unit/AnnotationAccessUnitHeader.h"
-#include "genie/core/record/annotation_access_unit/block.h"
+#include "genie/core/access_unit/annotation/annotation_access_unit_header.h"
+#include "genie/core/access_unit/annotation/block.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"
@@ -31,24 +31,24 @@ namespace genie {
 namespace variant_site {
 void AccessUnitComposer::setAccessUnit(
     std::map<core::AnnotDesc, std::stringstream>& _descriptorStream,
-    std::map<std::string, core::record::annotation_access_unit::TypedData>& _attributeTileStream,
+    std::map<std::string, core::access_unit::annotation::TypedData>& _attributeTileStream,
     std::map<std::string, core::parameter::annotation::AttributeData> _attributeInfo,
     const core::parameter::annotation::Record& _annotationParameterSet,
-    core::record::annotation_access_unit::Record& _annotationAccessUnit, uint8_t _AG_class, uint8_t _AT_ID,
+    core::access_unit::annotation::Record& _annotationAccessUnit, uint8_t _AG_class, uint8_t _AT_ID,
     uint64_t _rowIndex) {
     setAccessUnit(_descriptorStream, _attributeTileStream, _attributeInfo, _annotationParameterSet,
                   _annotationAccessUnit, _AG_class, _AT_ID, _rowIndex, 0);
 }
 void AccessUnitComposer::setAccessUnit(
     std::map<core::AnnotDesc, std::stringstream>& _descriptorStream,
-    std::map<std::string, core::record::annotation_access_unit::TypedData>& _attributeTileStream,
+    std::map<std::string, core::access_unit::annotation::TypedData>& _attributeTileStream,
     std::map<std::string, core::parameter::annotation::AttributeData> _attributeInfo,
     const core::parameter::annotation::Record& _annotationParameterSet,
-    core::record::annotation_access_unit::Record& _annotationAccessUnit, uint8_t _AG_class, uint8_t _AT_ID,
+    core::access_unit::annotation::Record& _annotationAccessUnit, uint8_t _AG_class, uint8_t _AT_ID,
     uint64_t _rowIndex, uint64_t _colIndex) {
     tile_index_2 = _colIndex;
     tile_index_1 = _rowIndex;
-    std::vector<core::record::annotation_access_unit::Block> blocks;
+    std::vector<core::access_unit::annotation::Block> blocks;
     AT_ID = _AT_ID;
     AG_class = _AG_class;
     if (AG_class == 0 || AG_class == 2)  // genotype or contact
@@ -65,8 +65,8 @@ void AccessUnitComposer::setAccessUnit(
     for (auto it = encodedDescriptors.begin(); it != encodedDescriptors.end(); ++it) {
         std::vector<uint8_t> data;
         for (auto readbyte : it->second.str()) data.push_back(readbyte);
-        core::record::annotation_access_unit::BlockVectorData blockInfo(it->first, data);
-        core::record::annotation_access_unit::Block block;
+        core::access_unit::annotation::BlockVectorData blockInfo(it->first, data);
+        core::access_unit::annotation::Block block;
         if (data.size() != 0) {
             block.set(blockInfo);
             blocks.push_back(block);
@@ -79,7 +79,7 @@ void AccessUnitComposer::setAccessUnit(
         _annotationParameterSet.getAnnotationEncodingParameters().getCompressorParameterSets();
     std::map<std::string, std::stringstream> encodedAttributes;
 
-    std::map<std::string, std::vector<core::record::annotation_access_unit::TypedData>> attributeTileStreamOutputs;
+    std::map<std::string, std::vector<core::access_unit::annotation::TypedData>> attributeTileStreamOutputs;
     for (auto& attribute : attributeParameterSets) {
         auto compressorId = attribute.getCompressorID();
         if (compressorId != 0) {
@@ -104,11 +104,12 @@ void AccessUnitComposer::setAccessUnit(
         std::stringstream data;
         util::BitWriter writer(&data);
         for (auto& oneBlock : tileData.second) {
-          oneBlock.Write(writer);
+          core::Writer coreWriter(&data);
+          oneBlock.write(coreWriter);
         }
         writer.FlushBits();
-        core::record::annotation_access_unit::BlockData blockInfo(core::AnnotDesc::ATTRIBUTE, attributeID, data);
-        core::record::annotation_access_unit::Block block;
+        core::access_unit::annotation::BlockData blockInfo(core::AnnotDesc::ATTRIBUTE, attributeID, data);
+        core::access_unit::annotation::Block block;
         block.set(blockInfo);
         blocks.push_back(block);
     }
@@ -117,11 +118,11 @@ void AccessUnitComposer::setAccessUnit(
 
     uint64_t n_blocks = static_cast<uint64_t>(blocks.size());
     ATCoordSize = _annotationParameterSet.getATCoordSize();
-    core::record::annotation_access_unit::AnnotationAccessUnitHeader annotationAccessUnitHeadertot(
+    core::access_unit::annotation::AnnotationAccessUnitHeader annotationAccessUnitHeadertot(
         attributeContiguity, twoDimensional, columnMajorTileOrder, variable_size_tiles, ATCoordSize, is_attribute,
         attribute_ID, descriptor_ID, n_tiles_per_col, n_tiles_per_row, n_blocks, tile_index_1, tile_index_2_exists,
         tile_index_2);
-    core::record::annotation_access_unit::Record annotationAccessUnit(
+    core::access_unit::annotation::Record annotationAccessUnit(
         AT_ID, AT_type, AT_subtype, AG_class, annotationAccessUnitHeadertot, blocks, attributeContiguity,
         twoDimensional, columnMajorTileOrder, ATCoordSize, variable_size_tiles, n_blocks, numChrs);
     _annotationAccessUnit = annotationAccessUnit;
@@ -161,7 +162,7 @@ void AccessUnitComposer::compress(
     }
 }
 
-void AccessUnitComposer::compress(core::record::annotation_access_unit::TypedData& oneBlock,
+void AccessUnitComposer::compress(core::access_unit::annotation::TypedData& oneBlock,
                                   core::parameter::annotation::CompressorParameterSet& compressor) {
     auto encodeId = compressor.getAlgorithmIDs();
     if (compressor.getCompressorID() != 0) {

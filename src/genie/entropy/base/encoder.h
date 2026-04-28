@@ -15,7 +15,7 @@
 
 #include <vector>
 // #include "genie/core/entropy_encoder.h"
-#include "genie/core/record/annotation_access_unit/TypedData.h"
+#include "genie/core/access_unit/annotation/typed_data.h"
 
 // -----------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ class Encoder {
      * @param index Input index (typically 0)
      * @param input Input typed data
      */
-    void setInput(uint8_t inVarID, const core::record::annotation_access_unit::TypedData& data);
+    void setInput(uint8_t inVarID, const core::access_unit::annotation::TypedData& data);
 
     /**
      * @brief Perform the encoding operation
@@ -59,12 +59,12 @@ class Encoder {
      * @param index Output index (0 = symbols, 1 = dimensions, etc.)
      * @return Reference to output typed data
      */
-    const core::record::annotation_access_unit::TypedData& getOutput(uint8_t outVarID) const;
+    const core::access_unit::annotation::TypedData& getOutput(uint8_t outVarID) const;
 
  protected:
     Encoder() = default;
-    std::vector<core::record::annotation_access_unit::TypedData> inputs;   ///< Input data
-    std::vector<core::record::annotation_access_unit::TypedData> outputs;  ///< Output data
+    std::vector<core::access_unit::annotation::TypedData> inputs;   ///< Input data
+    std::vector<core::access_unit::annotation::TypedData> outputs;  ///< Output data
 };
 
 // -----------------------------------------------------------------------------
