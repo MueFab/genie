@@ -35,6 +35,12 @@ struct PairHash {
     }
 };
 
+struct PairHash64 {
+    size_t operator()(const std::pair<uint64_t, uint64_t>& p) const {
+        return static_cast<size_t>(p.first * 31 + p.second);
+    }
+};
+
 inline void assign_vec_to_arr(UInt64VecDtype& dest, const std::vector<uint64_t>& src) {
     ::genie::backend::resize_arr(dest, src.size());
     for (size_t i = 0; i < src.size(); ++i) {
@@ -819,7 +825,7 @@ void decode_scm(ContactMatrixParameters& cm_param, SubcontactMatrixParameters& s
     auto ntiles_in_row = scm_param.GetNTilesInRow();
     auto ntiles_in_col = scm_param.GetNTilesInCol();
 
-    std::map<std::pair<uint64_t, uint64_t>, uint32_t> merged_entries;
+    std::unordered_map<std::pair<uint64_t, uint64_t>, uint32_t, detail::PairHash> merged_entries;
 
     for (size_t i = 0; i < ntiles_in_row; i++) {
         for (size_t j = 0; j < ntiles_in_col; j++) {
