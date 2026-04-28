@@ -43,15 +43,11 @@ struct PairHash64 {
 
 inline void assign_vec_to_arr(UInt64VecDtype& dest, const std::vector<uint64_t>& src) {
     ::genie::backend::resize_arr(dest, src.size());
-    for (size_t i = 0; i < src.size(); ++i) {
-        ::genie::backend::set_arr_element(dest, i, src[i]);
-    }
+    std::memcpy(dest.data(), src.data(), src.size() * sizeof(uint64_t));
 }
 inline void assign_vec_to_arr(UIntVecDtype& dest, const std::vector<uint32_t>& src) {
     ::genie::backend::resize_arr(dest, src.size());
-    for (size_t i = 0; i < src.size(); ++i) {
-        ::genie::backend::set_arr_element(dest, i, src[i]);
-    }
+    std::memcpy(dest.data(), src.data(), src.size() * sizeof(uint32_t));
 }
 
 }
