@@ -1,5 +1,6 @@
 add_subdirectory(core)
 add_subdirectory(variant)
+add_subdirectory(variantGenotypeRecordTest)
 add_subdirectory(example)
 add_subdirectory(records)
 add_subdirectory(genotype)
