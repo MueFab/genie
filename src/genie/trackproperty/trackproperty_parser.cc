@@ -35,11 +35,7 @@ TrackPropertyParser::TrackPropertyParser(std::ifstream& inputfile, std::vector<a
     while (fillRecord(reader)) {
         descriptors.write(trackPropertyRecord);
 
-        // Track properties are stored as attributes in the annotation parameter set
-        const auto& props = trackPropertyRecord.GetProperties();
-        if (!props.empty()) {
-            attributes.add(props);
-        }
+        attributes.add(trackPropertyRecord.GetFields());
         numberOfRows++;
     }
 

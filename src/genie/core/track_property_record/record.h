@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+#include "genie/core/access_unit/annotation/attribute_field.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/core/writer.h"
@@ -52,6 +53,15 @@ class Record {
     [[nodiscard]] uint8_t GetTrackType() const { return track_type_; }
     [[nodiscard]] uint8_t GetTrackPropertyCount() const { return track_property_count_; }
     [[nodiscard]] const std::vector<TrackProperty>& GetProperties() const { return properties_; }
+    [[nodiscard]] std::vector<genie::core::access_unit::annotation::AttributeField> GetFields() const {
+        std::vector<genie::core::access_unit::annotation::AttributeField> fields;
+        fields.reserve(properties_.size());
+        for (const auto& prop : properties_) {
+            fields.push_back({prop.track_property, static_cast<genie::core::DataType>(prop.track_property_type),
+                             prop.track_property_values});
+        }
+        return fields;
+    }
     [[nodiscard]] uint8_t GetReserved() const { return reserved_; }
     [[nodiscard]] uint8_t GetLinkedRecord() const { return linked_record_; }
     [[nodiscard]] bool IsLinkedRecord() const {

@@ -30,16 +30,16 @@ void FeatureAnnotation::parseInfoTags(std::string& recordInputFileName) {
     std::ifstream readForTags;
     readForTags.open(recordInputFileName, std::ios::in | std::ios::binary);
     util::BitReader bitreader(readForTags);
-    std::vector<core::record::feature::FeatureFields::Field> infoTag;
+    std::vector<core::access_unit::annotation::AttributeField> infoTag;
     core::record::feature::Record recs;
     while (recs.Read(bitreader)) {
         infoTag = recs.GetFeatureAttributes().GetFields();
         for (const auto& tag : infoTag) {
-            InfoField infoField(tag.attr, tag.attr_type, static_cast<uint8_t>(tag.attr_values.size()));
-            core::record::feature::Info_tag infotag{static_cast<uint8_t>(tag.attr.size()), tag.attr, tag.attr_type,
-                                                    static_cast<uint8_t>(tag.attr_values.size()), tag.attr_values};
-            infoTags[tag.attr] = infotag;
-            attributeInfo[tag.attr] = infoField;
+            InfoField infoField(tag.name, tag.type, static_cast<uint8_t>(tag.values.size()));
+            core::record::feature::Info_tag infotag{static_cast<uint8_t>(tag.name.size()), tag.name, tag.type,
+                                                    static_cast<uint8_t>(tag.values.size()), tag.values};
+            infoTags[tag.name] = infotag;
+            attributeInfo[tag.name] = infoField;
         }
     }
     readForTags.close();

@@ -58,8 +58,8 @@ void Record::Write(genie::util::BitWriter& writer) {
   auto info_tag = info_.GetFields();
   writer.WriteBits(static_cast<uint8_t>(info_tag.size()), 8);
   for (auto idx_i = 0u; idx_i < info_tag.size(); ++idx_i) {
-    writer.WriteBits(info_tag[idx_i].tag.size(), 8);
-    writer.Write(info_tag[idx_i].tag);
+    writer.WriteBits(info_tag[idx_i].name.size(), 8);
+    writer.Write(info_tag[idx_i].name);
     writer.WriteBits(static_cast<uint8_t>(info_tag[idx_i].type), 8);
     writer.WriteBits(info_tag[idx_i].values.size(), 8);
     ArrayType writeType;

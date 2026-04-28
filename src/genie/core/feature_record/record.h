@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "genie/core/array_type.h"
+#include "genie/core/access_unit/annotation/attribute_field.h"
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
@@ -94,10 +95,28 @@ class FeatureFields {
   }
   /**
    * @brief Gets the vector of information fields
-   * @return Reference to the vector of fields
+   * @return Vector of AttributeField entries
    */
-  std::vector<Field>& GetFields() {
-    return fields_;
+  std::vector<genie::core::access_unit::annotation::AttributeField> GetFields() {
+    std::vector<genie::core::access_unit::annotation::AttributeField> result;
+    result.reserve(fields_.size());
+    for (const auto& field : fields_) {
+      result.push_back({field.attr, field.attr_type, field.attr_values});
+    }
+    return result;
+  }
+
+  /**
+   * @brief Gets the fields as AttributeField vector
+   * @return Vector of AttributeField entries
+   */
+  std::vector<genie::core::access_unit::annotation::AttributeField> GetFields() const {
+    std::vector<genie::core::access_unit::annotation::AttributeField> result;
+    result.reserve(fields_.size());
+    for (const auto& field : fields_) {
+      result.push_back({field.attr, field.attr_type, field.attr_values});
+    }
+    return result;
   }
 
  private:

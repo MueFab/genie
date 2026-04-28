@@ -55,7 +55,7 @@ FunctionalAnnotationParser::FunctionalAnnotationParser(std::istream& _annotation
     util::BitReader reader(annotationMGrecs);
     while (fillRecord(reader)) {
         descriptors.write(functionalAnnotation);
-        attributes.add(functionalAnnotation.GetAttributes());
+        attributes.add(functionalAnnotation.GetFields());
         numberOfRows++;
     }
     descriptors.writeDanglingBits();

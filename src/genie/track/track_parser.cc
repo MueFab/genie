@@ -36,7 +36,7 @@ TrackParser::TrackParser(std::istream& _track_MGrecs, std::vector<genie::annotat
     util::BitReader reader(trackMGrecs);
     while (fillRecord(reader)) {
         descriptors.write(trackRecord);
-        attributes.add(trackRecord.GetAttributes());
+        attributes.add(trackRecord.GetFields());
         numberOfRows++;
     }
     descriptors.writeDanglingBits();

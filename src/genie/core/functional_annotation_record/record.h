@@ -17,6 +17,7 @@
 #include <vector>
 
 #include "genie/core/array_type.h"
+#include "genie/core/access_unit/annotation/attribute_field.h"
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -252,6 +253,19 @@ class Record {
      */
     [[nodiscard]] const std::vector<Attribute>& GetAttributes() const {
         return attributes_;
+    }
+
+    /**
+     * @brief Gets the attributes as AttributeField vector
+     * @return Vector of AttributeField entries
+     */
+    [[nodiscard]] std::vector<genie::core::access_unit::annotation::AttributeField> GetFields() const {
+        std::vector<genie::core::access_unit::annotation::AttributeField> fields;
+        fields.reserve(attributes_.size());
+        for (const auto& attr : attributes_) {
+            fields.push_back({attr.attr_tag, static_cast<genie::core::DataType>(attr.attr_type), attr.attr_values});
+        }
+        return fields;
     }
 
     /**

@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "genie/core/array_type.h"
+#include "genie/core/access_unit/annotation/attribute_field.h"
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
@@ -80,11 +81,29 @@ class InfoFields {
     fields_.shrink_to_fit();
   }
   /**
-   * @brief Gets the vector of information fields
-   * @return Reference to the vector of fields
+   * @brief Gets the fields as AttributeField vector
+   * @return Vector of AttributeField entries
    */
-  std::vector<Field>& GetFields() {
-    return fields_;
+  std::vector<genie::core::access_unit::annotation::AttributeField> GetFields() {
+    std::vector<genie::core::access_unit::annotation::AttributeField> result;
+    result.reserve(fields_.size());
+    for (const auto& field : fields_) {
+      result.push_back({field.tag, field.type, field.values});
+    }
+    return result;
+  }
+
+  /**
+   * @brief Gets the fields as AttributeField vector
+   * @return Vector of AttributeField entries
+   */
+  std::vector<genie::core::access_unit::annotation::AttributeField> GetFields() const {
+    std::vector<genie::core::access_unit::annotation::AttributeField> result;
+    result.reserve(fields_.size());
+    for (const auto& field : fields_) {
+      result.push_back({field.tag, field.type, field.values});
+    }
+    return result;
   }
 
  private:
@@ -371,9 +390,9 @@ class Record {
 
   /**
    * @brief Gets the information field tags
-   * @return Reference to the vector of information field tags
+   * @return Vector of AttributeField entries
    */
-  std::vector<InfoFields::Field>& GetInfoTag() {
+  std::vector<genie::core::access_unit::annotation::AttributeField> GetInfoTag() {
     return info_.GetFields();
   }
   //  std::vector<std::vector<std::vector<uint8_t>>> getInfoValues() const {

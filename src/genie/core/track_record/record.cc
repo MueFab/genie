@@ -46,7 +46,9 @@ void Record::Write(util::BitWriter& writer) {
         writer.Write(attributes_[i].attr_tag);
         writer.WriteBits(attributes_[i].attr_type, 8);
         DataType type = static_cast<DataType>(attributes_[i].attr_type);
-        writeType.toFile(type, attributes_[i].attr_value, writer);
+        for (const auto& value : attributes_[i].attr_values) {
+            writeType.toFile(type, value, writer);
+        }
     }
 
     writer.WriteBits(reserved_, 7);
@@ -84,7 +86,11 @@ bool Record::Read(util::BitReader& reader) {
         }
         attr.attr_type = static_cast<uint8_t>(reader.ReadBits(8));
         DataType type = static_cast<DataType>(attr.attr_type);
-        attr.attr_value = readType.toArray(type, reader);
+        auto array_len = static_cast<uint8_t>(reader.ReadBits(8));
+        attr.attr_values.reserve(array_len);
+        for (auto j = 0; j < array_len; ++j) {
+            attr.attr_values.push_back(readType.toArray(type, reader));
+        }
         attributes_.push_back(attr);
     }
 
