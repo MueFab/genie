@@ -12,7 +12,7 @@
 #include <vector>
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
-#include "genie/variantsite/accessunit_composer.h"
+#include "genie/annotation/accessunit_composer.h"
 
 // "genie/util/runtime_exception.h"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ std::vector<GeneExpressionUnits> GeneExpressionAnnotation::parseGeneExpression(
       std::cerr << " blockIndex: " << std::to_string(blockIndex) << std::endl;
 
       size_t linkIdRowCnt = 0;
-      std::map<std::string, core::record::annotation_access_unit::TypedData>
+      std::map<std::string, core::access_unit::annotation::TypedData>
           attributeTDStream;
       std::cerr << " attributeTDStream... " << std::endl;
       for (auto& formatdata : combined.blocks.at(blockIndex).attributes) {
@@ -86,8 +86,8 @@ std::vector<GeneExpressionUnits> GeneExpressionAnnotation::parseGeneExpression(
       std::map<core::AnnotDesc, std::stringstream> descriptorStream;
 
       variant_site::AccessUnitComposer accessUnitcomposer;
-      accessUnitcomposer.setATtype(core::record::annotation_access_unit::AnnotationType::GENE_EXPRESSION,
-          core::record::annotation_access_unit::AnnotationSubtype::GENE_EXPRESSION);
+      accessUnitcomposer.setATtype(core::access_unit::annotation::AnnotationType::GENIE_EXPRESSION,
+          9);
 
       accessUnitcomposer.setCompressors(compressors);
 

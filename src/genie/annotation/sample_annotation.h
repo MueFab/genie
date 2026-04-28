@@ -15,18 +15,18 @@
 #include "genie/annotation/json_attribute_parser.h"
 #include "genie/core/constants.h"
 #include "genie/variantsample/variantsample_parser.h"
-#include "genie/variantsite/accessunit_composer.h"
+#include "genie/annotation/accessunit_composer.h"
 #include "genie/variantsite/parameterset_composer.h"
 
 #include "genie/annotation/compressors.h"
-#include "genie/core/data_unit_record/record.h"
+#include "genie/core/record/data_unit/record.h"
 
 namespace genie {
 namespace annotation {
 
 struct SampleUnits {
   core::parameter::annotation::Record annotationParameterSet;
-  std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
+  std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
 };
 
 class SampleAnnotation {
@@ -35,8 +35,7 @@ class SampleAnnotation {
     defaultTileSizeWidth = _defaultTileSizeWidth;
   }
 
-  void setATtype(core::record::annotation_access_unit::AnnotationType annotationType, core::record::annotation_access_unit::AnnotationSubtype
-          annotationSubtype) {
+  void setATtype(core::access_unit::annotation::AnnotationType annotationType, uint8_t annotationSubtype) {
     annotationType_ = annotationType;
     annotationSubtype_ = annotationSubtype;
   }
@@ -54,16 +53,15 @@ class SampleAnnotation {
   std::map<std::string, InfoField> attributeInfo;
   std::vector<InfoField> infoFields;
 
-  variant_site::AccessUnitComposer accessUnitcomposer;
+  variant_site::  AccessUnitComposer accessUnitcomposer;
   core::parameter::annotation::Record annotationParameterSet;
-  std::vector<core::record::annotation_access_unit::Record> annotationAccessUnits;
+  std::vector<core::access_unit::annotation::Record> annotationAccessUnits;
 
   uint32_t defaultTileSizeWidth;
   uint64_t colIndex = 0;
-  core::record::annotation_access_unit::AnnotationType annotationType_ =
-      core::record::annotation_access_unit::AnnotationType::VARIANTS;
-  core::record::annotation_access_unit::AnnotationSubtype annotationSubtype_ =
-      core::record::annotation_access_unit::AnnotationSubtype::VCF;
+  core::access_unit::annotation::AnnotationType annotationType_ =
+      core::access_unit::annotation::AnnotationType::VARIANTS;
+  uint8_t annotationSubtype_{1};
 };
 
 }  // namespace annotation

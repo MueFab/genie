@@ -6,7 +6,7 @@
 
 #include "TypedData.h"
 
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

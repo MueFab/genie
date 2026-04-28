@@ -32,7 +32,7 @@ Record::Record(util::BitReader& reader) {
 
 // -------------------------------------------------------------------------------------------------
 
-void Record::Write(core::Writer& writer) {
+void Record::Write(util::BitWriter& writer) {
     writer.WriteBits(track_data_index_, 64);
     writer.WriteBits(seq_id_, 16);
     writer.WriteBits(start_pos_, 40);
@@ -43,7 +43,7 @@ void Record::Write(core::Writer& writer) {
     ArrayType writeType;
     for (auto i = 0; i < attr_count_; ++i) {
         writer.WriteBits(attributes_[i].attr_tag_len, 8);
-        writerwrite(attributes_[i].attr_tag);
+        writer.Write(attributes_[i].attr_tag);
         writer.WriteBits(attributes_[i].attr_type, 8);
         DataType type = static_cast<DataType>(attributes_[i].attr_type);
         writeType.toFile(type, attributes_[i].attr_value, writer);
@@ -53,7 +53,7 @@ void Record::Write(core::Writer& writer) {
     writer.WriteBits(linked_record_, 1);
     if (linked_record_) {
         writer.WriteBits(link_name_len_, 8);
-        writerwrite(link_name_);
+        writer.Write(link_name_);
         writer.WriteBits(reference_box_id_, 8);
     }
 }

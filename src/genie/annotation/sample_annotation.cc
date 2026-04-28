@@ -15,7 +15,7 @@
 #include <vector>
 
 #include "genie/core/record/annotation_access_unit/TypedData.h"
-#include "genie/variantsite/accessunit_composer.h"
+#include "genie/annotation/accessunit_composer.h"
 
 #include "genie/core/array_type.h"
 #include "genie/util/runtime_exception.h"
@@ -75,7 +75,7 @@ SampleUnits SampleAnnotation::parseSample(std::ifstream& inputfile) {
   annotationAccessUnits.resize(parser.getNrOfTiles());
   uint64_t rowIndex = 0;
 
-  std::map<std::string, core::record::annotation_access_unit::TypedData> attr;
+  std::map<std::string, core::access_unit::annotation::TypedData> attr;
   auto nrOfRemainingColumns = parser.getNumberOfColumns();
   for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
     std::map<core::AnnotDesc, std::stringstream> desc;

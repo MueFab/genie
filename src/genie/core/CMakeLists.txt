@@ -36,6 +36,13 @@ set(source_files
         record/site/record.cc
         record/data_unit/record.cc
 
+        feature_record/record.cc
+        functional_annotation_record/record.cc
+        gene_expression_record/record.cc
+        sample_record/record.cc
+        track_property_record/record.cc
+        track_record/record.cc
+
         access_unit/annotation/record.cc
         access_unit/annotation/block.cc
         access_unit/annotation/block_header.cc

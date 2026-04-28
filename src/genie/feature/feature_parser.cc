@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"
@@ -56,8 +56,8 @@ void FeatureParser::init() {
 
         numberOfAttributes = static_cast<uint16_t>(infoFields.size());
     } else {
-        std::map<std::string, core::record::parameter::annotation::AttributeData> info;
-            std::map<std::string, core::record::parameter::annotation::AttributeData> attributetags;
+        std::map<std::string, core::parameter::annotation::AttributeData> info;
+            std::map<std::string, core::parameter::annotation::AttributeData> attributetags;
         for (auto tag : tags) {
             AttributeData tagdata(static_cast<uint8_t>(tag.first.length()), tag.first, tag.second.info_type, tag.second.info_array_len, attributeID);
             attributetags[tag.first] = tagdata;

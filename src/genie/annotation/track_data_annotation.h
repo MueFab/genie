@@ -14,12 +14,12 @@
 #include <vector>
 #include "genie/annotation/json_attribute_parser.h"
 #include "genie/core/constants.h"
-#include "genie/variantsite/accessunit_composer.h"
+#include "genie/annotation/accessunit_composer.h"
 #include "genie/variantsite/parameterset_composer.h"
 #include "genie/track/track_parser.h"
 
 #include "genie/annotation/compressors.h"
-#include "genie/core/data_unit_record/record.h"
+#include "genie/core/record/data_unit/record.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
@@ -27,7 +27,7 @@ namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 struct TrackUnits {
     core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
+    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
 };
 
 class TrackDataAnnotation {
@@ -42,7 +42,7 @@ class TrackDataAnnotation {
     void parseInfoTags(std::string& recordInputFileName);
     TrackUnits parseTrack(std::ifstream& inputfile);
     void setCompressors(Compressor& _compressors) { compressors = _compressors; }
-    void setAnnotationSubtype(core::record::annotation_access_unit::AnnotationSubtype subtype) {
+    void setAnnotationSubtype(uint8_t subtype) {
         annotationSubtype_ = subtype;
     }
 
@@ -61,14 +61,13 @@ class TrackDataAnnotation {
         core::AnnotDesc::LINKNAME,
         core::AnnotDesc::LINKID};
 
-    variant_site::AccessUnitComposer accessUnitcomposer;
+    variant_site::    AccessUnitComposer accessUnitcomposer;
     core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
+    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
     uint64_t numberOfRecords{0};
-    core::record::annotation_access_unit::AnnotationSubtype annotationSubtype_{
-        core::record::annotation_access_unit::AnnotationSubtype::BED};
+    uint8_t annotationSubtype_{4};
 };
 
 }  // namespace annotation

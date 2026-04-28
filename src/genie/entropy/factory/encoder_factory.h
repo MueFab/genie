@@ -39,7 +39,7 @@ class EncoderFactory {
      */
     static std::unique_ptr<base::Encoder> createEncoder(
         core::AlgoID algorithmID,
-        const core::record::parameter::annotation::AlgorithmParameters& parameters);
+        const core::parameter::annotation::AlgorithmParameters& parameters);
 };
 
 // -----------------------------------------------------------------------------

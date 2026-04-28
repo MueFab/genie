@@ -22,6 +22,12 @@
 #include "genie/core/record/data_unit/record.h"
 #include "genie/annotation/geno_annotation.h"
 #include "genie/annotation/site_annotation.h"
+#include "genie/annotation/sample_annotation.h"
+#include "genie/annotation/feature_annotation.h"
+#include "genie/annotation/gene_expression_annotation.h"
+#include "genie/annotation/functional_annotation.h"
+#include "genie/annotation/track_data_annotation.h"
+#include "genie/annotation/trackproperty_annotation.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
@@ -45,6 +51,12 @@ class Annotation {
     defaultTileSizeWidth = _defaultTileSizeWidth;
     genoAnnotation.setTileSize(_defaultTileSizeHeight, defaultTileSizeWidth);
     siteAnnotation.setTileSize(_defaultTileSizeHeight);
+    sampleAnnotation.setTileSize(_defaultTileSizeWidth);
+    featureAnnotation.setTileSize(_defaultTileSizeHeight);
+    geneExpressionAnnotation.setTileSize(_defaultTileSizeHeight, _defaultTileSizeWidth);
+    functionalAnnotation.setTileSize(_defaultTileSizeHeight);
+    trackDataAnnotation.setTileSize(_defaultTileSizeHeight);
+    trackpropertyAnnotation.setTileSize(_defaultTileSizeHeight);
   }
 
   void startStream(RecType recType, std::string recordInputFileName,
@@ -76,6 +88,12 @@ class Annotation {
   GenoAnnotation genoAnnotation;
   SiteAnnotation siteAnnotation;
   CMAnnotation cmAnnotation;
+  SampleAnnotation sampleAnnotation;
+  FeatureAnnotation featureAnnotation;
+  GeneExpressionAnnotation geneExpressionAnnotation;
+  FunctionalAnnotation functionalAnnotation;
+  TrackDataAnnotation trackDataAnnotation;
+  TrackPropertyAnnotation trackpropertyAnnotation;
 
   uint32_t defaultTileSizeHeight{0};
   uint32_t defaultTileSizeWidth{0};

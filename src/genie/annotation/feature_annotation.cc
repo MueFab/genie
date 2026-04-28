@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "genie/core/record/annotation_access_unit/TypedData.h"
-#include "genie/variantsite/accessunit_composer.h"
+#include "genie/annotation/accessunit_composer.h"
 
 #include "genie/core/array_type.h"
 #include "genie/util/runtime_exception.h"
@@ -71,13 +71,13 @@ FeatureUnits FeatureAnnotation::parseFeature(std::ifstream& inputfile) {
     variant_site::ParameterSetComposer encodeParameters;
 
     variant_site::AccessUnitComposer accessUnit;
-    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::GENE_EXPRESSION,
-                         core::record::annotation_access_unit::AnnotationSubtype::GENE_EXPRESSION);
+    accessUnit.setATtype(core::access_unit::annotation::AnnotationType::GENIE_EXPRESSION,
+                         9);
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;
 
-    std::map<std::string, core::record::annotation_access_unit::TypedData> attr;
+    std::map<std::string, core::access_unit::annotation::TypedData> attr;
     for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
         std::map<core::AnnotDesc, std::stringstream> desc;
         for (auto& attrtile : parser.getAttributes().getTiles()) {

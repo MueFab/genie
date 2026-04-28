@@ -52,6 +52,11 @@ target_link_libraries(${PROJECT_NAME} PUBLIC genie-jbig)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-contact)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-genotype)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-likelihood)
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-feature)
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-track)
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-trackproperty)
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-functionalannotation)
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-variantsample)
 
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)

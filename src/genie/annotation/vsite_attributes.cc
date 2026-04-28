@@ -11,11 +11,92 @@
 
 #include "genie/annotation/attributes.h"
 #include "genie/core/array_type.h"
+#include "genie/core/functional_annotation_record/record.h"
+#include "genie/core/track_property_record/record.h"
+#include "genie/core/track_record/record.h"
 #include "genie/util/runtime_exception.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace variant_site {
+
+void Attributes::add(std::vector<genie::core::record::variant_site::InfoFields::Field> fields) {
+    for (const auto& field : fields) {
+        attributeTiles[field.tag].write(field.values);
+        attrWritten[field.tag] = true;
+    }
+    for (const auto& isWritten : attrWritten) {
+        if (!isWritten.second) {
+            attributeTiles[isWritten.first].writeMissing();
+        }
+        attrWritten[isWritten.first] = false;
+    }
+}
+
+void Attributes::add(std::vector<genie::core::record::feature::FeatureFields::Field> fields) {
+    for (const auto& field : fields) {
+        attributeTiles[field.attr].write(field.attr_values);
+        attrWritten[field.attr] = true;
+    }
+    for (const auto& isWritten : attrWritten) {
+        if (!isWritten.second) {
+            attributeTiles[isWritten.first].writeMissing();
+        }
+        attrWritten[isWritten.first] = false;
+    }
+}
+
+void Attributes::add(std::vector<genie::core::record::sample::SampleFields::Field> fields) {
+    for (const auto& field : fields) {
+        attributeTiles[field.attr].write(field.attr_values);
+        attrWritten[field.attr] = true;
+    }
+    for (const auto& isWritten : attrWritten) {
+        if (!isWritten.second) {
+            attributeTiles[isWritten.first].writeMissing();
+        }
+        attrWritten[isWritten.first] = false;
+    }
+}
+
+void Attributes::add(std::vector<genie::core::record::track::Attribute> fields) {
+    for (const auto& field : fields) {
+        attributeTiles[field.attr_tag].write({field.attr_value});
+        attrWritten[field.attr_tag] = true;
+    }
+    for (const auto& isWritten : attrWritten) {
+        if (!isWritten.second) {
+            attributeTiles[isWritten.first].writeMissing();
+        }
+        attrWritten[isWritten.first] = false;
+    }
+}
+
+void Attributes::add(std::vector<genie::core::record::track_property::TrackProperty> fields) {
+    for (const auto& field : fields) {
+        attributeTiles[field.track_property].write(field.track_property_values);
+        attrWritten[field.track_property] = true;
+    }
+    for (const auto& isWritten : attrWritten) {
+        if (!isWritten.second) {
+            attributeTiles[isWritten.first].writeMissing();
+        }
+        attrWritten[isWritten.first] = false;
+    }
+}
+
+void Attributes::add(std::vector<genie::core::record::functional_annotation::Attribute> fields) {
+    for (const auto& field : fields) {
+        attributeTiles[field.attr_tag].write(field.attr_values);
+        attrWritten[field.attr_tag] = true;
+    }
+    for (const auto& isWritten : attrWritten) {
+        if (!isWritten.second) {
+            attributeTiles[isWritten.first].writeMissing();
+        }
+        attrWritten[isWritten.first] = false;
+    }
+}
 
 void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
     AddFirst();
@@ -108,22 +189,6 @@ AttributeTile::AttributeTile(const AttributeTile& other) {
 void AttributeTile::setCompressedData(uint64_t tilenr, std::stringstream& compressedData) {
     (void)tilenr;
     (void)compressedData;
-}
-
-void Attributes::add(std::vector<genie::core::record::variant_site::InfoFields::Field> tags)  // , std::vector<std::vector<std::vector<uint8_t>>> infoValues) {
-{
-    size_t index = 0;
-    for (const auto& tag : tags) {
-        attributeTiles[tag.tag].write(tag.values);  // infoValues.at(index));
-        attrWritten[tag.tag] = true;
-        index++;
-    }
-    for (const auto& isWritten : attrWritten) {
-        if (!isWritten.second) {
-            attributeTiles[isWritten.first].writeMissing();
-        }
-        attrWritten[isWritten.first] = false;
-    }
 }
 
 void Attributes::add(std::map<std::string, genie::core::record::variant_site::Info_tag> tags, std::map<std::string, std::vector<std::vector<uint8_t>>> infoValues) {

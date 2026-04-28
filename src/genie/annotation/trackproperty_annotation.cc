@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "genie/core/record/annotation_access_unit/TypedData.h"
-#include "genie/variantsite/accessunit_composer.h"
+#include "genie/annotation/accessunit_composer.h"
 
 #include "genie/core/array_type.h"
 #include "genie/util/runtime_exception.h"
@@ -77,21 +77,20 @@ TrackPropertyUnits TrackPropertyAnnotation::parseTrackProperty(std::ifstream& in
     annotationParameterSet =
         parameterset.Compose(AT_ID, AG_class, {defaultTileSizeHeight, 0}, annotationEncodingParameters);
 
-    // Convert track_type to AnnotationSubtype
+    // Convert track_type to subtype
     // track_type values: GTF=2, GFF=3, BED=4, BEDGRAPH=5, WIG=6, BIGWIG=7, GENBANK=8
-    core::record::annotation_access_unit::AnnotationSubtype subtype =
-        static_cast<core::record::annotation_access_unit::AnnotationSubtype>(trackType_);
+    uint8_t subtype = static_cast<uint8_t>(trackType_);
 
     variant_site::AccessUnitComposer accessUnit;
     // Track properties use TRACK_PROPERTY type with subtype from track_type
-    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::TRACKS,
+    accessUnit.setATtype(core::access_unit::annotation::AnnotationType::TRACKS,
                          subtype);
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;
     auto& descrStream = parser.getDescriptors().getTiles();
 
-    std::map<std::string, core::record::annotation_access_unit::TypedData> attr;
+    std::map<std::string, core::access_unit::annotation::TypedData> attr;
     for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
         std::map<core::AnnotDesc, std::stringstream> desc;
         for (auto& desctile : descrStream) {

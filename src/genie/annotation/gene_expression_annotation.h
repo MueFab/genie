@@ -14,7 +14,8 @@
 #include "genie/annotation/compressors.h"
 #include "genie/core/gene_expression_record/record.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
-#include "genie/core/record/annotation_access_unit/record.h"
+#include "genie/core/access_unit/annotation/record.h"
+#include "genie/core/access_unit/annotation/typed_data.h"
 // #include "genie/core/data_unit_record/record.h"
 // #include "genie/annotation/json_attribute_parser.h"
 // #include "genie/gene_expression/gene_expression_parser.h"
@@ -24,7 +25,7 @@ namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 struct GeneExpressionUnits {
     core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
+    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
 };
 class GeneExpressionAnnotation {
  public:
@@ -71,7 +72,7 @@ class GeneExpressionAnnotation {
  private:
     Compressor compressors;
     core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
+    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
     uint32_t defaultTileSizeWidth;

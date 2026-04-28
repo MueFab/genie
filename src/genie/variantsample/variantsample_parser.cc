@@ -13,7 +13,7 @@
 #include "genie/variantsample/variantsample_parser.h"
 
 #include "genie/util/json.h"
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"

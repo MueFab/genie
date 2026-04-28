@@ -159,6 +159,19 @@ class Writer {
         return binwriter;
     }
 
+    /**
+     * @brief Write bits directly to the underlying BitWriter
+     * @param bits Data to write
+     * @param numBits Number of bits to write
+     */
+    void WriteBits(uint64_t bits, uint8_t numBits) {
+        if (getWriteSize) {
+            writeBitSize += numBits;
+        } else if (!writingLog) {
+            binwriter.WriteBits(bits, numBits);
+        }
+    }
+
 };
 }  // namespace core
 }  // namespace genie

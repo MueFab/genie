@@ -30,7 +30,7 @@
 #include "genie/core/track_record/record.h"
 #include "genie/core/track_property_record/record.h"
 
-#include "genie/core/record/annotation_access_unit/TypedData.h"
+#include "genie/core/access_unit/annotation/typed_data.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -61,7 +61,7 @@ class AttributeTile {
     }
 
     void setCompressedData(uint64_t tilenr, std::stringstream& compressedData);
-    core::record::annotation_access_unit::TypedData& getTypedTile(uint64_t tilenr) {
+    core::access_unit::annotation::TypedData& getTypedTile(uint64_t tilenr) {
         return typedTiles.at(tilenr);
     }
 
@@ -82,7 +82,7 @@ class AttributeTile {
  private:
     uint64_t rowsPerTile;
     genie::core::parameter::annotation::AttributeData info;
-    std::vector< genie::core::record::annotation_access_unit::TypedData> typedTiles;
+    std::vector< genie::core::access_unit::annotation::TypedData> typedTiles;
     std::vector<std::stringstream> tiles;
     std::vector<util::BitWriter> writers;
     uint64_t rowInTile;

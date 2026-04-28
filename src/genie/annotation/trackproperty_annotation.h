@@ -14,12 +14,12 @@
 #include <vector>
 #include "genie/annotation/json_attribute_parser.h"
 #include "genie/core/constants.h"
-#include "genie/variantsite/accessunit_composer.h"
+#include "genie/annotation/accessunit_composer.h"
 #include "genie/variantsite/parameterset_composer.h"
 #include "genie/trackproperty/trackproperty_parser.h"
 
 #include "genie/annotation/compressors.h"
-#include "genie/core/data_unit_record/record.h"
+#include "genie/core/record/data_unit/record.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
@@ -27,7 +27,7 @@ namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 struct TrackPropertyUnits {
     core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
+    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
 };
 
 class TrackPropertyAnnotation {
@@ -54,7 +54,7 @@ class TrackPropertyAnnotation {
 
     variant_site::AccessUnitComposer accessUnitcomposer;
     core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
+    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
     uint8_t trackType_;  // Track type from first record (GTF, GFF, GENBANK, BED, BEDGRAPH, WIG, BIGWIG)

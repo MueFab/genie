@@ -15,11 +15,11 @@
 #include "genie/annotation/json_attribute_parser.h"
 #include "genie/core/constants.h"
 #include "genie/feature/feature_parser.h"
-#include "genie/variantsite/accessunit_composer.h"
+#include "genie/annotation/accessunit_composer.h"
 #include "genie/variantsite/parameterset_composer.h"
 
 #include "genie/annotation/compressors.h"
-#include "genie/core/data_unit_record/record.h"
+#include "genie/core/record/data_unit/record.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
@@ -27,7 +27,7 @@ namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 struct FeatureUnits {
     core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
+    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
 };
 
 class FeatureAnnotation {
@@ -50,7 +50,7 @@ class FeatureAnnotation {
 
     variant_site::AccessUnitComposer accessUnitcomposer;
     core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
+    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
 };

@@ -39,13 +39,13 @@ void Record::Write(core::Writer& writer) {
     writer.WriteBits(start_pos_, 40);
     writer.WriteBits(end_pos_, 40);
     writer.WriteBits(feature_name_len_, 8);
-    writerwrite(feature_name_);
+    writer.Write(feature_name_);
     writer.WriteBits(feature_ID_, 24);
     writer.WriteBits(ontology_count_, 8);
 
     for (auto i = 0; i < ontology_count_; ++i) {
         writer.WriteBits(ontologies_[i].ontology_name_len, 8);
-        writerwrite(ontologies_[i].ontology_name);
+        writer.Write(ontologies_[i].ontology_name);
         writer.WriteBits(ontologies_[i].ontology_ID, 24);
     }
 
@@ -55,7 +55,7 @@ void Record::Write(core::Writer& writer) {
     ArrayType writeType;
     for (auto i = 0; i < attr_count_; ++i) {
         writer.WriteBits(attributes_[i].attr_tag_len, 8);
-        writerwrite(attributes_[i].attr_tag);
+        writer.Write(attributes_[i].attr_tag);
         writer.WriteBits(attributes_[i].attr_type, 8);
         writer.WriteBits(attributes_[i].attr_array_len, 8);
         DataType type = static_cast<DataType>(attributes_[i].attr_type);
@@ -68,7 +68,7 @@ void Record::Write(core::Writer& writer) {
     writer.WriteBits(linked_record_, 1);
     if (linked_record_) {
         writer.WriteBits(link_name_len_, 8);
-        writerwrite(link_name_);
+        writer.Write(link_name_);
         writer.WriteBits(reference_box_id_, 8);
     }
 }

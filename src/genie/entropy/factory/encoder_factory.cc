@@ -20,7 +20,7 @@ namespace factory {
 
 std::unique_ptr<base::Encoder> EncoderFactory::createEncoder(
     genie::core::AlgoID algorithmID,
-    const genie::core::record::parameter::annotation::AlgorithmParameters& parameters) {
+    const genie::core::parameter::annotation::AlgorithmParameters& parameters) {
 
     switch (algorithmID) {
         case genie::core::AlgoID::BSC: {

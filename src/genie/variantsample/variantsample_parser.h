@@ -23,6 +23,7 @@
 
 #include "genie/annotation/json_attribute_parser.h"
 #include "genie/core/sample_record/record.h"
+#include "genie/core/feature_record/record.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
 #include "genie/core/parameter/annotation/attribute_parameter_set.h"
 #include "genie/core/parameter/annotation/descriptor_configuration.h"

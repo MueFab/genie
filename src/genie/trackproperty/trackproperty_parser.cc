@@ -51,7 +51,7 @@ void TrackPropertyParser::init() {
     uint16_t attributeID = 0;
 
     if (!infoFields.empty()) {
-        std::map<std::string, genie::core::record::parameter::annotation::AttributeData> attributeData;
+        std::map<std::string, genie::core::parameter::annotation::AttributeData> attributeData;
 
         for (const auto& infoField : infoFields) {
             AttributeData attribute(
