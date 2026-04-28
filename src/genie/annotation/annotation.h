@@ -28,7 +28,7 @@ namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum class RecType { SITE_FILE = 0, GENO_FILE, CM_FILE };
+enum class RecType { SITE_FILE = 0, GENO_FILE, SAMPLE_FILE, FEATURE_FILE, GENE_EXPRESSION_FILE, CM_FILE, FUNCTIONAL_ANNOTATIONS_FILE, TRACK_FILE, TRACK_PROPERTY_FILE };
 
 
 
