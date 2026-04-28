@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_ANNOTATION_FEATURE_ANNOTATION_H_
-#define SRC_GENIE_ANNOTATION_FEATURE_ANNOTATION_H_
+#ifndef SRC_GENIE_ANNOTATION_TRACK_DATA_ANNOTATION_H_
+#define SRC_GENIE_ANNOTATION_TRACK_DATA_ANNOTATION_H_
 
 #include <fstream>
 #include <map>
@@ -14,9 +14,9 @@
 #include <vector>
 #include "genie/annotation/json_attribute_parser.h"
 #include "genie/core/constants.h"
-#include "genie/feature/feature_parser.h"
 #include "genie/variantsite/accessunit_composer.h"
 #include "genie/variantsite/parameterset_composer.h"
+#include "genie/track/track_parser.h"
 
 #include "genie/annotation/compressors.h"
 #include "genie/core/data_unit_record/record.h"
@@ -25,34 +25,50 @@
 namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
-struct FeatureUnits {
+struct TrackUnits {
     core::record::annotation_parameter_set::Record annotationParameterSet;
     std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
 };
 
-class FeatureAnnotation {
+class TrackDataAnnotation {
  public:
+    TrackDataAnnotation() : defaultTileSizeHeight(0) {}
+
     void setCompressorConfig(std::stringstream& config) { compressors.parseConfig(config); }
     void setTileSize(uint32_t _defaultTileSizeHeight) { defaultTileSizeHeight = _defaultTileSizeHeight; }
 
     void setInfoFields(std::string jsonFileName);
 
     void parseInfoTags(std::string& recordInputFileName);
-    FeatureUnits parseFeature(std::ifstream& inputfile);
+    TrackUnits parseTrack(std::ifstream& inputfile);
     void setCompressors(Compressor& _compressors) { compressors = _compressors; }
+    void setAnnotationSubtype(core::record::annotation_access_unit::AnnotationSubtype subtype) {
+        annotationSubtype_ = subtype;
+    }
+
+    uint64_t getNumberOfRecords() const { return numberOfRecords; }
 
  private:
     std::ifstream recordInput;
     Compressor compressors;
-    std::map<std::string, core::record::feature::Info_tag> infoTags;
     std::map<std::string, InfoField> attributeInfo;
     std::vector<InfoField> infoFields;
+    const std::vector<core::AnnotDesc> descrList{
+        core::AnnotDesc::SEQUENCEID,
+        core::AnnotDesc::STARTPOS,
+        core::AnnotDesc::ENDPOS,
+        core::AnnotDesc::STRAND,
+        core::AnnotDesc::LINKNAME,
+        core::AnnotDesc::LINKID};
 
     variant_site::AccessUnitComposer accessUnitcomposer;
     core::record::annotation_parameter_set::Record annotationParameterSet;
     std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
+    uint64_t numberOfRecords{0};
+    core::record::annotation_access_unit::AnnotationSubtype annotationSubtype_{
+        core::record::annotation_access_unit::AnnotationSubtype::BED};
 };
 
 }  // namespace annotation
@@ -60,4 +76,4 @@ class FeatureAnnotation {
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_ANNOTATION_FEATURE_ANNOTATION_H_
+#endif  // SRC_GENIE_ANNOTATION_TRACK_DATA_ANNOTATION_H_

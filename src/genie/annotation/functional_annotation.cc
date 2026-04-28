@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/annotation/feature_annotation.h"
+#include "genie/annotation/functional_annotation.h"
 
 #include <codecs/include/mpegg-codecs.h>
 
-#include <iostream>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -21,76 +21,89 @@
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace annotation {
 
-void FeatureAnnotation::parseInfoTags(std::string& recordInputFileName) {
+void FunctionalAnnotation::parseInfoTags(std::string& recordInputFileName) {
     std::ifstream readForTags;
     readForTags.open(recordInputFileName, std::ios::in | std::ios::binary);
     util::BitReader bitreader(readForTags);
-    std::vector<core::record::feature::FeatureFields::Field> infoTag;
-    core::record::feature::Record recs;
+    core::record::functional_annotation::Record recs;
+    std::set<std::string> uniqueFeatureNames;
+    std::set<std::string> uniqueOntologyNames;
+    maxOntologiesPerRecord = 1; // minimum 1, so descriptor won't be empty
+
     while (recs.Read(bitreader)) {
-        infoTag = recs.GetFeatureAttributes().GetFields();
-        for (const auto& tag : infoTag) {
-            InfoField infoField(tag.attr, tag.attr_type, static_cast<uint8_t>(tag.attr_values.size()));
-            core::record::feature::Info_tag infotag{static_cast<uint8_t>(tag.attr.size()), tag.attr, tag.attr_type,
-                                                    static_cast<uint8_t>(tag.attr_values.size()), tag.attr_values};
-            infoTags[tag.attr] = infotag;
-            attributeInfo[tag.attr] = infoField;
+        const auto& attrs = recs.GetAttributes();
+        for (const auto& attr : attrs) {
+            uint8_t attr_array_len = attributeInfo[attr.attr_tag].Number;
+            if (attr_array_len < attr.attr_array_len) {
+                attr_array_len = attr.attr_array_len;
+            }
+            InfoField infoField(attr.attr_tag, static_cast<core::DataType>(attr.attr_type), attr_array_len);
+            attributeInfo[attr.attr_tag] = infoField;
+        }
+        // Collect unique feature names
+        if (!recs.GetFeatureName().empty()) {
+            uniqueFeatureNames.insert(recs.GetFeatureName());
+        }
+        // Collect unique ontology names and track maximum count per record
+        const auto& ontologies = recs.GetOntologies();
+        if (ontologies.size() > maxOntologiesPerRecord) {
+            maxOntologiesPerRecord = static_cast<uint8_t>(ontologies.size());
+        }
+        for (const auto& ontology : ontologies) {
+            if (!ontology.ontology_name.empty()) {
+                uniqueOntologyNames.insert(ontology.ontology_name);
+            }
         }
     }
     readForTags.close();
-    for (const auto& info : infoTags)
-        infoFields.emplace_back(info.second.info_tag, info.second.info_type, info.second.info_array_len);
+    for (const auto& info : attributeInfo)
+        infoFields.emplace_back(info.second.ID, info.second.Type, info.second.Number);
+    // Convert sets to vectors
+    featureNames.assign(uniqueFeatureNames.begin(), uniqueFeatureNames.end());
+    ontologyNames.assign(uniqueOntologyNames.begin(), uniqueOntologyNames.end());
 }
 
-FeatureUnits FeatureAnnotation::parseFeature(std::ifstream& inputfile) {
-    feature::FeatureParser parser(inputfile, infoFields, defaultTileSizeHeight);
-    uint8_t AG_class = 1;
+FunctionalAnnotationUnits FunctionalAnnotation::parseFunctionalAnnotation(std::ifstream& inputfile) {
+    functional_annotation::FunctionalAnnotationParser parser(inputfile, infoFields, featureNames, ontologyNames, maxOntologiesPerRecord, defaultTileSizeHeight);
+    uint8_t AG_class = 0;
     uint8_t AT_ID = 1;
 
     for (const auto& infoField : infoFields) attributeInfo[infoField.ID] = infoField;
 
     AnnotationEncoder encodingPars;
-    entropy::bsc::BSCParameters bscParameters;
-    auto BSCalgorithmParameters = bscParameters.convertToAlgorithmParameters();
-
-    encodingPars.setDescriptorParameters(core::AnnotDesc::LINKID, core::AlgoID::BSC,
-                                         BSCalgorithmParameters);
+    encodingPars.setDescriptors(descrList);
     encodingPars.setCompressors(compressors);
     encodingPars.setAttributes(parser.getAttributes().getInfo());
+    encodingPars.setFeatures(featureNames);
+    encodingPars.setOntologyTerms(ontologyNames);
     auto annotationEncodingParameters = encodingPars.Compose();
     ParameterSetComposer parameterset;
 
     annotationParameterSet =
         parameterset.Compose(AT_ID, AG_class, {defaultTileSizeHeight, 0}, annotationEncodingParameters);
 
-    variant_site::ParameterSetComposer encodeParameters;
-
     variant_site::AccessUnitComposer accessUnit;
-    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::GENE_EXPRESSION,
-                         core::record::annotation_access_unit::AnnotationSubtype::GENE_EXPRESSION);
+    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::FUNCTIONAL_ANNOTATIONS,
+                         annotationSubtype_);
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;
+    auto& descrStream = parser.getDescriptors().getTiles();
 
     std::map<std::string, core::record::annotation_access_unit::TypedData> attr;
     for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
         std::map<core::AnnotDesc, std::stringstream> desc;
+        for (auto& desctile : descrStream) {
+            desc[desctile.first] << desctile.second.getTile(i).rdbuf();
+        }
         for (auto& attrtile : parser.getAttributes().getTiles()) {
             attr[attrtile.first] = attrtile.second.getTypedTile(i);
-        }
-
-        if (i == 0) {
-            // add LINK_ID default values
-            std::cerr << " add link values... " << std::endl;
-            for (auto j = 0u; j < defaultTileSizeHeight; ++j) {
-                const char val = '\xFF';
-                desc[core::AnnotDesc::LINKID].write(&val, 1);
-            }
         }
 
         accessUnit.setAccessUnit(desc, attr, parser.getAttributes().getInfo(), annotationParameterSet,
@@ -98,10 +111,10 @@ FeatureUnits FeatureAnnotation::parseFeature(std::ifstream& inputfile) {
         rowIndex++;
     }
 
-    return FeatureUnits{annotationParameterSet, annotationAccessUnit};
+    return FunctionalAnnotationUnits{annotationParameterSet, annotationAccessUnit};
 }
 
-void FeatureAnnotation::setInfoFields(std::string jsonFileName) {
+void FunctionalAnnotation::setInfoFields(std::string jsonFileName) {
     // read attributes info from json file
     std::ifstream AttributeFieldsFile;
     AttributeFieldsFile.open(jsonFileName, std::ios::in);
