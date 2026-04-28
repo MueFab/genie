@@ -26,7 +26,7 @@ namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 struct FeatureUnits {
-    core::record::annotation_parameter_set::Record annotationParameterSet;
+    core::parameter::annotation::Record annotationParameterSet;
     std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
 };
 
@@ -49,7 +49,7 @@ class FeatureAnnotation {
     std::vector<InfoField> infoFields;
 
     variant_site::AccessUnitComposer accessUnitcomposer;
-    core::record::annotation_parameter_set::Record annotationParameterSet;
+    core::parameter::annotation::Record annotationParameterSet;
     std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;

@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/record/annotation_parameter_set/record.h"
+#include "genie/core/parameter/annotation/record.h"
 
 #include <algorithm>
 #include <cstring>

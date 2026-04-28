@@ -13,7 +13,8 @@
 #include <vector>
 #include "genie/annotation/compressors.h"
 #include "genie/core/gene_expression_record/record.h"
-#include "genie/core/record/annotation_parameter_set/AttributeData.h"
+#include "genie/core/parameter/annotation/attribute_data.h"
+#include "genie/core/record/annotation_access_unit/record.h"
 // #include "genie/core/data_unit_record/record.h"
 // #include "genie/annotation/json_attribute_parser.h"
 // #include "genie/gene_expression/gene_expression_parser.h"
@@ -22,7 +23,7 @@ namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 struct GeneExpressionUnits {
-    core::record::annotation_parameter_set::Record annotationParameterSet;
+    core::parameter::annotation::Record annotationParameterSet;
     std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
 };
 class GeneExpressionAnnotation {
@@ -34,7 +35,7 @@ class GeneExpressionAnnotation {
     uint32_t rowStart;
     uint32_t colStart;
     genotype::GenotypeParameters pars;
-    std::map<std::string, std::tuple<core::record::annotation_parameter_set::AttributeData,
+    std::map<std::string, std::tuple<core::parameter::annotation::AttributeData,
                                      std::vector<std::vector<std::vector<AttrType>>>>>
         attributes;
     uint32_t numSamples;
@@ -44,7 +45,7 @@ class GeneExpressionAnnotation {
     RecData(uint32_t _rowStart, uint32_t _colStart,
             uint32_t _numSamples,
             uint8_t _formatCount,
-            std::map<std::string, std::tuple<core::record::annotation_parameter_set::AttributeData,
+            std::map<std::string, std::tuple<core::parameter::annotation::AttributeData,
                                              std::vector<std::vector<std::vector<AttrType>>>>>
                 attributes);
 
@@ -53,7 +54,7 @@ class GeneExpressionAnnotation {
     void set(uint32_t _rowStart, uint32_t _colStart,
              uint32_t _numSamples,
              uint8_t _formatCount,
-             std::map<std::string, std::tuple<core::record::annotation_parameter_set::AttributeData,
+             std::map<std::string, std::tuple<core::parameter::annotation::AttributeData,
                                               std::vector<std::vector<std::vector<AttrType>>>>>
                  _attributes);
   };
@@ -69,14 +70,14 @@ class GeneExpressionAnnotation {
 
  private:
     Compressor compressors;
-    core::record::annotation_parameter_set::Record annotationParameterSet;
+    core::parameter::annotation::Record annotationParameterSet;
     std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
     uint32_t defaultTileSizeWidth;
     // gene_expression::GeneExpressionParser geneExpressionParser;
 
-    std::map<std::string, core::record::annotation_parameter_set::AttributeData> attrInfo;
+    std::map<std::string, core::parameter::annotation::AttributeData> attrInfo;
     std::map<std::string, std::vector<std::vector<std::vector<AttrType>>>> attrValues;
 
     void sort_format(std::vector<core::record::gene_expression::Record>& recs);

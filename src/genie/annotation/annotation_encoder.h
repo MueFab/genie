@@ -94,10 +94,20 @@ class AnnotationEncoder {
         compressorParameters = _compressors.getCompressorParameters();
     }
 
+    void setFeatures(std::vector<std::string> _features) {
+        features = _features;
+    }
+
+    void setOntologyTerms(std::vector<std::string> _ontologyTerms) {
+        ontologyTerms = _ontologyTerms;
+    }
+
  private:
     std::vector<genie::core::parameter::annotation::DescriptorConfiguration> descriptorConfigurations;
     std::vector<genie::core::parameter::annotation::CompressorParameterSet> compressorParameters;
     std::vector<core::parameter::annotation::AttributeParameterSet> attribute_parameter_set;
+    std::vector<std::string> features;
+    std::vector<std::string> ontologyTerms;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -277,7 +277,7 @@ void SEREncoder::serializeStringsReverseOrder(const uint8_t* data, size_t dataSi
     iterate(0);
 }
 
-genie::core::record::annotation_parameter_set::AlgorithmParameters SERParameters::convertToAlgorithmParameters() const {
+genie::core::record::parameter::annotation::AlgorithmParameters SERParameters::convertToAlgorithmParameters() const {
     uint8_t n_pars = 1;
     std::vector<uint8_t> par_ID{ 1 };
     const std::vector<core::DataType> par_type{ core::DataType::BOOL };
@@ -290,12 +290,12 @@ genie::core::record::annotation_parameter_set::AlgorithmParameters SERParameters
 
     for (auto i = 0; i < n_pars; ++i) {
         if (par_type.at(i) == core::DataType::BOOL) {
-            par_val.push_back(genie::core::record::annotation_parameter_set::parameterToVector<uint8_t>(
+            par_val.push_back(genie::core::record::parameter::annotation::parameterToVector<uint8_t>(
                 { values.at(i) }, par_type.at(i), par_num_array_dims.at(i), par_array_dims.at(i)));
         }
     }
 
-    return genie::core::record::annotation_parameter_set::AlgorithmParameters(n_pars, par_ID, par_type,
+    return genie::core::record::parameter::annotation::AlgorithmParameters(n_pars, par_ID, par_type,
                                                          par_num_array_dims, par_array_dims, par_val);
 }
 

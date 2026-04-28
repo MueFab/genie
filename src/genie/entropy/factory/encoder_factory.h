@@ -15,7 +15,7 @@
 
 #include <memory>
 #include "genie/entropy/base/encoder.h"
-#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
+#include "genie/core/parameter/annotation/algorithm_parameters.h"
 #include "genie/core/record/annotation_access_unit/TypedData.h"
 // -----------------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ class EncoderFactory {
      */
     static std::unique_ptr<base::Encoder> createEncoder(
         core::AlgoID algorithmID,
-        const core::record::annotation_parameter_set::AlgorithmParameters& parameters);
+        const core::record::parameter::annotation::AlgorithmParameters& parameters);
 };
 
 // -----------------------------------------------------------------------------

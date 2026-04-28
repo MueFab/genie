@@ -25,7 +25,7 @@ namespace genie {
 namespace annotation {
 
 struct SampleUnits {
-  core::record::annotation_parameter_set::Record annotationParameterSet;
+  core::parameter::annotation::Record annotationParameterSet;
   std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
 };
 
@@ -55,7 +55,7 @@ class SampleAnnotation {
   std::vector<InfoField> infoFields;
 
   variant_site::AccessUnitComposer accessUnitcomposer;
-  core::record::annotation_parameter_set::Record annotationParameterSet;
+  core::parameter::annotation::Record annotationParameterSet;
   std::vector<core::record::annotation_access_unit::Record> annotationAccessUnits;
 
   uint32_t defaultTileSizeWidth;

@@ -14,11 +14,11 @@ namespace record {
 namespace annotation_access_unit {
 
 BlockPayloadStream::BlockPayloadStream()
-    : descriptor_ID(annotation_parameter_set::DescriptorID::GENOTYPE),
+    : descriptor_ID(parameter::annotation::DescriptorID::GENOTYPE),
       block_payload_size(0),
       generic_payload{} {}
 
-BlockPayloadStream::BlockPayloadStream(annotation_parameter_set::DescriptorID _descriptorID,
+BlockPayloadStream::BlockPayloadStream(parameter::annotation::DescriptorID _descriptorID,
                                        uint32_t _block_payload_size, const std::stringstream& _generic_payload)
     : descriptor_ID(_descriptorID),
       block_payload_size(_block_payload_size),

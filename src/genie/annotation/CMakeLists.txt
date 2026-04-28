@@ -15,6 +15,12 @@ set(source_files
 		vsite_attributes.cc
 		vsite_descriptors.cc
 		vsite_tiles.cc
+		gene_expression_annotation.cc
+		functional_annotation.cc
+		sample_annotation.cc
+		track_data_annotation.cc
+		trackproperty_annotation.cc
+		feature_annotation.cc
 )
 
 add_library(${PROJECT_NAME} ${source_files})

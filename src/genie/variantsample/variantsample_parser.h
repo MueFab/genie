@@ -23,9 +23,9 @@
 
 #include "genie/annotation/json_attribute_parser.h"
 #include "genie/core/sample_record/record.h"
-#include "genie/core/record/annotation_parameter_set/AttributeData.h"
-#include "genie/core/record/annotation_parameter_set/AttributeParameterSet.h"
-#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
+#include "genie/core/parameter/annotation/attribute_data.h"
+#include "genie/core/parameter/annotation/attribute_parameter_set.h"
+#include "genie/core/parameter/annotation/descriptor_configuration.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
@@ -34,7 +34,7 @@ namespace variant_sample {
 
 class VariantSampleParser {
  public:
-  using AttributeData = core::record::annotation_parameter_set::AttributeData;
+  using AttributeData = core::parameter::annotation::AttributeData;
   using InfoField = annotation::InfoField;
 
   VariantSampleParser(std::istream& _samples, std::vector<annotation::InfoField>& _fields, uint32_t _rowsPerTile);

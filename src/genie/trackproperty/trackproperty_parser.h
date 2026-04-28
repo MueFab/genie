@@ -30,7 +30,7 @@ namespace track_property {
 
 class TrackPropertyParser {
  public:
-    using AttributeData = core::record::annotation_parameter_set::AttributeData;
+    using AttributeData = core::parameter::annotation::AttributeData;
 
     TrackPropertyParser(std::ifstream& inputfile, std::vector<annotation::InfoField> infofields,
                         uint64_t _defaultTileSizeHeight);

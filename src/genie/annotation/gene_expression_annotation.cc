@@ -36,7 +36,7 @@ std::vector<GeneExpressionUnits> GeneExpressionAnnotation::parseGeneExpression(
     for (auto i = 1; i < blocksWPars.size(); ++i) {
       combined.blocks.push_back(blocksWPars.at(i).blocks.at(0));
     }
-    std::map<std::string, core::record::annotation_parameter_set::AttributeData> attributeInfo;
+    std::map<std::string, core::parameter::annotation::AttributeData> attributeInfo;
     for (auto& attr : combined.blocks.at(0).attributes)
       attributeInfo[attr.first] = std::get<0>(attr.second);
 
@@ -69,7 +69,7 @@ std::vector<GeneExpressionUnits> GeneExpressionAnnotation::parseGeneExpression(
       std::cerr << " attributeTDStream... " << std::endl;
       for (auto& formatdata : combined.blocks.at(blockIndex).attributes) {
         auto& info =
-            std::get<core::record::annotation_parameter_set::AttributeData>(formatdata.second);
+            std::get<core::parameter::annotation::AttributeData>(formatdata.second);
         auto& values = std::get<1>(formatdata.second);
         // .genotypeDatablock.attributeInfo[formatdata.first];
         std::vector<uint32_t> arrayDims;
@@ -184,7 +184,7 @@ size_t GeneExpressionAnnotation::readOneBlock(
   uint32_t rowStart = static_cast<uint32_t>(varGenoType.front().GetFeatureIndex());
 
   sort_format(varGenoType);
-  std::map<std::string, std::tuple<core::record::annotation_parameter_set::AttributeData,
+  std::map<std::string, std::tuple<core::parameter::annotation::AttributeData,
                                    std::vector<std::vector<std::vector<AttrType>>>>>
       attributes;
   for (auto& attr : attrInfo)
@@ -206,7 +206,7 @@ void GeneExpressionAnnotation::sort_format(
   // fill all attribute data
   for (const auto& format : recs.at(0).GetExpressionAttributes()) {
     const auto& formatName = format.GetAttrName();
-    core::record::annotation_parameter_set::AttributeData attrData(
+    core::parameter::annotation::AttributeData attrData(
         formatName.size(), formatName, format.GetAttrType(), format.GetAttrArrayLen(), AttributeID);
     attrInfo[formatName] = attrData;
     AttributeID++;
@@ -235,7 +235,7 @@ GeneExpressionAnnotation::RecData::RecData(
     uint32_t _rowStart, uint32_t _colStart,
     uint32_t _numSamples,
     uint8_t _formatCount,
-    std::map<std::string, std::tuple<core::record::annotation_parameter_set::AttributeData,
+    std::map<std::string, std::tuple<core::parameter::annotation::AttributeData,
                                      std::vector<std::vector<std::vector<AttrType>>>>>
         attributes)
     : rowStart(_rowStart),
@@ -257,7 +257,7 @@ void GeneExpressionAnnotation::RecData::set(
     uint32_t _rowStart, uint32_t _colStart,
     uint32_t _numSamples,
     uint8_t _formatCount,
-    std::map<std::string, std::tuple<core::record::annotation_parameter_set::AttributeData,
+    std::map<std::string, std::tuple<core::parameter::annotation::AttributeData,
                                      std::vector<std::vector<std::vector<AttrType>>>>>
         _attributes) {
   rowStart = _rowStart;

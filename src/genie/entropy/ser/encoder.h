@@ -35,7 +35,7 @@ class SERParameters {
         : order(_order) {
     }
 
-    core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
+    core::record::parameter::annotation::AlgorithmParameters convertToAlgorithmParameters() const;
 
     bool parsAreDefault() const {
         return order == true;

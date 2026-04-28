@@ -22,9 +22,9 @@
 #include "genie/functionalannotation/descriptors.h"
 
 #include "genie/annotation/json_attribute_parser.h"
-#include "genie/core/record/annotation_parameter_set/AttributeData.h"
-#include "genie/core/record/annotation_parameter_set/AttributeParameterSet.h"
-#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
+#include "genie/core/parameter/annotation/attribute_data.h"
+#include "genie/core/parameter/annotation/attribute_parameter_set.h"
+#include "genie/core/parameter/annotation/descriptor_configuration.h"
 #include "genie/core/functional_annotation_record/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -38,7 +38,7 @@ namespace functional_annotation {
 
 class FunctionalAnnotationParser {
  public:
-    using AttributeData = genie::core::record::annotation_parameter_set::AttributeData;
+    using AttributeData = genie::core::parameter::annotation::AttributeData;
     using InfoField = genie::annotation::InfoField;
 
     FunctionalAnnotationParser(std::istream& _annotation_MGrecs, std::vector<genie::annotation::InfoField>& _fields,

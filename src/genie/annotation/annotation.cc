@@ -49,6 +49,18 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
         auto dataunits = siteAnnotation.parseSite(inputfile);
         annotationParameterSet.push_back(dataunits.annotationParameterSet);
         annotationAccessUnit = dataunits.annotationAccessUnit;
+    } else if (recType == RecType::SAMPLE_FILE) {
+        // TODO: sampleAnnotation not yet integrated
+    } else if (recType == RecType::FEATURE_FILE) {
+        // TODO: featureAnnotation not yet integrated
+    } else if (recType == RecType::GENE_EXPRESSION_FILE) {
+        // TODO: geneExpressionAnnotation not yet integrated
+    } else if (recType == RecType::FUNCTIONAL_ANNOTATIONS_FILE) {
+        // TODO: functionalAnnotation not yet integrated
+    } else if (recType == RecType::TRACK_FILE) {
+        // TODO: trackDataAnnotation not yet integrated
+    } else if (recType == RecType::TRACK_PROPERTY_FILE) {
+        // TODO: trackpropertyAnnotation not yet integrated
     } else {  // contact matrix
         cmAnnotation.setCompressors(compressors);
         cmAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
