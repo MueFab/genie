@@ -22,3 +22,4 @@
 | 2026-04-27-optimize-append-arr-element | 2026-04-27 | Optimize append_arr_element in Contact Coder (O(n²) → O(n)) | Done |
 | 2026-04-27-optimize-contact-loop | 2026-04-27 | Optimize contact loop (remove dead code, cache sizes) | Done |
 | 2026-04-27-parallelize-contact-tiles | 2026-04-27 | Parallelize contact tile encoding with OpenMP | Pending |
+| 2026-04-28-common-attribute-field | 2026-04-28 | Standardize AttributeField - unify all parser field types | Pending |
