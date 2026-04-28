@@ -102,10 +102,9 @@ void AccessUnitComposer::setAccessUnit(
       auto attributeID = _attributeInfo[tileData.first].getAttributeID();
 
         std::stringstream data;
-        util::BitWriter writer(&data);
+        util::BitWriter writer(data);
         for (auto& oneBlock : tileData.second) {
-          core::Writer coreWriter(&data);
-          oneBlock.write(coreWriter);
+          oneBlock.write(writer);
         }
         writer.FlushBits();
         core::access_unit::annotation::BlockData blockInfo(core::AnnotDesc::ATTRIBUTE, attributeID, data);

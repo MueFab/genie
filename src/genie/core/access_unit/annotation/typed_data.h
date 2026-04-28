@@ -112,6 +112,7 @@ class TypedData {
     }
 
     void write(core::Writer& writer) const;
+    void write(util::BitWriter& writer) const;
 
  private:
     core::DataType data_type_ID;

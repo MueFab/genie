@@ -26,8 +26,8 @@
 #include "genie/core/parameter/annotation/attribute_parameter_set.h"
 #include "genie/core/parameter/annotation/descriptor_configuration.h"
 #include "genie/core/record/site/record.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -62,9 +62,9 @@ class VariantSiteParser {
     std::vector<std::string> testAltern;
     std::map<std::string, uint8_t> infoFieldType;
 
-    std::vector<genie::core::Writer> fieldWriter;
+    std::vector<genie::util::BitWriter> fieldWriter;
 
-    std::map<std::string, genie::core::Writer> attrWriter;
+    std::map<std::string, genie::util::BitWriter> attrWriter;
 
     std::map<std::string, AttributeData> attributeData;
     Attributes attributes;

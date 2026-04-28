@@ -45,14 +45,14 @@ void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
         typedTiles.back().setArrayDim0(static_cast<uint32_t>(rowInTile));
     } else {
         typedTiles.back().setArrayDim0(static_cast<uint32_t>(rowInTile + 1));
-        writers.back().Flush();
+        writers.back().FlushBits();
 
         std::vector<uint32_t> arrayDims;
         arrayDims.push_back(static_cast<uint32_t>(rowInTile+1));
         for (uint8_t idx_i = 1; idx_i < info.getArrayLength(); ++idx_i) arrayDims.push_back(static_cast<uint32_t>(2));
         typedTiles.emplace_back(info.getAttributeType(), info.getArrayLength(), arrayDims);
         tiles.emplace_back("");
-        writers.emplace_back(&tiles.back());
+        writers.emplace_back(tiles.back());
         rowInTile = 0;
     }
 }
@@ -81,7 +81,7 @@ std::vector<std::stringstream> AttributeTile::convertTilesToTypedData() {
         util::BitReader reader(tile);
         typedData.convertToTypedData(reader);
         TypedTiles.emplace_back("");
-        core::Writer writer(&TypedTiles.back());
+        genie::util::BitWriter writer(TypedTiles.back());
         typedData.write(writer);
     }
 
@@ -91,7 +91,7 @@ std::vector<std::stringstream> AttributeTile::convertTilesToTypedData() {
 void AttributeTile::AddFirst() {
     if (tiles.empty()) {
         tiles.emplace_back("");
-        writers.emplace_back(&tiles.back());
+        writers.emplace_back(tiles.back());
     }
     if (typedTiles.empty()) {
         std::vector<uint32_t> arrayDims;

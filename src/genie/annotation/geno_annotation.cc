@@ -125,8 +125,7 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(
     if (combined.blocks.at(blockIndex).likelihoodPayload.getNRows() > 0 &&
         combined.blocks.at(blockIndex).likelihoodPayload.getNCols() > 0) {
       descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
-      genie::core::Writer writer(
-          &descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
+      genie::util::BitWriter writer(descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
       combined.blocks.at(blockIndex).likelihoodPayload.write(writer);
     }
     // add LINK_ID default values

@@ -114,6 +114,29 @@ void TypedData::write(core::Writer& outputWriter) const {
     outputWriter.Flush();
 }
 
+void TypedData::write(util::BitWriter& writer) const {
+    writer.WriteBits(static_cast<uint8_t>(data_type_ID), 8);
+    writer.WriteBits(num_array_dims, 2);
+    uint64_t n_elements = 1;
+    for (uint64_t idx_i = 0; idx_i < num_array_dims; ++idx_i) {
+        writer.WriteBits(array_dims[idx_i], 32);
+        n_elements = n_elements * array_dims[idx_i];
+    }
+
+    if (!compressedDataStream.str().empty()) {
+        bool encoded = true;
+        writer.WriteBits(encoded, 1);
+        auto size = compressedDataStream.str().size();
+        writer.WriteBits(size, 32);
+        writer.Write(const_cast<std::stringstream*>(&compressedDataStream));
+    } else {
+        bool encoded = false;
+        writer.WriteBits(encoded, 1);
+        writer.Write(const_cast<std::stringstream*>(&dataStream));
+    }
+    writer.FlushBits();
+}
+
 }  // namespace annotation
 }  // namespace access_unit
 }  // namespace core
