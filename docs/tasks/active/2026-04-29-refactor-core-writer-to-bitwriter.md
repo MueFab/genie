@@ -3,87 +3,97 @@
 ## Goal
 Replace all `core::Writer` usage with `util::BitWriter` directly (like develop), while keeping all part6 features and new modules.
 
-## Current State
-- `core::Writer` exists in part6 as wrapper around `util::BitWriter` (dual-overload pattern)
-- 86+ files still reference `core::Writer`
-- Develop uses `util::BitWriter` directly
+## Strategy: Incremental Migration with Dual Overloads
+- Each class keeps BOTH `write(core::Writer&)` and `write(util::BitWriter&)` methods during transition
+- This allows gradual migration without breaking existing code
+- When all consumers migrate, the `core::Writer` version can be removed
 
-## Principle
-**One writer type**: Use only `util::BitWriter` (like develop) - no `core::Writer` wrapper.
+## Current State
+- Build: ✅ Clean
+- Tests: ✅ All 149 tests pass
 
 ---
 
-## Refactoring Order (Dependency-Based)
+## Progress Tracker
 
-### Phase 1: Core Infrastructure (Base Layer)
-Files that OTHER code depends on - refactor these FIRST.
+| Phase | Description | Status |
+|-------|-------------|--------|
+| 1 | Core Infrastructure (array_type.cc/h) | ✅ Complete |
+| 2 | parameter/annotation classes (12 files) | 🔄 In Progress |
+| 3 | access_unit/annotation classes (6 files) | ⏳ Pending |
+| 4 | Record classes (10 files) | ⏳ Pending |
+| 5 | Genotype/Likelihood/Contact coders | ⏳ Pending |
+| 6 | High-level modules & apps | ⏳ Pending |
+| 7 | Remove core::Writer entirely | ⏳ Pending |
 
-| Order | File | Reason |
-|-------|------|--------|
-| 1 | `core/writer.h` | Remove `core::Writer` class entirely |
-| 2 | `core/array_type.h/.cc` | Has dual `toFile()` overloads for both Writer types |
-| 3 | `util/bit_writer.h/.cc` | Ensure BitWriter has all needed methods |
+---
 
-### Phase 2: Parameter/Annotation Classes
-These are consumed by higher-level annotation code.
+## Phase 2: parameter/annotation Classes
 
-| Order | File | Change Required |
-|-------|------|-----------------|
-| 4 | `core/parameter/annotation/algorithm_parameters.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
-| 5 | `core/parameter/annotation/compressor_parameter_set.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
-| 6 | `core/parameter/annotation/descriptor_configuration.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
-| 7 | `core/parameter/annotation/contact_matrix_parameters.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
-| 8 | `core/parameter/annotation/annotation_encoding_parameters.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
-| 9 | `core/parameter/annotation/attribute_parameter_set.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
-| 10 | `core/parameter/annotation/tile_configuration.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
-| 11 | `core/parameter/annotation/tile_structure.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
-| 12 | `core/parameter/annotation/record.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
+All files in this phase already have BOTH `write(core::Writer&)` and `write(util::BitWriter&)` methods:
 
-### Phase 3: Access Unit/Annotation Classes
-Built on top of parameter classes.
+| File | core::Writer Version | util::BitWriter Version |
+|------|---------------------|------------------------|
+| `algorithm_parameters.h/.cc` | ✅ exists | ✅ exists |
+| `compressor_parameter_set.h/.cc` | ✅ exists | ✅ exists |
+| `descriptor_configuration.h/.cc` | ✅ exists | ✅ exists |
+| `contact_matrix_parameters.h/.cc` | ✅ exists | ✅ exists |
+| `annotation_encoding_parameters.h/.cc` | ✅ exists | ✅ exists |
+| `attribute_parameter_set.h/.cc` | ✅ exists | ✅ exists |
+| `tile_configuration.h/.cc` | ✅ exists | ✅ exists |
+| `tile_structure.h/.cc` | ✅ exists | ✅ exists |
+| `record.h/.cc` | ✅ exists | ✅ exists |
 
-| Order | File | Change Required |
-|-------|------|-----------------|
-| 13 | `core/access_unit/annotation/annotation_access_unit_header.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
-| 14 | `core/access_unit/annotation/block_header.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
-| 15 | `core/access_unit/annotation/block.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
-| 16 | `core/access_unit/annotation/block_payload.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
-| 17 | `core/access_unit/annotation/record.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
-| 18 | `core/access_unit/annotation/typed_data.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
+**Note**: All Phase 2 files already have dual overloads - no changes needed!
 
-### Phase 4: Record Classes
-Various record types that write themselves.
+---
 
-| Order | File | Change Required |
-|-------|------|-----------------|
-| 19 | `core/record/contact/record.h/.cc` | `Write(core::Writer&)` → `Write(util::BitWriter&)` |
-| 20 | `core/record/variant/record.h/.cc` | `Write(core::Writer&)` → `Write(util::BitWriter&)` |
-| 21 | `core/record/site/record.h/.cc` | `Write(core::Writer&)` → `Write(util::BitWriter&)` |
-| 22 | `core/record/data_unit/record.h/.cc` | `Write(core::Writer&)` → `Write(util::BitWriter&)` |
-| 23 | `core/sample_record/record.h/.cc` | `Write(core::Writer&)` → `Write(util::BitWriter&)` |
-| 24 | `core/feature_record/record.h/.cc` | `Write(core::Writer&)` → `Write(util::BitWriter&)` |
-| 25 | `core/functional_annotation_record/record.h/.cc` | `Write(core::Writer&)` → `Write(util::BitWriter&)` |
-| 26 | `core/gene_expression_record/record.h/.cc` | `Write(core::Writer&)` → `Write(util::BitWriter&)` |
-| 27 | `core/track_property_record/record.h/.cc` | `Write(core::Writer&)` → `Write(util::BitWriter&)` |
-| 28 | `core/linked_record/linked_record.h/.cc` | `Write(core::Writer&)` → `Write(util::BitWriter&)` |
+## Phase 3: access_unit/annotation Classes
 
-### Phase 5: Genotype/Likelihood/Contact
-Coders that use Writers.
+| File | core::Writer Version | util::BitWriter Version |
+|------|---------------------|------------------------|
+| `annotation_access_unit_header.h/.cc` | ✅ exists | ✅ exists |
+| `block_header.h/.cc` | ✅ exists | ✅ exists |
+| `block.h/.cc` | ✅ exists | ✅ exists |
+| `block_payload.h/.cc` | ✅ exists | ✅ exists |
+| `record.h/.cc` | ✅ exists | ✅ exists |
+| `typed_data.h/.cc` | ✅ exists | ✅ exists |
 
-| Order | File | Change Required |
-|-------|------|-----------------|
-| 29 | `genotype/genotype_parameters.h/.cc` | `Write(core::Writer&)` → `Write(util::BitWriter&)` |
-| 30 | `contact/contact_coder.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
-| 31 | `likelihood/likelihood_coder.h/.cc` | `write(core::Writer&)` → `write(util::BitWriter&)` |
+**Note**: All Phase 3 files already have dual overloads - no changes needed!
 
-### Phase 6: High-Level Modules & Apps
-Top-level consumers.
+---
 
-| Order | File | Change Required |
-|-------|------|-----------------|
-| 32 | `annotation/annotation.h/.cc` | Uses `core::Writer` for log writing |
-| 33 | `variantsite/variantsite_parser.h` | Uses `core::Writer` for fieldWriter/attrWriter |
-| 34 | `apps/genie/annotation/code.cc` | Uses `core::Writer` for dataUnitWriter |
+## Phase 4: Record Classes
+
+| File | core::Writer Version | util::BitWriter Version |
+|------|---------------------|------------------------|
+| `record/contact/record.h/.cc` | ✅ exists | ✅ exists |
+| `record/variant/record.h/.cc` | ✅ exists | ✅ exists |
+| `record/site/record.h/.cc` | ✅ exists | ✅ exists |
+| `record/data_unit/record.h/.cc` | ✅ exists | ✅ exists |
+| `sample_record/record.h/.cc` | ✅ exists | ✅ exists |
+| `feature_record/record.h/.cc` | ✅ exists | ✅ exists |
+| `functional_annotation_record/record.h/.cc` | ✅ exists | ✅ exists |
+| `gene_expression_record/record.h/.cc` | ✅ exists | ✅ exists |
+| `track_property_record/record.h/.cc` | ✅ exists | ✅ exists |
+| `linked_record/linked_record.h/.cc` | ✅ exists | ✅ exists |
+
+---
+
+## Phase 5-6: Coders, Modules & Apps
+
+These are the files that **consume** the above classes. They need to be updated to call the `util::BitWriter` version instead of `core::Writer`.
+
+### Files needing updates (to call BitWriter version instead of Writer):
+
+| Order | File | Current Call | Needs Change |
+|-------|------|--------------|--------------|
+| 1 | `genotype/genotype_parameters.cc` | `write(core::Writer&)` | Update to call `write(util::BitWriter&)` |
+| 2 | `contact/contact_coder.cc` | `write(core::Writer&)` | Update to call `write(util::BitWriter&)` |
+| 3 | `likelihood/likelihood_coder.cc` | `write(core::Writer&)` | Update to call `write(util::BitWriter&)` |
+| 4 | `annotation/annotation.cc` | `core::Writer` | Update to `util::BitWriter` |
+| 5 | `variantsite/variantsite_parser.h` | `core::Writer` | Update to `util::BitWriter` |
+| 6 | `apps/genie/annotation/code.cc` | `core::Writer` | Update to `util::BitWriter` |
 
 ---
 
@@ -127,13 +137,13 @@ After each phase:
 
 ---
 
-## Decision: What to do with core::Writer?
+## Final: Remove core::Writer
 
-**Option A**: Keep `core::Writer` as IS (no changes) - simpler
-**Option B**: Remove `core::Writer` entirely, migrate everything to `util::BitWriter`
-
-**Recommendation**: Option B (like develop) for consistency.
+Once all consumers are migrated to use `util::BitWriter`:
+1. Remove `core::Writer` class from `src/genie/core/writer.h`
+2. Update any remaining references
+3. Full build and test verification
 
 ---
 
-**Awaiting confirmation.**
+**Status**: Ready to proceed with Phase 5 updates (consumer files).
