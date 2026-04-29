@@ -160,24 +160,24 @@ void encodeVariantSite(const std::string& _inputFileName,
   outputFile.open(_outputFileName, std::ios::binary | std::ios::out);
 
   if (outputFile.is_open()) {
-    genie::core::Writer dataUnitWriter(&outputFile);
+    genie::util::BitWriter dataUnitWriter(outputFile);
     APS_dataUnit.Write(dataUnitWriter);
     for (auto& aau : annotationAccessUnit) {
       genie::core::record::data_unit::Record AAU_dataUnit(aau);
       AAU_dataUnit.Write(dataUnitWriter);
     }
     std::cerr << "bytes written: "
-              << std::to_string(dataUnitWriter.GetBitsWritten() / 8)
+              << std::to_string(dataUnitWriter.GetTotalBitsWritten() / 8)
               << std::endl;
     outputFile.close();
     if (testOutput) {
-      genie::core::Writer txtWriter(&txtFile, true);
+      genie::util::BitWriter txtWriter(txtFile);
       APS_dataUnit.Write(txtWriter);
       for (auto& aau : annotationAccessUnit) {
         genie::core::record::data_unit::Record AAU_dataUnit(aau);
         AAU_dataUnit.Write(txtWriter);
       }
-      txtWriter.Flush();
+      txtWriter.FlushBits();
       txtFile.close();
     }
   } else {
@@ -275,15 +275,13 @@ void encodeVariantGenotype(const std::string& _input_fpath,
   std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
   descriptorStream[genie::core::AnnotDesc::GENOTYPE];
   {
-    genie::core::Writer writer(
-        &descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
+    genie::util::BitWriter writer(descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
     genotypePayload.Write(writer);
   }
 
   descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
   {
-    genie::core::Writer writer(
-        &descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
+    genie::util::BitWriter writer(descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
     likelihoodPayload.write(writer);
   }
 
@@ -306,12 +304,12 @@ void encodeVariantGenotype(const std::string& _input_fpath,
   outputFile.open(_output_fpath, std::ios::binary | std::ios::out);
 
   if (outputFile.is_open()) {
-    genie::core::Writer dataUnitWriter(&outputFile);
+    genie::util::BitWriter dataUnitWriter(outputFile);
     APS_dataUnit.Write(dataUnitWriter);
     AAU_dataUnit.Write(dataUnitWriter);
 
     std::cerr << "bytes written: "
-              << std::to_string(dataUnitWriter.GetBitsWritten() / 8)
+              << std::to_string(dataUnitWriter.GetTotalBitsWritten() / 8)
               << std::endl;
     outputFile.close();
   } else {

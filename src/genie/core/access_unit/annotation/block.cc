@@ -39,10 +39,11 @@ void Block::read(util::BitReader& reader, uint8_t num_Chrs) {
     read(reader);
 }
 
-void Block::write(core::Writer& writer) const {
-    block_header.write(writer);
-    block_payload.write(writer);
-}
+// DEPRECATED: Use write(util::BitWriter&) instead
+// void Block::write(core::Writer& writer) const {
+//     block_header.write(writer);
+//     block_payload.write(writer);
+// }
 
 void Block::write(util::BitWriter& writer) const {
   block_header.write(writer);
@@ -73,10 +74,16 @@ void Block::set(BlockData& blockData) {
     block_payload = payload;
 }
 
-size_t Block::getSize(core::Writer& writesize) const {
+size_t Block::getSize(util::BitWriter& writesize) const {
     write(writesize);
-    return writesize.GetBitsWritten();
+    return writesize.GetTotalBitsWritten();
 }
+
+// DEPRECATED: Use getSize(util::BitWriter&) instead
+// size_t Block::getSize(core::Writer& writesize) const {
+//     write(writesize);
+//     return writesize.GetBitsWritten();
+// }
 
 }  // namespace annotation
 }  // namespace access_unit

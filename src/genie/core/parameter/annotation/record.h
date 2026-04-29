@@ -55,11 +55,13 @@ class Record {
            AnnotationEncodingParameters annotation_encoding_parameters);
 
     void read(util::BitReader& reader);
-    void write(Writer& writer) const;
+    // DEPRECATED: Use write(util::BitWriter&) instead
+    // void write(Writer& writer) const;
     void write(util::BitWriter& writer) const;
 
     size_t getSize() const;
-    size_t getSize(core::Writer& writesize) const;
+    // DEPRECATED: Use getSize(util::BitWriter&) instead
+    // size_t getSize(core::Writer& writesize) const;
 
     uint8_t getParameterSetID() const { return parameter_set_ID; }
     uint8_t getATID() const { return AT_ID; }

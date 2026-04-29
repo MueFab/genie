@@ -55,9 +55,12 @@ class DescriptorConfiguration {
     DescriptorConfiguration(AnnotDesc descriptor_ID, AlgoID encoding_mode_ID, AlgorithmParameters algorithm_parameters);
 
     void read(util::BitReader& reader);
-    void write(core::Writer& writer) const;
+    // DEPRECATED: Use write(util::BitWriter&) instead
+    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
-    size_t getSize(core::Writer& write_size) const;
+    size_t getSize(util::BitWriter& writesize) const;
+    // DEPRECATED: Use getSize(util::BitWriter&) instead
+    // size_t getSize(core::Writer& write_size) const;
     AnnotDesc getDescriptorID() const { return descriptor_ID; }
     AlgoID getEncodingModeID() const { return encoding_mode_ID; }
 

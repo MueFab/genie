@@ -12,7 +12,6 @@
 #include <string>
 #include <vector>
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/bit_writer.impl.h"
@@ -93,7 +92,7 @@ class Record {
    * @brief Writes the gene expression record to a bit writer
    * @param writer The bit writer to write to
    */
-  void Write(genie::core::Writer& writer);
+  void Write(genie::util::BitWriter& writer);
 
   /**
    * @brief Gets the feature index

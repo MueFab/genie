@@ -88,46 +88,26 @@ void CompressorParameterSet::read(util::BitReader& reader) {
     reader.FlushHeldBits();
 }
 
-void CompressorParameterSet::write(core::Writer& writer) const {
-  writer.Write(compressor_ID, 8);
-    writer.Write(compressorSteps.size(), 4);
-    for (auto step : compressorSteps) {
-      writer.Write(step.stepID, 4);
-        writer.Write(static_cast<uint8_t>(step.algorithmID), 5);
-        writer.Write(step.useDefaultAlgorithmParameters, 1);
-        if (!step.useDefaultAlgorithmParameters) step.algorithm_parameters.write(writer);
-        writer.Write(step.in_var_ID.size(), 4);
-        for (size_t idx_i = 0; idx_i < step.in_var_ID.size(); ++idx_i) {
-          writer.Write(step.in_var_ID.at(idx_i), 4);
-            writer.Write(step.prev_step_ID.at(idx_i), 4);
-            writer.Write(step.prev_out_var_ID.at(idx_i), 4);
-        }
-        writer.Write(step.completed_out_var_ID.size(), 4);
-        for (auto outvar : step.completed_out_var_ID) writer.Write(outvar, 4);
-    }
-    /*
-    writer.write(n_compressor_steps, 4);
-    uint8_t algorithm_index = 0;
-    for (auto idx_i = 0; idx_i < n_compressor_steps; ++idx_i) {
-        writer.write(compressor_step_ID[idx_i], 4);
-        writer.write(static_cast<uint8_t>(algorithm_ID[idx_i]), 5);
-        writer.write(use_default_pars[idx_i], 1);
-        if (!use_default_pars[idx_i]) {
-            (algorithm_parameters[algorithm_index].write(writer));
-            algorithm_index++;
-        }
-        writer.write(n_in_vars[idx_i], 4);
-        for (auto idx_j = 0; idx_j < n_in_vars[idx_i]; ++idx_j) {
-            writer.write(in_var_ID[idx_i][idx_j], 4);
-            writer.write(prev_step_ID[idx_i][idx_j], 4);
-            writer.write(prev_out_var_ID[idx_i][idx_j], 4);
-        }
-        writer.write(n_completed_out_vars[idx_i], 4);
-        for (auto idx_j = 0; idx_j < n_completed_out_vars[idx_i]; ++idx_j) writer.write(completed_out_var_ID[idx_i][idx_j], 4);
-    }
-    */
-    writer.Flush();
-}
+// DEPRECATED: Use write(util::BitWriter&) instead
+// void CompressorParameterSet::write(core::Writer& writer) const {
+//   writer.Write(compressor_ID, 8);
+//     writer.Write(compressorSteps.size(), 4);
+//     for (auto step : compressorSteps) {
+//       writer.Write(step.stepID, 4);
+//         writer.Write(static_cast<uint8_t>(step.algorithmID), 5);
+//         writer.Write(step.useDefaultAlgorithmParameters, 1);
+//         if (!step.useDefaultAlgorithmParameters) step.algorithm_parameters.write(writer);
+//         writer.Write(step.in_var_ID.size(), 4);
+//         for (size_t idx_i = 0; idx_i < step.in_var_ID.size(); ++idx_i) {
+//           writer.Write(step.in_var_ID.at(idx_i), 4);
+//             writer.Write(step.prev_step_ID.at(idx_i), 4);
+//             writer.Write(step.prev_out_var_ID.at(idx_i), 4);
+//         }
+//         writer.Write(step.completed_out_var_ID.size(), 4);
+//         for (auto outvar : step.completed_out_var_ID) writer.Write(outvar, 4);
+//     }
+//     writer.Flush();
+// }
 
 void CompressorParameterSet::write(util::BitWriter& writer) const {
   writer.WriteBits(compressor_ID, 8);
@@ -176,10 +156,16 @@ void CompressorParameterSet::addCompressorStep(compressorStep stepParameters) {
     compressorSteps.push_back(stepParameters);
 }
 
-size_t CompressorParameterSet::getSize(core::Writer& writesize) const {
+size_t CompressorParameterSet::getSize(util::BitWriter& writesize) const {
     write(writesize);
-    return writesize.GetBitsWritten();
+    return writesize.GetTotalBitsWritten();
 }
+
+// DEPRECATED: Use getSize(util::BitWriter&) instead
+// size_t CompressorParameterSet::getSize(core::Writer& writesize) const {
+//     write(writesize);
+//     return writesize.GetBitsWritten();
+// }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

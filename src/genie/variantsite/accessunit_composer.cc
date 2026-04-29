@@ -166,8 +166,8 @@ void AccessUnitComposer::compress(core::access_unit::annotation::TypedData& oneB
     auto encodeId = compressor.getAlgorithmIDs();
     if (compressor.getCompressorID() != 0) {
         std::stringstream compressedData;
-        compressors.compress(oneBlock.getdata(), compressedData, compressor.getCompressorID());
-        oneBlock.setCompressedData(compressedData);
+        compressors.compress(oneBlock.getDataStream(), compressedData, compressor.getCompressorID());
+        oneBlock.getCompresseddata() << compressedData.rdbuf();
     }
 }
 

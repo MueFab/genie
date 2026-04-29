@@ -184,31 +184,32 @@ void TileConfiguration::read(util::BitReader& reader) {
     }
 }
 
-void TileConfiguration::write(core::Writer& writer) const {
-  writer.Write(AG_class, 3);
-    writer.Write(attribute_contiguity, 1);
-    writer.Write(two_dimensional, 1);
-    if (two_dimensional) {
-      writer.WriteReserved(6);
-        writer.Write(column_major_tile_order, 1);
-        writer.Write(symmetry_mode, 3);
-        writer.Write(symmetry_minor_diagonal, 1);
-    } else {
-      writer.WriteReserved(3);
-    }
-    writer.Write(attribute_dependent_tiles, 1);
-    default_tile_structure.write(writer);
-    if (attribute_dependent_tiles) {
-      writer.Write(n_add_tile_structures, 16);
-        for (auto idx_i = 0; idx_i < n_add_tile_structures; ++idx_i) {
-          writer.Write(n_attributes[idx_i], 16);
-            for (auto ID : attribute_ID[idx_i]) writer.Write(ID, 16);
-            writer.Write(n_descriptors[idx_i], 7);
-            for (auto ID : descriptor_ID[idx_i]) writer.Write(ID, 7);
-            additional_tile_structure[idx_i].write(writer);
-        }
-    }
-}
+// DEPRECATED: Use write(util::BitWriter&) instead
+// void TileConfiguration::write(core::Writer& writer) const {
+//   writer.Write(AG_class, 3);
+//     writer.Write(attribute_contiguity, 1);
+//     writer.Write(two_dimensional, 1);
+//     if (two_dimensional) {
+//       writer.WriteReserved(6);
+//         writer.Write(column_major_tile_order, 1);
+//         writer.Write(symmetry_mode, 3);
+//         writer.Write(symmetry_minor_diagonal, 1);
+//     } else {
+//       writer.WriteReserved(3);
+//     }
+//     writer.Write(attribute_dependent_tiles, 1);
+//     default_tile_structure.write(writer);
+//     if (attribute_dependent_tiles) {
+//       writer.Write(n_add_tile_structures, 16);
+//         for (auto idx_i = 0; idx_i < n_add_tile_structures; ++idx_i) {
+//           writer.Write(n_attributes[idx_i], 16);
+//             for (auto ID : attribute_ID[idx_i]) writer.Write(ID, 16);
+//             writer.Write(n_descriptors[idx_i], 7);
+//             for (auto ID : descriptor_ID[idx_i]) writer.Write(ID, 7);
+//             additional_tile_structure[idx_i].write(writer);
+//         }
+//     }
+// }
 
 void TileConfiguration::write(util::BitWriter& writer) const {
       writer.WriteBits(AG_class, 3);
@@ -236,10 +237,16 @@ void TileConfiguration::write(util::BitWriter& writer) const {
       }
     }
 
-size_t TileConfiguration::getSize(core::Writer& writesize) const {
+size_t TileConfiguration::getSize(util::BitWriter& writesize) const {
     write(writesize);
-    return writesize.GetBitsWritten();
+    return writesize.GetTotalBitsWritten();
 }
+
+// DEPRECATED: Use getSize(util::BitWriter&) instead
+// size_t TileConfiguration::getSize(core::Writer& writesize) const {
+//     write(writesize);
+//     return writesize.GetBitsWritten();
+// }
 
 }  // namespace annotation
 }  // namespace parameter

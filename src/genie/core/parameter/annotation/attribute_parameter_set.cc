@@ -165,41 +165,42 @@ void AttributeParameterSet::read(util::BitReader& reader) {
     reader.FlushHeldBits();
 }
 
-void AttributeParameterSet::write(core::Writer& writer) const {
-    ArrayType curType;
-    writer.Write(attribute_ID, 16);
-    writer.Write(attribute_name_len, 8);
-    writer.Write(attribute_name);
-    writer.Write(static_cast<uint8_t>(attribute_type), 8);
-    writer.Write(attribute_num_array_dims, 2);
-    for (auto attribute_dim : attribute_array_dims)
-      writer.Write(attribute_dim, 8);
-    curType.toFile(attribute_type, attribute_default_val, writer);
-
-    writer.Write(attribute_miss_val_flag, 1);
-    if (attribute_miss_val_flag) {
-      writer.Write(attribute_miss_default_flag, 1);
-        if (!attribute_miss_default_flag) curType.toFile(attribute_type, attribute_miss_val, writer);
-        writer.Write(attribute_miss_str);
-        writer.WriteReserved(8);
-    }
-
-    writer.Write(compressor_ID, 8);
-    writer.Write(n_steps_with_dependencies, 4);
-    for (auto idx_i = 0; idx_i < n_steps_with_dependencies; ++idx_i) {
-      writer.Write(dependency_step_ID[idx_i], 4);
-        writer.Write(n_dependencies[idx_i], 4);
-        for (auto idx_j = 0; idx_j < n_dependencies[idx_i]; ++idx_j) {
-          writer.Write(dependency_var_ID[idx_i][idx_j], 4);
-            writer.Write(dependency_is_attribute[idx_i][idx_j], 1);
-            if (dependency_is_attribute[idx_i][idx_j])
-              writer.Write(dependency_ID[idx_i][idx_j], 16);
-            else
-              writer.Write(dependency_ID[idx_i][idx_j], 7);
-        }
-    }
-    writer.Flush();
-}
+// DEPRECATED: Use write(util::BitWriter&) instead
+// void AttributeParameterSet::write(core::Writer& writer) const {
+//     ArrayType curType;
+//     writer.Write(attribute_ID, 16);
+//     writer.Write(attribute_name_len, 8);
+//     writer.Write(attribute_name);
+//     writer.Write(static_cast<uint8_t>(attribute_type), 8);
+//     writer.Write(attribute_num_array_dims, 2);
+//     for (auto attribute_dim : attribute_array_dims)
+//       writer.Write(attribute_dim, 8);
+//     curType.toFile(attribute_type, attribute_default_val, writer);
+//
+//     writer.Write(attribute_miss_val_flag, 1);
+//     if (attribute_miss_val_flag) {
+//       writer.Write(attribute_miss_default_flag, 1);
+//         if (!attribute_miss_default_flag) curType.toFile(attribute_type, attribute_miss_val, writer);
+//         writer.Write(attribute_miss_str);
+//         writer.WriteReserved(8);
+//     }
+//
+//     writer.Write(compressor_ID, 8);
+//     writer.Write(n_steps_with_dependencies, 4);
+//     for (auto idx_i = 0; idx_i < n_steps_with_dependencies; ++idx_i) {
+//       writer.Write(dependency_step_ID[idx_i], 4);
+//         writer.Write(n_dependencies[idx_i], 4);
+//         for (auto idx_j = 0; idx_j < n_dependencies[idx_i]; ++idx_j) {
+//           writer.Write(dependency_var_ID[idx_i][idx_j], 4);
+//             writer.Write(dependency_is_attribute[idx_i][idx_j], 1);
+//             if (dependency_is_attribute[idx_i][idx_j])
+//               writer.Write(dependency_ID[idx_i][idx_j], 16);
+//             else
+//               writer.Write(dependency_ID[idx_i][idx_j], 7);
+//         }
+//     }
+//     writer.Flush();
+// }
 
 void AttributeParameterSet::write(util::BitWriter& writer) const {
   ArrayType curType;
@@ -237,10 +238,16 @@ void AttributeParameterSet::write(util::BitWriter& writer) const {
   writer.FlushBits();
 }
 
-size_t AttributeParameterSet::getSize(core::Writer& writesize) const {
+size_t AttributeParameterSet::getSize(util::BitWriter& writesize) const {
     write(writesize);
-    return writesize.GetBitsWritten();
+    return writesize.GetTotalBitsWritten();
 }
+
+// DEPRECATED: Use getSize(util::BitWriter&) instead
+// size_t AttributeParameterSet::getSize(core::Writer& writesize) const {
+//     write(writesize);
+//     return writesize.GetBitsWritten();
+// }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

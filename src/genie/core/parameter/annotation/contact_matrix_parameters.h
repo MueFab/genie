@@ -72,10 +72,12 @@ class ContactMatrixParameters {
                             std::vector<uint8_t> norm_matrix_name_len, std::vector<std::string> norm_matrix_name);
 
     void read(util::BitReader& reader);
-
-    void write(core::Writer& writer) const;
+    // DEPRECATED: Use write(util::BitWriter&) instead
+    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
-    size_t getSize(core::Writer& writesize) const;
+    size_t getSize(util::BitWriter& writesize) const;
+    // DEPRECATED: Use getSize(util::BitWriter&) instead
+    // size_t getSize(core::Writer& writesize) const;
 
     uint8_t getNumberOfSamples() const { return num_samples; }
     std::vector<uint8_t> getSampleIDs() const { return sample_ID; }

@@ -40,7 +40,7 @@ class TypedData {
           num_array_dims(numArrayDims),
           array_dims(arrayDims),
           dataStream{},
-          writer{&dataStream},
+          // DEPRECATED: writer{&dataStream},
           compressedDataStream{} {}
 
     TypedData()
@@ -48,7 +48,7 @@ class TypedData {
           num_array_dims(0),
           array_dims{},
           dataStream{},
-          writer{&dataStream},
+          // DEPRECATED: writer{&dataStream},
           compressedDataStream{} {}
 
     TypedData& operator=(const TypedData& other) {
@@ -82,36 +82,44 @@ class TypedData {
     }
 
     void convertToTypedData(util::BitReader& reader);
-
     void writeElement(std::vector<CustomType> matrixRow);
-
     void convertToTypedData(CustomType value);
     void convertToTypedData(std::vector<CustomType> matrix);
     void convertToTypedData(std::vector<std::vector<CustomType>> matrix);
     void convertToTypedData(std::vector<std::vector<std::vector<CustomType>>> matrix);
 
+    // DEPRECATED: Internal method used writer member - commented out
+    // void convertToTypedData(std::vector<std::vector<CustomType>> matrix);
+
+    // DEPRECATED: Internal method used writer member - commented out
+    // void convertToTypedData(std::vector<std::vector<std::vector<CustomType>>> matrix);
+
     std::stringstream& getDataStream() { return dataStream; }
 
-    std::stringstream& getdata() {
-      writer.Flush();
-        return dataStream;
-    }
+    // DEPRECATED: Use getCompresseddata() directly
+    // std::stringstream& getdata() {
+    //   writer.Flush();
+    //     return dataStream;
+    // }
     std::stringstream& getCompresseddata() { return compressedDataStream; }
 
-    void setCompressedData(std::stringstream& _compressed_data_block) {
-        compressedDataStream.str("");
-        compressedDataStream.clear();
-        genie::core::Writer compressedWriter(const_cast<std::stringstream*>(&compressedDataStream));
-        compressedWriter.Write(&_compressed_data_block);
-    }
+    // DEPRECATED: Use util::BitWriter version instead
+    // void setCompressedData(std::stringstream& _compressed_data_block) {
+    //     compressedDataStream.str("");
+    //     compressedDataStream.clear();
+    //     genie::core::Writer compressedWriter(const_cast<std::stringstream*>(&compressedDataStream));
+    //     compressedWriter.Write(&_compressed_data_block);
+    // }
 
-    void setCompressedData(std::vector<uint8_t>& _compressed_data_block) {
-        genie::core::Writer compressedWriter(&compressedDataStream);
-        for (auto byte : _compressed_data_block)
-          compressedWriter.Write(byte, 8);
-    }
+    // DEPRECATED: Use util::BitWriter version instead
+    // void setCompressedData(std::vector<uint8_t>& _compressed_data_block) {
+    //     genie::core::Writer compressedWriter(&compressedDataStream);
+    //     for (auto byte : _compressed_data_block)
+    //       compressedWriter.Write(byte, 8);
+    // }
 
-    void write(core::Writer& writer) const;
+    // DEPRECATED: Use util::BitWriter version instead
+    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
 
  private:
@@ -120,7 +128,8 @@ class TypedData {
     std::vector<uint32_t> array_dims;
     std::vector<CustomType> data_block;
     std::stringstream dataStream;
-    genie::core::Writer writer{&dataStream};
+    // DEPRECATED: Use util::BitWriter version instead
+    // genie::core::Writer writer{&dataStream};
     std::stringstream compressedDataStream;
 };
 

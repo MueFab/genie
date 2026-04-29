@@ -115,7 +115,7 @@ void Annotation::writeToFile(std::string& outputFileName) {
     genie::util::BitWriter testwriter(&testfile);
     std::ofstream txtfile;
     txtfile.open(filename + ".txt", std::ios::out);
-    genie::core::Writer txtwriter(&txtfile, true);
+    genie::util::BitWriter txtwriter(txtfile);
     uint64_t sizeSofar = 0;
 
     for (auto& pars : annotationParameterSet) {

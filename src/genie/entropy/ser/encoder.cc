@@ -56,7 +56,7 @@ void SEREncoder::encode() {
         dimensionsDims);
 
     // Get input data stream
-    auto& inputStream = const_cast<core::access_unit::annotation::TypedData&>(inputData).getdata();
+    auto& inputStream = const_cast<core::access_unit::annotation::TypedData&>(inputData).getDataStream();
     const std::string inputStr = inputStream.str();
     const uint8_t* inputBytes = reinterpret_cast<const uint8_t*>(inputStr.data());
 

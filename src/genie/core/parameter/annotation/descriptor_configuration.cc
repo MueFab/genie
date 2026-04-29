@@ -72,25 +72,26 @@ void DescriptorConfiguration::read(util::BitReader& reader) {
         algorithm_parameters.read(reader);
     }
 }
-void DescriptorConfiguration::write(core::Writer& writer) const {
-  writer.Write(static_cast<uint8_t>(descriptor_ID), 8);
-    if (descriptor_ID == AnnotDesc::GENOTYPE) {
-      writer.Flush();
-      genotype_parameters.Write(writer);
-    } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
-        writer.Flush();
-        likelihood_parameters.Write(writer);
-    } else if (descriptor_ID == AnnotDesc::CONTACT) {
-      writer.Flush();
-      contact_matrix_parameters.Write(writer);
-        writer.Write(subcontract_matrix_parameters.size(), 16);
-        for (auto& scm_params : subcontract_matrix_parameters)
-          scm_params.Write(writer);
-    } else {
-      writer.Write(static_cast<uint8_t>(encoding_mode_ID), 8);
-        algorithm_parameters.write(writer);
-    }
-}
+// DEPRECATED: Use write(util::BitWriter&) instead
+// void DescriptorConfiguration::write(core::Writer& writer) const {
+//   writer.Write(static_cast<uint8_t>(descriptor_ID), 8);
+//     if (descriptor_ID == AnnotDesc::GENOTYPE) {
+//       writer.Flush();
+//       genotype_parameters.Write(writer);
+//     } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
+//         writer.Flush();
+//         likelihood_parameters.Write(writer);
+//     } else if (descriptor_ID == AnnotDesc::CONTACT) {
+//       writer.Flush();
+//       contact_matrix_parameters.Write(writer);
+//         writer.Write(subcontract_matrix_parameters.size(), 16);
+//         for (auto& scm_params : subcontract_matrix_parameters)
+//           scm_params.Write(writer);
+//     } else {
+//       writer.Write(static_cast<uint8_t>(encoding_mode_ID), 8);
+//         algorithm_parameters.write(writer);
+//     }
+// }
 
 void DescriptorConfiguration::write(util::BitWriter& writer) const {
   writer.WriteBits(static_cast<uint8_t>(descriptor_ID), 8);
@@ -112,10 +113,16 @@ void DescriptorConfiguration::write(util::BitWriter& writer) const {
   }
 }
 
-size_t DescriptorConfiguration::getSize(core::Writer& write_size) const {
-    write(write_size);
-    return write_size.GetBitsWritten();
+size_t DescriptorConfiguration::getSize(util::BitWriter& writesize) const {
+    write(writesize);
+    return writesize.GetTotalBitsWritten();
 }
+
+// DEPRECATED: Use getSize(util::BitWriter&) instead
+// size_t DescriptorConfiguration::getSize(core::Writer& write_size) const {
+//     write(write_size);
+//     return write_size.GetBitsWritten();
+// }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

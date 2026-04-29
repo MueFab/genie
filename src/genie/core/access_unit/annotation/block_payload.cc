@@ -68,13 +68,14 @@ void BlockPayload::read(util::BitReader& reader, AnnotDesc descriptorID, uint8_t
     read(reader);
 }
 
-void BlockPayload::write(core::Writer& writer) const {
-    if (generic_payload_stream.str().size() > 0)
-      writer.Write(const_cast<std::stringstream*>(&generic_payload_stream));
-    else
-    for (const auto& byte : generic_payload) writer.Write(byte, 8, true);
-    writer.Flush();
-}
+// DEPRECATED: Use write(util::BitWriter&) instead
+// void BlockPayload::write(core::Writer& writer) const {
+//     if (generic_payload_stream.str().size() > 0)
+//       writer.Write(const_cast<std::stringstream*>(&generic_payload_stream));
+//     else
+//     for (const auto& byte : generic_payload) writer.Write(byte, 8, true);
+//     writer.Flush();
+// }
 
 void BlockPayload::write(util::BitWriter& writer) const {
   if (generic_payload_stream.str().size() > 0)
@@ -84,10 +85,16 @@ void BlockPayload::write(util::BitWriter& writer) const {
   writer.FlushBits();
 }
 
-size_t BlockPayload::getSize(core::Writer& writesize) const {
+size_t BlockPayload::getSize(util::BitWriter& writesize) const {
     write(writesize);
-    return writesize.GetBitsWritten();
+    return writesize.GetTotalBitsWritten();
 }
+
+// DEPRECATED: Use getSize(util::BitWriter&) instead
+// size_t BlockPayload::getSize(core::Writer& writesize) const {
+//     write(writesize);
+//     return writesize.GetBitsWritten();
+// }
 
 }  // namespace annotation
 }  // namespace access_unit

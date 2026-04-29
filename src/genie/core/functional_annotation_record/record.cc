@@ -33,7 +33,7 @@ Record::Record(util::BitReader& reader) {
 
 // -------------------------------------------------------------------------------------------------
 
-void Record::Write(core::Writer& writer) {
+void Record::Write(util::BitWriter& writer) {
     writer.WriteBits(annotation_index_, 64);
     writer.WriteBits(seq_id_, 16);
     writer.WriteBits(start_pos_, 40);

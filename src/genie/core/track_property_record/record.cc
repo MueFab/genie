@@ -32,7 +32,7 @@ Record::Record(util::BitReader& reader) {
 
 // -------------------------------------------------------------------------------------------------
 
-void Record::Write(core::Writer& writer) {
+void Record::Write(util::BitWriter& writer) {
     writer.WriteBits(track_index_, 16);
     writer.WriteBits(track_type_, 8);
     writer.WriteBits(track_property_count_, 8);

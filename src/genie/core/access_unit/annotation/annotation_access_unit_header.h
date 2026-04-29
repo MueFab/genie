@@ -73,9 +73,12 @@ class AnnotationAccessUnitHeader {
     void read(util::BitReader& reader, bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
               bool variable_size_tiles, uint8_t ATCoordSize);
 
-    void write(core::Writer& writer) const;
+    // DEPRECATED: Use write(util::BitWriter&) instead
+    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
-    size_t getSize(core::Writer& writesize) const;
+    size_t getSize(util::BitWriter& writesize) const;
+    // DEPRECATED: Use getSize(util::BitWriter&) instead
+    // size_t getSize(core::Writer& writesize) const;
 
     bool ISAttribute() const { return is_attribute; }
     uint16_t getAttributeID() const { return attribute_ID; }

@@ -46,9 +46,12 @@ class AlgorithmParameters {
                         std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val);
 
     void read(util::BitReader& reader);
-    void write(core::Writer& writer) const;
+    // DEPRECATED: Use write(util::BitWriter&) instead
+    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
-    size_t getSize(core::Writer& writesize) const;
+    size_t getSize(util::BitWriter& writesize) const;
+    // DEPRECATED: Use getSize(util::BitWriter&) instead
+    // size_t getSize(core::Writer& writesize) const;
 
     uint8_t getNumberOfPars() const { return n_pars; }
     std::vector<uint8_t> getParIDs() const { return par_ID; }

@@ -36,62 +36,38 @@ class AnnotationParameterSetTests : public ::testing::Test {
     // }
 };
 
-TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(cert-err58-cpp)
-    // The rule of thumb is to use EXPECT_* when you want the test to continue
-    // to reveal more errors after the assertion failure, and use ASSERT_*
-    // when continuing after failure doesn't make sense.
-
-    RandomAnnotationEncodingParameters RandomContactMatrixParameters;
-    genie::core::parameter::annotation::Record annotationParameterSet;
-    genie::core::parameter::annotation::Record annotationParameterSetCheck;
-
-    annotationParameterSet = RandomContactMatrixParameters.randomAnnotationParameterSet();
-
-    std::stringstream InOut;
-    genie::core::Writer strwriter(&InOut);
-    genie::util::BitReader strreader(InOut);
-    annotationParameterSet.write(strwriter);
-    strwriter.Flush();
-    annotationParameterSetCheck.read(strreader);
-    std::stringstream testOut;
-    genie::core::Writer teststrwriter(&testOut);
-    annotationParameterSetCheck.write(teststrwriter);
-
-    EXPECT_EQ(annotationParameterSet.getATAlphbetID(), annotationParameterSetCheck.getATAlphbetID());
-    EXPECT_EQ(annotationParameterSet.getATID(), annotationParameterSetCheck.getATID());
-    EXPECT_EQ(annotationParameterSet.getATAlphbetID(), annotationParameterSetCheck.getATAlphbetID());
-    EXPECT_EQ(annotationParameterSet.getATCoordSize(), annotationParameterSetCheck.getATCoordSize());
-    EXPECT_EQ(annotationParameterSet.isATPos40Bits(), annotationParameterSetCheck.isATPos40Bits());
-
-    EXPECT_EQ(annotationParameterSet.getTileConfigurations().size(),
-              annotationParameterSetCheck.getTileConfigurations().size());
-
-    EXPECT_EQ(InOut.str(), testOut.str());
-    auto size = annotationParameterSet.getSize();
-    if (size % 8 != 0) size += (8 - size % 8);
-    EXPECT_EQ(InOut.str().size(), size / 8);
-
-#if GENERATE_TEST_FILES
-    std::string name = "TestFiles/AnnotationParameterSet_seed_";
-    name += std::to_string(rand() % 10);
-
-    std::ofstream outputfile;
-    outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
-    if (outputfile.is_open()) {
-        genie::core::Writer writer(&outputfile);
-        annotationParameterSet.write(writer);
-        writer.flush();
-        outputfile.close();
-    }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile, true);
-        annotationParameterSet.write(txtWriter);
-        txtfile.close();
-    }
-#endif
-}
+// DEPRECATED: Use BitWriter version instead
+// TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(cert-err58-cpp)
+//     RandomAnnotationEncodingParameters RandomContactMatrixParameters;
+//     genie::core::parameter::annotation::Record annotationParameterSet;
+//     genie::core::parameter::annotation::Record annotationParameterSetCheck;
+//
+//     annotationParameterSet = RandomContactMatrixParameters.randomAnnotationParameterSet();
+//
+//     std::stringstream InOut;
+//     genie::core::Writer strwriter(&InOut);
+//     genie::util::BitReader strreader(InOut);
+//     annotationParameterSet.write(strwriter);
+//     strwriter.Flush();
+//     annotationParameterSetCheck.read(strreader);
+//     std::stringstream testOut;
+//     genie::core::Writer teststrwriter(&testOut);
+//     annotationParameterSetCheck.write(teststrwriter);
+//
+//     EXPECT_EQ(annotationParameterSet.getATAlphbetID(), annotationParameterSetCheck.getATAlphbetID());
+//     EXPECT_EQ(annotationParameterSet.getATID(), annotationParameterSetCheck.getATID());
+//     EXPECT_EQ(annotationParameterSet.getATAlphbetID(), annotationParameterSetCheck.getATAlphbetID());
+//     EXPECT_EQ(annotationParameterSet.getATCoordSize(), annotationParameterSetCheck.getATCoordSize());
+//     EXPECT_EQ(annotationParameterSet.isATPos40Bits(), annotationParameterSetCheck.isATPos40Bits());
+//
+//     EXPECT_EQ(annotationParameterSet.getTileConfigurations().size(),
+//               annotationParameterSetCheck.getTileConfigurations().size());
+//
+//     EXPECT_EQ(InOut.str(), testOut.str());
+//     auto size = annotationParameterSet.getSize();
+//     if (size % 8 != 0) size += (8 - size % 8);
+//     EXPECT_EQ(InOut.str().size(), size / 8);
+// }
 
 TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandomBitWriter) {  // NOLINT(cert-err58-cpp)
     RandomAnnotationEncodingParameters RandomContactMatrixParameters;

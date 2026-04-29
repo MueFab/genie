@@ -47,15 +47,16 @@ void BlockHeader::read(genie::util::BitReader& reader) {
     block_payload_size = static_cast<uint32_t>(reader.ReadBits(29));
 }
 
-void BlockHeader::write(core::Writer& writer) const {
-    if (!attribute_contiguity) {
-      writer.Write(static_cast<uint8_t>(descriptor_ID), 8);
-      if (descriptor_ID == AnnotDesc::ATTRIBUTE) writer.Write(attribute_ID, 16);
-    }
-    writer.WriteReserved(2);
-    writer.Write(indexed, 1);
-    writer.Write(block_payload_size, 29);
-}
+// DEPRECATED: Use write(util::BitWriter&) instead
+// void BlockHeader::write(core::Writer& writer) const {
+//     if (!attribute_contiguity) {
+//       writer.Write(static_cast<uint8_t>(descriptor_id), 8);
+//       if (descriptor_id == AnnotDesc::ATTRIBUTE) writer.Write(attribute_id, 16);
+//     }
+//     writer.WriteReserved(2);
+//     writer.Write(indexed, 1);
+//     writer.Write(block_payload_size, 29);
+// }
 
 void BlockHeader::write(util::BitWriter& writer) const {
   writer.WriteBits(static_cast<uint8_t>(descriptor_ID), 8);
@@ -65,10 +66,16 @@ void BlockHeader::write(util::BitWriter& writer) const {
   writer.WriteBits(block_payload_size, 29);
 }
 
-size_t BlockHeader::getSize(core::Writer& writesize) const {
+size_t BlockHeader::getSize(util::BitWriter& writesize) const {
     write(writesize);
-    return writesize.GetBitsWritten();
+    return writesize.GetTotalBitsWritten();
 }
+
+// DEPRECATED: Use getSize(util::BitWriter&) instead
+// size_t BlockHeader::getSize(core::Writer& writesize) const {
+//     write(writesize);
+//     return writesize.GetBitsWritten();
+// }
 }  // namespace annotation
 }  // namespace access_unit
 }  // namespace core

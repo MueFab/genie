@@ -51,10 +51,13 @@ class TileStructure {
 
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, uint8_t ATCoordSize, bool two_dimensional);
-    void write(core::Writer& writer) const;
+    // DEPRECATED: Use write(util::BitWriter&) instead
+    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
 
-    size_t getSize(core::Writer& writesize) const;
+    size_t getSize(util::BitWriter& writesize) const;
+    // DEPRECATED: Use getSize(util::BitWriter&) instead
+    // size_t getSize(core::Writer& writesize) const;
 
     bool isVariableSizeTiles() const { return variable_size_tiles; }
     uint64_t getNumberOfTiles() const { return n_tiles; }

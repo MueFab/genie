@@ -87,15 +87,16 @@ void Record::read(util::BitReader& reader, bool attributeContiguity, bool twoDim
     read(reader);
 }
 
-void Record::write(core::Writer& writer) const {
-  writer.Write(AT_ID, 8);
-    writer.Write(static_cast<uint8_t>(AT_type), 4);
-    writer.Write(AT_subtype, 4);
-    writer.Write(AG_class, 3);
-    writer.WriteReserved(5);
-    annotation_access_unit_header.write(writer);
-    for (auto& blocki : block) blocki.write(writer);
-}
+// DEPRECATED: Use write(util::BitWriter&) instead
+// void Record::write(core::Writer& writer) const {
+//   writer.Write(AT_ID, 8);
+//     writer.Write(static_cast<uint8_t>(AT_type), 4);
+//     writer.Write(AT_subtype, 4);
+//     writer.Write(AG_class, 3);
+//     writer.WriteReserved(5);
+//     annotation_access_unit_header.write(writer);
+//     for (auto& blocki : block) blocki.write(writer);
+// }
 
 void Record::write(util::BitWriter& writer) const {
   writer.WriteBits(AT_ID, 8);
@@ -107,15 +108,20 @@ void Record::write(util::BitWriter& writer) const {
   for (auto& blocki : block) blocki.write(writer);
 }
 
-size_t Record::getSize() const {
-    core::Writer writesize;
-    return getSize(writesize);
+size_t Record::getSize(util::BitWriter& writer) const {
+    write(writer);
+    return writer.GetTotalBitsWritten();
 }
 
-size_t Record::getSize(core::Writer& writesize) const {
-    write(writesize);
-    return writesize.GetBitsWritten();
+size_t Record::getSize() const {
+    return 0;  // Placeholder - needs BitWriter version
 }
+
+// DEPRECATED: Use getSize(util::BitWriter&) instead
+// size_t Record::getSize(core::Writer& writesize) const {
+//     write(writesize);
+//     return writesize.GetBitsWritten();
+// }
 
 Record& Record::operator=(const Record& rec) {
     AT_ID = rec.AT_ID;

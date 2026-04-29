@@ -102,11 +102,14 @@ class Block {
 
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, uint8_t numChrs);
-    void write(core::Writer& writer) const;
+    // DEPRECATED: Use write(util::BitWriter&) instead
+    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
     void set(BlockVectorData blockData);
     void set(BlockData& blockData);
-    size_t getSize(core::Writer& writesize) const;
+    size_t getSize(util::BitWriter& writer) const;
+    // DEPRECATED: Use getSize(util::BitWriter&) instead
+    // size_t getSize(core::Writer& writesize) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

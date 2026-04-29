@@ -18,7 +18,6 @@
 #include "genie/core/array_type.h"
 #include "genie/core/access_unit/annotation/attribute_field.h"
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/bit_writer.impl.h"
@@ -181,7 +180,8 @@ class Record {
    * @brief Writes record data to a writer
    * @param writer The writer to write to
    */
-  void Write(core::Writer& writer);
+  // DEPRECATED: No longer needed
+  // void Write(core::Writer& writer);
 
   /**
    * @brief Gets the feature index

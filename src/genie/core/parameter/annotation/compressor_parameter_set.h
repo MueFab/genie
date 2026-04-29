@@ -58,10 +58,13 @@ class CompressorParameterSet {
     void addCompressorStep(compressorStep stepParameters);
 
     void read(util::BitReader& reader);
-    void write(core::Writer& writer) const;
+    // DEPRECATED: Use write(util::BitWriter&) instead
+    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
 
-    size_t getSize(core::Writer& writesize) const;
+    size_t getSize(util::BitWriter& writesize) const;
+    // DEPRECATED: Use getSize(util::BitWriter&) instead
+    // size_t getSize(core::Writer& writesize) const;
 
     uint8_t getCompressorID() const { return compressor_ID; }
     uint8_t getNumberOfCompressorSteps() const { return static_cast<uint8_t>(compressorSteps.size()); }

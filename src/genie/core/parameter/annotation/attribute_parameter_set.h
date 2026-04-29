@@ -102,10 +102,13 @@ class AttributeParameterSet {
      * @brief
      * @param writer
      */
-    void write(core::Writer& writer) const;
+    // DEPRECATED: Use write(util::BitWriter&) instead
+    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
 
-    size_t getSize(core::Writer& writesize) const;
+    size_t getSize(util::BitWriter& writesize) const;
+    // DEPRECATED: Use getSize(util::BitWriter&) instead
+    // size_t getSize(core::Writer& writesize) const;
 
     uint16_t getAttriubuteID() const { return attribute_ID; }
     uint8_t getAttributeNameLength() const { return attribute_name_len; }

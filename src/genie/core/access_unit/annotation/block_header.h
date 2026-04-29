@@ -45,14 +45,17 @@ class BlockHeader {
                 uint16_t attribute_ID, bool indexed, uint32_t block_payload_size);
 
     void read(genie::util::BitReader& reader);
-    void write(core::Writer& writer) const;
+    // DEPRECATED: Use write(util::BitWriter&) instead
+    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
 
     AnnotDesc getDescriptorID() const { return descriptor_ID; }
     uint16_t getAttributeID() const { return attribute_ID; }
     bool isIndexed() const { return indexed; }
     uint32_t getBlockPayloadSize() const { return block_payload_size; }
-    size_t getSize(core::Writer& writesize) const;
+    size_t getSize(util::BitWriter& writer) const;
+    // DEPRECATED: Use getSize(util::BitWriter&) instead
+    // size_t getSize(core::Writer& writesize) const;
 };
 
 

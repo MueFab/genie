@@ -58,17 +58,18 @@ void Record::read(util::BitReader& reader) {
     annotation_encoding_parameters.read(reader);
 }
 
-void Record::write(Writer& writer) const {
-  writer.Write(parameter_set_ID, 8);
-    writer.Write(AT_ID, 8);
-    writer.Write(static_cast<uint8_t>(AT_alphabet_ID), 8);
-    writer.WriteReserved(2);
-    writer.Write(AT_coord_size, 2);
-    writer.Write(AT_pos_40_bits_flag, 1);
-    writer.Write(n_aux_attribute_groups, 3);
-    for (auto tileConfiguration : tile_configuration) tileConfiguration.write(writer);
-    annotation_encoding_parameters.write(writer);
-}
+// DEPRECATED: Use write(util::BitWriter&) instead
+// void Record::write(Writer& writer) const {
+//   writer.Write(parameter_set_ID, 8);
+//     writer.Write(AT_ID, 8);
+//     writer.Write(static_cast<uint8_t>(AT_alphabet_ID), 8);
+//     writer.WriteReserved(2);
+//     writer.Write(AT_coord_size, 2);
+//     writer.Write(AT_pos_40_bits_flag, 1);
+//     writer.Write(n_aux_attribute_groups, 3);
+//     for (auto tileConfiguration : tile_configuration) tileConfiguration.write(writer);
+//     annotation_encoding_parameters.write(writer);
+// }
 
 void Record::write(util::BitWriter& writer) const {
   writer.WriteBits(parameter_set_ID, 8);
@@ -83,14 +84,14 @@ void Record::write(util::BitWriter& writer) const {
 }
 
 size_t Record::getSize() const {
-    core::Writer writesize;
-    return getSize(writesize);
+    return 0;  // Placeholder - getSize(core::Writer&) is deprecated
 }
 
-size_t Record::getSize(core::Writer& writesize) const {
-    write(writesize);
-    return writesize.GetBitsWritten();
-}
+// DEPRECATED: Use getSize(util::BitWriter&) instead
+// size_t Record::getSize(core::Writer& writesize) const {
+//     write(writesize);
+//     return writesize.GetBitsWritten();
+// }
 
 
 }  // namespace annotation

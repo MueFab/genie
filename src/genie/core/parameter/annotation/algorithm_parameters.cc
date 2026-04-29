@@ -66,21 +66,22 @@ void AlgorithmParameters::read(util::BitReader& reader) {
     }
 }
 
-void AlgorithmParameters::write(core::Writer& writer) const {
-    ArrayType types;
-    writer.Write(n_pars, 4);
-    for (auto idx_i = 0; idx_i < n_pars; ++idx_i) {
-      writer.Write(par_ID[idx_i], 4);
-        writer.Write(static_cast<uint8_t>(par_type[idx_i]), 8);
-        writer.Write(par_num_array_dims[idx_i], 2);
-        for (auto idx_j = 0; idx_j < par_num_array_dims[idx_i]; ++idx_j) {
-          writer.Write(par_array_dims[idx_i][idx_j], 8);
-        }
-        for (auto idx_j : par_val[idx_i])
-            for (auto idx_k : idx_j)
-                for (auto l : idx_k) types.toFile(par_type[idx_i], l, writer);
-    }
-}
+// DEPRECATED: Use write(util::BitWriter&) instead
+// void AlgorithmParameters::write(core::Writer& writer) const {
+//     ArrayType types;
+//     writer.Write(n_pars, 4);
+//     for (auto idx_i = 0; idx_i < n_pars; ++idx_i) {
+//       writer.Write(par_ID[idx_i], 4);
+//         writer.Write(static_cast<uint8_t>(par_type[idx_i]), 8);
+//         writer.Write(par_num_array_dims[idx_i], 2);
+//         for (auto idx_j = 0; idx_j < par_num_array_dims[idx_i]; ++idx_j) {
+//           writer.Write(par_array_dims[idx_i][idx_j], 8);
+//         }
+//         for (auto idx_j : par_val[idx_i])
+//             for (auto idx_k : idx_j)
+//                 for (auto l : idx_k) types.toFile(par_type[idx_i], l, writer);
+//     }
+// }
 
 void AlgorithmParameters::write(util::BitWriter& writer) const {
   ArrayType types;
@@ -98,10 +99,16 @@ void AlgorithmParameters::write(util::BitWriter& writer) const {
   }
 }
 
-size_t AlgorithmParameters::getSize(core::Writer& writesize) const {
+size_t AlgorithmParameters::getSize(util::BitWriter& writesize) const {
     write(writesize);
-    return writesize.GetBitsWritten();
+    return writesize.GetTotalBitsWritten();
 }
+
+// DEPRECATED: Use getSize(util::BitWriter&) instead
+// size_t AlgorithmParameters::getSize(core::Writer& writesize) const {
+//     write(writesize);
+//     return writesize.GetBitsWritten();
+// }
 
 std::vector<std::vector<std::vector<std::vector<uint8_t>>>> AlgorithmParameters::resizeVector(
     uint8_t num_array_dims, std::vector<uint8_t> array_dims) {

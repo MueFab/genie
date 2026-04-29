@@ -71,15 +71,14 @@ class TileConfiguration {
                       std::vector<std::vector<uint8_t>> descriptor_ID,
                       std::vector<TileStructure> additional_tile_structure);
 
-    void read(util::BitReader& reader, uint8_t AT_coord_size);
     void read(util::BitReader& reader);
-    void write(core::Writer& writer) const;
+    void read(util::BitReader& reader, uint8_t ATCoordSize);
     void write(util::BitWriter& writer) const;
-
-    void setAGClass(uint8_t AGClass) { AG_class = AGClass; }
-    void setATCoordSize(uint8_t ATCoordSize) { AT_coord_size = ATCoordSize; }
-
-    size_t getSize(core::Writer& writesize) const;
+    // DEPRECATED: Use write(util::BitWriter&) instead
+    // void write(core::Writer& writer) const;
+    size_t getSize(util::BitWriter& writesize) const;
+    // DEPRECATED: Use getSize(util::BitWriter&) instead
+    // size_t getSize(core::Writer& writesize) const;
 
     uint8_t getAttributeGroupClass() const { return AG_class; }
     bool isAttributeContiguity() const { return attribute_contiguity; }

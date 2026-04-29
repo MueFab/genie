@@ -31,9 +31,10 @@ Record::Record(util::BitReader& reader) {
 
 // -------------------------------------------------------------------------------------------------
 
-void Record::Write(core::Writer& writer) {
-    (void)writer;
-}
+// DEPRECATED: No longer needed
+// void Record::Write(core::Writer& writer) {
+//     (void)writer;
+// }
 
 // -------------------------------------------------------------------------------------------------
 

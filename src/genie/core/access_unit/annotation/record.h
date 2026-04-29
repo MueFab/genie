@@ -68,10 +68,11 @@ class Record {
     void read(util::BitReader& reader, bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
               uint8_t ATCoordSize, uint8_t numChrs);
 
-    void write(core::Writer& writer) const;
+    // DEPRECATED: Use write(util::BitWriter&) instead
+    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
+    size_t getSize(util::BitWriter& writer) const;
     size_t getSize() const;
-    size_t getSize(core::Writer& writesize) const;
 
     Record& operator=(const Record& rec);
 };

@@ -22,6 +22,8 @@
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/bit_writer.impl.h"
+// DEPRECATED: core::Writer no longer used
+// #include "genie/core/writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -163,7 +165,7 @@ class Record {
      * @brief Writes record data to a writer
      * @param writer The writer to write to
      */
-    void Write(core::Writer& writer);
+    void Write(util::BitWriter& writer);
 
     // Getter methods
 

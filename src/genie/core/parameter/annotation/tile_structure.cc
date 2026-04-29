@@ -118,23 +118,24 @@ void TileStructure::read(util::BitReader& reader) {
     }
 }
 
-void TileStructure::write(core::Writer& writer) const {
-  writer.WriteReserved(7);
-    writer.Write(variable_size_tiles, 1);
-    writer.Write(n_tiles, coordSizeInBits(ATCoordSize));
-
-    auto dimensions = two_dimensional ? 2 : 1;
-    if (variable_size_tiles) {
-        for (uint64_t idx_i = 0; idx_i < n_tiles; ++idx_i)
-            for (auto idx_j = 0; idx_j < dimensions; ++idx_j) {
-              writer.Write(start_index[idx_i][idx_j], coordSizeInBits(ATCoordSize));
-                writer.Write(end_index[idx_i][idx_j], coordSizeInBits(ATCoordSize));
-            }
-    } else {
-        for (auto idx_j = 0; idx_j < dimensions; ++idx_j)
-          writer.Write(tile_size[idx_j], coordSizeInBits(ATCoordSize));
-    }
-}
+// DEPRECATED: Use write(util::BitWriter&) instead
+// void TileStructure::write(core::Writer& writer) const {
+//   writer.WriteReserved(7);
+//     writer.Write(variable_size_tiles, 1);
+//     writer.Write(n_tiles, coordSizeInBits(ATCoordSize));
+//
+//     auto dimensions = two_dimensional ? 2 : 1;
+//     if (variable_size_tiles) {
+//         for (uint64_t idx_i = 0; idx_i < n_tiles; ++idx_i)
+//             for (auto idx_j = 0; idx_j < dimensions; ++idx_j) {
+//               writer.Write(start_index[idx_i][idx_j], coordSizeInBits(ATCoordSize));
+//                 writer.Write(end_index[idx_i][idx_j], coordSizeInBits(ATCoordSize));
+//             }
+//     } else {
+//         for (auto idx_j = 0; idx_j < dimensions; ++idx_j)
+//           writer.Write(tile_size[idx_j], coordSizeInBits(ATCoordSize));
+//     }
+// }
 
 void TileStructure::write(util::BitWriter& writer) const {
   writer.WriteReserved(7);
@@ -155,10 +156,16 @@ void TileStructure::write(util::BitWriter& writer) const {
 }
 
 
-size_t TileStructure::getSize(core::Writer& writesize) const {
+size_t TileStructure::getSize(util::BitWriter& writesize) const {
     write(writesize);
-    return writesize.GetBitsWritten();
+    return writesize.GetTotalBitsWritten();
 }
+
+// DEPRECATED: Use getSize(util::BitWriter&) instead
+// size_t TileStructure::getSize(core::Writer& writesize) const {
+//     write(writesize);
+//     return writesize.GetBitsWritten();
+// }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

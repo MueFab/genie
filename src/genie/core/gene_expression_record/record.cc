@@ -66,7 +66,7 @@ bool Record::Read(genie::util::BitReader& reader) {
   return true;
 }
 //-------------------------------------------------------------------------------------------------
-void Record::Write(genie::core::Writer& writer) {
+void Record::Write(genie::util::BitWriter& writer) {
   (void)writer;
 }
 // -------------------------------------------------------------------------------------------------
