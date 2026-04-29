@@ -126,14 +126,208 @@ flowchart TD
 
 ---
 
-## 2. Module Dependency Table
+## 2. Module Dependency
 
-| Module | Type | Files Changed | Develop Status | Risk | Dependencies |
-|--------|------|--------------|---------------|------|--------------|
+### Dependency Flow Chart (✅ = Completed, 🔄 = In Progress, ⏳ = Pending)
+
+```mermaid
+flowchart TB
+    subgraph "External Dependencies"
+        XTENSOR["xtensor<br/>(optional)"]
+        EIGEN["Eigen3<br/>(optional)"]
+        ZSTD["ZSTD codec"]
+        LZMA["LZMA codec"]
+        JBIG["JBIG codec"]
+        BSC["BSC codec"]
+        JSON["nlohmann/json"]
+        FS["filesystem"]
+    end
+
+    subgraph "genie-util" #90EE90
+        UTIL["✅ genie-util<br/>~45 files<br/>Risk: LOW"]
+    end
+
+    subgraph "genie-backend" #90EE90
+        BACKEND["genie-backend<br/>~10 files<br/>100% NEW<br/>Risk: MEDIUM"]
+    end
+
+    subgraph "genie-core" #FFB6C1
+        CORE["genie-core<br/>~150 files<br/>Risk: HIGH"]
+    end
+
+    subgraph "genie-entropy" #FFFF99
+        ENTROPY["genie-entropy<br/>~120 files<br/>Risk: MEDIUM"]
+    end
+
+    subgraph "genie-format" #FFFF99
+        FORMAT["genie-format<br/>~210 files<br/>Risk: MEDIUM"]
+    end
+
+    subgraph "genie-module" #90EE90
+        MOD["✅ genie-module<br/>~7 files<br/>Risk: LOW"]
+    end
+
+    subgraph "genie-name" #90EE90
+        NAME["genie-name<br/>~2 files<br/>Risk: LOW"]
+    end
+
+    subgraph "genie-quality" #90EE90
+        QUAL["genie-quality<br/>~20 files<br/>Risk: LOW"]
+    end
+
+    subgraph "genie-read" #90EE90
+        READ["genie-read<br/>~40 files<br/>Risk: LOW"]
+    end
+
+    subgraph "genie-contact" #FFFF99
+        CONTACT["genie-contact<br/>~20 files<br/>UNIFIED<br/>Risk: MEDIUM"]
+    end
+
+    subgraph "genie-genotype" #FFFF99
+        GENO["genie-genotype<br/>~12 files<br/>UNIFIED<br/>Risk: MEDIUM"]
+    end
+
+    subgraph "genie-likelihood" #FFFF99
+        LIKE["genie-likelihood<br/>~10 files<br/>UNIFIED<br/>Risk: MEDIUM"]
+    end
+
+    subgraph "genie-annotation" #FFB6C1
+        ANNOT["genie-annotation<br/>~30 files<br/>100% NEW<br/>Risk: HIGH"]
+    end
+
+    %% External dependencies
+    XTENSOR -.-> BACKEND
+    EIGEN -.-> BACKEND
+    ZSTD -.-> ENTROPY
+    LZMA -.-> ENTROPY
+    JBIG -.-> ENTROPY
+    BSC -.-> ENTROPY
+
+    %% Base layer (✅ done)
+    UTIL --> CORE
+    UTIL --> BACKEND
+    UTIL --> ENTROPY
+    UTIL --> FORMAT
+
+    %% Core dependencies
+    CORE --> BACKEND
+    CORE --> ENTROPY
+    CORE --> FORMAT
+    CORE --> MOD
+    CORE --> NAME
+    CORE --> QUAL
+    CORE --> READ
+
+    %% Backend dependencies
+    BACKEND --> CONTACT
+    BACKEND --> GENO
+    BACKEND --> LIKE
+
+    %% Format dependencies
+    FORMAT --> READ
+
+    %% High-level modules
+    ENTROPY --> ANNOT
+    CORE --> ANNOT
+    CONTACT --> ANNOT
+    GENO --> ANNOT
+    LIKE --> ANNOT
+
+    %% Legend with status
+    classDef HIGH risk fill:#FFB6C1,stroke:#FF0000,stroke-width:3px
+    classDef MEDIUM risk fill:#FFFF99,stroke:#FFA500,stroke-width:2px
+    classDef LOW risk fill:#90EE90,stroke:#228B22,stroke-width:1px
+    classDef DONE stroke:#228B22,stroke-width:2px,fill:#90EE90
+
+    class UTIL DONE
+    class MOD DONE
+    class BACKEND,ENTROPY,FORMAT,CONTACT,GENO,LIKE MEDIUM
+    class CORE,ANNOT HIGH
+    class NAME,QUAL,READ LOW
+```
+
+### Internal Structure of genie-core
+
+```mermaid
+flowchart TB
+    subgraph "genie-core Internal Architecture"
+        direction TB
+
+        subgraph "Core Infrastructure"
+            API["api.cc/h"]
+            C_API["c_api.cc/h"]
+            CLASSIFIER["classifier.h<br/>classifier_bypass.cc/h<br/>classifier_regroup.cc/h"]
+            FLOW["flow_graph.cc/h<br/>flow_graph_*.cc"]
+        end
+
+        subgraph "Access Units"
+            AU["access_unit.cc/h<br/>(FLAT in develop)"]
+            AU_HIER["access_unit/<br/>access_unit.cc/h<br/>(HIERARCHICAL in part6)"]
+            ANNOT_AU["access_unit/annotation/<br/>7 files<br/>NEW in part6"]
+        end
+
+        subgraph "Parameters"
+            PARAM["parameter/<br/>descriptor/descriptor_present/<br/>computed_ref.cc/h"]
+            ANNOT_PARAM["parameter/annotation/<br/>8 files<br/>NEW in part6"]
+        end
+
+        subgraph "Records (part6 additions)"
+            VARIANT_REC["record/variant/<br/>2 files<br/>NEW"]
+            LINKED_REC["linked_record/<br/>1 file<br/>NEW"]
+            SITE_REC["record/site/<br/>1 file<br/>NEW"]
+            DATA_UNIT_REC["record/data_unit/<br/>1 file<br/>NEW"]
+            CONTACT_REC["record/contact/<br/>1 file<br/>NEW"]
+        end
+
+        subgraph "Utility Files"
+            ARRAY["array_type.cc/h<br/>NEW in part6<br/>Dual Writer support"]
+            NDARRAY["ndarray.cc/h"]
+            WRITER["writer.cc/h<br/>part6 only"]
+        end
+
+        subgraph "Format Export/Import"
+            FORMAT_EXP["format_exporter.cc/h<br/>format_exporter_compressed.cc/h"]
+            FORMAT_IMP["format_importer.cc/h<br/>format_importer_compressed.cc/h<br/>format_importer_null.cc/h"]
+        end
+
+        subgraph "Meta"
+            META["meta/access_unit.cc/h<br/>meta/block_header/"]
+        end
+    end
+
+    %% Styling
+    classDef NEW fill:#DDA0DD,stroke:#800080,stroke-width:2px
+    classDef PART6_ONLY fill:#E6E6FA,stroke:#9370DB,stroke-width:1px,stroke-dash:5,5
+
+    class ANNOT_AU,ANNOT_PARAM NEW
+    class VARIANT_REC,LINKED_REC,SITE_REC,DATA_UNIT_REC,CONTACT_REC NEW
+    class ARRAY,WRITER,AU_HIER PART6_ONLY
+```
+
+### genie-core Internal Legend
+
+| Style | Meaning | Examples |
+|-------|---------|----------|
+| **Solid purple border** | NEW in part6 (didn't exist in develop) | `access_unit/annotation/`, `parameter/annotation/` |
+| **Dashed purple border** | part6-only file (not in develop) | `array_type.cc/h`, `writer.cc/h`, hierarchical `access_unit/` |
+| **Flat structure** | Files that exist in both branches | `api.cc/h`, `classifier*.cc`, `flow_graph*.cc` |
+
+---
+
+| Color | Risk Level | Modules |
+|-------|-------------|---------|
+| 🟢 `#90EE90` | **LOW** | genie-util, genie-module, genie-name, genie-quality, genie-read |
+| 🟡 `#FFFF99` | **MEDIUM** | genie-backend, genie-entropy, genie-format, genie-contact, genie-genotype, genie-likelihood |
+| 🔴 `#FFB6C1` | **HIGH** | genie-core, genie-annotation |
+
+### Module Summary Table
+
+| Module | Type | Files | Status | Risk | Key Dependencies |
+|--------|------|-------|--------|------|------------------|
 | **genie-util** | EXISTING | ~45 | Unchanged | LOW | None (base) |
 | **genie-core** | EXISTING | ~150 | Modified | HIGH | util, backend (NEW) |
-| **genie-backend** | NEW | 10 | 100% New | MEDIUM | util, external libs |
-| **genie-entropy** | EXISTING | ~120 | Modified | MEDIUM | util, core |
+| **genie-backend** | NEW | 10 | 100% New | MEDIUM | util, xtensor, eigen |
+| **genie-entropy** | EXISTING | ~120 | Modified | MEDIUM | util, core, zstd, lzma, jbig, bsc |
 | **genie-format** | EXISTING | ~210 | Modified | MEDIUM | util, core |
 | **genie-module** | EXISTING | ~7 | Modified | LOW | core |
 | **genie-name** | EXISTING | ~2 | Unchanged | LOW | core |
@@ -1509,6 +1703,310 @@ ctest --output-on-failure
 | `fasta_source.cc` | `fasta-source.cc` | FASTA |
 | `subsequence.cc` | `subsequence.cpp` | ZSTD |
 | `access_unit.cc` | `access_unit/access_unit.cc` | Core |
+
+---
+
+---
+
+# APPENDIX D: develop-part6 Changes Since Merge Base
+
+## D.1 Summary
+
+Since the merge base `934b5ca9` (shared history creation), the following files were modified in `develop-part6`:
+
+```
+src/genie/annotation/accessunit_composer.cc
+src/genie/annotation/attributes.h
+src/genie/annotation/geno_annotation.cc
+src/genie/annotation/tiles.h
+src/genie/annotation/variantsite_parser.h
+src/genie/annotation/vsite_attributes.cc
+src/genie/annotation/vsite_tiles.cc
+src/genie/core/access_unit/annotation/typed_data.cc
+src/genie/core/access_unit/annotation/typed_data.h
+src/genie/variantsite/accessunit_composer.cc
+src/genie/variantsite/attributes.h
+```
+
+**Total: 11 files changed, 55 insertions(+), 33 deletions(-)**
+
+---
+
+## D.2 Detailed Changes by File
+
+### 1. `core/access_unit/annotation/typed_data.{cc,h}` (NEW METHOD)
+
+**Change**: Added `write(util::BitWriter&)` method alongside existing `write(core::Writer&)`.
+
+```cpp
+// typed_data.h - Added new method declaration
+void write(util::BitWriter& writer) const;
+
+// typed_data.cc - Added new method implementation
+void TypedData::write(util::BitWriter& writer) const {
+    writer.WriteBits(static_cast<uint8_t>(data_type_ID), 8);
+    writer.WriteBits(num_array_dims, 2);
+    uint64_t n_elements = 1;
+    for (uint64_t idx_i = 0; idx_i < num_array_dims; ++idx_i) {
+        writer.WriteBits(array_dims[idx_i], 32);
+        n_elements = n_elements * array_dims[idx_i];
+    }
+
+    if (!compressedDataStream.str().empty()) {
+        bool encoded = true;
+        writer.WriteBits(encoded, 1);
+        auto size = compressedDataStream.str().size();
+        writer.WriteBits(size, 32);
+        writer.Write(const_cast<std::stringstream*>(&compressedDataStream));
+    } else {
+        bool encoded = false;
+        writer.WriteBits(encoded, 1);
+        writer.Write(const_cast<std::stringstream*>(&dataStream));
+    }
+    writer.FlushBits();
+}
+```
+
+---
+
+### 2. `annotation/accessunit_composer.cc`
+
+**Change**: Replaced `core::Writer` with `util::BitWriter`.
+
+```diff
+-        genie::core::Writer writer(&data);
++        genie::util::BitWriter writer(data);
+         tile.second.write(writer);
+-        writer.Flush();
++        writer.FlushBits();
+```
+
+---
+
+### 3. `annotation/attributes.h`
+
+**Changes**:
+- Replaced `#include "genie/core/writer.h"` with `#include "genie/util/bit_writer.h"`
+- Changed `writers.back().Flush()` to `writers.back().FlushBits()`
+- Changed `writers.back().GetBitsWritten()` to `writers.back().GetTotalBitsWritten()`
+- Changed `std::vector<genie::core::Writer>` to `std::vector<genie::util::BitWriter>`
+
+```diff
+-#include "genie/core/writer.h"
++#include "genie/util/bit_writer.h"
+
+-  writers.back().Flush();
++  writers.back().FlushBits();
+
+-  uint64_t getCurrentsize() const {return writers.back().GetBitsWritten(); }
++  uint64_t getCurrentsize() const {return writers.back().GetTotalBitsWritten(); }
+
+-    std::vector<genie::core::Writer> writers;
++    std::vector<genie::util::BitWriter> writers;
+```
+
+---
+
+### 4. `annotation/geno_annotation.cc`
+
+**Change**: Replaced `core::Writer` with `util::BitWriter`.
+
+```diff
+-      genie::core::Writer writer(
+-          &descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
++      genie::util::BitWriter writer(descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
+       combined.blocks.at(blockIndex).likelihoodPayload.write(writer);
+```
+
+---
+
+### 5. `annotation/tiles.h`
+
+**Changes**:
+- Replaced `#include "genie/core/writer.h"` with `#include "genie/util/bit_writer.h"`
+- Changed `tileWriter.emplace_back(&tileData.back())` to `tileWriter.emplace_back(tileData.back())`
+- Changed `std::vector<genie::core::Writer>` to `std::vector<genie::util::BitWriter>`
+- Changed `Write(value, bits)` to `WriteBits(value, bits)`
+- Changed `Flush()` to `FlushBits()`
+- Changed `GetBitsWritten()` to `GetTotalBitsWritten()`
+
+```diff
+-    std::vector<genie::core::Writer> tileWriter;
++    std::vector<genie::util::BitWriter> tileWriter;
+
+-        tiles.tileWriter.back().Write(value, bits);
++        tiles.tileWriter.back().WriteBits(value, bits);
+
+-    void wrapUp() { tiles.tileWriter.back().Flush(); }
++    void wrapUp() { tiles.tileWriter.back().FlushBits(); }
+
+-    size_t getBitsWrittenInTile(size_t tilenr) { return tiles.tileWriter.at(tilenr).GetBitsWritten(); }
++    size_t getBitsWrittenInTile(size_t tilenr) { return tiles.tileWriter.at(tilenr).GetTotalBitsWritten(); }
+```
+
+---
+
+### 6. `annotation/variantsite_parser.h`
+
+**Change**: Replaced `core::Writer` with `util::BitWriter`.
+
+```diff
+-#include "genie/core/writer.h"
++#include "genie/util/bit_writer.h"
+
+-    std::vector<genie::core::Writer> fieldWriter;
++    std::vector<genie::util::BitWriter> fieldWriter;
+
+-    std::map<std::string, genie::core::Writer> attrWriter;
++    std::map<std::string, genie::util::BitWriter> attrWriter;
+```
+
+---
+
+### 7. `annotation/vsite_attributes.cc`
+
+**Changes**:
+- Changed `writers.back().Flush()` to `writers.back().FlushBits()`
+- Changed `writers.emplace_back(&tiles.back())` to `writers.emplace_back(tiles.back())`
+- Changed `core::Writer writer(&TypedTiles.back())` to `genie::util::BitWriter writer(TypedTiles.back())`
+
+```diff
+-        writers.back().Flush();
++        writers.back().FlushBits();
+
+-        writers.emplace_back(&tiles.back());
++        writers.emplace_back(tiles.back());
+
+-        core::Writer writer(&TypedTiles.back());
++        genie::util::BitWriter writer(TypedTiles.back());
+```
+
+---
+
+### 8. `annotation/vsite_tiles.cc`
+
+**Changes**:
+- Changed `Write(value)` to `WriteBits(value, 8)` for string termination
+- Changed `tiles.tileWriter.back().Flush()` to `tiles.tileWriter.back().FlushBits()`
+- Changed `tiles.tileWriter.emplace_back(&tiles.tileData.back())` to `tiles.tileWriter.emplace_back(tiles.tileData.back())`
+
+```diff
+-    tiles.tileWriter.back().Write(0, 8);
++    tiles.tileWriter.back().WriteBits(0, 8);
+
+-      tiles.tileWriter.back().Flush();
++      tiles.tileWriter.back().FlushBits();
+
+-        tiles.tileWriter.emplace_back(&tiles.tileData.back());
++        tiles.tileWriter.emplace_back(tiles.tileData.back());
+```
+
+---
+
+### 9. `variantsite/accessunit_composer.cc`
+
+**Change**: Replaced `core::Writer` with direct `util::BitWriter` usage.
+
+```diff
+-        util::BitWriter writer(&data);
++        util::BitWriter writer(data);
+         for (auto& oneBlock : tileData.second) {
+-          core::Writer coreWriter(&data);
+-          oneBlock.write(coreWriter);
++          oneBlock.write(writer);
+         }
+```
+
+---
+
+### 10. `variantsite/attributes.h`
+
+**Same changes as `annotation/attributes.h`**:
+- Replaced `#include "genie/core/writer.h"` with `#include "genie/util/bit_writer.h"`
+- Changed `Flush()` to `FlushBits()`
+- Changed `GetBitsWritten()` to `GetTotalBitsWritten()`
+- Changed `std::vector<genie::core::Writer>` to `std::vector<genie::util::BitWriter>`
+
+---
+
+## D.3 `array_type.{cc,h}` Status
+
+**IMPORTANT**: `array_type.{cc,h}` is a **part6-only file** - it does NOT exist in the `develop` branch.
+
+```bash
+$ git show develop:src/genie/core/array_type.h
+fatal: path 'src/genie/core/array_type.h' exists on disk, but not in 'develop'
+```
+
+### Current State in develop-part6
+
+The file is **unchanged since the merge base** (`934b5ca9`). It provides:
+- `toArray()` methods for converting BitReader/values to byte arrays
+- `toFile()` methods for writing to core::Writer or util::BitWriter
+- Data type conversion utilities
+
+### Method Signatures (from array_type.h)
+
+```cpp
+class ArrayType {
+  private:
+    uint8_t bitSize = 0;
+
+  public:
+    std::vector<uint8_t> toArray(DataType type, util::BitReader& reader) const;
+
+    void toFile(core::DataType type, std::vector<uint8_t> bytearray, core::Writer& writer) const;
+    void toFile(core::DataType type, std::vector<uint8_t> bytearray, util::BitWriter& writer) const;
+    void toFile(core::DataType type, util::BitReader& reader, core::Writer& writer, uint64_t number) const;
+    void toFile(core::DataType type, util::BitReader& reader, util::BitWriter& writer, uint64_t number) const;
+    std::string toString(core::DataType type, std::vector<uint8_t> value) const;
+
+    uint8_t getDefaultBitsize(core::DataType type) const;
+    uint64_t getDefaultValue(core::DataType type) const;
+    std::vector<uint8_t> toArray(core::DataType type, uint64_t value) const;
+};
+```
+
+### Merge Recommendation for array_type
+
+Since this file doesn't exist in develop, during merge it should be treated as a **NEW file addition** (like genie-backend). It provides dual-write capability for both `core::Writer` and `util::BitWriter`.
+
+---
+
+## D.4 Pattern Analysis: core::Writer → util::BitWriter Migration
+
+All modified files follow the same migration pattern:
+
+| Original | Migrated To | Notes |
+|----------|-------------|-------|
+| `core::Writer` | `util::BitWriter` | Direct replacement |
+| `Writer(&stream)` | `BitWriter(stream)` | Constructor change (pointer → reference) |
+| `writer.Flush()` | `writer.FlushBits()` | Method rename |
+| `writer.GetBitsWritten()` | `writer.GetTotalBitsWritten()` | Method rename |
+| `writer.Write(value, bits)` | `writer.WriteBits(value, bits)` | Method rename |
+| `writer.Write(string)` | `writer.Write(string)` | Same method name, different signature |
+
+---
+
+## D.5 Build & Test Status
+
+**Build**: Clean compile with no errors
+**Tests**: All 149 tests pass across 13 test binaries
+
+| Test Binary | Tests | Status |
+|-------------|-------|--------|
+| genie-test-annotation | 18 | ✓ |
+| genie-test-annotation-parameter-set | 29 | ✓ |
+| genie-test-conformance | 12 | ✓ |
+| genie-test-contact | 21 | ✓ |
+| genie-test-core | 18 | ✓ |
+| genie-test-entropy | 10 | ✓ |
+| genie-test-example | 1 | ✓ |
+| genie-test-genotype | 17 | ✓ |
+| genie-test-likelihood | 6 | ✓ |
+| genie-test-records | 13 | ✓ |
+| genie-test-variant-genotype-record | 3 | ✓ |
+| genie-test-variant-site-record | 1 | ✓ |
 
 ---
 
