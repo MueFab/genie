@@ -93,6 +93,36 @@ TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(c
 #endif
 }
 
+TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandomBitWriter) {  // NOLINT(cert-err58-cpp)
+    RandomAnnotationEncodingParameters RandomContactMatrixParameters;
+    genie::core::parameter::annotation::Record annotationParameterSet;
+    genie::core::parameter::annotation::Record annotationParameterSetCheck;
+
+    annotationParameterSet = RandomContactMatrixParameters.randomAnnotationParameterSet();
+
+    std::stringstream InOut;
+    genie::util::BitWriter strwriter(InOut);
+    genie::util::BitReader strreader(InOut);
+    annotationParameterSet.write(strwriter);
+    strwriter.FlushBits();
+    annotationParameterSetCheck.read(strreader);
+    std::stringstream testOut;
+    genie::util::BitWriter teststrwriter(testOut);
+    annotationParameterSetCheck.write(teststrwriter);
+    teststrwriter.FlushBits();
+
+    EXPECT_EQ(annotationParameterSet.getATAlphbetID(), annotationParameterSetCheck.getATAlphbetID());
+    EXPECT_EQ(annotationParameterSet.getATID(), annotationParameterSetCheck.getATID());
+    EXPECT_EQ(annotationParameterSet.getATAlphbetID(), annotationParameterSetCheck.getATAlphbetID());
+    EXPECT_EQ(annotationParameterSet.getATCoordSize(), annotationParameterSetCheck.getATCoordSize());
+    EXPECT_EQ(annotationParameterSet.isATPos40Bits(), annotationParameterSetCheck.isATPos40Bits());
+
+    EXPECT_EQ(annotationParameterSet.getTileConfigurations().size(),
+              annotationParameterSetCheck.getTileConfigurations().size());
+
+    EXPECT_EQ(InOut.str(), testOut.str());
+}
+
 TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*

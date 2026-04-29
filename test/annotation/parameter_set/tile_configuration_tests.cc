@@ -135,6 +135,40 @@ TEST_F(TileConfigurationTests, TileConfigurationRandom) {  // NOLINT(cert-err58-
 #endif
 }
 
+TEST_F(TileConfigurationTests, TileConfigurationRandomBitWriter) {  // NOLINT(cert-err58-cpp)
+    RandomAnnotationEncodingParameters randomTileConfiguration;
+    uint8_t AT_coord_size = static_cast<uint8_t>(rand() % 4);
+    genie::core::parameter::annotation::TileConfiguration tileConfiguration(AT_coord_size);
+    genie::core::parameter::annotation::TileConfiguration tileConfigurationCheck(AT_coord_size);
+
+    tileConfiguration = randomTileConfiguration.randomTileConfiguration(AT_coord_size);
+    std::stringstream InOut;
+    genie::util::BitWriter strwriter(InOut);
+    genie::util::BitReader strreader(InOut);
+    tileConfiguration.write(strwriter);
+    strwriter.FlushBits();
+    tileConfigurationCheck.read(strreader);
+    std::stringstream CheckOut;
+    genie::util::BitWriter checkWriter(CheckOut);
+    tileConfigurationCheck.write(checkWriter);
+    checkWriter.FlushBits();
+
+    EXPECT_EQ(tileConfiguration.isAttributeContiguity(), tileConfigurationCheck.isAttributeContiguity());
+    EXPECT_EQ(tileConfiguration.isTwoDimensional(), tileConfigurationCheck.isTwoDimensional());
+    EXPECT_EQ(tileConfiguration.isColumnMajorTileOrder(), tileConfigurationCheck.isColumnMajorTileOrder());
+    EXPECT_EQ(tileConfiguration.isSymmetryMinorDiagonal(), tileConfigurationCheck.isSymmetryMinorDiagonal());
+    EXPECT_EQ(tileConfiguration.getAttributeGroupClass(), tileConfigurationCheck.getAttributeGroupClass());
+    EXPECT_EQ(tileConfiguration.getSymmetryMode(), tileConfigurationCheck.getSymmetryMode());
+
+    EXPECT_EQ(tileConfiguration.getAttributeIDs().size(), tileConfigurationCheck.getAttributeIDs().size());
+    EXPECT_EQ(tileConfiguration.getNumberOfAttributes().size(), tileConfigurationCheck.getNumberOfAttributes().size());
+    EXPECT_EQ(tileConfiguration.getDescriptorIDs().size(), tileConfigurationCheck.getDescriptorIDs().size());
+
+    EXPECT_EQ(tileConfiguration.getAttributeIDs(), tileConfigurationCheck.getAttributeIDs());
+    EXPECT_EQ(tileConfiguration.getNumberOfAttributes(), tileConfigurationCheck.getNumberOfAttributes());
+    EXPECT_EQ(tileConfiguration.getDescriptorIDs(), tileConfigurationCheck.getDescriptorIDs());
+}
+
 TEST_F(TileConfigurationTests, TileConfigurationRandomSimpleStructure) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
@@ -183,4 +217,23 @@ TEST_F(TileConfigurationTests, TileConfigurationRandomSimpleStructure) {  // NOL
         txtfile.close();
     }
 #endif
+}
+
+TEST_F(TileConfigurationTests, TileConfigurationRandomSimpleStructureBitWriter) {  // NOLINT(cert-err58-cpp)
+    RandomAnnotationEncodingParameters randomTileConfiguration;
+    genie::core::parameter::annotation::TileConfiguration tileConfiguration;
+    uint8_t ATCoordSize = static_cast<uint8_t>(rand() % 4);
+    tileConfiguration = randomTileConfiguration.randomTileConfiguration(ATCoordSize);
+    genie::core::parameter::annotation::TileConfiguration tileConfigurationCheck;
+
+    std::stringstream InOut;
+    genie::util::BitWriter strwriter(InOut);
+    genie::util::BitReader strreader(InOut);
+    tileConfiguration.write(strwriter);
+    strwriter.FlushBits();
+    tileConfigurationCheck.read(strreader);
+
+    EXPECT_EQ(tileConfiguration.getAttributeGroupClass(), tileConfigurationCheck.getAttributeGroupClass());
+    EXPECT_EQ(tileConfiguration.isAttributeContiguity(), tileConfigurationCheck.isAttributeContiguity());
+    EXPECT_EQ(tileConfiguration.isTwoDimensional(), tileConfigurationCheck.isTwoDimensional());
 }

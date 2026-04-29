@@ -174,3 +174,31 @@ TEST_F(CompressorParameterSetTests, CompressorParameterSetRandom) {  // NOLINT(c
     }
 #endif
 }
+
+TEST_F(CompressorParameterSetTests, CompressorParameterSetRandomBitWriter) {  // NOLINT(cert-err58-cpp)
+    RandomAnnotationEncodingParameters RandomContactMatrixParameters;
+    genie::core::parameter::annotation::CompressorParameterSet compressorParameterSet;
+    genie::core::parameter::annotation::CompressorParameterSet compressorParameterSetCheck;
+    genie::core::parameter::annotation::CompressorParameterSet compressorParameterSetCheck2;
+
+    compressorParameterSet = RandomContactMatrixParameters.randomCompressorParameterSet();
+
+    std::stringstream InOut;
+    genie::util::BitWriter strwriter(InOut);
+    genie::util::BitReader strreader(InOut);
+    compressorParameterSet.write(strwriter);
+    compressorParameterSet.write(strwriter);
+    strwriter.FlushBits();
+    compressorParameterSetCheck.read(strreader);
+    compressorParameterSetCheck2.read(strreader);
+
+    EXPECT_EQ(compressorParameterSet.getCompressorID(), compressorParameterSetCheck.getCompressorID());
+    EXPECT_EQ(compressorParameterSet.getCompressorID(), compressorParameterSetCheck2.getCompressorID());
+    EXPECT_EQ(compressorParameterSet.getNumberOfCompressorSteps(),
+              compressorParameterSetCheck.getNumberOfCompressorSteps());
+    EXPECT_EQ(compressorParameterSet.getCompressorStepIDs(), compressorParameterSetCheck.getCompressorStepIDs());
+    EXPECT_EQ(compressorParameterSet.getAlgorithmIDs(), compressorParameterSetCheck.getAlgorithmIDs());
+    EXPECT_EQ(compressorParameterSet.IsDefaultParsUsed(), compressorParameterSetCheck.IsDefaultParsUsed());
+    EXPECT_EQ(compressorParameterSet.getAlgorithmParameters().size(),
+              compressorParameterSetCheck.getAlgorithmParameters().size());
+}

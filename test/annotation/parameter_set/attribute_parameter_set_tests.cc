@@ -169,3 +169,37 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetRandom) {  // NOLINT(cer
     }
 #endif
 }
+
+TEST_F(AttributeParameterSetTests, AttributeParameterSetRandomBitWriter) {  // NOLINT(cert-err58-cpp)
+    RandomAnnotationEncodingParameters randomattributeParameterSet;
+    genie::core::parameter::annotation::AttributeParameterSet attributeParameterSet;
+    genie::core::parameter::annotation::AttributeParameterSet attributeParameterSetCheck;
+    attributeParameterSet = randomattributeParameterSet.randomAttributeParameterSet();
+
+    std::stringstream InOut;
+    genie::util::BitWriter strwriter(InOut);
+    genie::util::BitReader strreader(InOut);
+    attributeParameterSet.write(strwriter);
+    strwriter.FlushBits();
+    attributeParameterSetCheck.read(strreader);
+    std::stringstream TestOut;
+    genie::util::BitWriter teststrwriter(TestOut);
+    attributeParameterSetCheck.write(teststrwriter);
+    teststrwriter.FlushBits();
+
+    EXPECT_EQ(InOut.str(), TestOut.str());
+
+    EXPECT_EQ(attributeParameterSet.getAttriubuteID(), attributeParameterSetCheck.getAttriubuteID());
+    EXPECT_EQ(attributeParameterSet.getAttributeName(), attributeParameterSetCheck.getAttributeName());
+    EXPECT_EQ(attributeParameterSet.getAttributeType(), attributeParameterSetCheck.getAttributeType());
+    EXPECT_EQ(attributeParameterSet.getAttributeNumberOFArrayDims(),
+              attributeParameterSetCheck.getAttributeNumberOFArrayDims());
+    EXPECT_EQ(attributeParameterSet.getAttributeArrayDims(), attributeParameterSetCheck.getAttributeArrayDims());
+    EXPECT_EQ(attributeParameterSet.getAttributeDefaultValue(), attributeParameterSetCheck.getAttributeDefaultValue());
+    EXPECT_EQ(attributeParameterSet.isAttributeMissedValue(), attributeParameterSetCheck.isAttributeMissedValue());
+    EXPECT_EQ(attributeParameterSet.getAttributeMissedValues(), attributeParameterSetCheck.getAttributeMissedValues());
+    EXPECT_EQ(attributeParameterSet.getAttributeMissedString(), attributeParameterSetCheck.getAttributeMissedString());
+    EXPECT_EQ(attributeParameterSet.getCompressorID(), attributeParameterSetCheck.getCompressorID());
+    EXPECT_EQ(attributeParameterSet.areDependeciesAttributes(), attributeParameterSetCheck.areDependeciesAttributes());
+    EXPECT_EQ(attributeParameterSet.getAttributeNameLength(), attributeParameterSetCheck.getAttributeNameLength());
+}

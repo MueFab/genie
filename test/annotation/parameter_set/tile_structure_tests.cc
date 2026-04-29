@@ -152,3 +152,32 @@ TEST_F(TileStructureTests, TileStructureRandom) {  // NOLINT(cert-err58-cpp)
     }
 #endif
 }
+
+TEST_F(TileStructureTests, TileStructureRandomBitWriter) {  // NOLINT(cert-err58-cpp)
+    RandomAnnotationEncodingParameters RandomTileStructure;
+    genie::core::parameter::annotation::TileStructure tileStructure;
+    genie::core::parameter::annotation::TileStructure tileStructureCheck;
+    uint8_t ATCoordSize = static_cast<uint8_t>(rand() % 4);
+    bool two_dimensional = static_cast<bool>(rand() % 2);
+    tileStructure = RandomTileStructure.randomTileStructure(ATCoordSize, two_dimensional);
+
+    std::stringstream InOut;
+    genie::util::BitWriter testWriter(InOut);
+    genie::util::BitReader testReader(InOut);
+
+    tileStructure.write(testWriter);
+    testWriter.FlushBits();
+    tileStructureCheck.read(testReader, ATCoordSize, two_dimensional);
+
+    std::stringstream checkOut;
+    genie::util::BitWriter checkWriter(checkOut);
+    tileStructureCheck.write(checkWriter);
+    checkWriter.FlushBits();
+
+    EXPECT_EQ(tileStructure.getALLEndIndices(), tileStructureCheck.getALLEndIndices());
+    EXPECT_EQ(tileStructure.getAllStartIndices(), tileStructureCheck.getAllStartIndices());
+    EXPECT_EQ(tileStructure.getAllTileSizes(), tileStructureCheck.getAllTileSizes());
+    EXPECT_EQ(tileStructure.isVariableSizeTiles(), tileStructureCheck.isVariableSizeTiles());
+
+    EXPECT_EQ(InOut.str(), checkOut.str());
+}

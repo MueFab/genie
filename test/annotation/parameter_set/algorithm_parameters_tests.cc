@@ -151,6 +151,37 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-er
     EXPECT_EQ(algorithmParameters.getParNumberOfArrayDims(), algorithmParametersCheck.getParNumberOfArrayDims());
     EXPECT_EQ(algorithmParameters.getParTypes(), algorithmParametersCheck.getParTypes());
     EXPECT_EQ(algorithmParameters.getParValues(), algorithmParametersCheck.getParValues());
+}
+
+TEST_F(AlgorithmParametersTests, AlgorithmParametersRandomBitWriter) {  // NOLINT(cert-err58-cpp)
+    RandomAnnotationEncodingParameters randomAlgorithmParameters;
+    genie::core::parameter::annotation::AlgorithmParameters algorithmParameters;
+    genie::core::parameter::annotation::AlgorithmParameters algorithmParametersCheck;
+    uint8_t nPars = 3;
+    uint8_t numArray = 0;
+    std::vector<uint8_t> parNumArrayDims(nPars, numArray);
+    algorithmParameters = randomAlgorithmParameters.randomAlgorithmParameters(nPars, parNumArrayDims);
+
+    std::stringstream InOut;
+    genie::util::BitWriter strwriter(InOut);
+    genie::util::BitReader strreader(InOut);
+    algorithmParameters.write(strwriter);
+    strwriter.FlushBits();
+    algorithmParametersCheck.read(strreader);
+    std::stringstream TestOut;
+    genie::util::BitWriter teststrwriter(TestOut);
+    algorithmParametersCheck.write(teststrwriter);
+    teststrwriter.FlushBits();
+
+    EXPECT_EQ(InOut.str(), TestOut.str());
+
+    EXPECT_EQ(algorithmParameters.getParArrayDims(), algorithmParametersCheck.getParArrayDims());
+
+    EXPECT_EQ(algorithmParameters.getNumberOfPars(), algorithmParametersCheck.getNumberOfPars());
+    EXPECT_EQ(algorithmParameters.getParIDs(), algorithmParametersCheck.getParIDs());
+    EXPECT_EQ(algorithmParameters.getParNumberOfArrayDims(), algorithmParametersCheck.getParNumberOfArrayDims());
+    EXPECT_EQ(algorithmParameters.getParTypes(), algorithmParametersCheck.getParTypes());
+    EXPECT_EQ(algorithmParameters.getParValues(), algorithmParametersCheck.getParValues());
 
 #if GENERATE_TEST_FILES
     std::string name = "TestFiles/AlgorithmParameters_";
