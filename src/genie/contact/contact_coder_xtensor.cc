@@ -1231,10 +1231,10 @@ void encode_scm(
 
       } else {
         // Direct mask storage, no RLE
-        scm_payload.SetRowMaskPayload(SubcontactMatrixMaskPayload(row_mask));
+        scm_payload.SetRowMaskPayload(SubcontactMatrixMaskPayload(std::move(row_mask)));
         scm_param.SetRowMaskExistsFlag(true);
         if (!is_intra_scm){
-          scm_payload.SetColMaskPayload(SubcontactMatrixMaskPayload(col_mask));
+          scm_payload.SetColMaskPayload(SubcontactMatrixMaskPayload(std::move(col_mask)));
           scm_param.SetColMaskExistsFlag(true);
         }
       }

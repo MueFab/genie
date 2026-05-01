@@ -48,11 +48,11 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(
   auto numberofRows = readBlocks(inputfile, defaultTileSizeHeight, blocksWPars);
   GenoUnits dataunit;
   ParsBlocks combined;
-  combined = blocksWPars.at(0);
+  combined = std::move(blocksWPars.at(0));
   //--------------
 
   for (auto i = 1; i < blocksWPars.size(); ++i) {
-    combined.blocks.push_back(blocksWPars.at(i).blocks.at(0));
+    combined.blocks.push_back(std::move(blocksWPars.at(i).blocks.at(0)));
   }
   std::map<std::string, core::record::annotation_parameter_set::AttributeData>
       attributeInfo;
@@ -168,9 +168,9 @@ size_t GenoAnnotation::readBlocks(std::ifstream& inputfile,
     ParsBlocks parWBlock;
     parWBlock.genotypePars = genotypeParameters;
     parWBlock.likelihoodPars = likelihoodParameters;
-    parWBlock.blocks.push_back(oneTileData);
+    parWBlock.blocks.push_back(std::move(oneTileData));
     parWBlock.rows = static_cast<uint32_t>(rowsInBlock);
-    blocksWPars.emplace_back(parWBlock);
+    blocksWPars.emplace_back(std::move(parWBlock));
 
     TotalnumberOfRows += rowsInBlock;
 
@@ -316,18 +316,27 @@ GenoAnnotation::RecData::RecData(
       colStart(_colStart),
       pars(std::get<genie::genotype::GenotypeParameters>(_genotypeData)),
       payload(std::get<genie::genotype::GenotypePayload>(_genotypeData)),
-      likelihoodPayload(_likelihoodPayload),
+      likelihoodPayload(std::move(_likelihoodPayload)),
       numSamples(_numSamples),
       formatCount(_formatCount) {}
 
-GenoAnnotation::RecData& GenoAnnotation::RecData::operator=(
-    const RecData& other) {
+GenoAnnotation::RecData::RecData(RecData&& other) noexcept
+    : rowStart(other.rowStart),
+      colStart(other.colStart),
+      pars(std::move(other.pars)),
+      payload(std::move(other.payload)),
+      attributes(std::move(other.attributes)),
+      likelihoodPayload(std::move(other.likelihoodPayload)),
+      numSamples(other.numSamples),
+      formatCount(other.formatCount) {}
+
+GenoAnnotation::RecData& GenoAnnotation::RecData::operator=(RecData&& other) noexcept {
   rowStart = other.rowStart;
   colStart = other.colStart;
-  pars = other.pars;
-  payload = other.payload;
-  attributes = other.attributes;
-  likelihoodPayload = other.likelihoodPayload;
+  pars = std::move(other.pars);
+  payload = std::move(other.payload);
+  attributes = std::move(other.attributes);
+  likelihoodPayload = std::move(other.likelihoodPayload);
   numSamples = other.numSamples;
   return *this;
 }
@@ -347,7 +356,7 @@ void GenoAnnotation::RecData::set(
   colStart = _colStart;
   pars = std::get<genie::genotype::GenotypeParameters>(_genotypeData);
   payload = std::get<genie::genotype::GenotypePayload>(_genotypeData);
-  likelihoodPayload = _likelihoodPayload;
+  likelihoodPayload = std::move(_likelihoodPayload);
   numSamples = _numSamples;
   formatCount = _formatCount;
   attributes = _attributes;

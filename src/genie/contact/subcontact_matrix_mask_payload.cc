@@ -23,7 +23,7 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
 
     if (transform_ID_ == TransformID::ID_0){
 #if defined(GENIE_CONTACT_BACKEND_XTENSOR)
-        BinVecDtype tmp_mask_array = xt::empty<bool>({num_bin_entries}); // Not part of the spec
+        BinVecDtype tmp_mask_array = BinVecDtype(num_bin_entries);
         for (auto i = 0u; i<num_bin_entries; i++){
             tmp_mask_array[i] = reader.Read<bool>(MASK_ARR_BLEN);
         }
@@ -45,9 +45,7 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
         first_val_ = reader.Read<bool>(FIRST_VAL_BLEN);
         auto num_rl_entries = reader.Read<uint32_t>();
 #if defined(GENIE_CONTACT_BACKEND_XTENSOR)
-        UIntVecDtype tmp_rl_entries = xt::empty<uint32_t>({num_rl_entries}); // Not part of the spec
-#elif defined(GENIE_CONTACT_BACKEND_EIGEN)
-        UIntVecDtype tmp_rl_entries(num_rl_entries);
+        UIntVecDtype tmp_rl_entries = UIntVecDtype(num_rl_entries);
 #else
         UIntVecDtype tmp_rl_entries(num_rl_entries);
 #endif
@@ -179,7 +177,7 @@ void SubcontactMatrixMaskPayload::SetMaskArray(
 
     if (opt_array.has_value()){
 #if defined(GENIE_CONTACT_BACKEND_XTENSOR)
-        UTILS_DIE_IF(opt_array->shape(0) == 0, "Invalid opt_array size!");
+        UTILS_DIE_IF(opt_array->size() == 0, "Invalid opt_array size!");
 
         auto& array = opt_array.value();
         auto std_array = std::vector<bool>(array.begin(), array.end());
@@ -229,7 +227,7 @@ void SubcontactMatrixMaskPayload::SetRlEntries(
 
     if (_rl_entries.has_value()){
 #if defined(GENIE_CONTACT_BACKEND_XTENSOR)
-        UTILS_DIE_IF(_rl_entries->shape(0) == 0, "Invalid opt_array size!");
+        UTILS_DIE_IF(_rl_entries->size() == 0, "Invalid opt_array size!");
 
         auto& array = _rl_entries.value();
         auto std_array = std::vector<uint32_t>(array.begin(), array.end());

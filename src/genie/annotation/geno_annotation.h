@@ -18,6 +18,7 @@
 
 #include "genie/contact/contact_coder.h"
 #include "genie/core/constants.h"
+#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/variant_genotype_record/record.h"
 // #include "genie/genotype/ParameterSetComposer.h"
 #include "genie/annotation/compressors.h"
@@ -70,7 +71,7 @@ class GenoAnnotation {
     uint32_t numSamples;
     uint8_t formatCount;
 
-    RecData();
+RecData();
     RecData(
         uint32_t _rowStart, uint32_t _colStart,
         std::tuple<genie::genotype::GenotypeParameters,
@@ -84,7 +85,11 @@ class GenoAnnotation {
                        std::vector<std::vector<std::vector<AttrType>>>>>
             attributes);
 
-    RecData& operator=(const RecData& other);
+    RecData(RecData&& other) noexcept;
+    RecData(const RecData& other) = delete;
+
+    RecData& operator=(const RecData& other) = delete;
+    RecData& operator=(RecData&& other) noexcept;
 
     void set(
         uint32_t _rowStart, uint32_t _colStart,
@@ -139,6 +144,12 @@ class GenoAnnotation {
     genie::likelihood::LikelihoodParameters likelihoodPars;
     std::vector<RecData> blocks;
     uint32_t rows;
+
+    ParsBlocks() = default;
+    ParsBlocks(ParsBlocks&&) noexcept = default;
+    ParsBlocks& operator=(ParsBlocks&&) noexcept = default;
+    ParsBlocks(const ParsBlocks&) = delete;
+    ParsBlocks& operator=(const ParsBlocks&) = delete;
   };
 
   size_t readBlocks(std::ifstream& inputfile, const uint32_t& rowTileSize,

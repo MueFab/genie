@@ -48,6 +48,30 @@ LikelihoodPayload::LikelihoodPayload(genie::likelihood::LikelihoodParameters par
 
 // -----------------------------------------------------------------------------
 
+LikelihoodPayload::LikelihoodPayload(LikelihoodPayload&& other) noexcept
+    : nrows(other.nrows),
+      ncols(other.ncols),
+      transform_flag(other.transform_flag),
+      payload(std::move(other.payload)),
+      additionalPayload(std::move(other.additionalPayload)),
+      payloadStream(std::move(other.payloadStream)),
+      additionalPayloadStream(std::move(other.additionalPayloadStream)) {}
+
+LikelihoodPayload& LikelihoodPayload::operator=(LikelihoodPayload&& other) noexcept {
+    if (this != &other) {
+        nrows = other.nrows;
+        ncols = other.ncols;
+        transform_flag = other.transform_flag;
+        payload = std::move(other.payload);
+        additionalPayload = std::move(other.additionalPayload);
+        payloadStream = std::move(other.payloadStream);
+        additionalPayloadStream = std::move(other.additionalPayloadStream);
+    }
+    return *this;
+}
+
+// -----------------------------------------------------------------------------
+
 uint32_t LikelihoodPayload::getNRows() const { return nrows; }
 
 // -----------------------------------------------------------------------------

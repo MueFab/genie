@@ -7,6 +7,7 @@
 #ifndef GENIE_CONTACT_TYPES_H
 #define GENIE_CONTACT_TYPES_H
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 

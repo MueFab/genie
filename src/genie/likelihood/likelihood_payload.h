@@ -49,6 +49,12 @@ class LikelihoodPayload {
     LikelihoodPayload(genie::likelihood::EncodingBlock& block);
     LikelihoodPayload(genie::likelihood::LikelihoodParameters parameters, genie::likelihood::EncodingBlock& data);
 
+    LikelihoodPayload(LikelihoodPayload&& other) noexcept;
+    LikelihoodPayload& operator=(LikelihoodPayload&& other) noexcept;
+
+    LikelihoodPayload(const LikelihoodPayload&) = delete;
+    LikelihoodPayload& operator=(const LikelihoodPayload&) = delete;
+
     // Getters
     uint32_t getNRows() const;
     uint32_t getNCols() const;
