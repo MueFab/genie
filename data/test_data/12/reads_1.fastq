@@ -1,0 +1,12 @@
+@unequal_pair1/1
+AAAAAAAAAA
++
+!!!!!!!!!!
+@unequal_pair2/1
+CCCCCCCCCC
++
+$$$$$$$$$$
+@extra_read/1
+NNNNNNNNNN
++
+&&&&&&&&&&

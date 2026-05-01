@@ -1,0 +1,5 @@
+@HD	VN:1.6	SO:unsorted
+@SQ	SN:ref1	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
+@SQ	SN:ref2	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
+chimeric_read	0	ref1	11	60	20M25S	*	0	0	AAAAAAAAAAAAAAAAAAAATTTTTTTTTTTTTTTTTTTTTTTTT	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	SA:Z:ref2,50,+,20S25M,60,0;
+chimeric_read	2048	ref2	51	60	20S25M	*	0	0	AAAAAAAAAAAAAAAAAAAATTTTTTTTTTTTTTTTTTTTTTTTT	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

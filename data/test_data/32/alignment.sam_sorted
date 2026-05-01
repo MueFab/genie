@@ -1,0 +1,4 @@
+diff_flags_pair1	659	ref1	41	60	15M	=	11	-45	TTTTTTTTTTTTTTT	###############
+diff_flags_pair1	99	ref1	11	60	15M	=	41	45	AAAAAAAAAAAAAAA	!!!!!!!!!!!!!!!
+diff_flags_pair2	1123	ref1	71	60	15M	=	101	45	CCCCCCCCCCCCCCC	$$$$$$$$$$$$$$$
+diff_flags_pair2	147	ref1	101	60	15M	=	71	-45	GGGGGGGGGGGGGGG	%%%%%%%%%%%%%%%

@@ -1,0 +1,8 @@
+@HD	VN:1.6	SO:unsorted
+@SQ	SN:ref1	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
+@SQ	SN:ref2	LN:200	UR:file:///home/renzlau/Dokumente/genie-test-cases/test_data_generator/reference/simple_ref.fa
+@RG	ID:rg1	SM:sample1	LB:lib1	PU:unit1	PL:ILLUMINA
+@RG	ID:rg2	SM:sample2	LB:lib2	PU:unit2	PL:ONT
+read_group_1	0	ref1	11	60	10M	*	0	0	AAAAAAAAAA	!!!!!!!!!!	RG:Z:rg1
+read_group_2	0	ref1	31	60	10M	*	0	0	CCCCCCCCCC	##########	RG:Z:rg2
+read_group_3	0	ref1	51	60	10M	*	0	0	GGGGGGGGGG	$$$$$$$$$$	RG:Z:rg1

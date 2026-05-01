@@ -1,0 +1,293 @@
+name: CI
+
+on:
+  push:
+    branches: [ '**' ]
+    tags: [ '**' ]
+  pull_request:
+    branches: [ '**' ]
+
+jobs:
+  ## Debug Build Job
+  debug:
+    name: Debug Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Prerequisites (Ubuntu)
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          pip3 install --upgrade pip
+          sudo pip3 install cpplint
+          sudo apt-get update
+          sudo apt-get install -y cppcheck doxygen liblzma-dev libzstd-dev libbz2-dev
+
+      - name: Install HTSLib
+        run: |
+          git clone https://github.com/samtools/htslib.git
+          cd htslib
+          git checkout tags/1.21
+          git submodule update --init --recursive
+          autoreconf -i
+          ./configure
+          make -j
+          sudo make install
+
+      - name: Install LibBSC
+        run: |
+          git clone https://github.com/IlyaGrebnov/libbsc.git 
+          cd libbsc 
+          git checkout tags/v3.3.4
+          sed -i 's/clang++/g++/g' makefile 
+          make -j 
+          sudo make install
+
+      - name: Run Source Code Tests
+        run: ./ci/src_test.sh
+
+      - name: Build Documentation
+        run: ./ci/build.sh doc
+
+      - name: Build Genie (Debug)
+        run: ./ci/build.sh debug
+
+      - name: Upload Debug Binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: genie-debug-ubuntu2404-${{ github.sha }}
+          path: cmake-build-debug/bin
+
+      - name: Upload Documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: genie-documentation-${{ github.sha }}
+          path: cmake-build-debug/documentation/html
+
+  ## Release Build Job
+  release:
+    name: Release Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Prerequisites (Ubuntu)
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          pip3 install --upgrade pip
+          sudo pip3 install cpplint
+          sudo apt-get update
+          sudo apt-get install -y cppcheck doxygen liblzma-dev libzstd-dev libbz2-dev
+
+      - name: Install HTSLib
+        run: |
+          git clone https://github.com/samtools/htslib.git
+          cd htslib
+          git checkout tags/1.21
+          git submodule update --init --recursive
+          autoreconf -i
+          ./configure
+          make -j
+          sudo make install
+
+      - name: Install LibBSC
+        run: |
+          git clone https://github.com/IlyaGrebnov/libbsc.git 
+          cd libbsc 
+          git checkout tags/v3.3.4
+          sed -i 's/clang++/g++/g' makefile 
+          make -j 
+          sudo make install
+
+      - name: Build Genie (Release)
+        run: ./ci/build.sh release
+
+      - name: Upload Release Binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: genie-release-ubuntu2404-${{ github.sha }}
+          path: cmake-build-release/bin
+
+  ## Unit Tests Job
+  unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: debug
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Prerequisites (Ubuntu)
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          pip3 install --upgrade pip
+          sudo pip3 install cpplint
+          sudo apt-get update
+          sudo apt-get install -y cppcheck doxygen liblzma-dev libzstd-dev libbz2-dev
+
+      - name: Install HTSLib
+        run: |
+          git clone https://github.com/samtools/htslib.git
+          cd htslib
+          git checkout tags/1.21
+          git submodule update --init --recursive
+          autoreconf -i
+          ./configure
+          make -j
+          sudo make install
+
+      - name: Download Debug Binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: genie-debug-ubuntu2404-${{ github.sha }}
+          path: cmake-build-debug/bin
+
+      - name: Make Debug Binaries Executable
+        run: chmod +x cmake-build-debug/bin/*
+
+      - name: Run Unit Tests
+        run: ci/unit_test.sh
+
+      - name: Upload Utils Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: utils-ubuntu2404-${{ github.sha }}
+          path: cmake-build-debug/bin/utils_test.xml
+
+      - name: Upload Coding Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: coding-ubuntu2404-${{ github.sha }}
+          path: cmake-build-debug/bin/coding_test.xml
+
+      - name: Upload Gabac Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: gabac-ubuntu2404-${{ github.sha }}
+          path: cmake-build-debug/bin/gabac_test.xml
+
+  ## Conformance Roundtrip Tests Job
+  conformance_roundtrip:
+    name: Conformance Roundtrip Tests
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Prerequisites (Ubuntu)
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          pip3 install --upgrade pip
+          sudo pip3 install cpplint
+          sudo apt-get update
+          sudo apt-get install -y cppcheck doxygen liblzma-dev libzstd-dev libbz2-dev
+
+      - name: Install HTSLib
+        run: |
+          git clone https://github.com/samtools/htslib.git
+          cd htslib
+          git checkout tags/1.21
+          git submodule update --init --recursive
+          autoreconf -i
+          ./configure
+          make -j
+          sudo make install
+
+      - name: Checkout Reference Decoder
+        run: |
+          mkdir ref-decoder
+          cd ref-decoder
+          git config --global init.defaultBranch master
+          git config --global pull.ff only
+          git init
+          git config user.email "mitogen-group@gmail.com"
+          git config user.name "Azure test script"
+          git pull https://${{ secrets.EPFL_SCI_STI_MM_GITLAB_USERNAME }}:${{ secrets.EPFL_SCI_STI_MM_GITLAB_PASSWORD }}@git.mpeg.expert/MPEG/Genomic_Information_Representation/mpegg-reference-sw.git Fix_LA
+
+      - name: Configure Reference Decoder (CMake)
+        run: |
+          cd ref-decoder
+          sed -i '/set (CMAKE_C_FLAGS "-Wall -Werror ${CMAKE_C_FLAGS}")/s/^/#/' CMakeLists.txt
+          cmake .
+
+      - name: Build Reference Decoder
+        run: |
+          cd ref-decoder
+          make --jobs
+
+      - name: Download Release Binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: genie-release-ubuntu2404-${{ github.sha }}
+          path: cmake-build-release/bin
+
+      - name: Make Release Binaries Executable
+        run: chmod +x cmake-build-release/bin/*
+
+      - name: Run Conformance Tests
+        run: MPEGG_REF_DECODER=$PWD/ref-decoder/bin/decoder/mpegg-decoder-p2 ci/conformance_test.sh
+
+  ## Docker Build and Push Job
+  docker:
+    name: Docker Build and Push
+    runs-on: ubuntu-latest
+    needs: [ unit, conformance_roundtrip ]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU (for ARM builds)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx (for multi-platform builds)
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and Push Docker Image (develop branch)
+        if: github.ref == 'refs/heads/develop'
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: 'Dockerfile'
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: muefab/genie:develop
+
+      - name: Build and Push Docker Image (ci_test branch)
+        if: github.ref == 'refs/heads/ci_test'
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: 'Dockerfile'
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: muefab/genie:ci_test
+
+      - name: Build and Push Docker Image (main branch)
+        if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: 'Dockerfile'
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: muefab/genie:latest
+
+      - name: Build and Push Docker Image (Git tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: 'Dockerfile'
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: muefab/genie:${{ github.ref_name }}
+
