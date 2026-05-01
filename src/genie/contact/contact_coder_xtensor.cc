@@ -33,11 +33,12 @@ void compute_mask(
     BinVecDtype& mask
 ){
     auto xt_ids = xt::adapt(ids, {ids.size()});
-    auto xt_mask = xt::zeros<bool>({nelems});
+    auto xt_mask = xt::xtensor<bool, 1>({nelems}, false);
 
     auto unique_ids = xt::unique(xt_ids);
-    for (auto id: unique_ids){
-        if (id < nelems) xt_mask(id) = true;
+    for (auto id : unique_ids) {
+        size_t idx = static_cast<size_t>(id);
+        if (idx < nelems) xt_mask.at(idx) = true;
     }
     
     mask.assign(xt_mask.begin(), xt_mask.end());
@@ -71,9 +72,10 @@ void compute_masks(
         auto ids = xt::concatenate(xt::xtuple(xt_row_ids, xt_col_ids));
         auto unique_ids = xt::unique(ids);
         
-        auto xt_mask = xt::zeros<bool>({nrows});
+        auto xt_mask = xt::xtensor<bool, 1>({nrows}, false);
         for (auto id : unique_ids) {
-            if (id < nrows) xt_mask(id) = true;
+            size_t idx = static_cast<size_t>(id);
+            if (idx < nrows) xt_mask.at(idx) = true;
         }
 
         row_mask.assign(xt_mask.begin(), xt_mask.end());
@@ -352,7 +354,7 @@ void inverse_diag_transform(
 
     if (mode == DiagonalTransformMode::MODE_0) {
         auto target_nrows = ncols;
-        auto xt_trans_mat = xt::zeros<uint32_t>({target_nrows, ncols});
+        auto xt_trans_mat = xt::xtensor<uint32_t, 2>({target_nrows, ncols}, 0);
 
         auto o = 0u;
         for (size_t k_diag = 0u; k_diag < ncols; k_diag++) {
@@ -360,7 +362,7 @@ void inverse_diag_transform(
                 size_t target_j = target_i + k_diag;
                 size_t i = o / target_nrows;
                 size_t j = o % target_nrows;
-                xt_trans_mat(target_i, target_j) = xt_mat(i, j);
+                xt_trans_mat.at(target_i, target_j) = xt_mat(i, j);
                 o++;
             }
         }
@@ -383,11 +385,13 @@ void inverse_diag_transform(
                 if (diag_id < (int64_t)ncols) diag_ids_vec.push_back(diag_id);
                 if (diag_id < (int64_t)nrows) diag_ids_vec.push_back(-diag_id);
             }
-            diag_ids = xt::adapt(diag_ids_vec, {diag_ids_vec.size()});
+            diag_ids = std::move(diag_ids_vec);
         } else if (mode == DiagonalTransformMode::MODE_2){
-            diag_ids = xt::arange(-(int64_t)nrows+1, (int64_t)ncols, 1);
+            auto diag_ids_xt = xt::arange(-(int64_t)nrows+1, (int64_t)ncols, 1);
+            diag_ids.assign(diag_ids_xt.begin(), diag_ids_xt.end());
         } else if (mode == DiagonalTransformMode::MODE_3){
-            diag_ids = xt::arange<int64_t>((int64_t)ncols-1, -(int64_t)nrows, -1);
+            auto diag_ids_xt = xt::arange<int64_t>((int64_t)ncols-1, -(int64_t)nrows, -1);
+            diag_ids.assign(diag_ids_xt.begin(), diag_ids_xt.end());
         }
 
         int64_t target_i, target_j;
@@ -411,7 +415,7 @@ void inverse_diag_transform(
 
                 size_t i = o / ncols;
                 size_t j = o % ncols;
-                xt_trans_mat(target_i, target_j) = xt_mat(i, j);
+                xt_trans_mat.at(target_i, target_j) = xt_mat(i, j);
                 o++;
             }
         }
@@ -449,7 +453,7 @@ void diag_transform(
         UTILS_DIE_IF(nrows != ncols, "Matrix must be a square!");
 
         auto new_nrows = nrows / 2 + 1;
-        auto xt_trans_mat = xt::zeros<uint32_t>({new_nrows, nrows});
+        auto xt_trans_mat = xt::xtensor<uint32_t, 2>({new_nrows, nrows}, 0);
 
         auto o = 0u;
         for (size_t k_diag = 0u; k_diag < nrows; k_diag++) {
@@ -459,7 +463,7 @@ void diag_transform(
                 if (v != 0) {
                     size_t target_i = o / nrows;
                     size_t target_j = o % nrows;
-                    xt_trans_mat(target_i, target_j) = v;
+                    xt_trans_mat.at(target_i, target_j) = v;
                 }
                 o++;
             }
@@ -472,7 +476,7 @@ void diag_transform(
             }
         }
     } else {
-        auto xt_trans_mat = xt::zeros<uint32_t>({nrows, ncols});
+        auto xt_trans_mat = xt::xtensor<uint32_t, 2>({nrows, ncols}, 0);
         Int64VecDtype diag_ids;
 
         if (mode == DiagonalTransformMode::MODE_1){
@@ -483,11 +487,13 @@ void diag_transform(
                 if (diag_id < (int64_t)ncols) diag_ids_vec.push_back(diag_id);
                 if (diag_id < (int64_t)nrows) diag_ids_vec.push_back(-diag_id);
             }
-            diag_ids = xt::adapt(diag_ids_vec, {diag_ids_vec.size()});
+            diag_ids = std::move(diag_ids_vec);
         } else if (mode == DiagonalTransformMode::MODE_2){
-            diag_ids = xt::arange(-(int64_t)nrows+1, (int64_t)ncols, 1);
+            auto diag_ids_xt = xt::arange(-(int64_t)nrows+1, (int64_t)ncols, 1);
+            diag_ids.assign(diag_ids_xt.begin(), diag_ids_xt.end());
         } else if (mode == DiagonalTransformMode::MODE_3){
-            diag_ids = xt::arange<int64_t>((int64_t)ncols-1, -(int64_t)nrows, -1);
+            auto diag_ids_xt = xt::arange<int64_t>((int64_t)ncols-1, -(int64_t)nrows, -1);
+            diag_ids.assign(diag_ids_xt.begin(), diag_ids_xt.end());
         }
 
         int64_t i, j;
@@ -512,7 +518,7 @@ void diag_transform(
                 auto v = xt_mat(i, j);
                 size_t new_i = o / ncols;
                 size_t new_j = o % ncols;
-                xt_trans_mat(new_i, new_j) = v;
+                xt_trans_mat.at(new_i, new_j) = v;
                 o++;
             }
         }

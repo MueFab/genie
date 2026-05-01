@@ -91,6 +91,12 @@ void inverse_diag_transform(
     DiagonalTransformMode mode
 );
 
+[[maybe_unused]] void sort_by_row_ids(
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    UIntVecDtype& counts
+);
+
 void diag_transform(
     UIntMatDtype& mat,
     DiagonalTransformMode mode
