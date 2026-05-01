@@ -1232,7 +1232,7 @@ void encode_scm(
               tile_mat
           );
 
-          if (ena_diag_transform) {
+          if (ena_diag_transform && is_intra_scm && i_tile == j_tile) {
               diag_transform(tile_mat, DiagonalTransformMode::MODE_0);
           }
           
@@ -1250,7 +1250,7 @@ void encode_scm(
               i_tile,
               j_tile,
               {
-                  ena_diag_transform ? DiagonalTransformMode::MODE_0 : DiagonalTransformMode::NONE,
+                  (ena_diag_transform && is_intra_scm && i_tile == j_tile) ? DiagonalTransformMode::MODE_0 : DiagonalTransformMode::NONE,
                   BinarizationMode::ROW_BINARIZATION
               }
           );
