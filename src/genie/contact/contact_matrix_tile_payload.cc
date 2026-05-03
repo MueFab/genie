@@ -157,10 +157,14 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
     size_t payload_len
 ): codec_ID_(codec_ID),
       nrows_(tile_nrows),
-      ncols_(tile_ncols),
-   payload_(*payload, *(payload) + payload_len)
+      ncols_(tile_ncols)
 {
-    free(*payload);
+    if (payload == nullptr || *payload == nullptr) {
+        // payload is nullptr, do nothing
+    } else {
+        payload_.assign(*payload, *payload + payload_len);
+        free(*payload);
+    }
 
     if (codec_ID == core::AlgoID::JBIG){
       nrows_ = 0;
