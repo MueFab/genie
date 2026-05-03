@@ -76,6 +76,58 @@ void Record::Write(util::BitWriter& writer, uint64_t write_size) const {
   }
 }
 
+uint64_t Record::Write(core::Writer& writer) const {
+  writer.Write(data_unit_type_, 8);
+  uint64_t writesize = 0;
+  switch (data_unit_type_) {
+    case 0:
+      break;
+    case 1:
+      break;
+    case 2:
+      break;
+    case 3:
+      writer.WriteReserved(10);
+      writesize = (annotation_parameter_set_.getSize() + 40) / 8;
+      writer.Write(writesize, 22);
+      annotation_parameter_set_.write(writer);
+      break;
+    case 4:
+      writer.WriteReserved(3);
+      writesize = (annotation_access_unit_.getSize() + 40) / 8;
+      writer.Write(writesize, 29);
+      annotation_access_unit_.write(writer);
+      break;
+    default:
+      break;
+  }
+  return writesize;
+}
+
+void Record::Write(core::Writer& writer, uint64_t write_size) const {
+  writer.Write(data_unit_type_, 8);
+  switch (data_unit_type_) {
+    case 0:
+      break;
+    case 1:
+      break;
+    case 2:
+      break;
+    case 3:
+      writer.WriteReserved(10);
+      writer.Write(write_size, 22);
+      annotation_parameter_set_.write(writer);
+      break;
+    case 4:
+      writer.WriteReserved(3);
+      writer.Write(write_size, 29);
+      annotation_access_unit_.write(writer);
+      break;
+    default:
+      break;
+  }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 uint64_t genie::core::record::data_unit::Record::Write(util::BitWriter& writer) const {

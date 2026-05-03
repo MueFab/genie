@@ -365,6 +365,40 @@ void SubcontactMatrixParameters::Write(util::BitWriter& writer) const {
     writer.FlushBits();
 }
 
+void SubcontactMatrixParameters::Write(core::Writer& writer) const {
+    writer.WriteBypassBE(parameter_set_ID_);
+    writer.WriteBypassBE(chr1_ID_);
+    writer.WriteBypassBE(chr2_ID_);
+
+    uint8_t flags = 0u;
+    flags |= (static_cast<uint8_t>(codec_ID_) & 0x1F);
+    writer.WriteBypassBE(flags);
+
+    auto num_tiles_in_row = GetNTilesInRow();
+    auto num_tiles_in_col = GetNTilesInCol();
+
+    for (size_t i = 0; i < num_tiles_in_row; ++i) {
+        for (size_t j = 0; j < num_tiles_in_col; ++j) {
+            if (IsIntraSCM() && i > j) {
+                continue;
+            }
+            auto& tile_param = tile_parameters_[i][j];
+
+            flags = 0u;
+            flags |= static_cast<uint8_t>((static_cast<uint8_t>(tile_param.diag_tranform_mode) << 2));
+            flags |= static_cast<uint8_t>(tile_param.binarization_mode);
+            writer.WriteBypassBE(flags);
+        }
+    }
+
+    flags = 0u;
+    flags |= static_cast<uint8_t>((static_cast<uint8_t>(row_mask_exists_flag_) << 1));
+    flags |= static_cast<uint8_t>(col_mask_exists_flag_);
+    writer.WriteBypassBE(flags);
+
+    writer.Flush();
+}
+
 // -----------------------------------------------------------------------------
 
 }  // namespace genie::contact

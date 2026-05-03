@@ -7,6 +7,7 @@
 #define GENIE_CONTACT_SUBCONTACT_MATRIX_PARAMETERS_H
 
 #include <genie/core/constants.h>
+#include <genie/core/writer.h>
 #include <genie/util/bit_reader.h>
 #include <genie/util/bit_writer.h>
 #include <cstdint>
@@ -297,6 +298,7 @@ class SubcontactMatrixParameters {
      * @param writer The BitWriter to write to.
      */
     void Write(util::BitWriter& writer) const;
+    void Write(core::Writer& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

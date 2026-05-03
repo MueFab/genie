@@ -79,6 +79,14 @@ void LikelihoodParameters::Write(genie::util::BitWriter& writer) const {
   }
 }
 
+void LikelihoodParameters::Write(core::Writer& writer) const {
+  writer.WriteBypassBE(num_gl_per_sample);
+  writer.WriteBypassBE(static_cast<uint8_t>(transform_flag));
+  if (transform_flag){
+    writer.WriteBypassBE(static_cast<uint8_t>(dtype_id));
+  }
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace genie::

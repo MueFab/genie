@@ -277,7 +277,7 @@ void encodeVariantGenotype(const std::string& _input_fpath,
   {
     genie::core::Writer writer(
         &descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
-    genotypePayload.Write(writer);
+    genotypePayload.Write(writer.GetBinWriter());
   }
 
   descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];

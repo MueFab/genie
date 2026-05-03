@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 #include "genie/core/constants.h"
+#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
@@ -35,6 +36,7 @@ class LikelihoodParameters {
     LikelihoodParameters(util::BitReader& reader);
 
     void Write(genie::util::BitWriter& writer) const;
+    void Write(core::Writer& writer) const;
     void read(util::BitReader& reader);
     [[nodiscard]] size_t GetSize() const;
 

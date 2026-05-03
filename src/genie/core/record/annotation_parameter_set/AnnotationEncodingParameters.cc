@@ -200,14 +200,16 @@ void AnnotationEncodingParameters::write(util::BitWriter& writer) const {
     for (auto byte : feature_name[i]) writer.WriteBits(byte, 8);
   }
 
-  writer.WriteBits(n_ontology_terms, 8);
-  for (auto i = 0; i < n_ontology_terms; ++i) {
-    writer.WriteBits(ontology_term_name_len[i], 6);
-    for (auto byte : ontology_term_name[i]) writer.WriteBits(byte, 8);
-  }
+writer.WriteBits(n_ontology_terms, 8);
+    for (auto i = 0; i < n_ontology_terms; ++i) {
+        writer.WriteBits(ontology_term_name_len[i], 6);
+        for (auto byte : ontology_term_name[i]) writer.WriteBits(byte, 8);
+    }
 
-  writer.WriteBits(n_descriptors, 8);
+writer.FlushBits();
+    writer.WriteBits(n_descriptors, 8);
   for (auto i = 0; i < n_descriptors; ++i) {
+    writer.FlushBits();
     descriptor_configuration[i].write(writer);
   }
 
