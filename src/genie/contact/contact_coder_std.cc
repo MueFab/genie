@@ -1172,14 +1172,6 @@ void encode_scm(
           scm_param.SetColMaskExistsFlag(true);
         }
       }
-
-      remove_unaligned(
-          row_ids,
-          col_ids,
-          is_intra_scm,
-          row_mask,
-          col_mask
-      );
   } else {
       scm_param.SetRowMaskExistsFlag(false);
       scm_param.SetColMaskExistsFlag(false);
@@ -1207,7 +1199,20 @@ void encode_scm(
                   tile_counts.push_back(counts[i]);
               }
           }
-          
+
+          if (remove_unaligned_region && !tile_counts.empty()){
+              std::vector<bool> tile_row_mask(row_mask.begin() + start1_idx, row_mask.begin() + end1_idx);
+              std::vector<bool> tile_col_mask(col_mask.begin() + start2_idx, col_mask.begin() + end2_idx);
+              bool is_intra_tile = is_intra_scm && (i_tile == j_tile);
+              remove_unaligned(
+                  tile_row_ids,
+                  tile_col_ids,
+                  is_intra_tile,
+                  tile_row_mask,
+                  tile_col_mask
+              );
+          }
+
           if (tile_counts.empty()) {
               scm_payload.SetTilePayload(
                   i_tile,
