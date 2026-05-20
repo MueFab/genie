@@ -19,8 +19,8 @@
 
 #include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 #include "genie/annotation/compressors.h"
 #include "genie/core/record/annotation_parameter_set/AnnotationEncodingParameters.h"
@@ -39,7 +39,7 @@ namespace annotation {
 
 class ParameterSetComposer {
  public:
-    genie::core::record::annotation_parameter_set::Record Compose(
+    core::record::annotation_parameter_set::Record Compose(
         uint8_t AT_ID, uint8_t AG_class, std::pair<uint64_t, uint64_t> tile_Size,
                          core::record::annotation_parameter_set::AnnotationEncodingParameters& annotationEncodingpars);
 

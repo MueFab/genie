@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include <codecs/include/mpegg-codecs.h>
+#include "codecs/include/mpegg-codecs.h"
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -25,7 +25,7 @@
 #include "genie/core/record/annotation_access_unit/TypedData.h"
 #include "genie/core/record/annotation_access_unit/record.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/core/record/data_unit/record.h"
+#include "genie/core/data_unit_record/record.h"
 #include "genie/variantsite/accessunit_composer.h"
 
 #include "genie/annotation/annotation.h"
@@ -45,7 +45,7 @@ struct genoTestValues {
     genoTestValues(uint16_t id, genie::genotype::SortingAlgoID _SortingID, genie::genotype::BinarizationID _binID,
                    genie::genotype::ConcatAxis _concatAxis, bool _transposeMat, genie::core::AlgoID _algID,
                    std::string _filepath)
-        : ID(id),sortingID(_SortingID),
+        : ID(id), sortingID(_SortingID),
           binID(_binID),
           concatAxis(_concatAxis),
           transposeMat(_transposeMat),
@@ -106,12 +106,12 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
         testparams.algID        // codec_ID_;
     };
 
-    std::string set1 = "compressor 1 0 BSC {32 128 1 1}";
-    std::string set2 = "compressor 1 1 LZMA {8 16777216 3 0 2 32}";
+    std::string set1 = "compressor 1 0 SER {0} {} {1}";
+    std::string set2 = "compressor 1 1 BSC {32 128 1 1} {{0 0 0}} {0}";
     std::string set3 = "compressor 2 0 ZSTD";
     std::string set4 = "compressor 3 0 BSC";
     std::stringstream config;
-    config << set1 << '\n' << set3 << '\n' << set4 << '\n';
+    config << set1 << '\n' << set2 << '\n' << set3 << '\n' << set4 << '\n';
 
     genie::annotation::Annotation annotationGenerator;
     annotationGenerator.setCompressorConfig(config);
@@ -150,6 +150,9 @@ INSTANTIATE_TEST_SUITE_P(
         genoTestValues{12, genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
                        genie::genotype::ConcatAxis::CONCAT_COL_DIR, false, genie::core::AlgoID::JBIG,
                        "/data/records/conformance/1.3.11.bgz.CASE03"},
+        genoTestValues{12, genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
+                       genie::genotype::ConcatAxis::CONCAT_ROW_DIR, false, genie::core::AlgoID::JBIG,
+                       "/data/records/conformance/1.3.11.bgz.CASE03"},
         genoTestValues{13, genie::genotype::SortingAlgoID::RANDOM_SORT, genie::genotype::BinarizationID::ROW_BIN,
                        genie::genotype::ConcatAxis::CONCAT_COL_DIR, false, genie::core::AlgoID::JBIG,
-                       "/data/records/conformance/1.3.11.bgz.CASE03"} ));
+                       "/data/records/conformance/1.3.11.bgz.CASE03"}));

@@ -6,8 +6,10 @@
 
 #include <gtest/gtest.h>
 
+#include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <string>
 #include "codecs/include/mpegg-codecs.h"
 #include "genie/core/arrayType.h"
 #include "genie/util/string_helpers.h"
@@ -19,8 +21,8 @@
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/core/record/data_unit/record.h"
-#include "genie/core/record/variant_site/record.h"
+#include "genie/core/data_unit_record/record.h"
+#include "genie/core/variant_site_record/record.h"
 #include "genie/variantsite/accessunit_composer.h"
 #include "genie/variantsite/parameterset_composer.h"
 #include "genie/variantsite/variantsite_parser.h"
@@ -66,7 +68,7 @@ TEST_F(VariantSiteRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
         genie::core::Writer txtwriter(&outputfile, true);
         do {
             genie::core::record::variant_site::Record variant_site_record(reader);
-            variant_site_record.write(txtwriter);
+            variant_site_record.Write(txtwriter);
         } while (inputfile.peek() != EOF);
         inputfile.close();
         outputfile.close();
@@ -84,12 +86,12 @@ std::string exec(const std::string& cmd) {
         return "<exec(" + cmd + ") failed>";
     }
 
-    const int bufferSize = 256;
-    char buffer[bufferSize];
+    const int kBufferSize = 256;
+    char buffer[kBufferSize];
     std::string result;
 
     while (!feof(pipe)) {
-        if (fgets(buffer, bufferSize, pipe) != nullptr) {
+        if (fgets(buffer, kBufferSize, pipe) != nullptr) {
             result += buffer;
         }
     }

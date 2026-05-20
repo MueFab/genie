@@ -4,16 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "likelihood_payload.h"
+#include "genie/likelihood/likelihood_payload.h"
 
 #include <utility>
+#include <vector>
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie {
 namespace likelihood {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 LikelihoodPayload::LikelihoodPayload(LikelihoodParameters _parameters, uint32_t _nrows, uint32_t _ncols,
                                      std::vector<uint8_t> _payload, std::vector<uint8_t> _additionalPayload)
@@ -27,7 +28,7 @@ LikelihoodPayload::LikelihoodPayload(LikelihoodParameters _parameters, uint32_t 
     (void)_parameters;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 LikelihoodPayload::LikelihoodPayload(genie::likelihood::EncodingBlock& block) {
     nrows = block.nrows;
@@ -35,12 +36,11 @@ LikelihoodPayload::LikelihoodPayload(genie::likelihood::EncodingBlock& block) {
     payloadStream << block.serialized_mat.rdbuf();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 LikelihoodPayload::LikelihoodPayload(genie::likelihood::LikelihoodParameters parameters, genie::likelihood::EncodingBlock& data)
-    : LikelihoodPayload(data)
-{
-    transform_flag = parameters.getTransformFlag();
+    : LikelihoodPayload(data) {
+    transform_flag = parameters.GetTransformFlag();
     if (transform_flag) {
         additionalPayloadStream << data.serialized_arr.rdbuf();
     }
@@ -92,28 +92,27 @@ void LikelihoodPayload::setPayload(const std::vector<uint8_t>& _payload) { paylo
 
 // -----------------------------------------------------------------------------
 
-void LikelihoodPayload::write(core::Writer& writer) const {
-  writer.Write(nrows, 32u);
-    writer.Write(ncols, 32u);
+void LikelihoodPayload::Write(util::BitWriter& writer) const {
+    writer.WriteBits(nrows, 32u);
+    writer.WriteBits(ncols, 32u);
 
     if (!payload.empty()) {
-      writer.Write(payload.size(), 32u);
-        for(unsigned char i : payload) writer.Write(i, 8);
+        writer.WriteBits(payload.size(), 32u);
+        for (unsigned char i : payload) writer.WriteBits(i, 8);
         if (transform_flag) {
-          writer.Write(additionalPayload.size(), 32u);
-            for (unsigned char val : additionalPayload) writer.Write(val, 8);
+            writer.WriteBits(additionalPayload.size(), 32u);
+            for (unsigned char val : additionalPayload) writer.WriteBits(val, 8);
         }
-    } else{
-      writer.Write(payloadStream.str().size(), 32);
+    } else {
+        writer.WriteBits(payloadStream.str().size(), 32);
         std::istream writestream(payloadStream.rdbuf());
         writer.Write(&writestream);
         if (transform_flag) {
-          writer.Write(additionalPayloadStream.str().size(), 32);
+            writer.WriteBits(additionalPayloadStream.str().size(), 32);
             std::istream additionalWritestream(additionalPayloadStream.rdbuf());
             writer.Write(&additionalWritestream);
         }
     }
-
 }
 
 // -----------------------------------------------------------------------------

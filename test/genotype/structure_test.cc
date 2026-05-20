@@ -9,6 +9,7 @@
 #include <ctime>
 #include <iostream>
 #include <sstream>
+#include <utility>
 #include <vector>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xrandom.hpp>
@@ -51,16 +52,15 @@ TEST(GenotypeStructure, RoundTrip_GenotypeParameters) {
         genie::genotype::GenotypeParameters orig_params(
             bin_id,
             concat_axis,
-            false, // sort_variants_rows_flag
-            false, // sort_variants_cols_flag
-            false, // transpose_variants_mat_flag
-            codec, // variants_codec_ID
-            false, // encode_phases_data_flag
-            false, // sort_phases_rows_flag
-            false, // sort_phases_cols_flag
-            false, // transpose_phases_mat_flag
-            codec  // phases_codec_ID
-        );
+            false,   // sort_variants_rows_flag
+            false,   // sort_variants_cols_flag
+            false,   // transpose_variants_mat_flag
+            codec,   // variants_codec_ID
+            false,   // encode_phases_data_flag
+            false,   // sort_phases_rows_flag
+            false,   // sort_phases_cols_flag
+            false,   // transpose_phases_mat_flag
+            codec);  // phases_codec_ID
 
         // Verify initial values
         EXPECT_EQ(orig_params.GetBinarizationID(), bin_id)
@@ -124,8 +124,7 @@ TEST(GenotypeStructure, RoundTrip_GenotypeParameters) {
         sort_phases_rows_flag,    // sort_phases_rows_flag
         sort_phases_cols_flag,    // sort_phases_cols_flag
         transpose_phases_mat_flag,    // transpose_phases_mat_flag
-        genie::core::AlgoID::ZSTD
-    );
+        genie::core::AlgoID::ZSTD);
 
     EXPECT_EQ(orig_params.GetSortVariantsRowsFlag(), sort_variants_rows_flag) << "Failed for flags: " << std::hex << flags;
     EXPECT_EQ(orig_params.GetSortVariantsColsFlag(), sort_variants_cols_flag) << "Failed for flags: " << std::hex << flags;
@@ -195,8 +194,7 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
             ORIG_CODEC_ID,
             std::move(payload),
             ORIG_NROWS,
-            ORIG_NCOLS
-        );
+            ORIG_NCOLS);
 
         ASSERT_EQ(ORIG_NROWS, bin_mat_payload.GetNRows());
         ASSERT_EQ(ORIG_NCOLS, bin_mat_payload.GetNCols());
@@ -216,8 +214,7 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
         auto recon_obj = genie::genotype::BinMatPayload(
             bit_reader,
             payload_size,
-            ORIG_CODEC_ID
-        );
+            ORIG_CODEC_ID);
 
         ASSERT_EQ(ORIG_NROWS, recon_obj.GetNRows());
         ASSERT_EQ(ORIG_NCOLS, recon_obj.GetNCols());
@@ -235,8 +232,7 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
           ORIG_CODEC_ID,
           std::move(payload),
           ORIG_NROWS,
-          ORIG_NCOLS
-      );
+          ORIG_NCOLS);
 
       ASSERT_EQ(ORIG_NROWS, bin_mat_payload.GetNRows());
       ASSERT_EQ(ORIG_NCOLS, bin_mat_payload.GetNCols());
@@ -256,8 +252,7 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
       auto recon_obj = genie::genotype::BinMatPayload(
           bit_reader,
           payload_size,
-          ORIG_CODEC_ID
-      );
+          ORIG_CODEC_ID);
 
       ASSERT_EQ(ORIG_NROWS, recon_obj.GetNRows());
       ASSERT_EQ(ORIG_NCOLS, recon_obj.GetNCols());
@@ -275,8 +270,7 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
           ORIG_CODEC_ID,
           std::move(payload),
           ORIG_NROWS,
-          ORIG_NCOLS
-      );
+          ORIG_NCOLS);
 
       ASSERT_EQ(ORIG_NROWS, bin_mat_payload.GetNRows());
       ASSERT_EQ(ORIG_NCOLS, bin_mat_payload.GetNCols());
@@ -296,8 +290,7 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
       auto recon_obj = genie::genotype::BinMatPayload(
           bit_reader,
           payload_size,
-          ORIG_CODEC_ID
-      );
+          ORIG_CODEC_ID);
 
       ASSERT_EQ(ORIG_NROWS, recon_obj.GetNRows());
       ASSERT_EQ(ORIG_NCOLS, recon_obj.GetNCols());
@@ -315,8 +308,7 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
           ORIG_CODEC_ID,
           std::move(payload),
           ORIG_NROWS,
-          ORIG_NCOLS
-      );
+          ORIG_NCOLS);
 
       ASSERT_EQ(ORIG_NROWS, bin_mat_payload.GetNRows());
       ASSERT_EQ(ORIG_NCOLS, bin_mat_payload.GetNCols());
@@ -336,8 +328,7 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
       auto recon_obj = genie::genotype::BinMatPayload(
           bit_reader,
           payload_size,
-          ORIG_CODEC_ID
-      );
+          ORIG_CODEC_ID);
 
       ASSERT_EQ(ORIG_NROWS, recon_obj.GetNRows());
       ASSERT_EQ(ORIG_NCOLS, recon_obj.GetNCols());
@@ -410,7 +401,7 @@ TEST(GenotypeStructure, RoundTrip_RowColIdsPayload) {
     EXPECT_EQ(orig_obj.GetRowColIdsElements(), recon_obj.GetRowColIdsElements());
   }
 
-  for (size_t NUM_ELEMENTS : {2u, 3u, 4u, 5u, 7u, 8u, 15u, 16u}){
+  for (size_t NUM_ELEMENTS : {2u, 3u, 4u, 5u, 7u, 8u, 15u, 16u}) {
     auto ORIG_IDS = xt::random::permutation<uint32_t>(static_cast<uint32_t>(NUM_ELEMENTS));
     auto ORIG_IDS_VEC = std::vector<uint32_t>(ORIG_IDS.begin(), ORIG_IDS.end());
 
@@ -461,8 +452,7 @@ TEST(GenotypeStructure, RoundTrip_AmaxPayload) {
 
     genie::genotype::AmaxPayload recon_obj(
         std::move(elements),
-        std::optional<uint8_t>(ORIG_NBITS)
-    );
+        std::optional<uint8_t>(ORIG_NBITS));
 
     EXPECT_EQ(recon_obj.GetNElems(), NUM_ELEMENTS);
     EXPECT_EQ(recon_obj.GetNBitsPerElem(), ORIG_NBITS);
@@ -479,8 +469,7 @@ TEST(GenotypeStructure, RoundTrip_AmaxPayload) {
 
     genie::genotype::AmaxPayload orig(
         std::move(elements),
-        ORIG_NBITS
-    );
+        ORIG_NBITS);
 
     genie::genotype::AmaxPayload moved(std::move(orig));
     EXPECT_EQ(moved.GetAmaxElements().size(), NUM_ELEMENTS);
@@ -499,8 +488,7 @@ TEST(GenotypeStructure, RoundTrip_AmaxPayload) {
 
     genie::genotype::AmaxPayload orig(
         std::move(elements),
-        std::optional<uint8_t>(ORIG_NBITS)
-    );
+        std::optional<uint8_t>(ORIG_NBITS));
 
     genie::genotype::AmaxPayload moved;
     moved = std::move(orig);
@@ -538,8 +526,7 @@ TEST(GenotypeStructure, RoundTrip_AmaxPayload) {
 
     genie::genotype::AmaxPayload orig_obj(
         std::move(elements),
-        std::optional<uint8_t>(ORIG_NBITS)
-    );
+        std::optional<uint8_t>(ORIG_NBITS));
 
     EXPECT_EQ(orig_obj.GetNElems(), NUM_ELEMENTS);
     EXPECT_EQ(orig_obj.GetNBitsPerElem(), ORIG_NBITS);
@@ -555,9 +542,7 @@ TEST(GenotypeStructure, RoundTrip_AmaxPayload) {
 
     std::istream& reader = obj_payload;
     auto bit_reader = genie::util::BitReader(reader);
-    auto recon_obj = genie::genotype::AmaxPayload(
-        bit_reader
-    );
+    auto recon_obj = genie::genotype::AmaxPayload(bit_reader);
 
     EXPECT_EQ(recon_obj.GetNElems(), NUM_ELEMENTS);
     EXPECT_EQ(recon_obj.GetNBitsPerElem(), ORIG_NBITS);

@@ -12,9 +12,9 @@
 #include <memory>
 #include <string>
 #include "genie/core/classifier_regroup.h"
-#include "genie/core/flowgraph_convert.h"
-#include "genie/core/flowgraph_decode.h"
-#include "genie/core/flowgraph_encode.h"
+#include "genie/core/flow_graph_convert.h"
+#include "genie/core/flow_graph_decode.h"
+#include "genie/core/flow_graph_encode.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ namespace module {
  * @param writeRawStreams
  * @return
  */
-std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir, size_t,
+std::unique_ptr<core::FlowGraphEncode> BuildDefaultEncoder(size_t threads, const std::string& working_dir, size_t,
                                                            core::ClassifierRegroup::RefMode externalref, bool rawref,
                                                            bool writeRawStreams);
 
@@ -40,7 +40,7 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
  * @param combinePairsFlag
  * @return
  */
-std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const std::string&, bool combinePairsFlag,
+std::unique_ptr<core::FlowGraphDecode> build_default_decoder(size_t threads, const std::string&, bool combinePairsFlag,
                                                            size_t);
 
 /**
@@ -48,7 +48,7 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
  * @param threads
  * @return
  */
-std::unique_ptr<core::FlowGraphConvert> buildDefaultConverter(size_t threads);
+std::unique_ptr<core::FlowGraphConvert> build_default_converter(size_t threads);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

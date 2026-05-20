@@ -9,20 +9,11 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <fstream>
-#include <iostream>
-#include <memory>
 #include <sstream>
-#include <string>
-#include <utility>
 #include <vector>
 
-#include "genie/core/constants.h"
-#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
-#include "genie/core/writer.h"
-// #include "genie/genotype/genotype_parameters.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 #include "BlockHeader.h"
 #include "BlockPayload.h"
@@ -100,12 +91,13 @@ class Block {
         return *this;
     }
 
-    void read(util::BitReader& reader);
-    void read(util::BitReader& reader, uint8_t numChrs);
-    void write(core::Writer& writer) const;
+    void Read(util::BitReader& reader);
+    void Read(util::BitReader& reader, uint8_t numChrs);
+    void Write(util::BitWriter& writer) const;
+
     void set(BlockVectorData blockData);
     void set(BlockData& blockData);
-    size_t getSize(core::Writer& writesize) const;
+    size_t GetSize(util::BitWriter& writesize) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

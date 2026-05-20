@@ -4,8 +4,8 @@
 * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SRC_GENIE_GENOTYPE_AMAX_PAYLOAD_H_
-#define GENIE_SRC_GENIE_GENOTYPE_AMAX_PAYLOAD_H_
+#ifndef SRC_GENIE_GENOTYPE_AMAX_PAYLOAD_H_
+#define SRC_GENIE_GENOTYPE_AMAX_PAYLOAD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,9 +30,9 @@ namespace genie::genotype {
 
 class AmaxPayload {
  private:
- std::vector<uint64_t> amax_elements_;
- 
- uint8_t nbits_per_elem_;
+  std::vector<uint64_t> amax_elements_;
+
+  uint8_t nbits_per_elem_;
 
  public:
   // Default constructor
@@ -41,8 +41,7 @@ class AmaxPayload {
   // Parameterized constructor
   explicit AmaxPayload(
     std::vector<uint64_t>&& amax_elements,
-    std::optional<uint8_t> nbits_per_elem = std::nullopt
-  );
+    std::optional<uint8_t> nbits_per_elem = std::nullopt);
 
   // Copy constructor
   AmaxPayload(const AmaxPayload& other);
@@ -85,6 +84,6 @@ class AmaxPayload {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SRC_GENIE_GENOTYPE_AMAX_PAYLOAD_H_
+#endif  // SRC_GENIE_GENOTYPE_AMAX_PAYLOAD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------

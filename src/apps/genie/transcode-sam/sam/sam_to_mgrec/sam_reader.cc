@@ -5,6 +5,7 @@
  */
 
 #include <cstring>
+#include <string>
 #include <utility>
 #include <vector>
 

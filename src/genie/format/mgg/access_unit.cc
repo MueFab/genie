@@ -5,8 +5,11 @@
  */
 
 #include "genie/format/mgg/access_unit.h"
+#include <map>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,12 +30,12 @@ bool AccessUnit::operator==(const GenInfo& info) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(AccessUnitHeader h, core::MPEGMinorVersion _verison) : header(std::move(h)), version(_verison) {}
+AccessUnit::AccessUnit(AccessUnitHeader h, core::MpegMinorVersion _verison) : header(std::move(h)), version(_verison) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::AccessUnit(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet>& parameterSets,
-                       bool mit, bool block_header, core::MPEGMinorVersion _version)
+                       bool mit, bool block_header, core::MpegMinorVersion _version)
     : version(_version) {
     auto start_pos = reader.getPos() - 4;
     auto length = reader.readBypassBE<uint64_t>();
@@ -158,7 +161,7 @@ format::mgb::AccessUnit AccessUnit::decapsulate() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(format::mgb::AccessUnit au, bool mit, core::MPEGMinorVersion _version)
+AccessUnit::AccessUnit(format::mgb::AccessUnit au, bool mit, core::MpegMinorVersion _version)
     : header(std::move(au.getHeader()), mit), version(_version) {
     for (auto& b : au.getBlocks()) {
         blocks.emplace_back(std::move(b));

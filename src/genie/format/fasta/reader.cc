@@ -7,6 +7,7 @@
 #include "genie/format/fasta/reader.h"
 #include <algorithm>
 #include <istream>
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>

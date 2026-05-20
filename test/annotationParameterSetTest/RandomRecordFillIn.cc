@@ -6,7 +6,10 @@
  */
 
 #include "RandomRecordFillIn.h"
-#include "genie/core/constants.h"
+
+#include <string>
+#include <vector>
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 genie::likelihood::LikelihoodParameters
@@ -95,9 +98,9 @@ RandomAnnotationEncodingParameters::randomAlgorithmParameters(uint8_t nuMOfpars,
         par_ID[i] = randomU4();
         par_type[i] = randomType();
         if (par_type[i] == genie::core::DataType::STRING) par_type[i] = genie::core::DataType::UINT8;
-        //par_array_dims[i].resize(par_num_array_dims[i]+1);
+        // par_array_dims[i].resize(par_num_array_dims[i]+1);
         for (auto j = 0; j < par_num_array_dims[i]; ++j) par_array_dims[i][j] = randomU4();  // randomU8();
-        std::vector<std::vector<std::vector<std::vector<uint8_t>>>> tempvec=
+        std::vector<std::vector<std::vector<std::vector<uint8_t>>>> tempvec =
             genie::core::record::annotation_parameter_set::AlgorithmParameters::resizeVector(par_num_array_dims[i],
                                                                                              par_array_dims[i]);
         par_val.emplace_back(tempvec);
@@ -127,15 +130,16 @@ genie::core::record::annotation_parameter_set::TileStructure RandomAnnotationEnc
     end_index.resize(n_tiles, std::vector<uint64_t>(dimensions, 0));
     tile_size.resize(dimensions, 0);
 
-    if (variable_size_tiles)
+    if (variable_size_tiles) {
         for (uint64_t i = 0; i < n_tiles; ++i) {
             for (auto j = 0; j < dimensions; ++j) {
                 start_index[i][j] = 0;
                 end_index[i][j] = 1;
             }
         }
-    else
+    } else {
         for (auto j = 0; j < dimensions; ++j) tile_size[j] = 2;
+    }
 
     return genie::core::record::annotation_parameter_set::TileStructure(
         ATCoordSize, two_dimensional, variable_size_tiles, n_tiles, start_index, end_index, tile_size);
@@ -359,7 +363,7 @@ genie::core::record::annotation_parameter_set::Record
 RandomAnnotationEncodingParameters::randomAnnotationParameterSet() {
     uint8_t parameter_set_ID = randomU8();
     uint8_t AT_ID = randomU8();
-    genie::core::AlphabetID AT_alphabet_ID = static_cast <genie::core::AlphabetID>(randomU8());
+    genie::core::AlphabetId AT_alphabet_ID = static_cast <genie::core::AlphabetId>(randomU8());
     uint8_t AT_coord_size = randomU2();
     bool AT_pos_40_bits_flag = randomBool();
     uint8_t n_aux_attribute_groups = randomU3();

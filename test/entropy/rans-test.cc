@@ -1,12 +1,14 @@
 #include <gtest/gtest.h>
-#include <cstdlib> // For rand()
+#include <cstdlib>  // For rand()
+#include <string>
+#include <vector>
 #include "genie/entropy/rans/encoder.h"
 #include "genie/entropy/rans/decoder.h"
 #include "genie/entropy/rans/commons.h"
 
 
 class RANSTestCase : public ::testing::Test {
-   protected:
+ protected:
     // Do any necessary setup for your tests here
       RANSTestCase() = default;
 

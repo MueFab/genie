@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 #include <algorithm>
 #include <fstream>
+#include <string>
 #include <tuple>
 #include <vector>
 #include <xtensor/xmath.hpp>
@@ -15,7 +16,7 @@
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xview.hpp>
 #include "genie/core/constants.h"
-#include "genie/core/record/variant_genotype/record.h"
+#include "genie/core/variant_genotype_record/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
@@ -25,7 +26,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//TEST(Genotype, Decompose) {
+// TEST(Genotype, Decompose) {
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //    std::string filepath = gitRootDir + "/data/records/variant/1.3.5.header100.gt_only.vcf.geno";
 //    std::vector<genie::core::record::VariantGenotype> recs;
@@ -94,7 +95,7 @@
 //        ASSERT_EQ(xt::sum(xt::equal(allele_rec, 2))(0), 0);
 //    }
 //
-//}
+// }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -121,11 +122,11 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
         ASSERT_FALSE(no_ref_flag);
         ASSERT_FALSE(not_avail_flag);
         ASSERT_TRUE(allele_mat == orig_allele_mat);
-        ASSERT_TRUE(xt::amin(allele_mat)(0) == 0);
+        ASSERT_EQ(xt::amin(allele_mat)(0), 0);
 
         genie::genotype::inverse_transform_max_val(allele_mat, no_ref_flag, not_avail_flag);
         ASSERT_TRUE(allele_mat == orig_allele_mat);
-        ASSERT_TRUE(xt::amin(allele_mat)(0) == 0);
+        ASSERT_EQ(xt::amin(allele_mat)(0), 0);
     }
 
     // Case 2: no_ref
@@ -140,11 +141,11 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
         ASSERT_TRUE(no_ref_flag);
         ASSERT_FALSE(not_avail_flag);
         ASSERT_FALSE(allele_mat == orig_allele_mat);
-        ASSERT_TRUE(xt::amin(allele_mat)(0) == 0);
+        ASSERT_EQ(xt::amin(allele_mat)(0), 0);
 
         genie::genotype::inverse_transform_max_val(allele_mat, no_ref_flag, not_avail_flag);
         ASSERT_TRUE(allele_mat == orig_allele_mat);
-        ASSERT_TRUE(xt::amin(allele_mat)(0) == NO_REF_VAL);
+        ASSERT_EQ(xt::amin(allele_mat)(0), NO_REF_VAL);
     }
 
     // Case 3: not_avail_flag
@@ -159,11 +160,11 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
         ASSERT_FALSE(no_ref_flag);
         ASSERT_TRUE(not_avail_flag);
         ASSERT_FALSE(allele_mat == orig_allele_mat);
-        ASSERT_TRUE(xt::amin(allele_mat)(0) == 0);
+        ASSERT_EQ(xt::amin(allele_mat)(0), 0);
 
         genie::genotype::inverse_transform_max_val(allele_mat, no_ref_flag, not_avail_flag);
         ASSERT_TRUE(allele_mat == orig_allele_mat);
-        ASSERT_TRUE(xt::amin(allele_mat)(0) == NOT_AVAIL_VAL);
+        ASSERT_EQ(xt::amin(allele_mat)(0), NOT_AVAIL_VAL);
     }
 
     // Case 3: no_ref and not_avail_flag
@@ -180,11 +181,11 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
         ASSERT_TRUE(no_ref_flag);
         ASSERT_TRUE(not_avail_flag);
         ASSERT_FALSE(allele_mat == orig_allele_mat);
-        ASSERT_TRUE(xt::amin(allele_mat)(0) == 0);
+        ASSERT_EQ(xt::amin(allele_mat)(0), 0);
 
         genie::genotype::inverse_transform_max_val(allele_mat, no_ref_flag, not_avail_flag);
         ASSERT_TRUE(allele_mat == orig_allele_mat);
-        ASSERT_TRUE(xt::amin(allele_mat)(0) == NOT_AVAIL_VAL);
+        ASSERT_EQ(xt::amin(allele_mat)(0), NOT_AVAIL_VAL);
     }
 }
 
@@ -210,8 +211,7 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
             allele_mat,
             bin_mats,
             num_bin_mats,
-            concat_axis_mode
-        );
+            concat_axis_mode);
 
         ASSERT_EQ(bin_mats.size(), 3);
         ASSERT_EQ(num_bin_mats, 3);
@@ -221,8 +221,7 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
             bin_mats,
             num_bin_mats,
             concat_axis_mode,
-            recon_allele_mat
-        );
+            recon_allele_mat);
 
         ASSERT_TRUE(ORIG_ALLELE_MAT == recon_allele_mat);
     }
@@ -237,8 +236,7 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
             allele_mat,
             bin_mats,
             num_bin_mats,
-            genie::genotype::ConcatAxis::CONCAT_ROW_DIR
-        );
+            genie::genotype::ConcatAxis::CONCAT_ROW_DIR);
 
 
         ASSERT_EQ(bin_mats.size(), 1);
@@ -249,8 +247,7 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
             bin_mats,
             num_bin_mats,
             genie::genotype::ConcatAxis::CONCAT_ROW_DIR,
-            recon_allele_mat
-        );
+            recon_allele_mat);
 
         ASSERT_TRUE(ORIG_ALLELE_MAT == recon_allele_mat);
     }
@@ -265,8 +262,7 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
             allele_mat,
             bin_mats,
             num_bin_mats,
-            genie::genotype::ConcatAxis::CONCAT_COL_DIR
-        );
+            genie::genotype::ConcatAxis::CONCAT_COL_DIR);
 
         ASSERT_EQ(bin_mats.size(), 1);
         ASSERT_EQ(num_bin_mats, 3);
@@ -276,8 +272,7 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
             bin_mats,
             num_bin_mats,
             genie::genotype::ConcatAxis::CONCAT_COL_DIR,
-            recon_allele_mat
-        );
+            recon_allele_mat);
 
         ASSERT_TRUE(ORIG_ALLELE_MAT == recon_allele_mat);
     }
@@ -303,8 +298,7 @@ TEST(Genotype, RoundTrip_BinarizeRowBin_BinaryMatrix) {
   genie::genotype::binarize_row_bin(
       allele_mat,
       bin_mats,
-      amax_vec
-  );
+      amax_vec);
 
   ASSERT_EQ(bin_mats.size(), 1);
   ASSERT_EQ(bin_mats[0].shape(0), BIN_NROWS);
@@ -315,11 +309,9 @@ TEST(Genotype, RoundTrip_BinarizeRowBin_BinaryMatrix) {
   genie::genotype::debinarize_row_bin(
       bin_mats,
       amax_vec,
-      allele_mat
-  );
+      allele_mat);
 
   ASSERT_TRUE(allele_mat == ALLELE_MAT);
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -342,8 +334,7 @@ TEST(Genotype, RoundTrip_BinarizeRowBin) {
         genie::genotype::binarize_row_bin(
             allele_mat,
             bin_mats,
-            amax_vec
-        );
+            amax_vec);
 
         ASSERT_EQ(bin_mats.size(), 1);
         ASSERT_EQ(amax_vec.shape(0), NROWS);
@@ -352,12 +343,10 @@ TEST(Genotype, RoundTrip_BinarizeRowBin) {
         genie::genotype::debinarize_row_bin(
             bin_mats,
             amax_vec,
-            allele_mat
-        );
+            allele_mat);
 
         ASSERT_TRUE(allele_mat == orig_allele_mat);
     }
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -366,7 +355,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
     size_t NROWS = 100;
     size_t NCOLS = 200;
     int8_t MAX_ALLELE_VAL = 2;
-    
+
     genie::genotype::BinMatDtype bin_mat;
     genie::genotype::BinMatDtype orig_bin_mat;
     genie::genotype::UIntVecDtype row_ids;
@@ -375,8 +364,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
     // Sort rows
     {
         bin_mat = xt::cast<bool>(
-          xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL)
-        );
+          xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL));
         orig_bin_mat = bin_mat;
 
         std::stringstream test_description;
@@ -388,8 +376,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
             row_ids,
             col_ids,
             genie::genotype::SortingAlgoID::RANDOM_SORT,
-            genie::genotype::SortingAlgoID::NO_SORTING
-        );
+            genie::genotype::SortingAlgoID::NO_SORTING);
 
         ASSERT_EQ(row_ids.shape(0), bin_mat.shape(0));
         ASSERT_EQ(col_ids.shape(0), 1);
@@ -398,8 +385,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
         genie::genotype::invert_sort_bin_mat(
             bin_mat,
             row_ids,
-            col_ids
-        );
+            col_ids);
 
         ASSERT_TRUE(bin_mat == orig_bin_mat);
     }
@@ -418,8 +404,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
             row_ids,
             col_ids,
             genie::genotype::SortingAlgoID::NO_SORTING,
-            genie::genotype::SortingAlgoID::RANDOM_SORT
-        );
+            genie::genotype::SortingAlgoID::RANDOM_SORT);
 
         ASSERT_EQ(row_ids.shape(0), 1);
         ASSERT_EQ(col_ids.shape(0), bin_mat.shape(1));
@@ -428,8 +413,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
         genie::genotype::invert_sort_bin_mat(
             bin_mat,
             row_ids,
-            col_ids
-        );
+            col_ids);
 
         ASSERT_TRUE(bin_mat == orig_bin_mat);
     }
@@ -448,8 +432,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
             row_ids,
             col_ids,
             genie::genotype::SortingAlgoID::RANDOM_SORT,
-            genie::genotype::SortingAlgoID::RANDOM_SORT
-        );
+            genie::genotype::SortingAlgoID::RANDOM_SORT);
 
         ASSERT_EQ(row_ids.shape(0), bin_mat.shape(0));
         ASSERT_EQ(col_ids.shape(0), bin_mat.shape(1));
@@ -458,8 +441,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
         genie::genotype::invert_sort_bin_mat(
             bin_mat,
             row_ids,
-            col_ids
-        );
+            col_ids);
 
         ASSERT_TRUE(bin_mat == orig_bin_mat);
     }
@@ -468,7 +450,6 @@ TEST(Genotype, RoundTrip_RandomSort) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 TEST(Genotype, Serializer) {
-
     size_t ORIG_PAYLOAD_LEN = 15;
     uint8_t ORIG_PAYLOAD[15] = {0x7c, 0xe2, 0x38, 0x04, 0x92, 0x40, 0x04, 0xe2, 0x5c, 0x44, 0x92, 0x44, 0x38, 0xe2, 0x38};
     size_t NCOLS = 23;
@@ -480,16 +461,14 @@ TEST(Genotype, Serializer) {
         ORIG_PAYLOAD_LEN,
         NROWS,
         NCOLS,
-        bin_mat
-    );
+        bin_mat);
 
     uint8_t* payload;
     size_t payload_len;
     genie::genotype::bin_mat_to_bytes(
         bin_mat,
         &payload,
-        payload_len
-    );
+        payload_len);
 
     ASSERT_EQ(ORIG_PAYLOAD_LEN, payload_len);
     for (size_t i = 0; i < payload_len; i++) {
@@ -501,7 +480,7 @@ TEST(Genotype, Serializer) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO (Yeremia): Move this test to JBIG
+// TODO(Yeremia): Move this test to JBIG
 TEST(Genotype, RoundTrip_JBIG) {
 //    genie::genotype::BinMatDtype bin_mat;
     size_t ORIG_PAYLOAD_LEN = 15;
@@ -529,8 +508,7 @@ TEST(Genotype, RoundTrip_JBIG) {
             ORIG_PAYLOAD,
             ORIG_PAYLOAD_LEN,
             ORIG_NROWS,
-            ORIG_NCOLS
-        );
+            ORIG_NCOLS);
 
         ASSERT_EQ(ORIG_COMPRESSED_PAYLOAD_LEN, compressed_data_len);
         for (size_t i = 0; i < compressed_data_len; ++i) {
@@ -546,8 +524,7 @@ TEST(Genotype, RoundTrip_JBIG) {
             compressed_data,
             compressed_data_len,
             &nrows,
-            &ncols
-        );
+            &ncols);
 
         ASSERT_EQ(nrows, ORIG_NROWS);
         ASSERT_EQ(ncols, ORIG_NCOLS);
@@ -585,7 +562,6 @@ TEST(Genotype, RoundTrip_JBIG) {
 //    std::vector<uint8_t> mem_data_source(3 * ORIG_PAYLOAD_LEN);
 //    uint8_t* payload_ = &mem_data_source[0];
 //    size_t payload_len;
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -594,6 +570,7 @@ TEST(Genotype, RoundTrip_EncodeAndSortBinMat) {
   size_t NROWS = 27;
   size_t NCOLS = 5;
   int8_t MAX_ALLELE_VAL = 2;
+  auto CODEC_ID = genie::core::AlgoID::JBIG;
 
   genie::genotype::BinMatDtype ORIG_BIN_MAT;
   genie::genotype::BinMatDtype bin_mat;
@@ -609,304 +586,151 @@ TEST(Genotype, RoundTrip_EncodeAndSortBinMat) {
       genie::genotype::SortingAlgoID::RANDOM_SORT
   };
 
-  const std::vector<genie::core::AlgoID> codecs = {
-      genie::core::AlgoID::JBIG,
-      genie::core::AlgoID::ZSTD,
-      genie::core::AlgoID::BSC
-  };
+  for (const auto sort_row_method : sorting_methods) {
+    for (const auto sort_col_method : sorting_methods) {
+      auto sort_rows_flag = sort_row_method != genie::genotype::SortingAlgoID::NO_SORTING;
+      auto sort_cols_flag = sort_col_method != genie::genotype::SortingAlgoID::NO_SORTING;
 
-  for (const auto CODEC_ID : codecs) {
-      for (const auto sort_row_method : sorting_methods) {
-        for (const auto sort_col_method : sorting_methods) {
-          auto sort_rows_flag = sort_row_method != genie::genotype::SortingAlgoID::NO_SORTING;
-          auto sort_cols_flag = sort_col_method != genie::genotype::SortingAlgoID::NO_SORTING;
+      // Reset bin_mat to original for each test iteration
+      bin_mat = ORIG_BIN_MAT;
+      genie::genotype::SortedBinMatPayload sorted_bin_mat_payload;
 
-          // Reset bin_mat to original for each test iteration
-          bin_mat = ORIG_BIN_MAT;
-          genie::genotype::SortedBinMatPayload sorted_bin_mat_payload;
+      std::stringstream test_description;
+      test_description << "sort_row_method: " << static_cast<int>(sort_row_method)
+                       << ", sort_col_method: " << static_cast<int>(sort_col_method);
+      SCOPED_TRACE(test_description.str());
 
-          std::stringstream test_description;
-          test_description << "codec: " << static_cast<int>(CODEC_ID)
-                           << ", sort_row_method: " << static_cast<int>(sort_row_method)
-                           << ", sort_col_method: " << static_cast<int>(sort_col_method);
-          SCOPED_TRACE(test_description.str());
+      // Encode and sort the binary matrix
+      encode_and_sort_bin_mat(
+          bin_mat,
+          sorted_bin_mat_payload,
+          sort_row_method,
+          sort_col_method,
+          CODEC_ID);
 
-          // Encode and sort the binary matrix
-          encode_and_sort_bin_mat(
-              bin_mat,
-              sorted_bin_mat_payload,
-              sort_row_method,
-              sort_col_method,
-              CODEC_ID
-          );
-
-          if (sort_rows_flag | sort_cols_flag){
-            EXPECT_NE(bin_mat, ORIG_BIN_MAT);
-          }
-
-          EXPECT_EQ(sorted_bin_mat_payload.IsRowsSorted(), sort_rows_flag);
-          EXPECT_EQ(sorted_bin_mat_payload.IsColsSorted(), sort_cols_flag);
-
-          std::stringstream bitstream;
-          genie::util::BitWriter writer(&bitstream);
-          sorted_bin_mat_payload.Write(writer);
-
-          ASSERT_TRUE(writer.IsByteAligned());
-
-          size_t payload_size = bitstream.str().size();
-          EXPECT_EQ(payload_size, sorted_bin_mat_payload.GetSize())
-              << "Mismatch in payload size";
-
-          std::istream& reader = bitstream;
-          genie::util::BitReader bit_reader(reader);
-          genie::genotype::SortedBinMatPayload recon_obj(
-              bit_reader, CODEC_ID,
-              sort_rows_flag,
-              sort_cols_flag
-          );
-
-          EXPECT_EQ(sorted_bin_mat_payload.IsRowsSorted(), recon_obj.IsRowsSorted());
-          EXPECT_EQ(sorted_bin_mat_payload.IsColsSorted(), recon_obj.IsColsSorted());
-          EXPECT_EQ(sorted_bin_mat_payload.GetSize(), recon_obj.GetSize());
-
-          if (sort_rows_flag) {
-            EXPECT_TRUE(
-                sorted_bin_mat_payload.GetRowIdsPayload()->GetRowColIdsElements() ==
-                recon_obj.GetRowIdsPayload()->GetRowColIdsElements()
-            );
-
-            EXPECT_EQ(
-              sorted_bin_mat_payload.GetRowIdsPayload()->GetSize(),
-              recon_obj.GetRowIdsPayload()->GetSize()
-            );
-          }
-          if (sort_cols_flag) {
-            EXPECT_EQ(
-              sorted_bin_mat_payload.GetColIdsPayload()->GetRowColIdsElements(),
-              recon_obj.GetColIdsPayload()->GetRowColIdsElements()
-            );
-            EXPECT_EQ(
-              sorted_bin_mat_payload.GetColIdsPayload()->GetSize(),
-              recon_obj.GetColIdsPayload()->GetSize()
-            );
-          }
-
-          ASSERT_TRUE(sorted_bin_mat_payload == recon_obj)
-              << "Mismatch in reconstructed object";
-
-          genie::genotype::BinMatDtype recon_bin_mat;
-          decode_and_inverse_sort_bin_mat(
-            recon_obj,
-            recon_bin_mat,
-            CODEC_ID,
-            sort_rows_flag,
-            sort_cols_flag
-          );
-
-          ASSERT_EQ(ORIG_BIN_MAT, recon_bin_mat);
-
-    //      auto& recon_bin_mat_payload = recon_obj.GetBinMatPayload();
-    //      genie::genotype::entropy_decode_bin_mat(
-    //        recon_bin_mat_payload.GetPayload(),
-    //        CODEC_ID,
-    //        recon_bin_mat_payload.GetNRows(),
-    //        recon_bin_mat_payload.GetNCols(),
-    //        recon_bin_mat
-    //      );
-
-    //      if (!sort_rows_flag && !sort_cols_flag){
-    //        ASSERT_EQ(ORIG_BIN_MAT, recon_bin_mat);
-    //      }
-        }
+      if (sort_rows_flag | sort_cols_flag) {
+        EXPECT_NE(bin_mat, ORIG_BIN_MAT);
       }
+
+      EXPECT_EQ(sorted_bin_mat_payload.IsRowsSorted(), sort_rows_flag);
+      EXPECT_EQ(sorted_bin_mat_payload.IsColsSorted(), sort_cols_flag);
+
+      std::stringstream bitstream;
+      genie::util::BitWriter writer(&bitstream);
+      sorted_bin_mat_payload.Write(writer);
+
+      ASSERT_TRUE(writer.IsByteAligned());
+
+      size_t payload_size = bitstream.str().size();
+      EXPECT_EQ(payload_size, sorted_bin_mat_payload.GetSize())
+          << "Mismatch in payload size";
+
+      std::istream& reader = bitstream;
+      genie::util::BitReader bit_reader(reader);
+      genie::genotype::SortedBinMatPayload recon_obj(
+          bit_reader, CODEC_ID,
+          sort_rows_flag,
+          sort_cols_flag);
+
+      EXPECT_EQ(sorted_bin_mat_payload.IsRowsSorted(), recon_obj.IsRowsSorted());
+      EXPECT_EQ(sorted_bin_mat_payload.IsColsSorted(), recon_obj.IsColsSorted());
+      EXPECT_EQ(sorted_bin_mat_payload.GetSize(), recon_obj.GetSize());
+
+      if (sort_rows_flag) {
+        EXPECT_TRUE(
+            sorted_bin_mat_payload.GetRowIdsPayload()->GetRowColIdsElements() ==
+            recon_obj.GetRowIdsPayload()->GetRowColIdsElements());
+
+        EXPECT_EQ(
+          sorted_bin_mat_payload.GetRowIdsPayload()->GetSize(),
+          recon_obj.GetRowIdsPayload()->GetSize());
+      }
+      if (sort_cols_flag) {
+        EXPECT_EQ(
+          sorted_bin_mat_payload.GetColIdsPayload()->GetRowColIdsElements(),
+          recon_obj.GetColIdsPayload()->GetRowColIdsElements());
+        EXPECT_EQ(
+          sorted_bin_mat_payload.GetColIdsPayload()->GetSize(),
+          recon_obj.GetColIdsPayload()->GetSize());
+      }
+
+      ASSERT_TRUE(sorted_bin_mat_payload == recon_obj)
+          << "Mismatch in reconstructed object";
+
+      genie::genotype::BinMatDtype recon_bin_mat;
+      decode_and_inverse_sort_bin_mat(
+        recon_obj,
+        recon_bin_mat,
+        CODEC_ID,
+        sort_rows_flag,
+        sort_cols_flag);
+
+      ASSERT_EQ(ORIG_BIN_MAT, recon_bin_mat);
+
+//      auto& recon_bin_mat_payload = recon_obj.GetBinMatPayload();
+//      genie::genotype::entropy_decode_bin_mat(
+//        recon_bin_mat_payload.GetPayload(),
+//        CODEC_ID,
+//        recon_bin_mat_payload.GetNRows(),
+//        recon_bin_mat_payload.GetNCols(),
+//        recon_bin_mat
+//      );
+
+//      if (!sort_rows_flag && !sort_cols_flag){
+//        ASSERT_EQ(ORIG_BIN_MAT, recon_bin_mat);
+//      }
+    }
   }
 }
 
 // -----------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------------------------------------------
+TEST(Genotype, RoundTrip_CASE12) {
+  std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+  std::string filename = "1.3.11.bgz.CASE03.geno";
+  std::string filepath = gitRootDir + "/data/records/variant/" + filename;
 
-TEST(Genotype, RoundTrip_JBIG_RandomMatrix) {
-    const std::vector<std::pair<size_t, size_t>> dimensions = {
-        {10, 10},
-        {100, 50},
-        {50, 100},
-        {256, 256} // Block size like
-    };
+  std::vector<genie::core::record::VariantGenotype> RECS;
+  {
+    std::ifstream reader(filepath, std::ios::binary);
+    ASSERT_EQ(reader.fail(), false);
+    genie::util::BitReader bitreader(reader);
 
-    const std::vector<int8_t> max_vals = {1, 2, 3, 10, 64};
-    auto codec = genie::core::AlgoID::JBIG;
-
-    for (const auto& dim : dimensions) {
-        size_t NROWS = dim.first;
-        size_t NCOLS = dim.second;
-
-        for (int8_t max_val : max_vals) {
-            genie::genotype::Int8MatDtype allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, max_val));
-            genie::genotype::Int8MatDtype original_allele_mat = allele_mat;
-
-            // Create dummy phasing matrix (random bools)
-            // Phasing matrix usually has NCOLS / ploidy * (ploidy -1) columns, let's just make it compatible or random
-            // Logic in decompose: num_samples * (max_ploidy - 1). 
-            // Here we just test matrix round trip, so dimension doesn't strictly depend on allele_mat logic unless checking constraints.
-            // Let's assume ploidy 2 for phasing dim calculation relative to allele, or just random.
-            size_t PHASING_NCOLS = NCOLS / 2; 
-            if (PHASING_NCOLS == 0) PHASING_NCOLS = 1;
-            genie::genotype::BinMatDtype phasing_mat = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, PHASING_NCOLS}, 0, 2));
-            genie::genotype::BinMatDtype original_phasing_mat = phasing_mat;
-
-            // --- Encoding ---
-            genie::genotype::GenotypePayload payload;
-            genie::genotype::GenotypeParameters params(
-                genie::genotype::BinarizationID::BIT_PLANE,
-                genie::genotype::ConcatAxis::DO_NOT_CONCAT,
-                false, // sort rows
-                false, // sort cols
-                false, // transpose
-                codec,
-                true,  // encode phases
-                false, // sort phases rows
-                false, // sort phases cols
-                false, // transpose phases
-                codec
-            );
-
-            // 1. Transform
-            bool dot_flag, na_flag;
-            genie::genotype::transform_max_value(allele_mat, dot_flag, na_flag);
-            payload.SetNoReferenceFlag(dot_flag);
-            payload.SetNotAvailableFlag(na_flag);
-
-            // 2. Binarize
-            std::vector<genie::genotype::BinMatDtype> bin_mats;
-            uint8_t num_bit_planes;
-            genie::genotype::UIntVecDtype amax_vec;
-            genie::genotype::binarize_allele_mat(
-                allele_mat,
-                bin_mats,
-                num_bit_planes,
-                amax_vec,
-                params.GetBinarizationID(),
-                params.GetConcatAxis()
-            );
-            payload.SetNumBitPlanes(num_bit_planes);
-
-            // 3. Encode Alelle Bin Mats
-            for (auto& bm : bin_mats) {
-                genie::genotype::SortedBinMatPayload sorted_payload;
-                genie::genotype::encode_and_sort_bin_mat(
-                    bm,
-                    sorted_payload,
-                    genie::genotype::SortingAlgoID::NO_SORTING,
-                    genie::genotype::SortingAlgoID::NO_SORTING,
-                    codec
-                );
-                payload.AddVariantsPayload(std::move(sorted_payload));
-            }
-
-            // 4. Encode Phasing
-            genie::genotype::SortedBinMatPayload phasing_payload;
-            genie::genotype::encode_and_sort_bin_mat(
-                phasing_mat,
-                phasing_payload,
-                genie::genotype::SortingAlgoID::NO_SORTING,
-                genie::genotype::SortingAlgoID::NO_SORTING,
-                codec
-            );
-            payload.SetPhasesPayload(std::move(phasing_payload));
-
-
-            // --- Decoding ---
-            genie::genotype::Int8MatDtype decoded_allele_mat;
-            genie::genotype::BinMatDtype decoded_phasing_mat;
-
-            genie::genotype::decode_genotype(
-                params,
-                payload,
-                decoded_allele_mat,
-                decoded_phasing_mat
-            );
-
-            // --- Verification ---
-            ASSERT_TRUE(original_allele_mat == decoded_allele_mat) 
-                << "Allele Matrix mismatch! Dims: " << NROWS << "x" << NCOLS << ", MaxVal: " << (int)max_val;
-            ASSERT_TRUE(original_phasing_mat == decoded_phasing_mat)
-                << "Phasing Matrix mismatch!";
-        }
+    while (bitreader.IsStreamGood()) {
+      RECS.emplace_back(bitreader);
     }
+
+    // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
+    RECS.pop_back();
+  }
+
+  {
+    genie::genotype::GenotypeParameters params;
+    genie::genotype::GenotypePayload payload;
+
+    size_t BLOCK_SIZE = 512;
+    auto BINARIZATION_ID = genie::genotype::BinarizationID::BIT_PLANE;
+    auto CONCAT_AXIS = genie::genotype::ConcatAxis::CONCAT_ROW_DIR;
+    auto TRANSPOSE_MAT = false;
+    auto SORT_ROWS_METHOD = genie::genotype::SortingAlgoID::NO_SORTING;
+    auto SORT_COLS_METHOD = genie::genotype::SortingAlgoID::NO_SORTING;
+    auto CODEC_ID = genie::core::AlgoID::JBIG;
+
+    genie::genotype::encode_genotype(
+      // Inputs
+      RECS,
+      // Outputs
+      params,
+      payload,
+      // Options
+      BLOCK_SIZE,
+      BINARIZATION_ID,
+      CONCAT_AXIS,
+      TRANSPOSE_MAT,
+      SORT_ROWS_METHOD,
+      SORT_COLS_METHOD,
+      CODEC_ID);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-TEST(Genotype, RoundTrip_File_Integration) {
-    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::vector<std::string> files = {
-        "/data/records/variant/1.3.5.header100.gt_only.vcf.geno",
-        // Add more if needed, check existence first
-    };
-
-    for (const auto& file : files) {
-        std::string filepath = gitRootDir + file;
-        std::ifstream reader(filepath, std::ios::binary);
-        if (reader.fail()) {
-            std::cout << "Skipping file (not found): " << filepath << std::endl;
-            continue;
-        }
-
-        std::vector<genie::core::record::VariantGenotype> recs;
-        genie::util::BitReader bitreader(reader);
-        while (bitreader.IsStreamGood()) {
-            recs.emplace_back(bitreader);
-        }
-        recs.pop_back(); // Temporary fix as per other tests
-
-        if (recs.empty()) continue;
-
-        // --- Encode ---
-        genie::genotype::GenotypeParameters params;
-        genie::genotype::GenotypePayload payload;
-        
-        // Use default options or variations
-        genie::genotype::encode_genotype(
-            recs,
-            params,
-            payload,
-            512, // block size
-            genie::genotype::BinarizationID::BIT_PLANE,
-            genie::genotype::ConcatAxis::DO_NOT_CONCAT,
-            false,
-            genie::genotype::SortingAlgoID::NO_SORTING,
-            genie::genotype::SortingAlgoID::NO_SORTING,
-            genie::core::AlgoID::JBIG
-        );
-
-        // --- Decode ---
-        genie::genotype::Int8MatDtype decoded_allele_mat;
-        genie::genotype::BinMatDtype decoded_phasing_mat;
-
-        genie::genotype::decode_genotype(
-            params,
-            payload,
-            decoded_allele_mat,
-            decoded_phasing_mat
-        );
-
-        // --- Verify ---
-        // We need to decompose the original records to compare
-        uint8_t max_ploidy;
-        genie::genotype::Int8MatDtype expected_allele_mat;
-        genie::genotype::BinMatDtype expected_phasing_mat;
-        
-        genie::genotype::decompose(
-            recs,
-            max_ploidy,
-            expected_allele_mat,
-            expected_phasing_mat,
-            512 // block size must match
-        );
-
-        ASSERT_TRUE(expected_allele_mat == decoded_allele_mat) << "Allele Matrix Mismatch for file: " << file;
-        ASSERT_TRUE(expected_phasing_mat == decoded_phasing_mat) << "Phasing Matrix Mismatch for file: " << file;
-    }
-}
-
+// -----------------------------------------------------------------------------

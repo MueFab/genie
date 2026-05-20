@@ -6,6 +6,7 @@
 
 #include "genie/format/mgb/data-unit-factory.h"
 #include <iostream>
+#include <map>
 #include <string>
 #include <utility>
 #include "genie/format/mgb/access_unit.h"
@@ -35,7 +36,7 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
     do {
         type = bitReader.read<core::parameter::DataUnit::DataUnitType>();
         size_t pos = bitReader.getPos();
-        if (!bitReader.isGood()) {
+        if (!bitReader.IsStreamGood()) {
             bitReader.clear();
             return boost::none;
         }

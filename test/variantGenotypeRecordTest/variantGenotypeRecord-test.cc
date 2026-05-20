@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
 
 #include <array>
-#include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <string>
+#include <vector>
 
 #include "genie/core/arrayType.h"
 #include "genie/core/record/variant_genotype/format_field.h"
@@ -82,7 +83,7 @@ class VariantGenotypeRecordTests : public ::testing::Test {
     // }
 };
 
-//TEST_F(VariantGenotypeRecordTests, DISABLED_readFilefrombin) {  // NOLINT(cert-err58-cpp)
+// TEST_F(VariantGenotypeRecordTests, DISABLED_readFilefrombin) {  // NOLINT(cert-err58-cpp)
 //    // The rule of thumb is to use EXPECT_* when you want the test to continue
 //    // to reveal more errors after the assertion failure, and use ASSERT_*
 //    // when continuing after failure doesn't make sense.
@@ -101,9 +102,9 @@ class VariantGenotypeRecordTests : public ::testing::Test {
 //        inputfile.close();
 //        outputfile.close();
 //    }
-//}
+// }
 //
-//TEST_F(VariantGenotypeRecordTests, recordFilledWithZeros) {  // NOLINT(cert-err58-cpp)
+// TEST_F(VariantGenotypeRecordTests, recordFilledWithZeros) {  // NOLINT(cert-err58-cpp)
 //    // The rule of thumb is to use EXPECT_* when you want the test to continue
 //    // to reveal more errors after the assertion failure, and use ASSERT_*
 //    // when continuing after failure doesn't make sense.
@@ -126,7 +127,7 @@ class VariantGenotypeRecordTests : public ::testing::Test {
 //    EXPECT_FALSE(variant_geno_record.isLinkedRecord());
 //    EXPECT_EQ(variant_geno_record.getLinkName().size(), 0);
 //    EXPECT_EQ(variant_geno_record.getReferenceBoxID(), (uint8_t)0);
-//}
+// }
 
 TEST_F(VariantGenotypeRecordTests, recordFilledWithOtherValues) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue

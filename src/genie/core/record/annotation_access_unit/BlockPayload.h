@@ -9,20 +9,12 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <fstream>
-#include <iostream>
-#include <memory>
 #include <sstream>
-#include <string>
-#include <utility>
 #include <vector>
 
 #include "genie/core/constants.h"
-// #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
-#include "genie/core/writer.h"
-// #include "genie/genotype/genotype_parameters.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -51,10 +43,10 @@ class BlockPayload {
     BlockPayload(AnnotDesc descriptorID, uint8_t numChrs, uint32_t block_payload_size,
         std::stringstream& generic_payload);
 
-    void read(util::BitReader& reader);
-    void read(util::BitReader& reader, AnnotDesc descriptorID, uint8_t numChrs);
-    void write(core::Writer& writer) const;
-    size_t getSize(core::Writer& writesize) const;
+    void Read(util::BitReader& reader);
+    void Read(util::BitReader& reader, AnnotDesc descriptorID, uint8_t numChrs);
+    void Write(util::BitWriter& writer) const;
+    size_t GetSize(util::BitWriter& writesize) const;
 
 
     BlockPayload& operator=(const BlockPayload& other) {

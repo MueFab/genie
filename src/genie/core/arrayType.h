@@ -11,8 +11,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "constants.h"
-#include "genie/core/writer.h"
+#include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
@@ -26,8 +25,8 @@ class ArrayType {
  public:
     std::vector<uint8_t> toArray(DataType type, util::BitReader& reader) const;
 
-    void toFile(core::DataType type, std::vector<uint8_t> bytearray, core::Writer& writer) const;
-    void toFile(core::DataType type, util::BitReader& reader, core::Writer& writer, uint64_t number) const;
+    void toFile(core::DataType type, std::vector<uint8_t> bytearray, util::BitWriter& writer) const;
+    void toFile(core::DataType type, util::BitReader& reader, util::BitWriter& writer, uint64_t number) const;
 
     std::string toString(core::DataType type, std::vector<uint8_t> value) const;
 

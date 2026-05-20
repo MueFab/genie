@@ -5,8 +5,11 @@
  */
 
 #include "genie/format/mgg/reference.h"
+#include <memory>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/format/mgg/reference/location/external.h"
 #include "genie/format/mgg/reference/location/internal.h"
 #include "genie/util/runtime_exception.h"
@@ -30,7 +33,7 @@ bool Reference::operator==(const GenInfo& info) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(util::BitReader& reader, genie::core::MPEGMinorVersion _version) : ref_version(0, 0, 0) {
+Reference::Reference(util::BitReader& reader, genie::core::MpegMinorVersion _version) : ref_version(0, 0, 0) {
     version = _version;
     auto start_pos = reader.getPos() - 4;
     auto length = reader.readBypassBE<uint64_t>();
@@ -50,7 +53,7 @@ Reference::Reference(util::BitReader& reader, genie::core::MPEGMinorVersion _ver
 // ---------------------------------------------------------------------------------------------------------------------
 
 Reference::Reference(uint8_t group_id, uint8_t ref_id, std::string ref_name, reference::Version _ref_version,
-                     std::unique_ptr<reference::Location> location, genie::core::MPEGMinorVersion _version)
+                     std::unique_ptr<reference::Location> location, genie::core::MpegMinorVersion _version)
     : dataset_group_ID(group_id),
       reference_ID(ref_id),
       reference_name(std::move(ref_name)),
@@ -140,7 +143,7 @@ genie::core::meta::Reference Reference::decapsulate(std::string meta) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Reference::Reference(uint8_t _dataset_group_id, uint8_t _reference_ID, genie::core::meta::Reference ref,
-                     genie::core::MPEGMinorVersion _version)
+                     genie::core::MpegMinorVersion _version)
     : dataset_group_ID(_dataset_group_id),
       reference_ID(_reference_ID),
       reference_name(std::move(ref.getName())),
@@ -166,7 +169,7 @@ void Reference::print_debug(std::ostream& output, uint8_t depth, uint8_t max_dep
     print_offset(output, depth + 1, max_depth, "Reference patch version: " + std::to_string(ref_version.getPatch()));
     for (const auto& r : sequences) {
         std::string s = "Reference sequence: " + r.getName();
-        if (version != core::MPEGMinorVersion::V1900) {
+        if (version != core::MpegMinorVersion::kV1900) {
             s += " (ID: " + std::to_string(r.getID()) + "; length: " + std::to_string(r.getLength()) + ")";
         }
         print_offset(output, depth + 1, max_depth, s);

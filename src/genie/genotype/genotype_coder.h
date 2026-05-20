@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_GENOTYPE_GENOTYPE_CODER_H
-#define GENIE_GENOTYPE_GENOTYPE_CODER_H
+#ifndef SRC_GENIE_GENOTYPE_GENOTYPE_CODER_H_
+#define SRC_GENIE_GENOTYPE_GENOTYPE_CODER_H_
 
 #include <cstdint>
 #include <list>
@@ -13,6 +13,7 @@
 #include <optional>
 #include <sstream>
 #include <tuple>
+#include <vector>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
@@ -23,9 +24,9 @@
 #pragma GCC diagnostic pop
 
 #include "genie/core/constants.h"
-//#include "genie/core/record/annotation_parameter_set/AttributeData.h"
-#include "genie/core/record/variant_genotype/record.h"
-//#include "genie/likelihood/likelihood_parameters.h"
+// #include "genie/core/record/annotation_parameter_set/AttributeData.h"
+#include "genie/core/variant_genotype_record/record.h"
+// #include "genie/likelihood/likelihood_parameters.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/genotype/genotype_payload.h"
 
@@ -35,13 +36,13 @@ namespace genie::genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
+// using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
 using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
 using UInt8MatDtype = xt::xtensor<uint8_t, 2, xt::layout_type::row_major>;
 using Int8MatDtype = xt::xtensor<int8_t, 2, xt::layout_type::row_major>;
 using UIntVecDtype = xt::xtensor<uint32_t, 1, xt::layout_type::row_major>;
 
-//using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
+// using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
 using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
 using AttrType = std::vector<uint8_t>;
 
@@ -313,7 +314,7 @@ void invert_sort_bin_mat(
  * @param opt The encoding options.
  * @param block The encoding block to sort.
  */
-//void sort_block(
+// void sort_block(
 //    const EncodingOptions& opt,
 //    EncodingBlock& block
 //);
@@ -363,8 +364,8 @@ void bin_mat_from_bytes(
 
 // -----------------------------------------------------------------------------
 
-// TODO (Yeremia,Stefanie): Move and refactor this function to the parsing function
-//[[maybe_unused]] void sort_format(
+// TODO(Yeremia,Stefanie): Move and refactor this function to the parsing function
+// [[maybe_unused]] void sort_format(
 //    const std::vector<core::record::VariantGenotype>& recs,
 //    size_t block_size,
 //    std::map<std::string,
@@ -428,13 +429,13 @@ void encode_genotype(
     GenotypeParameters& params,
     GenotypePayload& payload,
     // Options
-    size_t block_size=512,
-    BinarizationID binarization_ID=BinarizationID::ROW_BIN,
-    ConcatAxis concat_axis=ConcatAxis::DO_NOT_CONCAT,
-    bool transpose_mat=false,
-    SortingAlgoID sort_row_method=SortingAlgoID::NO_SORTING,
-    SortingAlgoID sort_col_method=SortingAlgoID::NO_SORTING,
-    genie::core::AlgoID codec_ID=genie::core::AlgoID::JBIG
+    size_t block_size = 512,
+    BinarizationID binarization_ID = BinarizationID::ROW_BIN,
+    ConcatAxis concat_axis = ConcatAxis::DO_NOT_CONCAT,
+    bool transpose_mat = false,
+    SortingAlgoID sort_row_method = SortingAlgoID::NO_SORTING,
+    SortingAlgoID sort_col_method = SortingAlgoID::NO_SORTING,
+    genie::core::AlgoID codec_ID = genie::core::AlgoID::JBIG
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -455,4 +456,4 @@ void decode_genotype(
 
 // -----------------------------------------------------------------------------
 
-#endif  // GENIE_GENOTYPE_GENOTYPE_CODER_H
+#endif  // SRC_GENIE_GENOTYPE_GENOTYPE_CODER_H_

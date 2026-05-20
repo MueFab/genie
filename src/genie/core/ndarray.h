@@ -1,5 +1,5 @@
-#ifndef GENIE_NDARRAY_H
-#define GENIE_NDARRAY_H
+#ifndef SRC_GENIE_CORE_NDARRAY_H_
+#define SRC_GENIE_CORE_NDARRAY_H_
 
 // -----------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ class NDArray {
      *
      * @param dims The dimensions of the array.
      */
-    NDArray(const std::vector<size_t>& dims);
+    explicit NDArray(const std::vector<size_t>& dims);
 
     /**
      * @brief Constructor from dimensions and buffer.
@@ -237,11 +237,11 @@ class NDArrayFactory {
 
 // -----------------------------------------------------------------------------
 
-} // namespace genie::core
+}  // namespace genie::core
 
 // -----------------------------------------------------------------------------
 
-#endif  // GENIE_NDARRAY_H
+#endif  // SRC_GENIE_CORE_NDARRAY_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

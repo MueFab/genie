@@ -1,17 +1,11 @@
-#include <gtest/gtest.h>
+#include "annotationParameterSet-test.h"
 
-#include <chrono>
-#include <ctime>
-#include <fstream>
-#include <iostream>
+#include <gtest/gtest.h>
+#include <map>
+#include <string>
+#include <vector>
+
 #include "RandomRecordFillIn.h"
-// #include "genie/contact/contact_matrix_parameters.h"
-#include "genie/core/arrayType.h"
-#include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/core/writer.h"
-#include "genie/likelihood/likelihood_parameters.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
 
 #define GENERATE_TEST_FILES false
 
@@ -48,14 +42,14 @@ TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(c
     annotationParameterSet = RandomContactMatrixParameters.randomAnnotationParameterSet();
 
     std::stringstream InOut;
-    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
-    annotationParameterSet.write(strwriter);
-    strwriter.Flush();
-    annotationParameterSetCheck.read(strreader);
+    genie::util::BitWriter strwriter(&InOut);
+    annotationParameterSet.Write(strwriter);
+    strwriter.FlushBits();
+    annotationParameterSetCheck.Read(strreader);
     std::stringstream testOut;
-    genie::core::Writer teststrwriter(&testOut);
-    annotationParameterSetCheck.write(teststrwriter);
+    genie::util::BitWriter teststrwriter(&testOut);
+    annotationParameterSetCheck.Write(teststrwriter);
 
     EXPECT_EQ(annotationParameterSet.getATAlphbetID(), annotationParameterSetCheck.getATAlphbetID());
     EXPECT_EQ(annotationParameterSet.getATID(), annotationParameterSetCheck.getATID());
@@ -67,7 +61,7 @@ TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(c
               annotationParameterSetCheck.getTileConfigurations().size());
 
     EXPECT_EQ(InOut.str(), testOut.str());
-    auto size = annotationParameterSet.getSize();
+    auto size = annotationParameterSet.GetSize();
     if (size % 8 != 0) size += (8 - size % 8);
     EXPECT_EQ(InOut.str().size(), size / 8);
 
@@ -78,17 +72,10 @@ TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(c
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::core::Writer writer(&outputfile);
-        annotationParameterSet.write(writer);
-        writer.flush();
+        genie::util::BitWriter writer(&outputfile);
+        annotationParameterSet.Write(writer);
+        writer.FlushBits();
         outputfile.close();
-    }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile, true);
-        annotationParameterSet.write(txtWriter);
-        txtfile.close();
     }
 #endif
 }
@@ -101,7 +88,7 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
     // annotation_parameter_set parameters
     uint8_t parameter_set_ID = 1;
     uint8_t AT_ID = 1;
-    genie::core::AlphabetID AT_alphabet_ID = genie::core::AlphabetID::ACGTN;
+    genie::core::AlphabetId AT_alphabet_ID = genie::core::AlphabetId::kAcgtn;
     uint8_t AT_coord_size = 3;
     bool AT_pos_40_bits_flag = false;
     uint8_t n_aux_attribute_groups = 0;
@@ -147,12 +134,12 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
     std::vector<std::string> features;
     std::vector<std::string> ontologyTerms;
 
- //   uint8_t n_descriptors = 15;
+    // uint8_t n_descriptors = 15;
     std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration;
-   // uint8_t n_compressors = 0;
+    // uint8_t n_compressors = 0;
     std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressor_parameter_set;
 
-   // uint8_t n_attributes = 20;
+    // uint8_t n_attributes = 20;
     std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set;
 
     using DescriptorID = genie::core::AnnotDesc;
@@ -201,10 +188,10 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
     for (auto& itemName : infoName) {
         uint16_t attribute_ID = ID;
         ID++;
-   //     uint8_t attribute_name_len = static_cast<uint8_t>(itemName.first.length());
+        // uint8_t attribute_name_len = static_cast<uint8_t>(itemName.first.length());
         std::string attribute_name = itemName.first;
         genie::core::DataType attribute_type = static_cast<genie::core::DataType>(itemName.second);
-       // uint8_t attribute_num_array_dims = 0;
+        // uint8_t attribute_num_array_dims = 0;
         std::vector<uint8_t> attribute_array_dims;
 
         genie::core::ArrayType typeval;
@@ -250,17 +237,10 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::core::Writer writer(&outputfile);
-        annotationParameterSet.write(writer);
-        writer.flush();
+        genie::util::BitWriter writer(&outputfile);
+        annotationParameterSet.Write(writer);
+        writer.FlushBits();
         outputfile.close();
-    }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile, true);
-        annotationParameterSet.write(txtWriter);
-        txtfile.close();
     }
 
     genie::core::record::annotation_parameter_set::Record annotationParameterSetCheck;
@@ -268,7 +248,7 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
     inputfile.open(name + ".bin", std::ios::binary);
     if (inputfile.is_open()) {
         genie::util::BitReader reader(inputfile);
-        annotationParameterSetCheck.read(reader);
+        annotationParameterSetCheck.Read(reader);
         inputfile.close();
 
         EXPECT_EQ(annotationParameterSet.getATCoordSize(), annotationParameterSetCheck.getATCoordSize());

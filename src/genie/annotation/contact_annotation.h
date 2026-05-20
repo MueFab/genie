@@ -14,7 +14,7 @@
 #include "genie/core/constants.h"
 
 #include "genie/contact/contact_coder.h"
-#include "genie/core/record/variant_genotype/record.h"
+#include "genie/core/variant_genotype_record/record.h"
 
 #include "genie/annotation/compressors.h"
 // -----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ struct ContactMatrixParameters {
     bool ENA_BINARIZATION{true};
     bool NORM_AS_WEIGHT{true};
     bool MULTIPLICATIVE_NORM{true};
-    genie::core::AlgoID CODEC_ID{genie::core::AlgoID::JBIG};
+    core::AlgoID CODEC_ID{core::AlgoID::JBIG};
     uint32_t TILE_SIZE{150u};
     uint32_t MULT{1u};
 };
@@ -49,14 +49,14 @@ class CMAnnotation {
     }
 
     CMUnits parseContact(std::ifstream& inputfile);
-    void setCompressors(genie::annotation::Compressor& _compressors) { compressors = _compressors; }
+    void setCompressors(Compressor& _compressors) { compressors = _compressors; }
     void setCMparameters(ContactMatrixParameters cmParameters) { contactMatrixParameters = cmParameters; }
 
  private:
     uint32_t defaultTileSizeHeight;
     uint32_t defaultTileSizeWidth;
     ContactMatrixParameters contactMatrixParameters;
-    genie::annotation::Compressor compressors;
+    Compressor compressors;
 };
 
 }  // namespace annotation

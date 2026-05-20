@@ -4,8 +4,8 @@
 * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MGG_ANNOTATION_ACCESS_UNIT_ANNOTATION_ACCESS_UNIT_HEADER_H
-#define SRC_GENIE_FORMAT_MGG_ANNOTATION_ACCESS_UNIT_ANNOTATION_ACCESS_UNIT_HEADER_H
+#ifndef SRC_GENIE_FORMAT_MGG_ANNOTATION_ACCESS_UNIT_ANNOTATION_ACCESS_UNIT_HEADER_H_
+#define SRC_GENIE_FORMAT_MGG_ANNOTATION_ACCESS_UNIT_ANNOTATION_ACCESS_UNIT_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -84,4 +84,4 @@ class AnnotationAccessUnitHeader : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MGG_ANNOTATION_ACCESS_UNIT_ANNOTATION_ACCESS_UNIT_HEADER_H
+#endif  // SRC_GENIE_FORMAT_MGG_ANNOTATION_ACCESS_UNIT_ANNOTATION_ACCESS_UNIT_HEADER_H_

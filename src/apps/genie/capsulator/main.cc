@@ -31,7 +31,7 @@ namespace capsulator {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void encapsulate(ProgramOptions& options) {
-    auto version = genie::core::MPEGMinorVersion::V2000;
+    auto version = genie::core::MpegMinorVersion::kV2000;
 
     //   mgb_file.remove_class(genie::core::record::ClassType::CLASS_N);
     //   mgb_file.remove_class(genie::core::record::ClassType::CLASS_M);

@@ -5,11 +5,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
-#include <fstream>
-#include <iostream>
+#include <string>
 
 #include "RandomRecordFillIn.h"
-#include "genie/core/writer.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 #define GENERATE_TEST_FILES false
 
@@ -68,17 +67,20 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
     likelihoodParameters = randomLikelihood.randomLikelihood();
 
     std::stringstream outputfile;
-    genie::core::Writer strwriter(&outputfile);
     genie::util::BitReader strreader(outputfile);
-    likelihoodParameters.write(strwriter);
-    strwriter.Flush();
-    likelihoodParametersCheck.read(strreader);
+    genie::util::BitWriter strwriter(&outputfile);
+    likelihoodParameters.Write(strwriter);
+    strwriter.FlushBits();
+    likelihoodParametersCheck.Read(strreader);
 
-//    EXPECT_EQ(likelihoodParameters.getDtypeID(), likelihoodParametersCheck.getDtypeID());
-    EXPECT_EQ(likelihoodParameters.getNumGlPerSample(), likelihoodParametersCheck.getNumGlPerSample());
-    EXPECT_EQ(likelihoodParameters.getTransformFlag(), likelihoodParametersCheck.getTransformFlag());
-    genie::core::Writer writeSize;
-    auto size = likelihoodParameters.getSize(writeSize);
+//    EXPECT_EQ(likelihoodParameters.getDtypeID(), likelihoodParametersCheck.GetDtypeId());
+    EXPECT_EQ(likelihoodParameters.GetNumGlPerSample(),
+              likelihoodParametersCheck.GetNumGlPerSample());
+    EXPECT_EQ(likelihoodParameters.GetTransformFlag(),
+              likelihoodParametersCheck.GetTransformFlag());
+    std::stringstream sizefile;
+    genie::util::BitWriter writeSize(&sizefile);
+    auto size = likelihoodParameters.GetSize(writeSize);
     if (size % 8 != 0) size += (8 - size % 8);
     EXPECT_EQ(outputfile.str().size(), size / 8);
 
@@ -89,19 +91,11 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
     std::ofstream testfile;
     testfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (testfile.is_open()) {
-        genie::core::Writer writer(&testfile);
-        likelihoodParameters.write(writer);
-        writer.flush();
-        testfile.close();
+        genie::util::BitWriter writer(&testfile);
+        likelihoodParameters.Write(writer);
+        writer.FlushBits();
+        testfile.Close();
     }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile, true);
-        likelihoodParameters.write(txtWriter);
-        txtfile.close();
-    }
-
 #endif
 }
 
@@ -111,10 +105,10 @@ TEST_F(LikelihoodTests, LikelihoodConstructZeros) {  // NOLINT(cert-err58-cpp)
     // when continuing after failure doesn't make sense.
     genie::likelihood::LikelihoodParameters likelihoodParameters;
 
-    EXPECT_FALSE(likelihoodParameters.getTransformFlag());
-    EXPECT_EQ(static_cast<uint8_t>(likelihoodParameters.getDtypeID()),
+    EXPECT_FALSE(likelihoodParameters.GetTransformFlag());
+    EXPECT_EQ(static_cast<uint8_t>(likelihoodParameters.GetDtypeId()),
               static_cast<uint8_t>(genie::core::DataType::STRING));
-    EXPECT_EQ(likelihoodParameters.getNumGlPerSample(), 0);
+    EXPECT_EQ(likelihoodParameters.GetNumGlPerSample(), 0);
 }
 
 TEST_F(LikelihoodTests, LikelihoodConstructValues) {  // NOLINT(cert-err58-cpp)
@@ -123,8 +117,8 @@ TEST_F(LikelihoodTests, LikelihoodConstructValues) {  // NOLINT(cert-err58-cpp)
     // when continuing after failure doesn't make sense.
     genie::likelihood::LikelihoodParameters likelihoodParameters(128, true, genie::core::DataType::DOUBLE);
 
-    EXPECT_TRUE(likelihoodParameters.getTransformFlag());
-    EXPECT_EQ(static_cast<uint8_t>(likelihoodParameters.getDtypeID()),
+    EXPECT_TRUE(likelihoodParameters.GetTransformFlag());
+    EXPECT_EQ(static_cast<uint8_t>(likelihoodParameters.GetDtypeId()),
               static_cast<uint8_t>(genie::core::DataType::DOUBLE));
-    EXPECT_EQ(likelihoodParameters.getNumGlPerSample(), 128);
+    EXPECT_EQ(likelihoodParameters.GetNumGlPerSample(), 128);
 }

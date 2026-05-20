@@ -6,14 +6,15 @@
 
 #include <gtest/gtest.h>
 #include <fstream>
+#include <string>
 #include <vector>
-//#include <xtensor/xmath.hpp>
-//#include <xtensor/xoperation.hpp>
-//#include <xtensor/xrandom.hpp>
-//#include <xtensor/xview.hpp>
-#include <codecs/include/mpegg-codecs.h>
+// #include <xtensor/xmath.hpp>
+// #include <xtensor/xoperation.hpp>
+// #include <xtensor/xrandom.hpp>
+// #include <xtensor/xview.hpp>
+#include "codecs/include/mpegg-codecs.h"
 #include "genie/core/constants.h"
-#include "genie/core/record/variant_genotype/record.h"
+#include "genie/core/variant_genotype_record/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/runtime_exception.h"
@@ -36,7 +37,7 @@ TEST(Likelihood, ParseLikelihood) {
     }
     reader.close();
 
-    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
 
     ASSERT_EQ(recs.size(), 100);
@@ -54,8 +55,8 @@ TEST(Likelihood, ParseLikelihood) {
     ASSERT_EQ(likelihood_mat.dimension(), 2);
     ASSERT_EQ(likelihood_mat.shape(0), BLOCK_SIZE);
     ASSERT_EQ(likelihood_mat.shape(1), 1092 * 3);
-    ASSERT_EQ(likelihood_mat(0, 4), 3197737370);  // TODO (Yeremia): Check whats the value at this position
-    ASSERT_EQ(likelihood_mat(0, 8), 3241567846);  // TODO (Yeremia): Check whats the value at this position
+    ASSERT_EQ(likelihood_mat(0, 4), 3197737370);  // TODO(Yeremia): Check whats the value at this position
+    ASSERT_EQ(likelihood_mat(0, 8), 3241567846);  // TODO(Yeremia): Check whats the value at this position
 }
 
 TEST(Likelihood, RoundTripNoTransform) {
@@ -74,7 +75,7 @@ TEST(Likelihood, RoundTripNoTransform) {
     }
     reader.close();
 
-    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
 
     ASSERT_EQ(recs.size(), 100);
@@ -116,7 +117,7 @@ TEST(Likelihood, RoundTripTransform) {
     }
     reader.close();
 
-    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
 
     ASSERT_EQ(recs.size(), 100);
@@ -132,7 +133,7 @@ TEST(Likelihood, RoundTripTransform) {
 
     transform_likelihood_mat(opt, block);
     genie::likelihood::UInt32MatDtype recon_likelihood_mat;
- 
+
     block.likelihood_mat = xt::empty<uint32_t>({0});
 
     genie::likelihood::inverse_transform_likelihood_mat(opt, block);
@@ -149,7 +150,7 @@ TEST(Likelihood, RoundTripNoTransformEncode) {
     std::vector<genie::core::record::VariantGenotype> recs;
 
     uint32_t BLOCK_SIZE = 100;
-    bool TRANSFORM_MODE = false;  // TODO: If false + big data -> error
+    bool TRANSFORM_MODE = false;  // TODO(Yeremia): If false + big data -> error
 
     std::ifstream reader(filepath, std::ios::binary | std::ios::in);
     ASSERT_EQ(reader.fail(), false);
@@ -159,7 +160,7 @@ TEST(Likelihood, RoundTripNoTransformEncode) {
     }
     reader.close();
 
-    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
 
     ASSERT_EQ(recs.size(), 100);
@@ -195,7 +196,7 @@ TEST(Likelihood, RoundTripNoTransformEncode) {
     //    );
 
     const std::string& serialized_mat_str = block.serialized_mat.str();
-    size_t serialized_mat_len = (size_t)block.serialized_mat.tellp();
+    size_t serialized_mat_len = static_cast<size_t>(block.serialized_mat.tellp());
     auto* serialized_mat_payload = (unsigned char*)calloc(serialized_mat_len, sizeof(unsigned char));
     auto* serialized_mat_ptr = serialized_mat_str.c_str();
     std::memcpy(serialized_mat_payload, serialized_mat_ptr, serialized_mat_len);
@@ -207,8 +208,7 @@ TEST(Likelihood, RoundTripNoTransformEncode) {
         &compressed_data,
         &compressed_data_len,
         serialized_mat_payload,
-        serialized_mat_len
-    );
+        serialized_mat_len);
 
     uint8_t* recon_data;
     size_t recon_data_len;
@@ -231,7 +231,7 @@ TEST(Likelihood, RoundTripTransformEncode) {
     std::vector<genie::core::record::VariantGenotype> recs;
 
     uint32_t BLOCK_SIZE = 100;
-    bool TRANSFORM_MODE = true;  // TODO: If false + big data -> error
+    bool TRANSFORM_MODE = true;  // TODO(Yeremia): If false + big data -> error
 
     std::ifstream reader(filepath, std::ios::binary | std::ios::in);
     ASSERT_EQ(reader.fail(), false);
@@ -241,7 +241,7 @@ TEST(Likelihood, RoundTripTransformEncode) {
     }
     reader.close();
 
-    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
 
     ASSERT_EQ(recs.size(), 100);
@@ -275,7 +275,7 @@ TEST(Likelihood, RoundTripTransformEncode) {
     ASSERT_EQ((size_t)block.serialized_arr.tellp(), block.lut.size() * 4);
 
     const std::string& serialized_arr_str = block.serialized_arr.str();
-    size_t serialized_arr_len = (size_t)block.serialized_arr.tellp();
+    size_t serialized_arr_len = static_cast<size_t>(block.serialized_arr.tellp());
     auto* serialized_arr_payload = (unsigned char*)calloc(serialized_arr_len, sizeof(unsigned char));
     auto* serialized_arr_ptr = serialized_arr_str.c_str();
     std::memcpy(serialized_arr_payload, serialized_arr_ptr, serialized_arr_len);
@@ -287,8 +287,7 @@ TEST(Likelihood, RoundTripTransformEncode) {
         &compressed_data,
         &compressed_data_len,
         serialized_arr_payload,
-        serialized_arr_len
-    );
+        serialized_arr_len);
 
     uint8_t* recon_data;
     size_t recon_data_len;

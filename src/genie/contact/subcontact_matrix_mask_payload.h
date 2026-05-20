@@ -4,10 +4,11 @@
 * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CONTACT_SUBCONTACT_MATRIX_MASK_PAYLOAD_H
-#define GENIE_CONTACT_SUBCONTACT_MATRIX_MASK_PAYLOAD_H
+#ifndef SRC_GENIE_CONTACT_SUBCONTACT_MATRIX_MASK_PAYLOAD_H_
+#define SRC_GENIE_CONTACT_SUBCONTACT_MATRIX_MASK_PAYLOAD_H_
 
-#include "consts.h"
+#include <vector>
+#include "genie/contact/consts.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
@@ -74,8 +75,7 @@ class SubcontactMatrixMaskPayload{
      * @param other The SubcontactMatrixMaskPayload object to assign from.
      */
     SubcontactMatrixMaskPayload& operator=(
-        const SubcontactMatrixMaskPayload&
-    ) = default;
+        const SubcontactMatrixMaskPayload&) = default;
 
     /**
      * @brief Constructor that reads from a BitReader.
@@ -87,8 +87,7 @@ class SubcontactMatrixMaskPayload{
      */
     SubcontactMatrixMaskPayload(
         util::BitReader &reader,
-        uint32_t num_bin_entries
-    );
+        uint32_t num_bin_entries);
 
     /**
      * @brief Constructor that takes a mask array.
@@ -98,8 +97,7 @@ class SubcontactMatrixMaskPayload{
      *  @param mask_array The moveable mask array.
      */
     explicit SubcontactMatrixMaskPayload(
-        BinVecDtype&& mask_array
-    );
+        BinVecDtype&& mask_array);
 
     /**
      * @brief Constructor that takes a transform ID, a boolean value, and a RLE-transformed mask array.
@@ -113,8 +111,7 @@ class SubcontactMatrixMaskPayload{
     SubcontactMatrixMaskPayload(
         TransformID _transform_ID,
         bool _first_val,
-        UIntVecDtype& _rl_entries
-    );
+        UIntVecDtype& _rl_entries);
 
     /**
      * @brief Overloaded equality operator.
@@ -218,8 +215,7 @@ class SubcontactMatrixMaskPayload{
     void SetRlEntries(
         TransformID _transform_ID,
         bool _first_val,
-        const std::optional<UIntVecDtype>& _rl_entries
-    );
+        const std::optional<UIntVecDtype>& _rl_entries);
 
     /**
      * @brief Gets the size of this structure.
@@ -247,4 +243,4 @@ class SubcontactMatrixMaskPayload{
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CONTACT_SUBCONTACT_MATRIX_MASK_PAYLOAD_H
+#endif  // SRC_GENIE_CONTACT_SUBCONTACT_MATRIX_MASK_PAYLOAD_H_

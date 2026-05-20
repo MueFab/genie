@@ -9,15 +9,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
 #include <string>
-#include <utility>
 #include <vector>
+
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -96,15 +94,14 @@ class AttributeParameterSet {
      * @brief
      * @param reader
      */
-    void read(util::BitReader& reader);
+    void Read(util::BitReader& reader);
 
     /**
      * @brief
      * @param writer
      */
-    void write(core::Writer& writer) const;
-
-    size_t getSize(core::Writer& writesize) const;
+    void Write(util::BitWriter& writer) const;
+    size_t GetSize(util::BitWriter& writesize) const;
 
     uint16_t getAttriubuteID() const { return attribute_ID; }
     uint8_t getAttributeNameLength() const { return attribute_name_len; }

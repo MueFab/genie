@@ -5,7 +5,10 @@
  */
 
 #include "genie/format/mgg/encapsulator/encapsulated_file.h"
+#include <map>
+#include <string>
 #include <utility>
+#include <vector>
 #include "filesystem/filesystem.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -56,7 +59,7 @@ std::map<uint8_t, std::vector<std::string>> EncapsulatedFile::groupInputFiles(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-EncapsulatedFile::EncapsulatedFile(const std::vector<std::string>& input_files, genie::core::MPEGMinorVersion version) {
+EncapsulatedFile::EncapsulatedFile(const std::vector<std::string>& input_files, genie::core::MpegMinorVersion version) {
     std::map<uint8_t, std::vector<std::string>> file_groups = groupInputFiles(input_files);
 
     for (auto& g : file_groups) {
@@ -68,7 +71,7 @@ EncapsulatedFile::EncapsulatedFile(const std::vector<std::string>& input_files, 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::format::mgg::MggFile EncapsulatedFile::assemble(genie::core::MPEGMinorVersion version) {
+genie::format::mgg::MggFile EncapsulatedFile::assemble(genie::core::MpegMinorVersion version) {
     genie::format::mgg::MggFile ret;
     ret.addBox(genie::util::make_unique<genie::format::mgg::FileHeader>(version));
 

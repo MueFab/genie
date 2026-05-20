@@ -12,7 +12,7 @@
 #include <map>
 #include <set>
 #include <string>
-#include "genie/core/meta/external-ref/fasta.h"
+#include "genie/core/meta/external_ref/fasta.h"
 #include "genie/core/meta/reference.h"
 #include "genie/format/fasta/fai-file.h"
 #include "genie/format/fasta/sha256File.h"

@@ -4,8 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encoder.h"
+#include "genie/entropy/jbig/encoder.h"
 #include <iostream>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,18 +41,15 @@ void JBIGEncoder::encode(
     int ret = mpegg_jbig_compress_default(
         &compressedBuffer,
         &compSize,
-        (const unsigned char* )input.str().c_str(),
+        (const unsigned char*)input.str().c_str(),
         srcLen,
         buf_nrows,
-        buf_ncols
-    );
+        buf_ncols);
     if (ret != 0) {
         std::cerr << "error with jbig compression\n";
     }
     for (size_t i = 0; i < compSize; ++i)
         output << compressedBuffer[i];
- 
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -79,8 +77,7 @@ void JBIGEncoder::encode(
         inputBuffer,
         srcLen,
         buf_nrows,
-        buf_ncols
-    );
+        buf_ncols);
     if (ret != 0) {
         std::cerr << "error with decompression\n";
     }
@@ -96,9 +93,8 @@ void JBIGEncoder::decode(
     uint32_t& ncols,
     uint32_t& nrows
 ) {
-
     const size_t srcLen = input.str().size();
-     unsigned char* decompressedBuffer;
+    unsigned char* decompressedBuffer;
     size_t dest_data_len;
 
     unsigned long buf_nrows, buf_ncols;
@@ -106,11 +102,10 @@ void JBIGEncoder::decode(
     int ret = mpegg_jbig_decompress_default(
         &decompressedBuffer,
         &dest_data_len,
-        (const unsigned char* )input.str().c_str(),
+        (const unsigned char*)input.str().c_str(),
         srcLen,
         &buf_nrows,
-        &buf_ncols
-    );
+        &buf_ncols);
 
     nrows = (uint32_t) buf_nrows;
     ncols = (uint32_t) buf_ncols;

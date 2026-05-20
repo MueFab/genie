@@ -19,7 +19,7 @@
 #include "genie/core/record/annotation_access_unit/record.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/core/record/variant_site/record.h"
+#include "genie/core/variant_site_record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -38,10 +38,10 @@ class Code {
     Code(const std::string& _inputFileName, const std::string& _outputFileName, const std::string& _jsonInfoFileName);
     Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput);
     Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,
-         const std::string& rec = (std::string&)"all");
+         const std::string& rec = "all");
 
     Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,
-         const std::string& _infoFieldsFileName, const std::string& rec = (std::string&)"all");
+         const std::string& _infoFieldsFileName, const std::string& rec = "all");
 
  private:
     using AnnotationParameterSet = genie::core::record::annotation_parameter_set::Record;

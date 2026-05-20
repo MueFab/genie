@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mgb/reference.h"
+#include <string>
 #include "genie/format/mgb/importer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -9,16 +9,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
 #include <vector>
+
 #include "genie/core/arrayType.h"
-#include "genie/core/constants.h"
-#include "genie/core/writer.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -45,9 +38,9 @@ class AlgorithmParameters {
                         std::vector<uint8_t> par_num_array_dims, std::vector<std::vector<uint8_t>> par_array_dims,
                         std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val);
 
-    void read(util::BitReader& reader);
-    void write(core::Writer& writer) const;
-    size_t getSize(core::Writer& writesize) const;
+    void Read(util::BitReader& reader);
+    void Write(util::BitWriter& writer) const;
+    size_t GetSize(util::BitWriter& writesize) const;
 
     uint8_t getNumberOfPars() const { return n_pars; }
     std::vector<uint8_t> getParIDs() const { return par_ID; }

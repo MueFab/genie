@@ -4,21 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_GENOTYPE_PARAMETERS_H
-#define GENIE_GENOTYPE_PARAMETERS_H
+#ifndef SRC_GENIE_GENOTYPE_GENOTYPE_PARAMETERS_H_
+#define SRC_GENIE_GENOTYPE_GENOTYPE_PARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <boost/optional/optional.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+#include <boost/optional/optional.hpp>
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "genie/core/writer.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::genotype {
@@ -72,8 +72,7 @@ class GenotypeParameters {
       bool sort_phases_rows_flag,
       bool sort_phases_cols_flag,
       bool transpose_phases_mat_flag,
-      genie::core::AlgoID phases_codec_id
-  );
+      genie::core::AlgoID phases_codec_id);
 
   // Copy constructor
   GenotypeParameters(const GenotypeParameters& other);
@@ -116,12 +115,11 @@ class GenotypeParameters {
   [[maybe_unused]] void SetSortPhasesColsFlag(bool flag);
   [[maybe_unused]] void SetPhasesCodecID(genie::core::AlgoID codec_id);
 
-  static size_t GetSize() ;
+  static size_t GetSize();
   void Write(util::BitWriter& writer) const;
-  void Write(core::Writer& writer) const;
 
-  //TODO: Why we have read function here instead of a constructor?
-  void read(util::BitReader& reader);
+  // TODO(Yeremia): Why we have read function here instead of a constructor?
+  void Read(util::BitReader& reader);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -130,6 +128,6 @@ class GenotypeParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_GENOTYPE_PARAMETERS_H
+#endif  // SRC_GENIE_GENOTYPE_GENOTYPE_PARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "decoder.h"
+#include "genie/entropy/jbig/decoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

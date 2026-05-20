@@ -1,79 +1,82 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SHARED_DATA_H_
 #define SRC_GENIE_CORE_RECORD_ALIGNMENT_SHARED_DATA_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <cstdint>
 #include <memory>
+
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 /**
  * @brief
  */
-class AlignmentSharedData {
-    uint16_t seq_ID;   //!< @brief
-    uint8_t as_depth;  //!< @brief
+class AlignmentSharedData final {
+  uint16_t seq_id_;   //!< @brief
+  uint8_t as_depth_;  //!< @brief
 
  public:
-    /**
-     * @brief
-     */
-    AlignmentSharedData();
+  /**
+   * @brief
+   */
+  virtual ~AlignmentSharedData() = default;
 
-    /**
-     * @brief
-     * @param _seq_ID
-     * @param _as_depth
-     */
-    AlignmentSharedData(uint16_t _seq_ID, uint8_t _as_depth);
+  /**
+   * @brief
+   */
+  AlignmentSharedData();
 
-    /**
-     * @brief
-     * @param reader
-     */
-    explicit AlignmentSharedData(util::BitReader &reader);
+  /**
+   * @brief
+   * @param seq_id
+   * @param as_depth
+   */
+  AlignmentSharedData(uint16_t seq_id, uint8_t as_depth);
 
-    /**
-     * @brief
-     * @param write
-     */
-    virtual void write(util::BitWriter &write) const;
+  /**
+   * @brief
+   * @param reader
+   */
+  explicit AlignmentSharedData(util::BitReader& reader);
 
-    /**
-     * @brief
-     * @return
-     */
-    uint16_t getSeqID() const;
+  /**
+   * @brief
+   * @param writer
+   */
+  void Write(util::BitWriter& writer) const;
 
-    /**
-     * @brief
-     * @return
-     */
-    uint8_t getAsDepth() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint16_t GetSeqId() const;
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint8_t GetAsDepth() const;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_SHARED_DATA_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

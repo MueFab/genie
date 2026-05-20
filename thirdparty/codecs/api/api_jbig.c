@@ -223,12 +223,12 @@ int mpegg_jbig_decompress(
         exit(1);
     }
 
-#if defined(_WIN32) || defined(_WIN64)
-    *dest_len = src_len * 200; // Expect worst case 30x source size
+    *dest_len = src_len * 30; // Expect worst case 30x source size
     *dest = (unsigned char *) calloc (*dest_len, sizeof(unsigned  char));
+#if defined(_WIN32) || defined(_WIN64)
     fout = fmemopen_windows(*dest, *dest_len * sizeof(unsigned  char), "wb");
 #else
-    fout = open_memstream((char **)dest, dest_len);
+    fout = fmemopen(*dest, *dest_len * sizeof(unsigned  char), "wb");
 #endif
 
     if (!fout)
@@ -313,9 +313,7 @@ int mpegg_jbig_decompress(
         }
     }
 
-#if defined(_WIN32) || defined(_WIN64)
     *dest_len = ftell(fout);
-#endif
 
     fclose(fin);
 

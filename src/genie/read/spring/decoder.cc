@@ -62,14 +62,14 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
     // some state variables
     uint64_t abs_pos = 0;
 
-    while (!au.get(core::GenSub::RTYPE).end()) {
-        auto rtype = au.get(core::GenSub::RTYPE).pull();
+    while (!au.get(core::gen_sub::kRtype).end()) {
+        auto rtype = au.get(core::gen_sub::kRtype).pull();
         if (rtype == 5) {
             // put in refBuf
-            auto rlen = (uint32_t)au.get(core::GenSub::RLEN).pull() + 1;  // rlen
+            auto rlen = (uint32_t)au.get(core::gen_sub::kReadLength).pull() + 1;  // rlen
             for (uint32_t i = 0; i < rlen; i++) {
                 refBuf.push_back(
-                    getAlphabetProperties(core::AlphabetID::ACGTN).lut[au.get(core::GenSub::UREADS).pull()]);  // ureads
+                    GetAlphabetProperties(core::AlphabetId::kAcgtn).lut[au.get(core::gen_sub::kUnalignedReads).pull()]);  // ureads
             }
         } else {
             // rtype can be 1 (P) or 3 (M)
@@ -79,7 +79,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
             bool same_au_flag = false;  // when combine_pairs true and pair is split:
                                         // flag to indicate if mate in same AU
             if (paired_end) {
-                uint64_t pairing_decoding_case = au.get(core::GenSub::PAIR_DECODING_CASE).pull();
+                uint64_t pairing_decoding_case = au.get(core::gen_sub::kPairDecodingCase).pull();
                 // note that we don't decode/use mateAUid and mateRecordIndex in this
                 // decoder the compressor still stores this information which can be a
                 // bit redundant given it is stored at two places and also the ids are
@@ -89,7 +89,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                 uint16_t data_pair;
                 switch (pairing_decoding_case) {
                     case 0:
-                        data_pair = (uint16_t)au.get(core::GenSub::PAIR_SAME_REC).pull();
+                        data_pair = (uint16_t)au.get(core::gen_sub::kPairSameRec).pull();
                         read_1_first = !(((uint16_t)(data_pair)) & 1);
                         delta = ((uint16_t)(data_pair)) >> 1;
                         number_of_record_segments = 2;
@@ -125,8 +125,8 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
             }
             uint32_t rlen[2];
             for (int i = 0; i < number_of_record_segments; i++)
-                rlen[i] = (uint32_t)(au.get(core::GenSub::RLEN).pull()) + 1;      // rlen
-            auto pos = (uint32_t)au.get(core::GenSub::POS_MAPPING_FIRST).pull();  // pos
+                rlen[i] = (uint32_t)(au.get(core::gen_sub::kReadLength).pull()) + 1;      // rlen
+            auto pos = (uint32_t)au.get(core::gen_sub::kPositionFirst).pull();  // pos
 
             abs_pos += pos;
             std::string cur_read[2];
@@ -137,26 +137,26 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
             }
             bool reverseComp[2];
             for (int i = 0; i < number_of_record_segments; i++)
-                reverseComp[i] = au.get(core::GenSub::RCOMP).pull();  // rcomp
+                reverseComp[i] = au.get(core::gen_sub::kReverseComplement).pull();  // rcomp
             if (rtype == 3) {
                 // type M
                 for (int i = 0; i < number_of_record_segments; i++) {
                     uint32_t abs_mmpos = 0;
                     while (true) {
-                        bool mmpos_flag = static_cast<bool>(au.get(core::GenSub::MMPOS_TERMINATOR).pull());
+                        bool mmpos_flag = static_cast<bool>(au.get(core::gen_sub::kMismatchPosTerminator).pull());
                         if (mmpos_flag == 1) break;
-                        uint32_t mmpos = (uint32_t)(au.get(core::GenSub::MMPOS_POSITION).pull());
+                        uint32_t mmpos = (uint32_t)(au.get(core::gen_sub::kMismatchPosDelta).pull());
                         abs_mmpos += mmpos;
-                        uint32_t mmtype_0 = (uint32_t)(au.get(core::GenSub::MMTYPE_TYPE).pull());
+                        uint32_t mmtype_0 = (uint32_t)(au.get(core::gen_sub::kMismatchType).pull());
                         if (mmtype_0 != 0)  // i.e., not substitution
                             throw std::runtime_error("Non zero mmtype encountered.");
-                        const auto mmtype_1 = au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
-                                                  ? au.get(core::GenSub::MMTYPE_SUBSTITUTION)
+                        const auto mmtype_1 = au.get(core::gen_sub::kMismatchTypeSubstBase).getMismatchDecoder()->dataLeft()
+                                                  ? au.get(core::gen_sub::kMismatchTypeSubstBase)
                                                         .getMismatchDecoder()
-                                                        ->decodeMismatch(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                                        ->decodeMismatch(GetAlphabetProperties(core::AlphabetId::kAcgtn)
                                                                              .inverseLut[cur_read[i][abs_mmpos]])
-                                                  : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
-                        cur_read[i][abs_mmpos] = getAlphabetProperties(core::AlphabetID::ACGTN).lut[mmtype_1];
+                                                  : GetAlphabetProperties(core::AlphabetId::kAcgtn).inverseLut['N'];
+                        cur_read[i][abs_mmpos] = GetAlphabetProperties(core::AlphabetId::kAcgtn).lut[mmtype_1];
                         abs_mmpos++;
                     }
                 }
@@ -269,26 +269,26 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
 
     std::vector<std::string> ecigars;
     std::vector<uint64_t> positions;
-    while (!au.get(core::GenSub::RTYPE).end()) {
-        if (au.get(core::GenSub::RTYPE).pull() != 5) {
-            ecigars.emplace_back(std::to_string(au.get(core::GenSub::RLEN).pull() + 1) + "+");
+    while (!au.get(core::gen_sub::kRtype).end()) {
+        if (au.get(core::gen_sub::kRtype).pull() != 5) {
+            ecigars.emplace_back(std::to_string(au.get(core::gen_sub::kReadLength).pull() + 1) + "+");
             positions.emplace_back(std::numeric_limits<uint64_t>::max());
             if (cp.paired_end) {
-                if (au.get(core::GenSub::PAIR_DECODING_CASE).pull() == 0) {
-                    ecigars.emplace_back(std::to_string(au.get(core::GenSub::RLEN).pull() + 1) + "+");
+                if (au.get(core::gen_sub::kPairDecodingCase).pull() == 0) {
+                    ecigars.emplace_back(std::to_string(au.get(core::gen_sub::kReadLength).pull() + 1) + "+");
                     positions.emplace_back(std::numeric_limits<uint64_t>::max());
                 }
             }
         } else {
-            au.get(core::GenSub::RLEN).pull();
+            au.get(core::gen_sub::kReadLength).pull();
         }
     }
-    au.get(core::GenSub::PAIR_DECODING_CASE).setPosition(0);
-    au.get(core::GenSub::RTYPE).setPosition(0);
-    au.get(core::GenSub::RLEN).setPosition(0);
+    au.get(core::gen_sub::kPairDecodingCase).setPosition(0);
+    au.get(core::gen_sub::kRtype).setPosition(0);
+    au.get(core::gen_sub::kReadLength).setPosition(0);
 
     watch.pause();
-    auto names = namecoder->process(au.get(core::GenDesc::RNAME));
+    auto names = namecoder->process(au.get(core::GenDesc::kReadName));
 
     // if read names is empty but combine_pairs is set to true, raise error
     if (au.getNumReads() > 0 && std::get<0>(names).empty() && combine_pairs)
@@ -296,7 +296,7 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
 
     au.getStats().add(std::get<1>(names));
     auto qvs = qvcoder->process(au.getParameters().getQVConfig(core::record::ClassType::CLASS_U), ecigars, positions,
-                                au.get(core::GenDesc::QV));
+                                au.get(core::GenDesc::kQv));
     au.getStats().add(std::get<1>(qvs));
     watch.resume();
 

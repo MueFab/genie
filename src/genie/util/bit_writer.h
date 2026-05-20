@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_UTIL_BITWRITER_H_
-#define SRC_GENIE_UTIL_BITWRITER_H_
+#ifndef SRC_GENIE_UTIL_BIT_WRITER_H_
+#define SRC_GENIE_UTIL_BIT_WRITER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -41,6 +41,9 @@ class BitWriter {
      * @param str Some output stream. Must be valid to write to.
      */
     explicit BitWriter(std::ostream *str);
+
+    // newer version takes reference instead of pointer. do not remove.
+    explicit BitWriter(std::ostream &str);
 
     /**
      * @brief Controlled destruction. Flush is called, but stream not closed.
@@ -118,6 +121,9 @@ class BitWriter {
      */
     template <typename T, size_t SIZE = sizeof(T), typename = std::enable_if<std::is_integral<T>::value>>
     void WriteBypassBE(T val);
+    void WriteReserved(uint8_t bits);
+    void Write(uint64_t value, uint8_t bits, bool reserved);
+    void WriteAlignedStream(std::istream& in);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -131,7 +137,7 @@ class BitWriter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_UTIL_BITWRITER_H_
+#endif  // SRC_GENIE_UTIL_BIT_WRITER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

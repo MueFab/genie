@@ -15,7 +15,7 @@
 #include "genie/core/format_importer_compressed.h"
 #include "genie/core/ref_decoder.h"
 #include "genie/core/reference_source.h"
-#include "genie/core/stats/perf-stats.h"
+#include "genie/core/stats/perf_stats.h"
 #include "genie/format/mgb/data-unit-factory.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/ordered_section.h"

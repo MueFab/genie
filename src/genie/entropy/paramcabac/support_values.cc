@@ -1,127 +1,146 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * Copyright 2018-2024 The Genie Authors.
+ * @file support_values.cc
+ * @brief Implementation of CABAC support values for Genie.
+ *
+ * Provides the `SupportValues` class to manage parameters like output symbol
+ * size, coding subsymbol size, coding order, and flags for shared subsymbol
+ * LUTs and PRVs. Includes methods for serialization and JSON conversion.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/entropy/paramcabac/support_values.h"
+
 #include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 SupportValues::SupportValues() : SupportValues(8, 8, 0) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-SupportValues::SupportValues(uint8_t _output_symbol_size, uint8_t _coding_subsym_size, uint8_t _coding_order,
-                             bool _share_subsym_lut_flag, bool _share_subsym_prv_flag)
-    : output_symbol_size(_output_symbol_size),
-      coding_subsym_size(_coding_subsym_size),
-      coding_order(_coding_order),
-      share_subsym_lut_flag(_share_subsym_lut_flag),
-      share_subsym_prv_flag(_share_subsym_prv_flag) {}
+SupportValues::SupportValues(const uint8_t output_symbol_size,
+                             const uint8_t coding_subsym_size,
+                             const uint8_t coding_order,
+                             const bool share_subsym_lut_flag,
+                             const bool share_subsym_prv_flag)
+    : output_symbol_size_(output_symbol_size),
+      coding_subsym_size_(coding_subsym_size),
+      coding_order_(coding_order),
+      share_subsym_lut_flag_(share_subsym_lut_flag),
+      share_subsym_prv_flag_(share_subsym_prv_flag) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-SupportValues::SupportValues(TransformIdSubsym transformIdSubsym, util::BitReader &reader)
-    : share_subsym_lut_flag(false), share_subsym_prv_flag(false) {
-    output_symbol_size = reader.Read<uint8_t>(6);
-    coding_subsym_size = reader.Read<uint8_t>(6);
-    coding_order = reader.Read<uint8_t>(2);
-    if (coding_subsym_size < output_symbol_size && coding_order > 0) {
-        if (transformIdSubsym == TransformIdSubsym::LUT_TRANSFORM) {
-            share_subsym_lut_flag = reader.Read<bool>(1);
-        }
-        share_subsym_prv_flag = reader.Read<bool>(1);
+SupportValues::SupportValues(const TransformIdSubsym transform_id_subsym,
+                             util::BitReader& reader)
+    : share_subsym_lut_flag_(false), share_subsym_prv_flag_(false) {
+  output_symbol_size_ = reader.Read<uint8_t>(6);
+  coding_subsym_size_ = reader.Read<uint8_t>(6);
+  coding_order_ = reader.Read<uint8_t>(2);
+  if (coding_subsym_size_ < output_symbol_size_ && coding_order_ > 0) {
+    if (transform_id_subsym == TransformIdSubsym::LUT_TRANSFORM) {
+      share_subsym_lut_flag_ = reader.Read<bool>(1);
     }
+    share_subsym_prv_flag_ = reader.Read<bool>(1);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void SupportValues::write(TransformIdSubsym transformIdSubsym, util::BitWriter &writer) const {
-    writer.WriteBits(output_symbol_size, 6);
-    writer.WriteBits(coding_subsym_size, 6);
-    writer.WriteBits(coding_order, 2);
-    if (coding_subsym_size < output_symbol_size && coding_order > 0) {
-        if (transformIdSubsym == TransformIdSubsym::LUT_TRANSFORM) {
-            writer.WriteBits(share_subsym_lut_flag, 1);
-        }
-        writer.WriteBits(share_subsym_prv_flag, 1);
+void SupportValues::write(const TransformIdSubsym transform_id_subsym,
+                          util::BitWriter& writer) const {
+  writer.WriteBits(output_symbol_size_, 6);
+  writer.WriteBits(coding_subsym_size_, 6);
+  writer.WriteBits(coding_order_, 2);
+  if (coding_subsym_size_ < output_symbol_size_ && coding_order_ > 0) {
+    if (transform_id_subsym == TransformIdSubsym::LUT_TRANSFORM) {
+      writer.WriteBits(share_subsym_lut_flag_, 1);
     }
+    writer.WriteBits(share_subsym_prv_flag_, 1);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint8_t SupportValues::getOutputSymbolSize() const { return output_symbol_size; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t SupportValues::getCodingSubsymSize() const { return coding_subsym_size; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t SupportValues::getCodingOrder() const { return coding_order; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool SupportValues::getShareSubsymLutFlag() const { return share_subsym_lut_flag; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool SupportValues::getShareSubsymPrvFlag() const { return share_subsym_prv_flag; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool SupportValues::operator==(const SupportValues &val) const {
-    return output_symbol_size == val.output_symbol_size && coding_subsym_size == val.coding_subsym_size &&
-           coding_order == val.coding_order && share_subsym_lut_flag == val.share_subsym_lut_flag &&
-           share_subsym_prv_flag == val.share_subsym_prv_flag;
+uint8_t SupportValues::GetOutputSymbolSize() const {
+  return output_symbol_size_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-SupportValues::SupportValues(nlohmann::json j, TransformIdSubsym transformIdSubsym) {
-    share_subsym_lut_flag = false;
-    share_subsym_prv_flag = false;
-    output_symbol_size = j["output_symbol_size"];
-    coding_subsym_size = j["coding_subsym_size"];
-    coding_order = j["coding_order"];
-    if (coding_subsym_size < output_symbol_size && coding_order > 0) {
-        if (transformIdSubsym == TransformIdSubsym::LUT_TRANSFORM) {
-            share_subsym_lut_flag = j["share_subsym_lut_flag"];
-        }
-        share_subsym_prv_flag = j["share_subsym_prv_flag"];
+uint8_t SupportValues::GetCodingSubsymSize() const {
+  return coding_subsym_size_;
+}
+
+// -----------------------------------------------------------------------------
+
+uint8_t SupportValues::GetCodingOrder() const { return coding_order_; }
+
+// -----------------------------------------------------------------------------
+
+bool SupportValues::GetShareSubsymLutFlag() const {
+  return share_subsym_lut_flag_;
+}
+
+// -----------------------------------------------------------------------------
+
+bool SupportValues::GetShareSubsymPrvFlag() const {
+  return share_subsym_prv_flag_;
+}
+
+// -----------------------------------------------------------------------------
+
+bool SupportValues::operator==(const SupportValues& val) const {
+  return output_symbol_size_ == val.output_symbol_size_ &&
+         coding_subsym_size_ == val.coding_subsym_size_ &&
+         coding_order_ == val.coding_order_ &&
+         share_subsym_lut_flag_ == val.share_subsym_lut_flag_ &&
+         share_subsym_prv_flag_ == val.share_subsym_prv_flag_;
+}
+
+// -----------------------------------------------------------------------------
+
+SupportValues::SupportValues(nlohmann::json j,
+                             const TransformIdSubsym transform_id_subsym) {
+  share_subsym_lut_flag_ = false;
+  share_subsym_prv_flag_ = false;
+  output_symbol_size_ = j["output_symbol_size"];
+  coding_subsym_size_ = j["coding_subsym_size"];
+  coding_order_ = j["coding_order"];
+  if (coding_subsym_size_ < output_symbol_size_ && coding_order_ > 0) {
+    if (transform_id_subsym == TransformIdSubsym::LUT_TRANSFORM) {
+      share_subsym_lut_flag_ = j["share_subsym_lut_flag"];
     }
+    share_subsym_prv_flag_ = j["share_subsym_prv_flag"];
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-nlohmann::json SupportValues::toJson(TransformIdSubsym transformIdSubsym) const {
-    nlohmann::json ret;
-    ret["output_symbol_size"] = output_symbol_size;
-    ret["coding_subsym_size"] = coding_subsym_size;
-    ret["coding_order"] = coding_order;
-    if (coding_subsym_size < output_symbol_size && coding_order > 0) {
-        if (transformIdSubsym == TransformIdSubsym::LUT_TRANSFORM) {
-            ret["share_subsym_lut_flag"] = share_subsym_lut_flag;
-        }
-        ret["share_subsym_prv_flag"] = share_subsym_prv_flag;
+nlohmann::json SupportValues::ToJson(
+    const TransformIdSubsym transform_id_subsym) const {
+  nlohmann::json ret;
+  ret["output_symbol_size"] = output_symbol_size_;
+  ret["coding_subsym_size"] = coding_subsym_size_;
+  ret["coding_order"] = coding_order_;
+  if (coding_subsym_size_ < output_symbol_size_ && coding_order_ > 0) {
+    if (transform_id_subsym == TransformIdSubsym::LUT_TRANSFORM) {
+      ret["share_subsym_lut_flag"] = share_subsym_lut_flag_;
     }
-    return ret;
+    ret["share_subsym_prv_flag"] = share_subsym_prv_flag_;
+  }
+  return ret;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

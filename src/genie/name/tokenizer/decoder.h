@@ -39,7 +39,7 @@ class Decoder : public core::NameDecoder {
      * @param desc
      * @return
      */
-    std::tuple<std::vector<std::string>, core::stats::PerfStats> process(core::AccessUnit::Descriptor& desc) override;
+    std::tuple<std::vector<std::string>, core::stats::PerfStats> Process(core::AccessUnit::Descriptor& desc) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

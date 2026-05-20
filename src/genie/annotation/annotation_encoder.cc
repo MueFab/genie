@@ -4,19 +4,19 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/annotation/annotation_encoder.h"
+
 #include <algorithm>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "genie/annotation/annotation_encoder.h"
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/runtime_exception.h"
 
-// #include "genie/contact/contact_matrix_parameters.h"
 #include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
 #include "genie/core/record/annotation_parameter_set/TileConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/TileStructure.h"
@@ -33,8 +33,6 @@ namespace genie {
 namespace annotation {
 core::record::annotation_parameter_set::AnnotationEncodingParameters AnnotationEncoder::Compose() {
     std::vector<core::record::annotation_parameter_set::filterData> filters;
-    std::vector<std::string> features;
-    std::vector<std::string> ontologyTerms;
 
     core::record::annotation_parameter_set::AnnotationEncodingParameters annotation_encoding_parameters(
         filters, features, ontologyTerms, descriptorConfigurations, compressorParameters, attribute_parameter_set);

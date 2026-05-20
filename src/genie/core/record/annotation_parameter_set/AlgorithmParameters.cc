@@ -6,18 +6,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <iostream>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
-#include "genie/core/constants.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-
-#include "genie/core/arrayType.h"
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
+
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +19,7 @@ namespace annotation_parameter_set {
 AlgorithmParameters::AlgorithmParameters()
     : n_pars(0), par_ID{}, par_type{}, par_num_array_dims{}, par_array_dims{}, par_val{} {}
 
-AlgorithmParameters::AlgorithmParameters(util::BitReader& reader) { read(reader); }
+AlgorithmParameters::AlgorithmParameters(util::BitReader& reader) { Read(reader); }
 
 AlgorithmParameters::AlgorithmParameters(
     uint8_t n_pars, std::vector<uint8_t> par_ID, std::vector<core::DataType> par_type,
@@ -41,7 +32,7 @@ AlgorithmParameters::AlgorithmParameters(
       par_array_dims(par_array_dims),
       par_val(par_val) {}
 
-void AlgorithmParameters::read(util::BitReader& reader) {
+void AlgorithmParameters::Read(util::BitReader& reader) {
     par_val.resize(0);
 
     n_pars = static_cast<uint8_t>(reader.ReadBits(4));
@@ -55,6 +46,10 @@ void AlgorithmParameters::read(util::BitReader& reader) {
     for (auto i = 0; i < n_pars; ++i) {
         par_ID[i] = (static_cast<uint8_t>(reader.ReadBits(4)));
         par_type[i] = (static_cast<core::DataType>(reader.ReadBits(8)));
+        DataType paramType = par_type[i];
+        if (paramType == DataType::BOOL) {
+          paramType = DataType::UINT8;
+        }
         par_num_array_dims[i] = (static_cast<uint8_t>(reader.ReadBits(2)));
         for (auto j = 0; j < par_num_array_dims[i]; ++j) {
             par_array_dims[i].push_back(static_cast<uint8_t>(reader.ReadBits(8)));
@@ -62,29 +57,33 @@ void AlgorithmParameters::read(util::BitReader& reader) {
         par_val.emplace_back(resizeVector(par_num_array_dims[i], par_array_dims[i]));
         for (auto& d1 : par_val[i])
             for (auto& d2 : d1)
-                for (auto& d3 : d2) d3 = types.toArray(par_type[i], reader);
+                for (auto& d3 : d2) d3 = types.toArray(paramType, reader);
     }
 }
 
-void AlgorithmParameters::write(core::Writer& writer) const {
+void AlgorithmParameters::Write(util::BitWriter& writer) const {
     ArrayType types;
-    writer.Write(n_pars, 4);
+    writer.WriteBits(n_pars, 4);
     for (auto i = 0; i < n_pars; ++i) {
-      writer.Write(par_ID[i], 4);
-        writer.Write(static_cast<uint8_t>(par_type[i]), 8);
-        writer.Write(par_num_array_dims[i], 2);
+        writer.WriteBits(par_ID[i], 4);
+        writer.WriteBits(static_cast<uint8_t>(par_type[i]), 8);
+        DataType paramType = par_type[i];
+        if (paramType == DataType::BOOL) {
+          paramType = DataType::UINT8;
+        }
+        writer.WriteBits(par_num_array_dims[i], 2);
         for (auto j = 0; j < par_num_array_dims[i]; ++j) {
-          writer.Write(par_array_dims[i][j], 8);
+          writer.WriteBits(par_array_dims[i][j], 8);
         }
         for (auto j : par_val[i])
             for (auto k : j)
-                for (auto l : k) types.toFile(par_type[i], l, writer);
+                for (auto l : k) types.toFile(paramType, l, writer);
     }
 }
 
-size_t AlgorithmParameters::getSize(core::Writer& writesize) const {
-    write(writesize);
-    return writesize.GetBitsWritten();
+size_t AlgorithmParameters::GetSize(util::BitWriter& writesize) const {
+    Write(writesize);
+    return writesize.GetTotalBitsWritten();
 }
 
 std::vector<std::vector<std::vector<std::vector<uint8_t>>>> AlgorithmParameters::resizeVector(

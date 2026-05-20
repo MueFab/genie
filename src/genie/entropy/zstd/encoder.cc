@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <utility>
+#include <vector>
 #include "genie/util/make_unique.h"
 #include "genie/util/stop_watch.h"
 
@@ -26,6 +27,47 @@ namespace zstd {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ZSTDEncoder::ZSTDEncoder() : use_dictionary_flag(false), dictionary_size(0), dictionary{} {}
+
+void ZSTDEncoder::encode() {
+    // Use base class input/output storage
+    if (inputs.empty()) {
+        throw std::runtime_error("ZSTDEncoder: No input data set");
+    }
+    if (inputs[0].getArrayDims().size() != 1) {
+        throw std::runtime_error("ZSTDEncoder: Input data must be a 1D array");
+    }
+
+    auto &inputData = inputs[0];
+    const size_t srcLen = inputData.getdata().str().size();
+    unsigned char *destination;
+    size_t destLen = srcLen;
+
+    int ret = mpegg_zstd_compress(
+        &destination, &destLen,
+        reinterpret_cast<const unsigned char *>(inputData.getdata().str().data()), srcLen, 0);
+
+    if (ret != 0) {
+    std::cerr << "error with zstd compression\n";
+    if (destination)
+        free(destination);
+    throw std::runtime_error("ZSTD compression failed");
+    }
+
+    outputs.clear();
+    outputs.resize(1);
+    outputs[0] = genie::core::record::annotation_access_unit::TypedData(
+        inputData.getDataTypeID(), inputData.getNumArrayDims(), inputData.getArrayDims());
+    outputs[0].getCompresseddata().str(
+        std::string(reinterpret_cast<const char *>(destination), destLen));
+
+    if (destination)
+    free(destination);
+}
+
+void ZSTDEncoder::decode() {
+    // Use base class input/output storage
+    throw std::runtime_error("ZSTDEncoder: No input data set");
+}
 
 void ZSTDEncoder::encode(std::stringstream &input, std::stringstream &output) {
     const size_t srcLen = input.str().size();

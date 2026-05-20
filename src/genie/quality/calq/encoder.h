@@ -26,7 +26,7 @@ namespace calq {
 /**
  * @brief
  */
-class Encoder : public core::QVEncoder {
+class Encoder : public core::QvEncoder {
  private:
     void fillCalqStructures(const core::record::Chunk& chunk, calq::EncodingOptions& opt,
                             calq::SideInformation& sideInformation, calq::EncodingBlock& input);
@@ -43,7 +43,7 @@ class Encoder : public core::QVEncoder {
      * @param rec
      * @return
      */
-    core::QVEncoder::QVCoded process(const core::record::Chunk& rec) override;
+    core::QvEncoder::qv_coded process(const core::record::Chunk& rec) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

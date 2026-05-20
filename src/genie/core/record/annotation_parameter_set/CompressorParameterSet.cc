@@ -6,16 +6,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
-#include "genie/core/constants.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-
 #include "CompressorParameterSet.h"
+
+#include <vector>
+
 #include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -27,7 +21,7 @@ namespace annotation_parameter_set {
 
 CompressorParameterSet::CompressorParameterSet() : compressor_ID(1), compressorSteps{} {}
 
-CompressorParameterSet::CompressorParameterSet(util::BitReader& reader) { read(reader); }
+CompressorParameterSet::CompressorParameterSet(util::BitReader& reader) { Read(reader); }
 
 CompressorParameterSet::CompressorParameterSet(
     uint8_t compressor_ID, uint8_t n_compressor_steps, std::vector<uint8_t> compressor_step_ID,
@@ -59,7 +53,7 @@ CompressorParameterSet::CompressorParameterSet(
     }
 }
 
-void CompressorParameterSet::read(util::BitReader& reader) {
+void CompressorParameterSet::Read(util::BitReader& reader) {
     compressor_ID = static_cast<uint8_t>(reader.ReadBits(8));
     uint8_t n_compressor_steps = static_cast<uint8_t>(reader.ReadBits(4));
     compressorSteps.resize(n_compressor_steps);
@@ -69,7 +63,7 @@ void CompressorParameterSet::read(util::BitReader& reader) {
         compressorSteps.at(i).useDefaultAlgorithmParameters = static_cast<bool>(reader.ReadBits(1));
 
         if (!compressorSteps.at(i).useDefaultAlgorithmParameters)
-            compressorSteps.at(i).algorithm_parameters.read(reader);
+            compressorSteps.at(i).algorithm_parameters.Read(reader);
 
         uint8_t nrOfInVars = static_cast<uint8_t>(reader.ReadBits(4));
         compressorSteps.at(i).in_var_ID.resize(nrOfInVars);
@@ -88,45 +82,24 @@ void CompressorParameterSet::read(util::BitReader& reader) {
     reader.FlushHeldBits();
 }
 
-void CompressorParameterSet::write(core::Writer& writer) const {
-  writer.Write(compressor_ID, 8);
-    writer.Write(compressorSteps.size(), 4);
+void CompressorParameterSet::Write(util::BitWriter& writer) const {
+    writer.WriteBits(compressor_ID, 8);
+    writer.WriteBits(compressorSteps.size(), 4);
     for (auto step : compressorSteps) {
-      writer.Write(step.stepID, 4);
-        writer.Write(static_cast<uint8_t>(step.algorithmID), 5);
-        writer.Write(step.useDefaultAlgorithmParameters, 1);
-        if (!step.useDefaultAlgorithmParameters) step.algorithm_parameters.write(writer);
-        writer.Write(step.in_var_ID.size(), 4);
+        writer.WriteBits(step.stepID, 4);
+        writer.WriteBits(static_cast<uint8_t>(step.algorithmID), 5);
+        writer.WriteBits(step.useDefaultAlgorithmParameters, 1);
+        if (!step.useDefaultAlgorithmParameters) step.algorithm_parameters.Write(writer);
+        writer.WriteBits(step.in_var_ID.size(), 4);
         for (size_t i = 0; i < step.in_var_ID.size(); ++i) {
-          writer.Write(step.in_var_ID.at(i), 4);
-            writer.Write(step.prev_step_ID.at(i), 4);
-            writer.Write(step.prev_out_var_ID.at(i), 4);
+            writer.WriteBits(step.in_var_ID.at(i), 4);
+            writer.WriteBits(step.prev_step_ID.at(i), 4);
+            writer.WriteBits(step.prev_out_var_ID.at(i), 4);
         }
-        writer.Write(step.completed_out_var_ID.size(), 4);
-        for (auto outvar : step.completed_out_var_ID) writer.Write(outvar, 4);
+        writer.WriteBits(step.completed_out_var_ID.size(), 4);
+        for (auto outvar : step.completed_out_var_ID) writer.WriteBits(outvar, 4);
     }
-    /*
-    writer.write(n_compressor_steps, 4);
-    uint8_t algorithm_index = 0;
-    for (auto i = 0; i < n_compressor_steps; ++i) {
-        writer.write(compressor_step_ID[i], 4);
-        writer.write(static_cast<uint8_t>(algorithm_ID[i]), 5);
-        writer.write(use_default_pars[i], 1);
-        if (!use_default_pars[i]) {
-            (algorithm_parameters[algorithm_index].write(writer));
-            algorithm_index++;
-        }
-        writer.write(n_in_vars[i], 4);
-        for (auto j = 0; j < n_in_vars[i]; ++j) {
-            writer.write(in_var_ID[i][j], 4);
-            writer.write(prev_step_ID[i][j], 4);
-            writer.write(prev_out_var_ID[i][j], 4);
-        }
-        writer.write(n_completed_out_vars[i], 4);
-        for (auto j = 0; j < n_completed_out_vars[i]; ++j) writer.write(completed_out_var_ID[i][j], 4);
-    }
-    */
-    writer.Flush();
+    writer.FlushBits();
 }
 
 void CompressorParameterSet::addCompressorStep(compressorStep stepParameters) {
@@ -135,9 +108,9 @@ void CompressorParameterSet::addCompressorStep(compressorStep stepParameters) {
     compressorSteps.push_back(stepParameters);
 }
 
-size_t CompressorParameterSet::getSize(core::Writer& writesize) const {
-    write(writesize);
-    return writesize.GetBitsWritten();
+size_t CompressorParameterSet::GetSize(util::BitWriter& writesize) const {
+    Write(writesize);
+    return writesize.GetTotalBitsWritten();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

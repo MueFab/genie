@@ -4,16 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CONTACT_CONTACT_MATRIX_PARAMETERS_H
-#define GENIE_CONTACT_CONTACT_MATRIX_PARAMETERS_H
+#ifndef SRC_GENIE_CONTACT_CONTACT_MATRIX_PARAMETERS_H_
+#define SRC_GENIE_CONTACT_CONTACT_MATRIX_PARAMETERS_H_
 
 #include <genie/core/constants.h>
-#include <genie/core/writer.h>
 #include <genie/util/bit_reader.h>
 #include <genie/util/bit_writer.h>
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -95,7 +95,6 @@ class ContactMatrixParameters {
     std::unordered_map<uint8_t, NormalizedMatrixInformations> norm_mat_infos_;
 
  public:
-
     /**
      * @brief Default constructor for ContactMatrixParameters.
      *
@@ -123,8 +122,7 @@ class ContactMatrixParameters {
         uint32_t tile_size,
         std::vector<uint32_t>&& interval_multipliers,
         std::unordered_map<uint8_t, NormalizationMethodInformation>&& norm_method_infos,
-        std::unordered_map<uint8_t, NormalizedMatrixInformations>&& norm_mat_infos
-    );
+        std::unordered_map<uint8_t, NormalizedMatrixInformations>&& norm_mat_infos);
 
     /**
      * @brief Constructor for ContactMatrixParameters from a bit reader.
@@ -162,7 +160,7 @@ class ContactMatrixParameters {
      * @param name The name of the sample.
      * @param exist_ok If true, allows the addition if the sample already exists.
      */
-    void AddSample(uint16_t ID, std::string&& name, bool exist_ok= true);
+    void AddSample(uint16_t ID, std::string&& name, bool exist_ok = true);
 
     /**
      * @brief Gets the samples.
@@ -197,7 +195,7 @@ class ContactMatrixParameters {
     void UpsertSample(
         uint16_t ID,
         const std::string& name,
-        bool exist_ok= true);
+        bool exist_ok = true);
 
     /**
     * @brief Upserts a sample in the contact matrix parameters.
@@ -213,7 +211,7 @@ class ContactMatrixParameters {
     void UpsertSample(
         uint16_t ID,
         std::string&& name,
-        bool exist_ok= true);
+        bool exist_ok = true);
 
     /**
      * @brief Gets the number of chromosomes.
@@ -247,13 +245,13 @@ class ContactMatrixParameters {
         uint8_t ID,
         const std::string& name,
         uint64_t length,
-        bool exist_ok= true);
+        bool exist_ok = true);
 
     void UpsertChromosome(
         uint8_t ID,
         std::string&& name,
         uint64_t length,
-        bool exist_ok= true);
+        bool exist_ok = true);
 
     /**
      * @brief Gets the chromosomes.
@@ -274,8 +272,7 @@ class ContactMatrixParameters {
     * @throws std::runtime_error If the bin size is not set or the chromosome ID does not exist.
     */
     uint64_t GetChromosomeLength(
-        uint8_t chr_ID
-    ) const;
+        uint8_t chr_ID) const;
 
     /**
      * @brief Gets the bin size.
@@ -323,8 +320,7 @@ class ContactMatrixParameters {
     [[maybe_unused]] uint8_t GetNumBinSizeMultipliers() const;
 
     void UpsertBinSizeMultiplier(
-        size_t bin_size_multiplier
-    );
+        size_t bin_size_multiplier);
 
     /**
     * @brief Gets the length of a chromosome.
@@ -336,8 +332,7 @@ class ContactMatrixParameters {
     * @throws std::runtime_error If the bin size is not set or the chromosome ID does not exist.
     */
     bool IsBinSizeMultiplierValid(
-        size_t target_interv_mult
-    ) const;
+        size_t target_interv_mult) const;
 
     /**
      * @brief Gets the number of normalization methods.
@@ -407,7 +402,7 @@ class ContactMatrixParameters {
      */
     uint64_t GetNumBinEntries(
         uint8_t chr_ID,
-        uint32_t interv_mult= 1);
+        uint32_t interv_mult = 1);
 
     /**
      * @brief Gets the number of tiles.
@@ -421,7 +416,7 @@ class ContactMatrixParameters {
      */
     uint32_t GetNumTiles(
         uint8_t chr_ID,
-        uint32_t interv_mult= 1);
+        uint32_t interv_mult = 1);
 
     /**
      * @brief Gets the size of the object when written to a writer in bytes.
@@ -433,13 +428,14 @@ class ContactMatrixParameters {
     size_t GetSize() const;
 
     /**
-     * @brief Writes the object to a writer.
+     * @brief Writes the object to a BitWriter.
      *
-     * This function writes the object to a writer.
+     * This function writes the object to a BitWriter.
+     * It writes each member variable to the BitWriter.
      *
-     * @param writer The writer to write to.
+     * @param writer The BitWriter to write to.
      */
-    void Write(core::Writer& writer) const;
+    void Write(util::BitWriter& writer) const;
 
     /**
      * @brief Overloaded operator to compare two ContactMatrixParameters objects
@@ -464,14 +460,14 @@ class ContactMatrixParameters {
 // *
 // * @return True if the pair of chromosomes is symmetrical, false otherwise.
 // */
-//bool IsIntraSCM(uint8_t chr1_ID_, uint8_t chr2_ID_);
+// bool IsIntraSCM(uint8_t chr1_ID_, uint8_t chr2_ID_);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // genie::contact
+}  // namespace genie::contact
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CONTACT_CONTACT_MATRIX_PARAMETERS_H
+#endif  // SRC_GENIE_CONTACT_CONTACT_MATRIX_PARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------

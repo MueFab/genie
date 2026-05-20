@@ -7,11 +7,14 @@
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/transcoder.h"
 #include <algorithm>
 #include <iostream>
+#include <list>
 #include <memory>
 #include <mutex>
 #include <queue>
+#include <string>
 #include <thread>
 #include <utility>
+#include <vector>
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_group.h"
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_reader.h"
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sorter.h"
@@ -392,7 +395,7 @@ std::string patch_ecigar(const std::string& ref, const std::string& seq, const s
                 break;
         }
 
-        if (genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN).isIncluded(cigar)) {
+        if (genie::core::GetAlphabetProperties(genie::core::AlphabetId::kAcgtn).IsIncluded(cigar)) {
             fixedCigar += std::string(1, cigar);
             return true;
         }
@@ -437,7 +440,7 @@ genie::core::record::ClassType classifyEcigar(const std::string& cigar) {
         if (c == '+' || c == '-' || c == '(' || c == '[') {
             return genie::core::record::ClassType::CLASS_I;
         }
-        if (genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN).isIncluded(c)) {
+        if (genie::core::GetAlphabetProperties(genie::core::AlphabetId::kAcgtn).IsIncluded(c)) {
             if (c == 'N') {
                 ret = std::max(ret, genie::core::record::ClassType::CLASS_N);
             } else {
@@ -452,7 +455,7 @@ genie::core::record::ClassType classifyEcigar(const std::string& cigar) {
 
 bool validateBases(const std::string& seq, const genie::core::Alphabet& alphabet) {
     for (const auto& c : seq) {
-        if (!alphabet.isIncluded(c)) {
+        if (!alphabet.IsIncluded(c)) {
             return false;
         }
     }
@@ -480,11 +483,11 @@ bool fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
         auto cigar = a.getAlignment().getECigar();
         auto seq = r.getSegments()[0].getSequence();
 
-        if (!validateBases(seq, genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
+        if (!validateBases(seq, genie::core::GetAlphabetProperties(genie::core::AlphabetId::kAcgtn))) {
             return false;
         }
 
-        if (!validateBases(refSeq, genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
+        if (!validateBases(refSeq, genie::core::GetAlphabetProperties(genie::core::AlphabetId::kAcgtn))) {
             return false;
         }
 
@@ -513,11 +516,11 @@ bool fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
                 cigar = split.getAlignment().getECigar();
                 seq = r.getSegments()[1].getSequence();
 
-                if (!validateBases(seq, genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
+                if (!validateBases(seq, genie::core::GetAlphabetProperties(genie::core::AlphabetId::kAcgtn))) {
                     return false;
                 }
 
-                if (!validateBases(refSeq, genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
+                if (!validateBases(refSeq, genie::core::GetAlphabetProperties(genie::core::AlphabetId::kAcgtn))) {
                     return false;
                 }
 
@@ -721,7 +724,7 @@ std::string eCigar2Cigar(const std::string& ecigar) {
             number_buffer.push_back(c);
             continue;
         }
-        if (genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN).isIncluded(c)) {
+        if (genie::core::GetAlphabetProperties(genie::core::AlphabetId::kAcgtn).IsIncluded(c)) {
             matchCount += 1;
         } else {
             if (c == '=') {
@@ -751,7 +754,7 @@ uint16_t computeSAMFlags(size_t s, size_t a, const genie::core::record::Record& 
     if (record.getNumberOfTemplateSegments() > 1) {
         flags |= 0x1;
     }
-    if (record.getFlags() & genie::core::GenConst::FLAGS_PROPER_PAIR_MASK) {
+    if (record.getFlags() & genie::core::gen_const::kFlagsProperPairMask) {
         flags |= 0x2;
     }
     // This read is unmapped
@@ -774,10 +777,10 @@ uint16_t computeSAMFlags(size_t s, size_t a, const genie::core::record::Record& 
     if (a > 0) {
         flags |= 0x100;
     }
-    if (record.getFlags() & genie::core::GenConst::FLAGS_QUALITY_FAIL_MASK) {
+    if (record.getFlags() & genie::core::gen_const::kFlagsQualityFailMask) {
         flags |= 0x200;
     }
-    if (record.getFlags() & genie::core::GenConst::FLAGS_PCR_DUPLICATE_MASK) {
+    if (record.getFlags() & genie::core::gen_const::kFlagsPcrDuplicateMask) {
         flags |= 0x400;
     }
     return flags;

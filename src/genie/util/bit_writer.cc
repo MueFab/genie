@@ -19,6 +19,10 @@ BitWriter::BitWriter(std::ostream *str) : stream(str), m_heldBits(0), m_numHeldB
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+BitWriter::BitWriter(std::ostream &str) : stream(&str), m_heldBits(0), m_numHeldBits(0), m_bitsWritten(0) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 BitWriter::~BitWriter() { FlushBits(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -153,6 +157,20 @@ void BitWriter::WriteAlignedStream(std::istream *in) {
     } while (in->gcount() == BUFFERSIZE);
 }
 
+// -----------------------------------------------------------------------------
+
+// BitWriter::WriteAlignedStream(std::istream *in) is incompatible, so this is temporarily added.
+constexpr size_t kWriteBufferSize = 100;
+void BitWriter::WriteAlignedStream(std::istream& in) {
+  UTILS_DIE_IF(!IsByteAligned(), "Writer not aligned when it should be");
+  do {
+    char byte[kWriteBufferSize];
+    in.read(byte, kWriteBufferSize);
+    stream->write(byte, in.gcount());
+    this->m_bitsWritten += in.gcount() * 8;
+  } while (in.gcount() == kWriteBufferSize);
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 void BitWriter::WriteAlignedBytes(const void *in, size_t size) {
@@ -170,6 +188,14 @@ int64_t BitWriter::SetStreamPosition() const { return stream->tellp(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void BitWriter::SetStreamPosition(int64_t pos) { stream->seekp(pos, std::ios::beg); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void BitWriter::WriteReserved(uint8_t bits) {  WriteBits(0, bits); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void BitWriter::Write(uint64_t value, uint8_t bits, bool) { WriteBits(value, bits); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

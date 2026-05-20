@@ -4,6 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "helpers.h"
+#include <cstdio>
+#include <string>
 #include "genie/util/string_helpers.h"
 
 namespace util_tests {
@@ -18,12 +21,12 @@ std::string exec(const std::string &cmd) {
         return "<exec(" + cmd + ") failed>";
     }
 
-    const int bufferSize = 256;
-    char buffer[bufferSize];
+    const int kBufferSize = 256;
+    char buffer[kBufferSize];
     std::string result;
 
     while (!feof(pipe)) {
-        if (fgets(buffer, bufferSize, pipe) != nullptr) {
+        if (fgets(buffer, kBufferSize, pipe) != nullptr) {
             result += buffer;
         }
     }

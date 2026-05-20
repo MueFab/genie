@@ -9,19 +9,14 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
 #include <vector>
-#include "genie/core/constants.h"
+
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
 #include "AlgorithmParameters.h"
 #include "genie/contact/contact_matrix_parameters.h"
 #include "genie/contact/subcontact_matrix_parameters.h"
-#include "genie/core/writer.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/likelihood/likelihood_parameters.h"
 
@@ -50,13 +45,15 @@ class DescriptorConfiguration {
 
     explicit DescriptorConfiguration(genie::likelihood::LikelihoodParameters likelihood_parameters);
 
-    DescriptorConfiguration(genie::contact::ContactMatrixParameters _contact_matrix_parameters, std::vector<genie::contact::SubcontactMatrixParameters> _subconstract_matrix_parameters);
+    DescriptorConfiguration(genie::contact::ContactMatrixParameters _contact_matrix_parameters,
+                            std::vector<genie::contact::SubcontactMatrixParameters> _subconstract_matrix_parameters);
 
     DescriptorConfiguration(AnnotDesc descriptor_ID, AlgoID encoding_mode_ID, AlgorithmParameters algorithm_parameters);
 
-    void read(util::BitReader& reader);
-    void write(core::Writer& writer) const;
-    size_t getSize(core::Writer& write_size) const;
+    void Read(util::BitReader& reader);
+    void Write(util::BitWriter& writer) const;
+    size_t GetSize(util::BitWriter& write_size) const;
+
     AnnotDesc getDescriptorID() const { return descriptor_ID; }
     AlgoID getEncodingModeID() const { return encoding_mode_ID; }
 

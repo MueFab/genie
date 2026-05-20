@@ -6,13 +6,14 @@
 
 #include "genie/quality/paramqv1/parameter_set.h"
 #include <utility>
+#include <vector>
 #include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace paramqv1 {
+
+
+namespace genie::quality::paramqv1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,7 +37,7 @@ void ParameterSet::write(util::BitWriter &writer) const {
 ParameterSet::ParameterSet(util::BitReader &reader) {
     const size_t num_codebooks = reader.read<int>(4);
     for (auto c = num_codebooks; c > 0; --c) {
-        qv_codebooks.emplace_back(Codebook(reader));
+        qv_codebooks.emplace_back(reader);
     }
 }
 
@@ -46,9 +47,9 @@ const std::vector<Codebook> &ParameterSet::getCodebooks() const { return qv_code
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramqv1
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::paramqv1
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

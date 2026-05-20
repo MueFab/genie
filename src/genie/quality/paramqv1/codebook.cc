@@ -5,15 +5,14 @@
  */
 
 #include "genie/quality/paramqv1/codebook.h"
+#include <vector>
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace paramqv1 {
+namespace genie::quality::paramqv1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,9 +21,9 @@ bool Codebook::operator==(const Codebook& ps) const { return qv_recon == ps.qv_r
 // ---------------------------------------------------------------------------------------------------------------------
 
 Codebook::Codebook(util::BitReader& reader) {
-    qv_recon.resize(reader.read<uint8_t>());
+    qv_recon.resize(reader.Read<uint8_t>());
     for (auto& v : qv_recon) {
-        v = reader.read<uint8_t>();
+        v = reader.Read<uint8_t>();
     }
 }
 
@@ -58,9 +57,9 @@ const std::vector<uint8_t>& Codebook::getEntries() const { return qv_recon; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramqv1
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::paramqv1
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

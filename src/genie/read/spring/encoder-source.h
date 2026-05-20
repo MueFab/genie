@@ -13,7 +13,7 @@
 #include <vector>
 #include "genie/core/access_unit.h"
 #include "genie/core/parameter/parameter_set.h"
-#include "genie/core/stats/perf-stats.h"
+#include "genie/core/stats/perf_stats.h"
 #include "genie/read/spring/util.h"
 #include "genie/util/original_source.h"
 #include "genie/util/source.h"

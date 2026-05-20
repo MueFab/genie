@@ -16,8 +16,8 @@
 
 #include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 #include "genie/annotation/compressors.h"
 #include "genie/core/record/annotation_access_unit/TypedData.h"
@@ -39,7 +39,8 @@ class AccessUnitComposer {
     //       annotationParameterSet = _annotationParameterSet;
     // AG_class = annotationParameterSet;
     //   }
-    void setATtype(core::record::annotation_access_unit::AnnotationType ATtype, uint8_t ATsubtype) {
+    void setATtype(core::record::annotation_access_unit::AnnotationType ATtype,
+                   core::record::annotation_access_unit::AnnotationSubtype ATsubtype) {
         AT_type = ATtype;
         AT_subtype = ATsubtype;
     }
@@ -68,7 +69,8 @@ class AccessUnitComposer {
     bool columnMajorTileOrder = false;
     uint8_t ATCoordSize = 3;
     bool variable_size_tiles = false;
-    uint8_t AT_subtype = 1;
+    core::record::annotation_access_unit::AnnotationSubtype AT_subtype{
+        core::record::annotation_access_unit::AnnotationSubtype::VCF};
     uint64_t n_tiles_per_col = 1;
     uint64_t n_tiles_per_row = 1;
     uint64_t tile_index_1 = 0;
@@ -86,14 +88,12 @@ class AccessUnitComposer {
                       descriptorConfigurations,
                   std::map<genie::core::AnnotDesc, std::stringstream>& inputstream,
                   std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors);
-    void compress(
-        std::map<std::string, std::stringstream>& attributeStream,
-        const std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet>& attributeParameterSets,
-        const std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet>&
-            compressorParameterSets,
-        std::map<std::string, std::stringstream>& encodedAttributes);
 
     void compress(genie::core::record::annotation_access_unit::TypedData& oneBlock,
+                  genie::core::record::annotation_parameter_set::CompressorParameterSet& compressor);
+
+    void compress(genie::core::record::annotation_access_unit::TypedData& oneBlock,
+                  std::vector<genie::core::record::annotation_access_unit::TypedData>& outputBlocks,
                   genie::core::record::annotation_parameter_set::CompressorParameterSet& compressor);
 };
 

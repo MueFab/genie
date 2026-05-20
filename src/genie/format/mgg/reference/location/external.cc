@@ -5,6 +5,8 @@
  */
 
 #include "genie/format/mgg/reference/location/external.h"
+#include <memory>
+#include <string>
 #include <utility>
 #include "genie/format/mgg/reference/location/external/fasta.h"
 #include "genie/format/mgg/reference/location/external/mpeg.h"
@@ -26,7 +28,7 @@ const size_t External::checksum_sizes[] = {128 / 8, 256 / 8};
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<Location> External::factory(genie::util::BitReader& reader, uint8_t _reserved, size_t seq_count,
-                                            genie::core::MPEGMinorVersion _version) {
+                                            genie::core::MpegMinorVersion _version) {
     std::string _ref_uri;
     reader.readBypass_null_terminated(_ref_uri);
     auto _checksum_algo = reader.readBypassBE<ChecksumAlgorithm>();

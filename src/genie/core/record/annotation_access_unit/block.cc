@@ -5,13 +5,6 @@
  */
 
 #include "genie/core/record/annotation_access_unit/block.h"
-#include <algorithm>
-#include <iostream>
-#include <string>
-#include <utility>
-#include "genie/util/bit_reader.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,25 +16,25 @@ namespace annotation_access_unit {
 Block::Block() : block_header{}, block_payload{}, numChrs(0) {}
 
 Block::Block(util::BitReader& reader, uint8_t num_Chrs) : block_header{}, block_payload{}, numChrs(num_Chrs) {
-    read(reader);
+    Read(reader);
 }
 
 Block::Block(BlockHeader block_header, BlockPayload block_payload, uint8_t numChrs)
     : block_header(block_header), block_payload(block_payload), numChrs(numChrs) {}
 
-void Block::read(util::BitReader& reader) {
-    block_header.read(reader);
-    block_payload.read(reader, block_header.getDescriptorID(), numChrs);
+void Block::Read(util::BitReader& reader) {
+    block_header.Read(reader);
+    block_payload.Read(reader, block_header.getDescriptorID(), numChrs);
 }
 
-void Block::read(util::BitReader& reader, uint8_t num_Chrs) {
+void Block::Read(util::BitReader& reader, uint8_t num_Chrs) {
     numChrs = num_Chrs;
-    read(reader);
+    Read(reader);
 }
 
-void Block::write(core::Writer& writer) const {
-    block_header.write(writer);
-    block_payload.write(writer);
+void Block::Write(util::BitWriter& writer) const {
+    block_header.Write(writer);
+    block_payload.Write(writer);
 }
 
 void Block::set(BlockVectorData blockData) {
@@ -68,9 +61,9 @@ void Block::set(BlockData& blockData) {
     block_payload = payload;
 }
 
-size_t Block::getSize(core::Writer& writesize) const {
-    write(writesize);
-    return writesize.GetBitsWritten();
+size_t Block::GetSize(util::BitWriter& writesize) const {
+    Write(writesize);
+    return writesize.GetTotalBitsWritten();
 }
 
 }  // namespace annotation_access_unit

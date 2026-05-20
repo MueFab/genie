@@ -6,10 +6,11 @@
 
 #include <gtest/gtest.h>
 #include <random>
+#include <vector>
 #include "genie/entropy/lzma/encoder.h"
 
 class LZMATestCase : public ::testing::Test {
-   protected:
+ protected:
     // Do any necessary setup for your tests here
       LZMATestCase() = default;
 
@@ -69,7 +70,7 @@ TEST_F(LZMATestCase, LZMAEncodeDecodeTest) {  // NOLINT(cert-err58-cpp)
 
     std::stringstream uncompressed_output;
     encoder.decode(compressed_output, uncompressed_output);
-    
+
     ASSERT_EQ(NrOfInputBytes, uncompressed_output.str().size());
     for (size_t i = 0; i < NrOfInputBytes; ++i)
         EXPECT_EQ(testDataUncompressed.at(i), static_cast<uint8_t>(uncompressed_output.str().at(i)));
@@ -77,9 +78,8 @@ TEST_F(LZMATestCase, LZMAEncodeDecodeTest) {  // NOLINT(cert-err58-cpp)
 
 TEST_F(LZMATestCase, LZMAparametersTest) {  // NOLINT(cert-err58-cpp)
     genie::entropy::lzma::LZMAParameters lzmaParameters;
-    
+
 
     auto parameters = lzmaParameters.convertToAlgorithmParameters();
     EXPECT_EQ(parameters.getNumberOfPars(), 7);
-
 }

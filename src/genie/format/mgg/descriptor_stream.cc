@@ -7,7 +7,9 @@
 #include "genie/format/mgg/descriptor_stream.h"
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

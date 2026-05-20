@@ -6,8 +6,11 @@
 
 #include "genie/format/mgg/dataset_header.h"
 #include <limits>
+#include <memory>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -43,7 +46,7 @@ uint16_t DatasetHeader::getDatasetID() const { return ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::MPEGMinorVersion DatasetHeader::getVersion() const { return version; }
+genie::core::MpegMinorVersion DatasetHeader::getVersion() const { return version; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -97,7 +100,7 @@ bool DatasetHeader::getParameterUpdateFlag() const { return parameters_update_fl
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AlphabetID DatasetHeader::getAlphabetID() const { return alphabet_id; }
+core::AlphabetId DatasetHeader::getAlphabetID() const { return alphabet_id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -121,16 +124,16 @@ const std::string& DatasetHeader::getKey() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetHeader::DatasetHeader()
-    : DatasetHeader(0, 0, genie::core::MPEGMinorVersion::V2000, false, false, false, false,
-                    core::parameter::DataUnit::DatasetType::ALIGNED, false, core::AlphabetID::ACGTN) {}
+    : DatasetHeader(0, 0, genie::core::MpegMinorVersion::kV2000, false, false, false, false,
+                    core::parameter::DataUnit::DatasetType::ALIGNED, false, core::AlphabetId::kAcgtn) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetHeader::DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, genie::core::MPEGMinorVersion _version,
+DatasetHeader::DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, genie::core::MpegMinorVersion _version,
                              bool _multiple_alignments_flags, bool _byte_offset_size_flags,
                              bool _non_overlapping_AU_range_flag, bool _pos_40_bits_flag,
                              core::parameter::DataUnit::DatasetType _dataset_type, bool _parameters_update_flag,
-                             core::AlphabetID _alphabet_id)
+                             core::AlphabetId _alphabet_id)
     : group_ID(_dataset_group_id),
       ID(_dataset_id),
       version(_version),
@@ -155,7 +158,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
     std::string versionString(4, '\0');
     reader.readBypass(versionString);
     version = core::getMPEGVersion(versionString);
-    UTILS_DIE_IF(version == core::MPEGMinorVersion::UNKNOWN, "Unknown MPEG version");
+    UTILS_DIE_IF(version == core::MpegMinorVersion::kUnknown, "Unknown MPEG version");
 
     multiple_alignment_flag = reader.read<bool>(1);
     byte_offset_size_flag = reader.read<bool>(1);
@@ -176,7 +179,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
         }
     }
     parameters_update_flag = reader.read<bool>(1);
-    alphabet_id = reader.read<genie::core::AlphabetID>(7);
+    alphabet_id = reader.read<genie::core::AlphabetId>(7);
     num_U_access_units = reader.read<uint32_t>(32);
     if (num_U_access_units) {
         u_options = dataset_header::UOptions(reader);

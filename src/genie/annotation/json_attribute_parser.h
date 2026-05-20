@@ -19,8 +19,8 @@
 
 #include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -29,9 +29,9 @@ namespace annotation {
 class InfoField {
  public:
     InfoField() = default;
-    InfoField(std::string _ID, genie::core::DataType _Type, uint8_t _Number) : ID(_ID), Type(_Type), Number(_Number) {}
+    InfoField(std::string _ID, core::DataType _Type, uint8_t _Number) : ID(_ID), Type(_Type), Number(_Number) {}
     std::string ID{""};
-    genie::core::DataType Type{genie::core::DataType::UINT16};
+    core::DataType Type{core::DataType::UINT16};
     uint8_t Number{0};
 };
 
@@ -70,7 +70,7 @@ class JsonAttributeParser {
 
     void ParseInfoFields();
     void ParseFormatFields() {}
-    genie::core::DataType InterpretType(std::string type) const;
+    core::DataType InterpretType(std::string type) const;
     uint8_t InterpretSize(std::string size) const;
 };
 

@@ -4,19 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genotype_payload.h"
+#include "genie/genotype/genotype_payload.h"
+#include <utility>
+#include <vector>
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/jbig/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
 #include "genie/entropy/zstd/encoder.h"
 
-#include "genotype_coder.h"
+#include "genie/genotype/genotype_coder.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::genotype {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // Default constructor
 GenotypePayload::GenotypePayload() {
@@ -48,12 +50,12 @@ GenotypePayload::GenotypePayload(
       variants_amax_payload_(std::move(variants_amax_payload)),
       phases_payload_(std::move(phases_payload)) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // Copy constructor
-//GenotypePayload::GenotypePayload(const GenotypePayload& other) = default;
+// GenotypePayload::GenotypePayload(const GenotypePayload& other) = default;
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // Move constructor
 GenotypePayload::GenotypePayload(GenotypePayload&& other) noexcept {
@@ -67,7 +69,7 @@ GenotypePayload::GenotypePayload(GenotypePayload&& other) noexcept {
   phases_payload_ = std::move(other.phases_payload_);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // Copy constructor
 GenotypePayload::GenotypePayload(const GenotypePayload& other) {
@@ -77,7 +79,7 @@ GenotypePayload::GenotypePayload(const GenotypePayload& other) {
   phases_value_ = other.phases_value_;
   num_bit_planes_ = other.num_bit_planes_;
   variants_payloads_ = other.variants_payloads_;
-  
+
   if (other.variants_amax_payload_.has_value()) {
     variants_amax_payload_ = std::make_optional(other.variants_amax_payload_.value());
   } else {
@@ -119,7 +121,7 @@ GenotypePayload& GenotypePayload::operator=(const GenotypePayload& other) {
     phases_value_ = other.phases_value_;
     num_bit_planes_ = other.num_bit_planes_;
     variants_payloads_ = other.variants_payloads_;
-    
+
     if (other.variants_amax_payload_.has_value()) {
       variants_amax_payload_ = std::make_optional(other.variants_amax_payload_.value());
     } else {
@@ -142,7 +144,6 @@ GenotypePayload::GenotypePayload(
   util::BitReader& reader,
   GenotypeParameters& parameters
 ) {
-
   UTILS_DIE_IF(!reader.IsByteAligned(), "Not byte aligned!");
   max_ploidy_ = reader.Read<uint8_t>();
 
@@ -156,7 +157,7 @@ GenotypePayload::GenotypePayload(
 
   auto num_variants_payloads = 1;
   // Special case for num_variants_payloads
-  if (parameters.GetBinarizationID() == BinarizationID::BIT_PLANE && parameters.GetConcatAxis() == ConcatAxis::DO_NOT_CONCAT){
+  if (parameters.GetBinarizationID() == BinarizationID::BIT_PLANE && parameters.GetConcatAxis() == ConcatAxis::DO_NOT_CONCAT) {
     num_variants_payloads = num_bit_planes_;
   }
 
@@ -165,8 +166,7 @@ GenotypePayload::GenotypePayload(
       reader,
       parameters.GetVariantsCodecID(),
       parameters.GetSortVariantsRowsFlag(),
-      parameters.GetSortVariantsColsFlag()
-    );
+      parameters.GetSortVariantsColsFlag());
   }
 
   if (parameters.GetBinarizationID() == BinarizationID::ROW_BIN) {
@@ -179,8 +179,7 @@ GenotypePayload::GenotypePayload(
       reader,
         parameters.GetPhasesCodecID(),
         parameters.GetSortPhasesRowsFlag(),
-        parameters.GetSortPhasesColsFlag()
-    );
+        parameters.GetSortPhasesColsFlag());
   }
 }
 
@@ -317,9 +316,9 @@ void GenotypePayload::SetPhasesPayload(std::optional<SortedBinMatPayload>&& phas
 size_t GenotypePayload::GetSize() const {
   size_t size = 0;
   size += sizeof(max_ploidy_);
-  size += sizeof(uint8_t); // reserved, no_reference_flag, not_available_flag_, phases_value_
-  size += sizeof(uint8_t); // num_bit_planes
-  for (auto& variant_payload: variants_payloads_) {
+  size += sizeof(uint8_t);  // reserved, no_reference_flag, not_available_flag_, phases_value_
+  size += sizeof(uint8_t);  // num_bit_planes
+  for (auto& variant_payload : variants_payloads_) {
     size += variant_payload.GetSize();
   }
 
@@ -354,7 +353,7 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
   writer.WriteBypassBE(flag);
 
   writer.WriteBypassBE(GetNumBitPlanes());
-  for (const auto& variant_payload: GetVariantsPayloads()){
+  for (const auto& variant_payload : GetVariantsPayloads()) {
     variant_payload.Write(writer);
   }
 
@@ -371,7 +370,7 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
 
 // -----------------------------------------------------------------------------
 
-//GenotypePayload::GenotypePayload(EncodingBlock& datablock, GenotypeParameters& genotypeParameters)
+// GenotypePayload::GenotypePayload(EncodingBlock& datablock, GenotypeParameters& genotypeParameters)
 //    : genotype_parameters_(genotypeParameters) {
 //
 //    // Initialize phases payload
@@ -418,9 +417,9 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
 //    }
 //}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-//void genie::genotype::GenotypePayload::Write(core::Writer& writer) const {
+// void genie::genotype::GenotypePayload::Write(core::Writer& writer) const {
 //    size_t indecRowIds = 0;
 //    size_t indecColIds = 0;
 //    uint8_t num_variants_payloads =
@@ -465,8 +464,8 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
 //    }
 //}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::genotype
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

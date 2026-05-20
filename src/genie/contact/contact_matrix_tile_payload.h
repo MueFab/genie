@@ -5,17 +5,17 @@
 */
 
 
-#ifndef GENIE_CONTACT_CONTACT_MATRIX_TILE_PAYLOAD_H
-#define GENIE_CONTACT_CONTACT_MATRIX_TILE_PAYLOAD_H
+#ifndef SRC_GENIE_CONTACT_CONTACT_MATRIX_TILE_PAYLOAD_H_
+#define SRC_GENIE_CONTACT_CONTACT_MATRIX_TILE_PAYLOAD_H_
 
 #include <cstdint>
 #include <list>
 #include <optional>
 #include <tuple>
+#include <vector>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xtensor.hpp>
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
@@ -34,14 +34,13 @@ namespace genie::contact {
  * It includes the codec ID, the number of rows and columns in the tile, and the payload_ itself.
  */
 class ContactMatrixTilePayload {
-  private:
+ private:
     core::AlgoID codec_ID_;
     uint32_t nrows_;
     uint32_t ncols_;
     std::vector<uint8_t> payload_;
 
-  public:
-
+ public:
      /**
       * @brief Default constructor for ContactMatrixTilePayload.
       *
@@ -113,8 +112,7 @@ class ContactMatrixTilePayload {
         core::AlgoID codec_ID,
         uint32_t tile_nrows,
         uint32_t tile_ncols,
-        std::vector<uint8_t>&& payload
-    );
+        std::vector<uint8_t>&& payload);
 
     /**
      * @brief Constructor for ContactMatrixTilePayload from a 2D array.
@@ -132,8 +130,7 @@ class ContactMatrixTilePayload {
         uint32_t tile_nrows,
         uint32_t tile_ncols,
         uint8_t** payload,
-        size_t payload_len
-    );
+        size_t payload_len);
 
     /**
      * @brief Get the Codec ID.
@@ -241,8 +238,8 @@ class ContactMatrixTilePayload {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-} // namespace genie::contact
+}  // namespace genie::contact
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CONTACT_CONTACT_MATRIX_TILE_PAYLOAD_H
+#endif  // SRC_GENIE_CONTACT_CONTACT_MATRIX_TILE_PAYLOAD_H_

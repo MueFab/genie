@@ -19,12 +19,18 @@
 
 #include "genie/core/constants.h"
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
-#include "genie/core/record/variant_site/record.h"
+#include "genie/core/variant_site_record/record.h"
+#include "genie/core/feature_record/record.h"
+#include "genie/core/sample_record/record.h"
+#include "genie/core/functional_annotation_record/record.h"
+#include "genie/core/track_record/record.h"
+#include "genie/core/track_property_record/record.h"
 
 #include "genie/core/record/annotation_access_unit/TypedData.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -45,10 +51,12 @@ class AttributeTile {
     AttributeTile(const AttributeTile& other);
 
     size_t getNrOfTiles() {
-        if (rowsPerTile == 0) {
-            tiles.pop_back();
+        size_t size = tiles.size();
+        if (rowInTile == 0) {
+            // the last tile is empty, so we don't count it
+            size--;
         }
-        return tiles.size();
+        return size;
     }
 
     void setCompressedData(uint64_t tilenr, std::stringstream& compressedData);
@@ -58,14 +66,14 @@ class AttributeTile {
 
     std::stringstream& getTile(uint64_t tilenr) {
         if (tilenr == tiles.size() - 1) {
-          writers.back().Flush();
+            writers.back().FlushBits();
         }
         return tiles.at(tilenr);
     }
 
     void write(std::vector<std::vector<uint8_t>> value);
 
-    uint64_t getCurrentsize() const {return writers.back().GetBitsWritten(); }
+    uint64_t getCurrentsize() const {return writers.back().GetTotalBitsWritten(); }
     void writeMissing();
 
     std::vector<std::stringstream> convertTilesToTypedData();
@@ -75,7 +83,7 @@ class AttributeTile {
     genie::core::record::annotation_parameter_set::AttributeData info;
     std::vector< genie::core::record::annotation_access_unit::TypedData> typedTiles;
     std::vector<std::stringstream> tiles;
-    std::vector<genie::core::Writer> writers;
+    std::vector<util::BitWriter> writers;
     uint64_t rowInTile;
 
     void AddFirst();
@@ -93,6 +101,11 @@ class Attributes {
 
     void add(std::vector<genie::core::record::variant_site::InfoFields::Field> fields);  // std::vector<genie::core::record::variant_site::Info_tag> tags, std::vector<std::vector<std::vector<uint8_t>>> infoValues);
     void add(std::map<std::string, genie::core::record::variant_site::Info_tag> tags, std::map<std::string, std::vector<std::vector<uint8_t>>> infoValues);
+    void add(std::vector<genie::core::record::feature::FeatureFields::Field> fields);
+    void add(std::vector<genie::core::record::sample::SampleFields::Field> fields);
+    void add(std::vector<genie::core::record::functional_annotation::Attribute> fields);
+    void add(std::vector<genie::core::record::track::Attribute> fields);
+    void add(std::vector<genie::core::record::track_property::TrackProperty> fields);
 
     std::map<std::string, AttributeTile>& getTiles() { return attributeTiles; }
     std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& getInfo() { return info; }

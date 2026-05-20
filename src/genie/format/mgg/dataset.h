@@ -13,8 +13,8 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "genie/core/meta/blockheader/disabled.h"
-#include "genie/core/meta/blockheader/enabled.h"
+#include "genie/core/meta/block_header/disabled.h"
+#include "genie/core/meta/block_header/enabled.h"
 #include "genie/core/meta/dataset.h"
 #include "genie/format/mgb/mgb_file.h"
 #include "genie/format/mgg/access_unit.h"
@@ -46,7 +46,7 @@ class Dataset : public GenInfo {
     boost::optional<MasterIndexTable> master_index_table;  //!< @brief
     std::vector<AccessUnit> access_units;                  //!< @brief
     std::vector<DescriptorStream> descriptor_streams;      //!< @brief
-    core::MPEGMinorVersion version;                        //!< @brief
+    core::MpegMinorVersion version;                        //!< @brief
 
     std::map<size_t, core::parameter::EncodingSet> encoding_sets;  //!< @brief
 
@@ -98,7 +98,7 @@ class Dataset : public GenInfo {
      * @param reader
      * @param _version
      */
-    Dataset(util::BitReader& reader, core::MPEGMinorVersion _version);
+    Dataset(util::BitReader& reader, core::MpegMinorVersion _version);
 
     /**
      * @brief
@@ -107,7 +107,7 @@ class Dataset : public GenInfo {
      * @param _version
      * @param param_ids
      */
-    Dataset(format::mgb::MgbFile& file, core::meta::Dataset& meta, core::MPEGMinorVersion _version,
+    Dataset(format::mgb::MgbFile& file, core::meta::Dataset& meta, core::MpegMinorVersion _version,
             const std::vector<uint8_t>& param_ids);
 
     /**

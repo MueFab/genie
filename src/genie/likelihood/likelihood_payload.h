@@ -4,8 +4,8 @@
 * https://github.com/mitogen/genie for more details.
 */
 
-#ifndef GENIE_LIKELIHOOD_LIKELIHOOD_PAYLOAD_H
-#define GENIE_LIKELIHOOD_LIKELIHOOD_PAYLOAD_H
+#ifndef SRC_GENIE_LIKELIHOOD_LIKELIHOOD_PAYLOAD_H_
+#define SRC_GENIE_LIKELIHOOD_LIKELIHOOD_PAYLOAD_H_
 
 #include <cstdint>
 #include <iostream>
@@ -15,7 +15,6 @@
 #include <utility>
 #include <vector>
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_parameters.h"
 #include "genie/util/bit_reader.h"
@@ -23,8 +22,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace likelihood {
+namespace genie::likelihood {
 
 // -----------------------------------------------------------------------------
 
@@ -44,10 +42,9 @@ class LikelihoodPayload {
          uint32_t _nrows,
          uint32_t _ncols,
         std::vector<uint8_t> _payload,
-        std::vector<uint8_t> _additionalPayload
-    );
+        std::vector<uint8_t> _additionalPayload);
 
-    LikelihoodPayload(genie::likelihood::EncodingBlock& block);
+    explicit LikelihoodPayload(genie::likelihood::EncodingBlock& block);
     LikelihoodPayload(genie::likelihood::LikelihoodParameters parameters, genie::likelihood::EncodingBlock& data);
 
     // Getters
@@ -65,14 +62,13 @@ class LikelihoodPayload {
     void setTransformFlag(bool flag);
     void setPayload(const std::vector<uint8_t>& _payload);
 
-    void write(core::Writer& writer) const;
+    void Write(util::BitWriter& writer) const;
 };
 
 // -----------------------------------------------------------------------------
 
-}
-}
+}  // namespace genie::likelihood
 
 // -----------------------------------------------------------------------------
 
-#endif  // GENIE_LIKELIHOOD_LIKELIHOOD_PAYLOAD_H
+#endif  // SRC_GENIE_LIKELIHOOD_LIKELIHOOD_PAYLOAD_H_

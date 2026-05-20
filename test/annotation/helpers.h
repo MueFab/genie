@@ -4,16 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef TEST_CONFORMANCE_HELPERS_H
-#define TEST_CONFORMANCE_HELPERS_H
+#ifndef TEST_ANNOTATION_HELPERS_H_
+#define TEST_ANNOTATION_HELPERS_H_
 
-#include <string>
 #include <chrono>
 #include <cstddef>
+#include <iostream>
+#include <string>
 
 
 class MeasureTime {
-public:
+ public:
     MeasureTime() { start = std::chrono::high_resolution_clock::now(); }
     ~MeasureTime() {
         using namespace std::chrono_literals;
@@ -27,7 +28,7 @@ public:
         std::cerr << "Total geno Time(ns): " << minutes << " min " << secmin << " sec " << millisec << " millisec" << '\n';
     }
 
-private:
+ private:
     std::chrono::high_resolution_clock::time_point start;
 };
 
@@ -37,4 +38,4 @@ std::string exec(const std::string &cmd);
 
 }  // namespace util_tests
 
-#endif  // TEST_CONFORMANCE_HELPERS_H
+#endif  // TEST_ANNOTATION_HELPERS_H_

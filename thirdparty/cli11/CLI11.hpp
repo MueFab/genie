@@ -39,6 +39,7 @@
 // Standard combined includes:
 
 #include <algorithm>
+#include <cstdint>
 #include <cmath>
 #include <deque>
 #include <exception>

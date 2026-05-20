@@ -5,7 +5,9 @@
  */
 
 #include "genie/format/mgg/file_header.h"
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -20,7 +22,7 @@ const std::string& FileHeader::getMajorBrand() const { return major_brand; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::MPEGMinorVersion FileHeader::getMinorVersion() const { return minor_version; }
+core::MpegMinorVersion FileHeader::getMinorVersion() const { return minor_version; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -39,11 +41,11 @@ const std::string& FileHeader::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FileHeader::FileHeader() : major_brand("MPEG-G"), minor_version(core::MPEGMinorVersion::V2000) {}
+FileHeader::FileHeader() : major_brand("MPEG-G"), minor_version(core::MpegMinorVersion::kV2000) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FileHeader::FileHeader(core::MPEGMinorVersion _minor_version) : major_brand("MPEG-G"), minor_version(_minor_version) {}
+FileHeader::FileHeader(core::MpegMinorVersion _minor_version) : major_brand("MPEG-G"), minor_version(_minor_version) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

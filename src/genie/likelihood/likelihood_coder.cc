@@ -4,12 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <xtensor/xsort.hpp>
+#include "genie/likelihood/likelihood_coder.h"
 #include <codecs/include/mpegg-codecs.h>
+#include <tuple>
+#include <vector>
+#include <xtensor/xsort.hpp>
 
 #include "genie/entropy/lzma/encoder.h"
 #include "genie/util/runtime_exception.h"
-#include "likelihood_coder.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -17,7 +20,7 @@ namespace likelihood {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void extract_likelihoods(const EncodingOptions& opt, EncodingBlock& block, std::vector<core::record::VariantGenotype>& recs){
+void extract_likelihoods(const EncodingOptions& opt, EncodingBlock& block, std::vector<core::record::VariantGenotype>& recs) {
     UTILS_DIE_IF(recs.empty(), "No records found for the process!");
 
     auto block_size = opt.block_size < recs.size() ? opt.block_size : recs.size();
@@ -43,14 +46,14 @@ void extract_likelihoods(const EncodingOptions& opt, EncodingBlock& block, std::
         }
     }
 
-    block.nrows = (uint32_t) likelihood_mat.shape(0);
-    block.ncols = (uint32_t) likelihood_mat.shape(1);
+    block.nrows = static_cast<uint32_t>(likelihood_mat.shape(0));
+    block.ncols = static_cast<uint32_t>(likelihood_mat.shape(1));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block){
-    if (opt.transform_flag){
+void transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block) {
+    if (opt.transform_flag) {
         transform_lut(block.likelihood_mat, block.lut, block.nelems, block.idx_mat, block.dtype_id);
     } else {
         block.idx_mat = xt::empty_like(block.likelihood_mat);
@@ -60,8 +63,8 @@ void transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block){
-    if (opt.transform_flag){
+void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block) {
+    if (opt.transform_flag) {
         inverse_transform_lut(block.likelihood_mat, block.lut, block.idx_mat);
     } else {
         block.likelihood_mat = xt::empty_like(block.idx_mat);
@@ -72,7 +75,6 @@ void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock&
         (void)dim0;
         (void)dim1;
         xt::view(block.likelihood_mat, xt::all(), xt::all()) = xt::view(block.idx_mat, xt::all(), xt::all());
-
     }
 }
 
@@ -84,15 +86,15 @@ void transform_lut(
     uint32_t& nelems,
     UInt32MatDtype& idx_mat,
     core::DataType& dtype_id
-){
+) {
     auto m = likelihood_mat.shape(0);
     auto n = likelihood_mat.shape(1);
 
     idx_mat = xt::xtensor<uint32_t, 2>({m, n});
     lut = xt::unique(likelihood_mat);
 
-    for (size_t i=0; i<m; i++){
-        for (size_t j=0; j<n; j++){
+    for (size_t i = 0; i < m; i++) {
+        for (size_t j = 0; j < n; j++) {
             auto& likelihood_val = likelihood_mat(i, j);
 
             // Binary Search Algorithm
@@ -101,11 +103,11 @@ void transform_lut(
 
             while (low <= high) {
                 uint32_t idx = (low + high) / 2;
-                if (lut[idx] > likelihood_val)
+                if (lut[idx] > likelihood_val) {
                     high = idx - 1;
-                else if (lut[idx] < likelihood_val)
+                } else if (lut[idx] < likelihood_val) {
                     low = idx + 1;
-                else{
+                } else {
                     idx_mat(i, j) = idx;
                     break;
                 }
@@ -113,17 +115,16 @@ void transform_lut(
         }
     }
 
-    nelems = (uint32_t) lut.size();
-    if (nelems < (1<<8) ){
+    nelems = static_cast<uint32_t>(lut.size());
+    if (nelems < (1 << 8)) {
         dtype_id = core::DataType::UINT8;
-    } else if (nelems < (1<<16) ){
+    } else if (nelems < (1 << 16)) {
         dtype_id = core::DataType::UINT16;
-    } else if (nelems < ((size_t) 1<<32) ){
+    } else if (nelems < static_cast<size_t>((1ul) << 32)) {
         dtype_id = core::DataType::UINT32;
     } else {
         UTILS_DIE("Invalid DataType");
     }
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -132,8 +133,7 @@ void inverse_transform_lut(
     UInt32MatDtype& likelihood_mat,
     UInt32ArrDtype& lut,
     UInt32MatDtype& idx_mat
-){
-
+) {
     auto num_dim = lut.dimension();
 
     UTILS_DIE_IF(num_dim != 1, "LUT dimension must be 1!");
@@ -143,20 +143,19 @@ void inverse_transform_lut(
     auto m = likelihood_mat.shape(0);
     auto n = likelihood_mat.shape(1);
 
-    if (num_unique_vals > 1){
-        for (size_t i=0; i<m; i++){
-            for (size_t j=0; j<n; j++){
+    if (num_unique_vals > 1) {
+        for (size_t i = 0; i < m; i++) {
+            for (size_t j = 0; j < n; j++) {
                 likelihood_mat(i, j) = lut(idx_mat(i, j));
             }
         }
     } else {
-        for (size_t i=0; i<m; i++){
-            for (size_t j=0; j<n; j++){
+        for (size_t i = 0; i < m; i++) {
+            for (size_t j = 0; j < n; j++) {
                 likelihood_mat(i, j) = lut(i, j);
             }
         }
     }
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -167,32 +166,33 @@ void serialize_mat(
     uint32_t& nrows,
     uint32_t& ncols,
     std::stringstream& payload
-){
-    nrows = (uint32_t) mat.shape(0);
-    ncols = (uint32_t) mat.shape(1);
+) {
+    nrows = static_cast<uint32_t>(mat.shape(0));
+    ncols = static_cast<uint32_t>(mat.shape(1));
 
     util::BitWriter writer(&payload);
 
-    if (dtype_id == core::DataType::UINT8){
-        for (size_t i=0; i<nrows; i++) {
+    if (dtype_id == core::DataType::UINT8) {
+        for (size_t i = 0; i < nrows; i++) {
             for (size_t j = 0; j < ncols; j++) {
                 writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(mat(i, j)));
             }
         }
-    } else if (dtype_id == core::DataType::UINT16){
-        for (size_t i=0; i<nrows; i++) {
+    } else if (dtype_id == core::DataType::UINT16) {
+        for (size_t i = 0; i < nrows; i++) {
             for (size_t j = 0; j < ncols; j++) {
                 writer.WriteBypassBE<uint16_t>(static_cast<uint16_t>(mat(i, j)));
             }
         }
-    } else if (dtype_id == core::DataType::UINT32){
-        for (size_t i=0; i<nrows; i++) {
+    } else if (dtype_id == core::DataType::UINT32) {
+        for (size_t i = 0; i < nrows; i++) {
             for (size_t j = 0; j < ncols; j++) {
                 writer.WriteBypassBE<uint32_t>(static_cast<uint32_t>(mat(i, j)));
             }
         }
-    } else
+    } else {
         UTILS_DIE("Invalid DataType");
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -201,10 +201,10 @@ void serialize_arr(
     UInt32ArrDtype arr,
     const uint32_t nelems,
     std::stringstream& payload
-){
+) {
     util::BitWriter writer(&payload);
 
-    for (size_t i=0; i<nelems; i++) {
+    for (size_t i = 0; i < nelems; i++) {
         writer.WriteBypassBE<uint32_t>(static_cast<uint32_t>(arr(i)));
     }
 }
@@ -213,7 +213,7 @@ void serialize_arr(
 std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingBlock> encode_block(
     genie::likelihood::EncodingOptions opt, std::vector<genie::core::record::VariantGenotype> recs) {
     bool TRANSFORM_MODE = true;
-    
+
     genie::likelihood::EncodingBlock block;
     genie::likelihood::extract_likelihoods(opt, block, recs);
     transform_likelihood_mat(opt, block);
@@ -221,8 +221,7 @@ std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingB
     genie::likelihood::serialize_mat(block.idx_mat, block.dtype_id, block.nrows, block.ncols, block.serialized_mat);
     genie::likelihood::serialize_arr(block.lut, block.nelems, block.serialized_arr);
     block.serialized_mat.seekp(0, std::ios::end);
-    if (recs.at(0).GetNumberOfLikelihoods() > 0)
-    {
+    if (recs.at(0).GetNumberOfLikelihoods() > 0) {
         genie::entropy::lzma::LZMAEncoder lzmaEncoder;
         std::stringstream compressedData;
         lzmaEncoder.encode(block.serialized_arr, compressedData);
@@ -244,7 +243,7 @@ std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingB
 
 
 
-}
-}
+}  // namespace likelihood
+}  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------

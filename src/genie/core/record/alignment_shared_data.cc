@@ -1,52 +1,53 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
-#include "alignment_shared_data.h"
+#include "genie/core/record/alignment_shared_data.h"
+
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-AlignmentSharedData::AlignmentSharedData() : seq_ID(0), as_depth(0) {}
+AlignmentSharedData::AlignmentSharedData() : seq_id_(0), as_depth_(0) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-AlignmentSharedData::AlignmentSharedData(uint16_t _seq_ID, uint8_t _as_depth) : seq_ID(_seq_ID), as_depth(_as_depth) {}
+AlignmentSharedData::AlignmentSharedData(const uint16_t seq_id,
+                                         const uint8_t as_depth)
+    : seq_id_(seq_id), as_depth_(as_depth) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void AlignmentSharedData::write(util::BitWriter &writer) const {
-    writer.WriteBypassBE(seq_ID);
-    writer.WriteBypassBE(as_depth);
+void AlignmentSharedData::Write(util::BitWriter& writer) const {
+  writer.WriteBypassBE(seq_id_);
+  writer.WriteBypassBE(as_depth_);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-AlignmentSharedData::AlignmentSharedData(util::BitReader &reader)
-    : seq_ID(reader.ReadAlignedInt<uint16_t>()), as_depth(reader.ReadAlignedInt<uint8_t>()) {}
+AlignmentSharedData::AlignmentSharedData(util::BitReader& reader)
+    : seq_id_(reader.ReadAlignedInt<uint16_t>()),
+      as_depth_(reader.ReadAlignedInt<uint8_t>()) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint16_t AlignmentSharedData::getSeqID() const { return seq_ID; }
+uint16_t AlignmentSharedData::GetSeqId() const { return seq_id_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint8_t AlignmentSharedData::getAsDepth() const { return as_depth; }
+uint8_t AlignmentSharedData::GetAsDepth() const { return as_depth_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

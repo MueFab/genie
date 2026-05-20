@@ -5,11 +5,13 @@
 */
 
 #include <gtest/gtest.h>
+#include <filesystem>
 #include <fstream>
-#include "genie/core/record/variant_genotype/record.h"
+#include <string>
+#include <vector>
+#include "genie/core/variant_genotype_record/record.h"
 #include "genie/util/bit_reader.h"
 #include "helpers.h"
-#include <filesystem>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,17 +27,17 @@ TEST(VariantGenotypeRecord, Genotype_gt_only) {  // NOLINT(cert-err58-cpp)
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             recs.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         recs.pop_back();
     }
 
     ASSERT_EQ(recs.size(), 100);
 
-    for (size_t i = 0; i< recs.size(); i++){
+    for (size_t i = 0; i < recs.size(); i++) {
         auto& rec = recs[i];
         ASSERT_EQ(rec.GetVariantIndex(), i);
         ASSERT_EQ(rec.GetSampleCount(), 1092u);
@@ -50,8 +52,8 @@ TEST(VariantGenotypeRecord, Genotype_gt_only) {  // NOLINT(cert-err58-cpp)
 
         std::vector<uint32_t> num_counts_per_allele(3);
         auto& rec_alleles = rec.GetAlleles();
-        for (size_t i = 0; i < num_samples; i++){
-            for (size_t j = 0; j < num_alleles; j++){
+        for (size_t i = 0; i < num_samples; i++) {
+            for (size_t j = 0; j < num_alleles; j++) {
                 auto v = rec_alleles[i][j];
                 num_counts_per_allele[(size_t)v] += 1;
             }
@@ -69,8 +71,8 @@ TEST(VariantGenotypeRecord, Genotype_gt_only) {  // NOLINT(cert-err58-cpp)
 
         std::vector<uint32_t> num_counts_per_allele(3);
         auto& rec_alleles = rec.GetAlleles();
-        for (size_t i = 0; i < num_samples; i++){
-            for (size_t j = 0; j < num_alleles; j++){
+        for (size_t i = 0; i < num_samples; i++) {
+            for (size_t j = 0; j < num_alleles; j++) {
                 auto v = rec_alleles[i][j];
                 num_counts_per_allele[(size_t)v] += 1;
             }
@@ -80,7 +82,6 @@ TEST(VariantGenotypeRecord, Genotype_gt_only) {  // NOLINT(cert-err58-cpp)
         ASSERT_EQ(num_counts_per_allele[1], 6u);
         ASSERT_EQ(num_counts_per_allele[2], 0u);
     }
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -96,11 +97,11 @@ TEST(VariantGenotypeRecord, Genotype_FORMAT_only) {  // NOLINT(cert-err58-cpp)
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             recs.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         recs.pop_back();
     }
 
@@ -112,7 +113,6 @@ TEST(VariantGenotypeRecord, Genotype_FORMAT_only) {  // NOLINT(cert-err58-cpp)
         ASSERT_EQ(rec.GetSampleCount(), 1092u);
         ASSERT_EQ(rec.GetLinkedRecord(), false);
     }
-    
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -128,11 +128,11 @@ TEST(VariantGenotypeRecord, Genotype_FORMAT_CASE2) {  // NOLINT(cert-err58-cpp)
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.IsStreamGood()){
+        while (bitreader.IsStreamGood()) {
             recs.emplace_back(bitreader);
         }
 
-        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
         recs.pop_back();
     }
 
@@ -144,7 +144,6 @@ TEST(VariantGenotypeRecord, Genotype_FORMAT_CASE2) {  // NOLINT(cert-err58-cpp)
         ASSERT_EQ(rec.GetSampleCount(), 1233u);
         ASSERT_EQ(rec.GetLinkedRecord(), false);
     }
-
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

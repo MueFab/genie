@@ -104,7 +104,7 @@ class External : public Location {
      * @return
      */
     static std::unique_ptr<Location> factory(genie::util::BitReader& reader, uint8_t _reserved, size_t seq_count,
-                                             genie::core::MPEGMinorVersion _version);
+                                             genie::core::MpegMinorVersion _version);
 
     /**
      * @brief

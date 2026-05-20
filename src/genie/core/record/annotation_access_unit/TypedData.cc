@@ -5,13 +5,8 @@
  */
 
 #include "TypedData.h"
-#include <algorithm>
-#include <string>
-#include <utility>
-#include "genie/core/writer.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
+
+#include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -90,28 +85,28 @@ void TypedData::convertToTypedData(std::vector<std::vector<std::vector<CustomTyp
             }
 }
 
-void TypedData::write(core::Writer& outputWriter) const {
-  outputWriter.Write(static_cast<uint8_t>(data_type_ID), 8);
-    outputWriter.Write(num_array_dims, 2);
+void TypedData::Write(util::BitWriter& outputWriter) const {
+    outputWriter.WriteBits(static_cast<uint8_t>(data_type_ID), 8);
+    outputWriter.WriteBits(num_array_dims, 2);
     uint64_t n_elements = 1;
     for (uint64_t i = 0; i < num_array_dims; ++i) {
-      outputWriter.Write(array_dims[i], 32);
+        outputWriter.WriteBits(array_dims[i], 32);
         n_elements = n_elements * array_dims[i];
     }
 
     if (!compressedDataStream.str().empty()) {
         bool encoded = true;
-        outputWriter.Write(encoded, 1);
+        outputWriter.WriteBits(encoded, 1);
         auto size = compressedDataStream.str().size();
-        outputWriter.Write(size, 32);
+        outputWriter.WriteBits(size, 32);
         outputWriter.Write(
             const_cast<std::stringstream*>(&compressedDataStream));
     } else {
         bool encoded = false;
-        outputWriter.Write(encoded, 1);
+        outputWriter.WriteBits(encoded, 1);
         outputWriter.Write(const_cast<std::stringstream*>(&dataStream));
     }
-    outputWriter.Flush();
+    outputWriter.FlushBits();
 }
 
 }  // namespace annotation_access_unit

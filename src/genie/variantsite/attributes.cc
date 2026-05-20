@@ -5,6 +5,7 @@
  */
 
 #include <algorithm>
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>
@@ -12,6 +13,7 @@
 #include "genie/variantsite/attributes.h"
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -19,6 +21,12 @@ namespace variant_site {
 
 void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
     AddFirst();
+    while (value.size() < info.getArrayLength()) {
+        genie::core::ArrayType def{};
+        auto defaultType = info.getAttributeType();
+        auto defaultValue = def.getDefaultValue(defaultType);
+        value.emplace_back(def.toArray(defaultType, defaultValue));
+    }
     genie::core::ArrayType arraytype;
     for (const auto& onearray : value) {
         arraytype.toFile(info.getAttributeType(), onearray, writers.back());
@@ -30,13 +38,19 @@ void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
     } else if (rowInTile < (rowsPerTile-1)) {
         rowInTile++;
         typedTiles.back().setArrayDim0(static_cast<uint32_t>(rowInTile));
+        if (value.size() > typedTiles.back().getArrayDims()[1]) {
+            typedTiles.back().setArrayDim1(static_cast<uint32_t>(value.size()));
+        }
     } else {
         typedTiles.back().setArrayDim0(static_cast<uint32_t>(rowInTile + 1));
-        writers.back().Flush();
+        if (value.size() > typedTiles.back().getArrayDims()[1]) {
+            typedTiles.back().setArrayDim1(static_cast<uint32_t>(value.size()));
+        }
+        writers.back().FlushBits();
 
         std::vector<uint32_t> arrayDims;
         arrayDims.push_back(static_cast<uint32_t>(rowInTile+1));
-        for (uint8_t i = 1; i < info.getArrayLength(); ++i) arrayDims.push_back(static_cast<uint32_t>(2));
+        arrayDims.push_back(static_cast<uint32_t>(value.size()));
         typedTiles.emplace_back(info.getAttributeType(), info.getArrayLength(), arrayDims);
         tiles.emplace_back("");
         writers.emplace_back(&tiles.back());
@@ -68,8 +82,8 @@ std::vector<std::stringstream> AttributeTile::convertTilesToTypedData() {
         util::BitReader reader(tile);
         typedData.convertToTypedData(reader);
         TypedTiles.emplace_back("");
-        core::Writer writer(&TypedTiles.back());
-        typedData.write(writer);
+        util::BitWriter writer(&TypedTiles.back());
+        typedData.Write(writer);
     }
 
     return TypedTiles;
@@ -83,7 +97,7 @@ void AttributeTile::AddFirst() {
     if (typedTiles.empty()) {
         std::vector<uint32_t> arrayDims;
         arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
-        for (uint8_t i = 1; i < info.getArrayLength(); ++i) arrayDims.push_back(static_cast<uint32_t>(2));
+        arrayDims.push_back(static_cast<uint32_t>(1));
         typedTiles.emplace_back(info.getAttributeType(), info.getArrayLength(), arrayDims);
     }
 }
@@ -110,8 +124,7 @@ void AttributeTile::setCompressedData(uint64_t tilenr, std::stringstream& compre
     (void)compressedData;
 }
 
-void Attributes::add(std::vector<genie::core::record::variant_site::InfoFields::Field> tags)  // , std::vector<std::vector<std::vector<uint8_t>>> infoValues) {
-{
+void Attributes::add(std::vector<genie::core::record::variant_site::InfoFields::Field> tags) {  // , std::vector<std::vector<std::vector<uint8_t>>> infoValues) {
     size_t index = 0;
     for (const auto& tag : tags) {
         attributeTiles[tag.tag].write(tag.values);  // infoValues.at(index));
@@ -137,6 +150,83 @@ void Attributes::add(std::map<std::string, genie::core::record::variant_site::In
         }
         attrWritten[isWritten.first] = false;
     }
+}
+
+void Attributes::add(std::vector<genie::core::record::feature::FeatureFields::Field> tags) {
+    size_t index = 0;
+    for (const auto& tag : tags) {
+        attributeTiles[tag.attr].write(tag.attr_values);
+        attrWritten[tag.attr] = true;
+        index++;
+    }
+    for (const auto& isWritten : attrWritten) {
+        if (!isWritten.second) {
+            attributeTiles[isWritten.first].writeMissing();
+        }
+        attrWritten[isWritten.first] = false;
+    }
+}
+
+void Attributes::add(std::vector<genie::core::record::sample::SampleFields::Field> tags) {
+  size_t index = 0;
+  for (const auto& tag : tags) {
+    attributeTiles[tag.attr].write(tag.attr_values);
+    attrWritten[tag.attr] = true;
+    index++;
+  }
+  for (const auto& isWritten : attrWritten) {
+    if (!isWritten.second) {
+      attributeTiles[isWritten.first].writeMissing();
+    }
+    attrWritten[isWritten.first] = false;
+  }
+}
+
+void Attributes::add(std::vector<genie::core::record::functional_annotation::Attribute> tags) {
+  size_t index = 0;
+  for (const auto& tag : tags) {
+    attributeTiles[tag.attr_tag].write(tag.attr_values);
+    attrWritten[tag.attr_tag] = true;
+    index++;
+  }
+  for (const auto& isWritten : attrWritten) {
+    if (!isWritten.second) {
+      attributeTiles[isWritten.first].writeMissing();
+    }
+    attrWritten[isWritten.first] = false;
+  }
+}
+
+void Attributes::add(std::vector<genie::core::record::track::Attribute> tags) {
+  size_t index = 0;
+  for (const auto& tag : tags) {
+    std::vector<std::vector<uint8_t>> values;
+    values.push_back(tag.attr_value);
+    attributeTiles[tag.attr_tag].write(values);
+    attrWritten[tag.attr_tag] = true;
+    index++;
+  }
+  for (const auto& isWritten : attrWritten) {
+    if (!isWritten.second) {
+      attributeTiles[isWritten.first].writeMissing();
+    }
+    attrWritten[isWritten.first] = false;
+  }
+}
+
+void Attributes::add(std::vector<genie::core::record::track_property::TrackProperty> tags) {
+  size_t index = 0;
+  for (const auto& tag : tags) {
+    attributeTiles[tag.track_property].write(tag.track_property_values);
+    attrWritten[tag.track_property] = true;
+    index++;
+  }
+  for (const auto& isWritten : attrWritten) {
+    if (!isWritten.second) {
+      attributeTiles[isWritten.first].writeMissing();
+    }
+    attrWritten[isWritten.first] = false;
+  }
 }
 
 Attributes::Attributes(Attributes& other) {

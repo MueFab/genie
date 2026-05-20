@@ -11,7 +11,6 @@ set(source_files
         TileStructureTests.cc
         AnnotationEncodingParametersTests.cc
         DescriptorConfigurationTests.cc
-#        ContactMatrixTests.cc
         CompressorParameterSetTests.cc
         main.cc
 )

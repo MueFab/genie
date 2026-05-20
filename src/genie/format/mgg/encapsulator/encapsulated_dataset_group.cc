@@ -6,7 +6,9 @@
 
 #include "genie/format/mgg/encapsulator/encapsulated_dataset_group.h"
 #include <map>
+#include <string>
 #include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -42,7 +44,7 @@ void EncapsulatedDatasetGroup::patchID(uint8_t id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void EncapsulatedDatasetGroup::mergeMetadata(genie::core::MPEGMinorVersion version) {
+void EncapsulatedDatasetGroup::mergeMetadata(genie::core::MpegMinorVersion version) {
     std::string meta;
     std::string protection;
 
@@ -76,7 +78,7 @@ void EncapsulatedDatasetGroup::mergeMetadata(genie::core::MPEGMinorVersion versi
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void EncapsulatedDatasetGroup::mergeReferences(genie::core::MPEGMinorVersion version) {
+void EncapsulatedDatasetGroup::mergeReferences(genie::core::MpegMinorVersion version) {
     for (auto& d : datasets) {
         if (d->meta.getReference() == boost::none) {
             continue;
@@ -166,7 +168,7 @@ void EncapsulatedDatasetGroup::mergeLabels() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 EncapsulatedDatasetGroup::EncapsulatedDatasetGroup(const std::vector<std::string>& input_files,
-                                                   genie::core::MPEGMinorVersion version) {
+                                                   genie::core::MpegMinorVersion version) {
     datasets.reserve(input_files.size());
     for (const auto& i : input_files) {
         datasets.emplace_back(genie::util::make_unique<EncapsulatedDataset>(i, version));
@@ -187,7 +189,7 @@ EncapsulatedDatasetGroup::EncapsulatedDatasetGroup(const std::vector<std::string
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::format::mgg::DatasetGroup EncapsulatedDatasetGroup::assemble(genie::core::MPEGMinorVersion version) {
+genie::format::mgg::DatasetGroup EncapsulatedDatasetGroup::assemble(genie::core::MpegMinorVersion version) {
     genie::format::mgg::DatasetGroup ret(0, 0, version);
     for (auto& r : references) {
         ret.addReference(std::move(r));

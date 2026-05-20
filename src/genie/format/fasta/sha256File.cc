@@ -6,6 +6,8 @@
 
 #include "genie/format/fasta/sha256File.h"
 #include <algorithm>
+#include <string>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -8,8 +8,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace likelihood {
+namespace genie::likelihood {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,40 +22,69 @@ LikelihoodParameters::LikelihoodParameters(uint8_t _num_gl_per_sample, bool _tra
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t LikelihoodParameters::getNumGlPerSample() const { return num_gl_per_sample; }
+LikelihoodParameters::LikelihoodParameters(
+    util::BitReader& reader)
+    : num_gl_per_sample(reader.ReadAlignedInt<uint8_t>()),
+      transform_flag(static_cast<bool>(reader.ReadAlignedInt<uint8_t>() & 0x01)) {
+  if (transform_flag) {
+    dtype_id = static_cast<genie::core::DataType>(reader.ReadAlignedInt<uint8_t>());
+  }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool LikelihoodParameters::getTransformFlag() const { return transform_flag; }
+uint8_t LikelihoodParameters::GetNumGlPerSample() const { return num_gl_per_sample; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::DataType LikelihoodParameters::getDtypeID() const { return dtype_id; }
+bool LikelihoodParameters::GetTransformFlag() const { return transform_flag; }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void LikelihoodParameters::read(util::BitReader& reader) {
+
+core::DataType LikelihoodParameters::GetDtypeId() const { return dtype_id; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void LikelihoodParameters::Read(util::BitReader& reader) {
     num_gl_per_sample = static_cast<uint8_t>(reader.ReadBits(8));
     reader.ReadBits(7);  // reserved
     transform_flag = static_cast<bool>(reader.ReadBits(1));
     if (transform_flag) dtype_id = static_cast<genie::core::DataType>(reader.ReadBits(8));
 }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LikelihoodParameters::write(genie::core::Writer& writer) const {
-    writer.Write(num_gl_per_sample, 8);
-    writer.Write(0, 7);  // reserved
-    writer.Write(transform_flag, 1);
-    if (transform_flag) writer.Write(static_cast<uint8_t>(dtype_id), 8);
+size_t LikelihoodParameters::GetSize() const {
+  size_t size = 0;
+
+  size += sizeof(num_gl_per_sample);
+  size += sizeof(uint8_t);
+
+  if (transform_flag) {
+    size += sizeof(uint8_t);
+  }
+
+  return size;
 }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t LikelihoodParameters::getSize(core::Writer& writesize) const {
-    write(writesize);
-    return writesize.GetBitsWritten();
+size_t LikelihoodParameters::GetSize(util::BitWriter& writesize) const {
+    Write(writesize);
+    return writesize.GetTotalBitsWritten();
 }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace likelihood
-}  // namespace genie
+void LikelihoodParameters::Write(util::BitWriter& writer) const {
+    writer.WriteBits(num_gl_per_sample, 8);
+    writer.WriteReserved(7);
+    writer.WriteBits(transform_flag, 1);
+    if (transform_flag) writer.WriteBits(static_cast<uint64_t>(dtype_id), 8);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace genie::likelihood
 
 // ---------------------------------------------------------------------------------------------------------------------

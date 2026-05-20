@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include <filesystem>
+#include <iostream>
 #include <string>
 
 #include "helpers.h"
@@ -152,16 +152,17 @@ TEST_P(AnnotationTests, annotationSite) {
     if (std::filesystem::file_size(inputFilename) > 100 * 1024) return;
 
   std::string outputFilename = composeSiteOutputFileName(filePath, testParams);
-                                 
+
   std::filesystem::remove(outputFilename + ".bin");
 
   genie::annotation::Annotation annotationGenerator;
   std::string comment = "# with parameters";
-  std::string set1 = "compressor 1 1 BSC";
+  std::string set1a = "compressor 1 0 SER {0} {} {1}";
+  std::string set1b = "compressor 1 1 BSC {} {{0 0 0}} {0}";
   std::string set2 = "compressor 2 1 LZMA {8 16777216 3 0 2 32}";
   std::string set3 = "compressor 3 1 ZSTD {0 0}";
   std::stringstream config;
-  config << set1 << '\n';  //    << set2 << '\n' << set3 << '\n';
+  config << set1a << '\n' << set1b << '\n';  //    << set2 << '\n' << set3 << '\n';
 
   annotationGenerator.setCompressorConfig(config);
   annotationGenerator.setTileSize(testParams.defaultTileHeight,
@@ -178,7 +179,7 @@ TEST_P(AnnotationTests, annotationGeno) {
   auto testParams = GetParam();
 
   std::string inputFilename =
-      filePath + testParams.genofile_in;  //"ALL.chrX.10000.geno";
+      filePath + testParams.genofile_in;  // "ALL.chrX.10000.geno";
 
 
   ASSERT_TRUE(std::filesystem::exists(inputFilename));
@@ -192,11 +193,12 @@ TEST_P(AnnotationTests, annotationGeno) {
   std::filesystem::remove(outputFilename + ".bin");
 
   std::string comment = "# with parameters";
-  std::string set1 = "compressor 1 1 BSC";
+  std::string set1a = "compressor 1 0 SER {0} {} {1}";
+  std::string set1b = "compressor 1 1 BSC {} {{0 0 0}} {0}";
   std::string set2 = "compressor 3 2 LZMA {8 16777216 3 0 2 32}";
   std::string set3 = "compressor 3 1 ZSTD {0 0}";
   std::stringstream config;
-  config << set1 << '\n';  //   << set2 << '\n' << set3 << '\n';
+  config << set1a << '\n' << set1b << '\n';  //   << set2 << '\n' << set3 << '\n';
 
   uint32_t BLOCK_SIZE = testParams.defaultTileHeight;
   bool TRANSFORM_MODE = true;
@@ -208,7 +210,7 @@ TEST_P(AnnotationTests, annotationGeno) {
 
   genie::genotype::EncodingOptions genotype_opt = {
       BLOCK_SIZE,                                  // block_size;
-      genie::genotype::BinarizationID::ROW_BIN,    // BIT_PLANE,  //
+      genie::genotype::BinarizationID::ROW_BIN,    // BIT_PLANE,
                                                    // binarization_ID;
       genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
       false,                                       // transpose_mat;
@@ -236,6 +238,9 @@ TEST_P(AnnotationTests, annotationGeno) {
 INSTANTIATE_TEST_SUITE_P(
     testoutputs, AnnotationTests,
     ::testing::Values(
-        TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 1000, 3000u),
-                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 15u, 3000u),
-                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 3000u)));
+        TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 950u, 3000u),
+        TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 1000u, 3000u),
+        TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 10000u, 3000u),
+        TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 15u, 3000u),
+        TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 5u, 3000u),
+        TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 3000u)));

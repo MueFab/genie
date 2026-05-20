@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_ANNOTATION_PARAMETERSETCOMPOSER_H_
-#define SRC_GENIE_ANNOTATION_PARAMETERSETCOMPOSER_H_
+#ifndef SRC_GENIE_GENOTYPE_PARAMETERSET_COMPOSER_H_
+#define SRC_GENIE_GENOTYPE_PARAMETERSET_COMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <iostream>
@@ -19,6 +19,7 @@
 #include "genie/util/bit_reader.h"
 
 #include "genie/core/record/annotation_parameter_set/record.h"
+#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/jbig/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
@@ -42,7 +43,7 @@ class ParameterSetComposer {
         uint8_t _AT_ID, std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
         std::vector<uint64_t> defaultTileSize = {200, 3000});
 
- 
+
     void setGenotypeParameters(genie::genotype::GenotypeParameters _parameters) { genotypeParameters = _parameters; }
     void setContactParameters(genie::contact::ContactMatrixParameters _parameters) {
         contactMatrixParameters = _parameters;
@@ -63,7 +64,6 @@ class ParameterSetComposer {
     }
 
  private:
-
     genie::genotype::GenotypeParameters genotypeParameters;
     genie::likelihood::LikelihoodParameters likelihoodParameters;
     genie::contact::ContactMatrixParameters contactMatrixParameters;
@@ -74,7 +74,7 @@ class ParameterSetComposer {
 
     uint8_t parameter_set_ID;
     uint8_t AT_ID;
-    genie::core::AlphabetID AT_alphabet_ID;
+    genie::core::AlphabetId AT_alphabet_ID;
     uint8_t AT_coord_size;
     bool AT_pos_40_bits_flag;
     uint8_t n_aux_attribute_groups;
@@ -106,7 +106,7 @@ class ParameterSetComposer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_ANNOTATION_PARAMETERSETCOMPOSER_H_
+#endif  // SRC_GENIE_GENOTYPE_PARAMETERSET_COMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -1,11 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <fstream>
-#include <iostream>
-#include "genie/core/record/annotation_access_unit/BlockPayloadStream.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-
 class payloadStreamTests : public ::testing::Test {
  protected:
     // Do any necessary setup for your tests here

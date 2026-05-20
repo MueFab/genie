@@ -4,11 +4,10 @@
 * https://github.com/mitogen/genie for more details.
 */
 
-#ifndef GENIE_CONTACT_CONTACT_MATRIX_BIN_PAYLOAD_H
-#define GENIE_CONTACT_CONTACT_MATRIX_BIN_PAYLOAD_H
+#ifndef SRC_GENIE_CONTACT_CONTACT_MATRIX_BIN_PAYLOAD_H_
+#define SRC_GENIE_CONTACT_CONTACT_MATRIX_BIN_PAYLOAD_H_
 
 #include <genie/core/constants.h>
-#include <genie/core/writer.h>
 #include <genie/util/bit_reader.h>
 #include <genie/util/bit_writer.h>
 #include <cstdint>
@@ -37,8 +36,7 @@ class [[maybe_unused]] ContactMatrixBinPayload {
       uint16_t sample_ID,
       uint8_t chr_ID,
       uint32_t bin_size_multiplier,
-      std::vector<std::vector<double_t>>&& weight_value
-  );
+      std::vector<std::vector<double_t>>&& weight_value);
   ContactMatrixBinPayload(const ContactMatrixBinPayload& other);
   ContactMatrixBinPayload(ContactMatrixBinPayload&& other) noexcept;
 
@@ -50,8 +48,7 @@ class [[maybe_unused]] ContactMatrixBinPayload {
   explicit ContactMatrixBinPayload(
       genie::util::BitReader& bit_reader,
       uint8_t num_norm_methods,
-      uint32_t num_bin_entries
-  );
+      uint32_t num_bin_entries);
 
   bool operator==(const ContactMatrixBinPayload& other) const;
 
@@ -73,7 +70,6 @@ class [[maybe_unused]] ContactMatrixBinPayload {
   void ReadWeightValuesFromFileAtIndex(const std::string& fpath, size_t idx);
 
   void Write(util::BitWriter& writer) const;
-
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -82,6 +78,6 @@ class [[maybe_unused]] ContactMatrixBinPayload {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CONTACT_CONTACT_MATRIX_BIN_PAYLOAD_H
+#endif  // SRC_GENIE_CONTACT_CONTACT_MATRIX_BIN_PAYLOAD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------

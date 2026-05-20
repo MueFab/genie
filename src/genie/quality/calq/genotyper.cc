@@ -5,6 +5,9 @@
  */
 
 #include "genie/quality/calq/genotyper.h"
+#include <map>
+#include <string>
+#include <vector>
 
 // -----------------------------------------------------------------------------
 

@@ -6,12 +6,11 @@
 
 #include <gtest/gtest.h>
 
-#include <filesystem>
 #include <string>
 
 #include "genie/annotation/annotation.h"
 #include "genie/contact/contact_coder.h"
-#include "genie/core/record/contact/record.h"
+#include "genie/core/contact_record/record.h"
 #include "helpers.h"
 
 struct ContactTestDetails {
@@ -19,7 +18,7 @@ struct ContactTestDetails {
                      bool REMOVE_UNALIGNED_REGION, bool TRANSFORM_MASK,
                      bool ENA_DIAG_TRANSFORM, bool ENA_BINARIZATION,
                      bool NORM_AS_WEIGHT, bool MULTIPLICATIVE_NORM,
-                     uint32_t TILE_SIZE, uint32_t MULT = 1u){//, std::vector<uint32_t> BINSIZEMULT ={}) {
+                     uint32_t TILE_SIZE, uint32_t MULT = 1u) {
     filename = contactin;
     cm_pars.REMOVE_UNALIGNED_REGION = REMOVE_UNALIGNED_REGION;
     cm_pars.TRANSFORM_MASK = TRANSFORM_MASK;
@@ -30,13 +29,11 @@ struct ContactTestDetails {
     cm_pars.CODEC_ID = genie::core::AlgoID::JBIG, cm_pars.TILE_SIZE = TILE_SIZE;
     cm_pars.MULT = MULT;
     outputfile = casename;
-    //binSizemultipliers = BINSIZEMULT;
   }
 
   std::string filename;
   std::string outputfile;
   genie::annotation::ContactMatrixParameters cm_pars;
- // std::vector<uint32_t> binSizemultipliers;
 };
 
 class AnnotationContactTests
@@ -100,40 +97,56 @@ INSTANTIATE_TEST_SUITE_P(
         ContactTestDetails(
             "CASE01",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
-            false, false, true, true, true, false, 1000),
+            false, false, true, true, false, false, 1000),
         ContactTestDetails(
             "CASE02",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
-            false, false, true, true, true, false, 150),
+            false, false, true, true, false, false, 150),
         ContactTestDetails(
             "CASE03",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_22.cont",
-            false, false, true, true, true, false, 1000),
+            false, false, true, true, false, false, 1000),
         ContactTestDetails(
             "CASE04",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_22.cont",
-            false, false, true, true, true, false, 150),
+            false, false, true, true, false, false, 150),
+        // ContactTestDetails(
+        //     "CASE05",
+        //     "",
+        //     false, false, true, true, false, false, 0),
+        // ContactTestDetails(
+        //     "CASE06",
+        //     "",
+        //     false, false, true, true, false, false, 0),
         ContactTestDetails(
             "CASE07",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-50000-21_21.cont",
-            false, false, true, true, true, false, 1000, 5u),
+            false, false, true, true, false, false, 1000, 5u),
         ContactTestDetails(
             "CASE08",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-50000-21_21.cont",
-            false, false, true, true, true, false, 150, 5u),//, {1,5}),
+            false, false, true, true, false, false, 150, 5u),
         ContactTestDetails(
             "CASE09",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
-            true, false, true, true, true, false, 1000),
+            true, false, true, true, false, false, 1000),
+        // ContactTestDetails(
+        //     "CASE10",
+        //     "",
+        //     true, false, true, true, false, false, 0),
+        // ContactTestDetails(
+        //     "CASE11",
+        //     "",
+        //     true, false, true, true, false, false, 0),
         ContactTestDetails(
             "CASE12",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
-            true, false, false, true, true, false, 1000),
+            true, false, false, true, false, false, 1000),
         ContactTestDetails(
             "CASE13",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
-            true, false, true, true, true, false, 1000),
+            true, false, true, false, false, false, 1000),
         ContactTestDetails(
             "CASE14",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
-            true, false, true, true, true, false, 1000)));
+            true, false, true, true, false, false, 1000)));

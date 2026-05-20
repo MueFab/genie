@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include <codecs/include/mpegg-codecs.h>
+#include "codecs/include/mpegg-codecs.h"
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -25,8 +25,8 @@
 #include "genie/core/record/annotation_access_unit/TypedData.h"
 #include "genie/core/record/annotation_access_unit/record.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/core/record/data_unit/record.h"
-#include "genie/core/record/variant_genotype/record.h"
+#include "genie/core/data_unit_record/record.h"
+#include "genie/core/variant_genotype_record/record.h"
 #include "genie/variantsite/accessunit_composer.h"
 
 #include "genie/annotation/annotation.h"
@@ -55,12 +55,12 @@ TEST_P(SiteConformanceTest, SiteConformancetests) {  // NOLINT(cert-err58-cpp)
     std::string filename = GetParam();
     std::string filepath = gitRootDir + filename;
 
-    std::string set1 = "compressor 1 0 BSC";
-    std::string set2 = "compressor 1 1 LZMA";
+    std::string set1 = "compressor 1 0 SER {0} {} {1}";
+    std::string set2 = "compressor 1 1 BSC {} {{0 0 0}} {0}";
     std::string set3 = "compressor 2 0 ZSTD";
     std::string set4 = "compressor 3 0 BSC";
     std::stringstream config;
-    config << set1 << '\n' << set3 << '\n' << set4 << '\n';
+    config << set1 << '\n' << set2 << '\n' << set3 << '\n' << set4 << '\n';
 
     genie::annotation::Annotation annotationGenerator;
 
@@ -71,6 +71,6 @@ TEST_P(SiteConformanceTest, SiteConformancetests) {  // NOLINT(cert-err58-cpp)
 }
 
 INSTANTIATE_TEST_SUITE_P(testallsiteConformance, SiteConformanceTest,
-                        ::testing::Values("/data/records/conformance/1.3.5.bgz.CASE01.site",
-                                          "/data/records/conformance/1.3.11.bgz.CASE03.site",
-                                          "/data/records/conformance/1.3.11.bgz.CASE04.site"));
+    ::testing::Values("/data/records/conformance/1.3.5.bgz.CASE01.site",
+                      "/data/records/conformance/1.3.11.bgz.CASE03.site",
+                      "/data/records/conformance/1.3.11.bgz.CASE04.site"));

@@ -12,7 +12,7 @@
 #include "genie/core/classifier.h"
 #include "genie/core/format_importer.h"
 #include "genie/core/record/chunk.h"
-#include "genie/core/stats/perf-stats.h"
+#include "genie/core/stats/perf_stats.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/ordered_lock.h"
 #include "genie/util/original_source.h"
@@ -59,7 +59,7 @@ class Importer : public core::FormatImporter {
      * @param _classifier
      * @return
      */
-    bool pumpRetrieve(core::Classifier* _classifier) override;
+    bool PumpRetrieve(core::Classifier* _classifier) override;
 
     /**
      * @brief

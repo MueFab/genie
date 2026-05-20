@@ -6,8 +6,10 @@
 #include "genie/variantsite/parameterset_composer.h"
 
 #include <algorithm>
+#include <map>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
