@@ -89,19 +89,19 @@ std::map<uint8_t, genie::core::meta::Reference> DecapsulatedDatasetGroup::decaps
     genie::format::mgg::DatasetGroup* grp) {
     std::map<uint8_t, std::string> ref_metadata;
 
-    for (auto& m : grp->getReferenceMetadata()) {
-        ref_metadata.emplace(std::make_pair(m.getReferenceID(), m.decapsulate()));
+    for (auto& dim_m : grp->getReferenceMetadata()) {
+        ref_metadata.emplace(std::make_pair(dim_m.getReferenceID(), dim_m.decapsulate()));
     }
 
     std::map<uint8_t, genie::core::meta::Reference> references;
 
-    for (auto& m : grp->getReferences()) {
-        auto it = ref_metadata.find(m.getReferenceID());
+    for (auto& dim_m : grp->getReferences()) {
+        auto it = ref_metadata.find(dim_m.getReferenceID());
         std::string meta;
         if (it != ref_metadata.end()) {
             meta = std::move(it->second);
         }
-        references.emplace(std::make_pair(m.getReferenceID(), m.decapsulate(std::move(meta))));
+        references.emplace(std::make_pair(dim_m.getReferenceID(), dim_m.decapsulate(std::move(meta))));
     }
     return references;
 }

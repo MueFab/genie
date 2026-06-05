@@ -13,14 +13,15 @@
 #include <string>
 #include <vector>
 
-#include "genie/core/record/annotation_access_unit/TypedData.h"
-#include "genie/variantsite/accessunit_composer.h"
+#include "genie/core/access_unit/annotation/typed_data.h"
+#include "genie/annotation/accessunit_composer.h"
 
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/util/runtime_exception.h"
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
+#include "genie/annotation/vsite_parameterset_composer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -30,16 +31,16 @@ void SiteAnnotation::parseInfoTags(std::string& recordInputFileName) {
     std::ifstream readForTags;
     readForTags.open(recordInputFileName, std::ios::in | std::ios::binary);
     genie::util::BitReader bitreader(readForTags);
-    std::vector<genie::core::record::variant_site::InfoFields::Field> infoTag;
+    std::vector<genie::core::access_unit::annotation::AttributeField> infoTag;
     genie::core::record::variant_site::Record recs;
     while (recs.Read(bitreader)) {
         infoTag = recs.GetInfoTag();
         for (const auto& tag : infoTag) {
-            InfoField infoField(tag.tag, tag.type, static_cast<uint8_t>(tag.values.size()));
-            genie::core::record::variant_site::Info_tag infotag{static_cast<uint8_t>(tag.tag.size()), tag.tag, tag.type,
-                                                                static_cast<uint8_t>(tag.values.size()), tag.values};
-            infoTags[tag.tag] = infotag;
-            attributeInfo[tag.tag] = infoField;
+            InfoField infoField(tag.name, tag.type, static_cast<uint8_t>(tag.values.size()));
+            genie::core::record::variant_site::Info_tag infotag{static_cast<uint8_t>(tag.name.size()), tag.name, tag.type,
+                                                                 static_cast<uint8_t>(tag.values.size()), tag.values};
+            infoTags[tag.name] = infotag;
+            attributeInfo[tag.name] = infoField;
         }
     }
     readForTags.close();
@@ -67,24 +68,24 @@ SiteUnits SiteAnnotation::parseSite(std::ifstream& inputfile) {
     genie::variant_site::ParameterSetComposer encodeParameters;
 
     genie::variant_site::AccessUnitComposer accessUnit;
-    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::VARIANTS, 1);
+    accessUnit.setATtype(core::access_unit::annotation::AnnotationType::VARIANTS, 1);
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;
     auto& descrStream = parser.getDescriptors().getTiles();
 
-    std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attr;
-    for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
+    std::map<std::string, genie::core::access_unit::annotation::TypedData> attr;
+    for (uint64_t idx_i = 0; idx_i < parser.getNrOfTiles(); ++idx_i) {
         std::map<genie::core::AnnotDesc, std::stringstream> desc;
         for (auto& desctile : descrStream) {
-            desc[desctile.first] << desctile.second.getTile(i).rdbuf();
+            desc[desctile.first] << desctile.second.getTile(idx_i).rdbuf();
         }
         for (auto& attrtile : parser.getAttributes().getTiles()) {
-            attr[attrtile.first] = attrtile.second.getTypedTile(i);
+            attr[attrtile.first] = attrtile.second.getTypedTile(idx_i);
         }
 
         accessUnit.setAccessUnit(desc, attr, parser.getAttributes().getInfo(), annotationParameterSet,
-                                 annotationAccessUnit.at(i), AG_class, AT_ID, rowIndex);
+                                 annotationAccessUnit.at(idx_i), AG_class, AT_ID, rowIndex);
         rowIndex++;
     }
 

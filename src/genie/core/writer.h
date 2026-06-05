@@ -57,13 +57,7 @@ class Writer {
         : logwriter(writer), binwriter(writer), writingLog(log), getWriteSize(false), writeBitSize(0) {}
 
     bool IsLogWriter() const { return writingLog; }
-    bool IsGetSizeMode() const { return getWriteSize; }
-    util::BitWriter& GetBinWriter() {
-        if (getWriteSize) {
-            throw std::runtime_error("GetBinWriter called during getSize mode - use Writer::Write() instead");
-        }
-        return binwriter;
-    }
+    util::BitWriter& GetBinWriter() { return binwriter; }
     /**
      * @brief Write a specified number of bits, reserved are not written to log
      * @param value Data to write. The LSBs will be written.
@@ -126,14 +120,6 @@ class Writer {
             }
         }
     }
-    template <typename T, size_t SIZE = sizeof(T), typename = std::enable_if<std::is_integral<T>::value>>
-    void WriteBypassBE(T val) {
-        if (getWriteSize) {
-            writeBitSize += SIZE * 8;
-        } else if (!writingLog) {
-            binwriter.WriteBypassBE(val);
-        }
-    }
 
     /**
      * @brief Writes all buffered bits to the output stream. If there is no full byte available, the missing bits for
@@ -166,7 +152,25 @@ class Writer {
      */
     std::ostream* getStreamObj() { return logwriter; }
 
-    
+    /**
+     * @brief Use for implicit conversion where BitWriter is expected. (Temp fix!)
+     */
+    operator util::BitWriter&() {
+        return binwriter;
+    }
+
+    /**
+     * @brief Write bits directly to the underlying BitWriter
+     * @param bits Data to write
+     * @param numBits Number of bits to write
+     */
+    void WriteBits(uint64_t bits, uint8_t numBits) {
+        if (getWriteSize) {
+            writeBitSize += numBits;
+        } else if (!writingLog) {
+            binwriter.WriteBits(bits, numBits);
+        }
+    }
 
 };
 }  // namespace core

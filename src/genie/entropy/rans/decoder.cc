@@ -29,8 +29,8 @@ void RANSDecoder::decode(std::istream& input, std::ostream& output, uint32_t num
         param.stats.calc_cum_freqs();
         cum2sym.resize(param.stats.cum_freqs[256]);
         for (int s = 0; s < 256; ++s)
-            for (uint32_t i = param.stats.cum_freqs[s]; i < param.stats.cum_freqs[s+1]; ++i)
-                cum2sym[i] = static_cast<uint8_t>(s);
+            for (uint32_t idx_i = param.stats.cum_freqs[s]; idx_i < param.stats.cum_freqs[s+1]; ++idx_i)
+                cum2sym[idx_i] = static_cast<uint8_t>(s);
     }
 
     input.read(reinterpret_cast<char*>(&param.num_symbols), sizeof(param.num_symbols));
@@ -43,7 +43,7 @@ void RANSDecoder::decode(std::istream& input, std::ostream& output, uint32_t num
     if (!input) throw std::runtime_error("Failed to read compressed data.");
 
     Rans64DecSymbol dsyms[256];
-    for (int i = 0; i < 256; ++i) Rans64DecSymbolInit(&dsyms[i], param.stats.cum_freqs[i], param.stats.freqs[i]);
+    for (int idx_i = 0; idx_i < 256; ++idx_i) Rans64DecSymbolInit(&dsyms[idx_i], param.stats.cum_freqs[idx_i], param.stats.freqs[idx_i]);
 
     std::vector<uint8_t> dec_bytes(param.num_symbols, 0);
     std::vector<Rans64State> rans_states(num_interleavings);
@@ -51,11 +51,11 @@ void RANSDecoder::decode(std::istream& input, std::ostream& output, uint32_t num
     for (auto& rans : rans_states) Rans64DecInit(&rans, &ptr);
 
     for (size_t symbol_idx = 0; symbol_idx < param.num_symbols;) {
-        for (size_t j = 0; j < num_interleavings && symbol_idx < param.num_symbols; ++j) {
-            uint32_t symbol_code = Rans64DecGet(&rans_states[j], PROB_BITS);
+        for (size_t idx_j = 0; idx_j < num_interleavings && symbol_idx < param.num_symbols; ++idx_j) {
+            uint32_t symbol_code = Rans64DecGet(&rans_states[idx_j], PROB_BITS);
             uint8_t symbol = cum2sym[symbol_code];
             dec_bytes[symbol_idx++] = symbol;
-            Rans64DecAdvanceSymbol(&rans_states[j], &ptr, &dsyms[symbol], PROB_BITS);
+            Rans64DecAdvanceSymbol(&rans_states[idx_j], &ptr, &dsyms[symbol], PROB_BITS);
         }
     }
 

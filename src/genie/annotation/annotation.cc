@@ -13,9 +13,10 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/util/runtime_exception.h"
 
+#include "genie/annotation/attributes.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -49,6 +50,50 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
         auto dataunits = siteAnnotation.parseSite(inputfile);
         annotationParameterSet.push_back(dataunits.annotationParameterSet);
         annotationAccessUnit = dataunits.annotationAccessUnit;
+    } else if (recType == RecType::SAMPLE_FILE) {
+        sampleAnnotation.setCompressors(compressors);
+        sampleAnnotation.parseInfoTags(recordInputFileName);
+        auto dataunits = sampleAnnotation.parseSample(inputfile);
+        annotationParameterSet.push_back(dataunits.annotationParameterSet);
+        annotationAccessUnit.insert(annotationAccessUnit.end(), dataunits.annotationAccessUnit.begin(),
+                                  dataunits.annotationAccessUnit.end());
+    } else if (recType == RecType::FEATURE_FILE) {
+        featureAnnotation.setCompressors(compressors);
+        featureAnnotation.parseInfoTags(recordInputFileName);
+        auto dataunits = featureAnnotation.parseFeature(inputfile);
+        annotationParameterSet.push_back(dataunits.annotationParameterSet);
+        annotationAccessUnit.insert(annotationAccessUnit.end(), dataunits.annotationAccessUnit.begin(),
+                                  dataunits.annotationAccessUnit.end());
+    } else if (recType == RecType::GENE_EXPRESSION_FILE) {
+        geneExpressionAnnotation.setCompressors(compressors);
+        geneExpressionAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
+        auto dataunits = geneExpressionAnnotation.parseGeneExpression(inputfile);
+        for (auto& dataunit : dataunits) {
+            annotationParameterSet.push_back(dataunit.annotationParameterSet);
+            annotationAccessUnit.insert(annotationAccessUnit.end(), dataunit.annotationAccessUnit.begin(),
+                                      dataunit.annotationAccessUnit.end());
+        }
+    } else if (recType == RecType::FUNCTIONAL_ANNOTATIONS_FILE) {
+        functionalAnnotation.setCompressors(compressors);
+        functionalAnnotation.parseInfoTags(recordInputFileName);
+        auto dataunits = functionalAnnotation.parseFunctionalAnnotation(inputfile);
+        annotationParameterSet.push_back(dataunits.annotationParameterSet);
+        annotationAccessUnit.insert(annotationAccessUnit.end(), dataunits.annotationAccessUnit.begin(),
+                                  dataunits.annotationAccessUnit.end());
+    } else if (recType == RecType::TRACK_FILE) {
+        trackDataAnnotation.setCompressors(compressors);
+        trackDataAnnotation.parseInfoTags(recordInputFileName);
+        auto dataunits = trackDataAnnotation.parseTrack(inputfile);
+        annotationParameterSet.push_back(dataunits.annotationParameterSet);
+        annotationAccessUnit.insert(annotationAccessUnit.end(), dataunits.annotationAccessUnit.begin(),
+                                  dataunits.annotationAccessUnit.end());
+    } else if (recType == RecType::TRACK_PROPERTY_FILE) {
+        trackpropertyAnnotation.setCompressors(compressors);
+        trackpropertyAnnotation.parseInfoTags(recordInputFileName);
+        auto dataunits = trackpropertyAnnotation.parseTrackProperty(inputfile);
+        annotationParameterSet.push_back(dataunits.annotationParameterSet);
+        annotationAccessUnit.insert(annotationAccessUnit.end(), dataunits.annotationAccessUnit.begin(),
+                                  dataunits.annotationAccessUnit.end());
     } else {  // contact matrix
         cmAnnotation.setCompressors(compressors);
         cmAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
@@ -70,7 +115,7 @@ void Annotation::writeToFile(std::string& outputFileName) {
     genie::util::BitWriter testwriter(&testfile);
     std::ofstream txtfile;
     txtfile.open(filename + ".txt", std::ios::out);
-    genie::core::Writer txtwriter(&txtfile, true);
+    genie::util::BitWriter txtwriter(txtfile);
     uint64_t sizeSofar = 0;
 
     for (auto& pars : annotationParameterSet) {

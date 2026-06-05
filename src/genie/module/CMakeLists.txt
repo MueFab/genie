@@ -11,6 +11,9 @@ add_library(genie-module ${source_files})
 target_link_libraries(genie-module PUBLIC genie-util)
 target_link_libraries(genie-module PUBLIC genie-core)
 target_link_libraries(genie-module PUBLIC genie-gabac)
+target_link_libraries(genie-module PUBLIC genie-contact)
+target_link_libraries(genie-module PUBLIC genie-genotype)
+target_link_libraries(genie-module PUBLIC genie-likelihood)
 
 # TODO: To be implemented later
 #target_link_libraries(genie-module PUBLIC genie-mgrec)

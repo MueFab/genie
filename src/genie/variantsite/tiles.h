@@ -18,9 +18,9 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/variant_site_record/record.h"
-#include "genie/core/writer.h"
+#include "genie/core/record/variant/record.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ class Tiles {
         tileWriter.emplace_back(&tileData.back());
     }
     std::vector<std::stringstream> tileData;
-    std::vector<genie::core::Writer> tileWriter;
+    std::vector<util::BitWriter> tileWriter;
 };
 
 class TiledStream {
@@ -51,26 +51,26 @@ class TiledStream {
     void write(T value, uint8_t bits) {
         setTile();
         if (bits == 0) bits = sizeof(T);
-        tiles.tileWriter.back().Write(value, bits);
+        tiles.tileWriter.back().WriteBits(value, bits);
     }
 
     template <class T>
     void write(std::vector<T> values, uint8_t bits) {
         setTile();
         if (bits == 0) bits = sizeof(T);
-        for (auto value : values) tiles.tileWriter.back().Write(value, bits);
+        for (auto value : values) tiles.tileWriter.back().WriteBits(value, bits);
     }
 
     void write(std::string value);
 
     void emptyForRow() { setTile(); }
 
-    void wrapUp() { tiles.tileWriter.back().Flush(); }
+    void wrapUp() { tiles.tileWriter.back().FlushBits(); }
     std::vector<std::stringstream>& getTiles() { return tiles.tileData; }
     size_t getNrOfTiles() { return tiles.tileData.size(); }
     std::stringstream& getTile(uint64_t tilenr) { return tiles.tileData.at(tilenr); }
 
-    size_t getBitsWrittenInTile(size_t tilenr) { return tiles.tileWriter.at(tilenr).GetBitsWritten(); }
+    size_t getBitsWrittenInTile(size_t tilenr) { return tiles.tileWriter.at(tilenr).GetTotalBitsWritten(); }
 
  private:
     uint64_t rowsPerTile;

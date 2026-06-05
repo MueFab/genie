@@ -21,31 +21,31 @@ std::map<uint8_t, std::vector<std::string>> EncapsulatedFile::groupInputFiles(
     const std::vector<std::string>& input_files) const {
     std::vector<std::string> unknown_id;
     std::map<uint8_t, std::vector<std::string>> ret;
-    for (auto& i : input_files) {
-        if (!ghc::filesystem::exists(i + ".json")) {
-            unknown_id.emplace_back(i);
+    for (auto& idx_i : input_files) {
+        if (!ghc::filesystem::exists(idx_i + ".json")) {
+            unknown_id.emplace_back(idx_i);
             continue;
         }
 
-        if ((ghc::filesystem::exists(i + ".json") && ghc::filesystem::file_size(i + ".json"))) {
-            std::ifstream in_file(i + ".json");
+        if ((ghc::filesystem::exists(idx_i + ".json") && ghc::filesystem::file_size(idx_i + ".json"))) {
+            std::ifstream in_file(idx_i + ".json");
             nlohmann::json my_json;
             in_file >> my_json;
             genie::core::meta::Dataset dataset(my_json);
             if (dataset.getDataGroup() == boost::none) {
-                unknown_id.emplace_back(i);
+                unknown_id.emplace_back(idx_i);
                 continue;
             }
-            ret[static_cast<uint8_t>(dataset.getDataGroup()->getID())].emplace_back(i);
+            ret[static_cast<uint8_t>(dataset.getDataGroup()->getID())].emplace_back(idx_i);
         } else {
-            unknown_id.emplace_back(i);
+            unknown_id.emplace_back(idx_i);
         }
     }
 
     if (!unknown_id.empty()) {
-        for (size_t i = 0; i < input_files.size(); ++i) {
-            if (ret.find(static_cast<uint8_t>(i)) == ret.end()) {
-                ret[static_cast<uint8_t>(i)] = std::move(unknown_id);
+        for (size_t idx_i = 0; idx_i < input_files.size(); ++idx_i) {
+            if (ret.find(static_cast<uint8_t>(idx_i)) == ret.end()) {
+                ret[static_cast<uint8_t>(idx_i)] = std::move(unknown_id);
                 break;
             }
         }

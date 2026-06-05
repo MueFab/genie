@@ -5,13 +5,6 @@
  */
 
 #include "AnnotationAccessUnitHeader.h"
-#include <algorithm>
-#include <string>
-#include <utility>
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,11 +29,10 @@ AnnotationAccessUnitHeader::AnnotationAccessUnitHeader()
       tile_index_2_exists(false),
       tile_index_2(0) {}
 
-AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(util::BitReader& reader) { read(reader); }
 AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(util::BitReader& reader, bool attributeContiguity,
                                                        bool twoDimensional, bool columnMajorTileOrder,
                                                        bool variable_size_tiles, uint8_t ATCoordSize) {
-    read(reader, attributeContiguity, twoDimensional, columnMajorTileOrder, variable_size_tiles, ATCoordSize);
+    Read(reader, attributeContiguity, twoDimensional, columnMajorTileOrder, variable_size_tiles, ATCoordSize);
 }
 AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(
     bool _attributeContiguity,
@@ -72,70 +64,46 @@ AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(
       tile_index_2_exists(_tile_index_2_exists),
       tile_index_2(_tile_index_2) {}
 
-void AnnotationAccessUnitHeader::read(util::BitReader& reader, bool attributeContiguity, bool twoDimensional,
+void AnnotationAccessUnitHeader::Read(util::BitReader& reader, bool attributeContiguity, bool twoDimensional,
                                       bool columnMajorTileOrder, bool variableSizeTiles, uint8_t ATCoordSize) {
     attribute_contiguity = attributeContiguity;
     two_dimensional = twoDimensional;
     column_major_tile_order = columnMajorTileOrder;
     AT_coord_size = ATCoordSize;
     variable_size_tiles = variableSizeTiles;
-    read(reader);
+    Read(reader);
 }
 
-void AnnotationAccessUnitHeader::write(core::Writer& writer) const {
+void AnnotationAccessUnitHeader::Write(util::BitWriter& writer) const {
     uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size);
     if (attribute_contiguity) {
-      writer.Write(is_attribute, 1);
+        writer.WriteBits(is_attribute, 1);
         if (is_attribute)
-          writer.Write(attribute_ID, 16);
+            writer.WriteBits(attribute_ID, 16);
         else
-          writer.Write(static_cast<uint8_t>(descriptor_ID), 7);
+            writer.WriteBits(static_cast<uint8_t>(descriptor_ID), 7);
         if (two_dimensional && !variable_size_tiles) {
             if (column_major_tile_order)
-              writer.Write(n_tiles_per_col, ATCoordBits);
+                writer.WriteBits(n_tiles_per_col, ATCoordBits);
             else
-              writer.Write(n_tiles_per_row, ATCoordBits);
+                writer.WriteBits(n_tiles_per_row, ATCoordBits);
         }
-        writer.Write(n_blocks, ATCoordBits);
+        writer.WriteBits(n_blocks, ATCoordBits);
     } else {
-      writer.Write(tile_index_1, ATCoordBits);
-        writer.Write(tile_index_2_exists, 1);
-        if (tile_index_2_exists) writer.Write(tile_index_2, ATCoordBits);
-        writer.Write(n_blocks, 16);
+        writer.WriteBits(tile_index_1, ATCoordBits);
+        writer.WriteBits(tile_index_2_exists, 1);
+        if (tile_index_2_exists) writer.WriteBits(tile_index_2, ATCoordBits);
+        writer.WriteBits(n_blocks, 16);
     }
-    writer.Flush();
+    writer.FlushBits();
 }
 
-void AnnotationAccessUnitHeader::write(util::BitWriter& writer) const {
-  uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size);
-  if (attribute_contiguity) {
-    writer.WriteBits(is_attribute, 1);
-    if (is_attribute)
-      writer.WriteBits(attribute_ID, 16);
-    else
-      writer.WriteBits(static_cast<uint8_t>(descriptor_ID), 7);
-    if (two_dimensional && !variable_size_tiles) {
-      if (column_major_tile_order)
-        writer.WriteBits(n_tiles_per_col, ATCoordBits);
-      else
-        writer.WriteBits(n_tiles_per_row, ATCoordBits);
-    }
-    writer.WriteBits(n_blocks, ATCoordBits);
-  } else {
-    writer.WriteBits(tile_index_1, ATCoordBits);
-    writer.WriteBits(tile_index_2_exists, 1);
-    if (tile_index_2_exists) writer.WriteBits(tile_index_2, ATCoordBits);
-    writer.WriteBits(n_blocks, 16);
-  }
-  writer.FlushBits();
+size_t AnnotationAccessUnitHeader::GetSize(util::BitWriter& writesize) const {
+    Write(writesize);
+    return writesize.GetTotalBitsWritten();
 }
 
-size_t AnnotationAccessUnitHeader::getSize(core::Writer& writesize) const {
-    write(writesize);
-    return writesize.GetBitsWritten();
-}
-
-void AnnotationAccessUnitHeader::read(util::BitReader& reader) {
+void AnnotationAccessUnitHeader::Read(util::BitReader& reader) {
     uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size);
     if (attribute_contiguity) {
         is_attribute = static_cast<bool>(reader.ReadBits(1));

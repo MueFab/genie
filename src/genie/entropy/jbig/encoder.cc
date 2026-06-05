@@ -48,8 +48,8 @@ void JBIGEncoder::encode(
     if (ret != 0) {
         std::cerr << "error with jbig compression\n";
     }
-    for (size_t i = 0; i < compSize; ++i)
-        output << compressedBuffer[i];
+    for (size_t idx_i = 0; idx_i < compSize; ++idx_i)
+        output << compressedBuffer[idx_i];
  
 
 }
@@ -84,8 +84,8 @@ void JBIGEncoder::encode(
     if (ret != 0) {
         std::cerr << "error with decompression\n";
     }
-    for (size_t i = 0; i < dest_data_len; ++i)
-        output.push_back(decompressedBuffer[i]);
+    for (size_t idx_i = 0; idx_i < dest_data_len; ++idx_i)
+        output.push_back(decompressedBuffer[idx_i]);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -118,14 +118,14 @@ void JBIGEncoder::decode(
     if (ret != 0) {
         std::cerr << "error with decompression\n";
     }
-    for (size_t i = 0; i < dest_data_len; ++i) {
-        output << decompressedBuffer[i];
+    for (size_t idx_i = 0; idx_i < dest_data_len; ++idx_i) {
+        output << decompressedBuffer[idx_i];
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::record::annotation_parameter_set::AlgorithmParameters JBIGparameters::convertToAlgorithmParameters()
+genie::core::parameter::annotation::AlgorithmParameters JBIGparameters::convertToAlgorithmParameters()
     const {
     uint8_t n_pars = 5;
     std::vector<uint8_t> par_ID = {1, 2, 3, 4, 5};
@@ -137,30 +137,30 @@ genie::core::record::annotation_parameter_set::AlgorithmParameters JBIGparameter
     std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val;
     std::vector<int32_t> values{num_lines_per_stripe, deterministic_pred, typical_pred, diff_layer_typical_pred,
                                 two_line_template};
-    for (uint8_t i = 0; i < n_pars; ++i) {
-        if (par_type.at(i) == core::DataType::BOOL) {
-            par_val.push_back(core::record::annotation_parameter_set::parameterToVector<bool>(
-                {static_cast<bool>(values.at(i))}, par_type.at(i), par_num_array_dims.at(i), par_array_dims.at(i)));
+    for (uint8_t idx_i = 0; idx_i < n_pars; ++idx_i) {
+        if (par_type.at(idx_i) == core::DataType::BOOL) {
+            par_val.push_back(core::parameter::annotation::parameterToVector<bool>(
+                {static_cast<bool>(values.at(idx_i))}, par_type.at(idx_i), par_num_array_dims.at(idx_i), par_array_dims.at(idx_i)));
         }
-        if (par_type.at(i) == core::DataType::INT32) {
-            par_val.push_back(core::record::annotation_parameter_set::parameterToVector<int32_t>(
-                {static_cast<int32_t>(values.at(i))}, par_type.at(i), par_num_array_dims.at(i), par_array_dims.at(i)));
+        if (par_type.at(idx_i) == core::DataType::INT32) {
+            par_val.push_back(core::parameter::annotation::parameterToVector<int32_t>(
+                {static_cast<int32_t>(values.at(idx_i))}, par_type.at(idx_i), par_num_array_dims.at(idx_i), par_array_dims.at(idx_i)));
         }
     }
 
-    return genie::core::record::annotation_parameter_set::AlgorithmParameters(
+    return genie::core::parameter::annotation::AlgorithmParameters(
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::record::annotation_parameter_set::CompressorParameterSet JBIGparameters::compressorParameterSet(
+genie::core::parameter::annotation::CompressorParameterSet JBIGparameters::compressorParameterSet(
     uint8_t compressor_ID) const {
     std::vector<genie::core::AlgoID> JBIGalgorithm_ID{genie::core::AlgoID::JBIG};
     uint8_t n_compressor_steps = 1;
     std::vector<uint8_t> compressor_step_ID{0};
     std::vector<bool> use_default_pars{true};
-    std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
+    std::vector<genie::core::parameter::annotation::AlgorithmParameters> algorithm_parameters;
     std::vector<uint8_t> n_in_vars{0};
     std::vector<std::vector<uint8_t>> in_var_ID{{0}};
     std::vector<std::vector<uint8_t>> prev_step_ID;
@@ -168,7 +168,7 @@ genie::core::record::annotation_parameter_set::CompressorParameterSet JBIGparame
     std::vector<uint8_t> n_completed_out_vars{0};
     std::vector<std::vector<uint8_t>> completed_out_var_ID;
 
-    return genie::core::record::annotation_parameter_set::CompressorParameterSet(
+    return genie::core::parameter::annotation::CompressorParameterSet(
         compressor_ID, n_compressor_steps, compressor_step_ID, JBIGalgorithm_ID, use_default_pars, algorithm_parameters,
         n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars, completed_out_var_ID);
 }

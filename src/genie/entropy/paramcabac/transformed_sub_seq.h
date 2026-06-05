@@ -139,11 +139,11 @@ class TransformedSubSeq final {
 
   /**
    * @brief Constructs the subsequence from a JSON object.
-   * @param j The JSON object containing the subsequence configuration.
+   * @param idx_j The JSON object containing the subsequence configuration.
    * @param last_transformed Indicates whether this is the last transformed
    * subsequence.
    */
-  explicit TransformedSubSeq(nlohmann::json j, bool last_transformed);
+  explicit TransformedSubSeq(nlohmann::json idx_j, bool last_transformed);
 
   /**
    * @brief Converts the current subsequence to a JSON object.

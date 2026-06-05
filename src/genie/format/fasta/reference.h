@@ -33,9 +33,9 @@ class Reference : public core::Reference {
      * @brief
      * @param name
      * @param length
-     * @param m
+     * @param dim_m
      */
-    Reference(std::string name, size_t length, Manager* m);
+    Reference(std::string name, size_t length, Manager* dim_m);
 
     /**
      * @brief

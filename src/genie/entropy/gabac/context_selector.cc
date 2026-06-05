@@ -40,10 +40,10 @@ unsigned int ContextSelector::GetContextIdxOrderGt0(
   ctx_idx += state_vars_.GetNumCtxLuts();
   ctx_idx += static_cast<unsigned int>(subsym_idx *
                                        state_vars_.GetCodingSizeCtxOffset());
-  for (uint8_t i = 1; i <= coding_order; i++) {
+  for (uint8_t idx_i = 1; idx_i <= coding_order; idx_i++) {
     ctx_idx +=
-        static_cast<unsigned int>(subsymbols[prv_idx].prv_values[i - 1] *
-                                  state_vars_.GetCodingOrderCtxOffset(i));
+        static_cast<unsigned int>(subsymbols[prv_idx].prv_values[idx_i - 1] *
+                                  state_vars_.GetCodingOrderCtxOffset(idx_i));
   }
 
   return ctx_idx;

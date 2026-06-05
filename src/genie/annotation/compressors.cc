@@ -63,8 +63,8 @@ void Compressor::compress(std::stringstream& input, std::stringstream& output, u
     for (auto& compressor : compressorParameters)
         if (compressor.getCompressorID() == compressorID) comp = compressor;
 
-    for (uint8_t i = 0; i < comp.getNumberOfCompressorSteps(); ++i) {
-        if (i == 0) {
+    for (uint8_t idx_i = 0; idx_i < comp.getNumberOfCompressorSteps(); ++idx_i) {
+        if (idx_i == 0) {
             intermediateIn << input.rdbuf();
         } else {
             intermediateIn.str("");
@@ -74,7 +74,7 @@ void Compressor::compress(std::stringstream& input, std::stringstream& output, u
             intermediateOut.clear();
         }
 
-        switch (comp.getAlgorithmIDs().at(i)) {
+        switch (comp.getAlgorithmIDs().at(idx_i)) {
             case genie::core::AlgoID::BSC: {
                 genie::entropy::bsc::BSCEncoder encoder;
                 encoder.encode(intermediateIn, intermediateOut);
@@ -231,7 +231,7 @@ void Compressor::parseCompressor(std::vector<std::string> commandline) {
     uint8_t compressorID = 0;
     parameter.read(commandline.at(1), compressorID);
 
-    genie::core::record::annotation_parameter_set::compressorStep step;
+    genie::core::parameter::annotation::compressorStep step;
     parameter.read(commandline.at(2), step.stepID);
     parameter.read(commandline.at(3), step.algorithmID);
 

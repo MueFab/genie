@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.9.0)
+cmake_minimum_required(VERSION 3.5)
 project(Lzma)
 
 # disable 7ZIP dependencies

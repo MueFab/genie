@@ -18,20 +18,20 @@
 #include <vector>
 
 #include "filesystem/filesystem.hpp"
-#include "genie/core/data_unit_record/record.h"
-#include "genie/core/variant_genotype_record/record.h"
+#include "genie/core/record/data_unit/record.h"
+#include "genie/core/record/variant/record.h"
 #include "genie/core/writer.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
-#include "genie/genotype/parameterset_composer.h"
+#include "genie/annotation/accessunit_composer.h"
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_parameters.h"
 #include "genie/likelihood/likelihood_payload.h"
 #include "genie/util/runtime_exception.h"
 #include "genie/util/string_helpers.h"
-#include "genie/variantsite/accessunit_composer.h"
-#include "genie/variantsite/parameterset_composer.h"
-#include "genie/variantsite/variantsite_parser.h"
+#include "genie/annotation/parameterset_composer.h"
+#include "genie/annotation/vsite_parameterset_composer.h"
+#include "genie/annotation/variantsite_parser.h"
 // ---------------------------------------------------------------------------------------------------------------------
 #ifdef _WIN32
 #include <windows.h>
@@ -121,30 +121,30 @@ void encodeVariantSite(const std::string& _inputFileName,
   for (auto& tile : tile_descriptorStream) descrList.push_back(tile.first);
 
   genie::variant_site::ParameterSetComposer encodeParameters;
-  genie::core::record::annotation_parameter_set::Record annotationParameterSet =
+  genie::core::parameter::annotation::Record annotationParameterSet =
       encodeParameters.setParameterSet(descrList, info,
                                        parser.getNumberOfRows(), AT_ID);
 
-  std::vector<genie::core::record::annotation_access_unit::Record>
+  std::vector<genie::core::access_unit::annotation::Record>
       annotationAccessUnit(parser.getNrOfTiles());
 
   genie::variant_site::AccessUnitComposer accessUnit;
   // uint8_t AT_ID = 1;
 
-  for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
+  for (uint64_t idx_i = 0; idx_i < parser.getNrOfTiles(); ++idx_i) {
     std::map<genie::core::AnnotDesc, std::stringstream> desc;
     for (auto& desctile : tile_descriptorStream) {
-      desc[desctile.first] << desctile.second.getTile(i).rdbuf();
+      desc[desctile.first] << desctile.second.getTile(idx_i).rdbuf();
     }
 
     std::map<std::string,
-             genie::core::record::annotation_access_unit::TypedData>
+             genie::core::access_unit::annotation::TypedData>
         attr;
     for (auto& attrtile : tile_attributeStream) {
-      attr[attrtile.first] = attrtile.second.getTypedTile(i);
+      attr[attrtile.first] = attrtile.second.getTypedTile(idx_i);
     }
     accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet,
-                             annotationAccessUnit.at(i), AG_class, AT_ID,
+                             annotationAccessUnit.at(idx_i), AG_class, AT_ID,
                              (uint8_t)0);
   }
 
@@ -160,24 +160,24 @@ void encodeVariantSite(const std::string& _inputFileName,
   outputFile.open(_outputFileName, std::ios::binary | std::ios::out);
 
   if (outputFile.is_open()) {
-    genie::core::Writer dataUnitWriter(&outputFile);
+    genie::util::BitWriter dataUnitWriter(outputFile);
     APS_dataUnit.Write(dataUnitWriter);
     for (auto& aau : annotationAccessUnit) {
       genie::core::record::data_unit::Record AAU_dataUnit(aau);
       AAU_dataUnit.Write(dataUnitWriter);
     }
     std::cerr << "bytes written: "
-              << std::to_string(dataUnitWriter.GetBitsWritten() / 8)
+              << std::to_string(dataUnitWriter.GetTotalBitsWritten() / 8)
               << std::endl;
     outputFile.close();
     if (testOutput) {
-      genie::core::Writer txtWriter(&txtFile, true);
+      genie::util::BitWriter txtWriter(txtFile);
       APS_dataUnit.Write(txtWriter);
       for (auto& aau : annotationAccessUnit) {
         genie::core::record::data_unit::Record AAU_dataUnit(aau);
         AAU_dataUnit.Write(txtWriter);
       }
-      txtWriter.Flush();
+      txtWriter.FlushBits();
       txtFile.close();
     }
   } else {
@@ -241,12 +241,12 @@ void encodeVariantGenotype(const std::string& _input_fpath,
   uint8_t AG_class = 0;
 
   std::map<std::string,
-           genie::core::record::annotation_parameter_set::AttributeData>
+           genie::core::parameter::annotation::AttributeData>
       info;
-  genie::genotype::ParameterSetComposer genotypeParameterSet;
+  genie::annotation::ParameterSetComposer genotypeParameterSet;
   genotypeParameterSet.setGenotypeParameters(genotypeParameters);
   genotypeParameterSet.setLikelihoodParameters(likelihoodParameters);
-  genie::core::record::annotation_parameter_set::Record annotationParameterSet =
+  genie::core::parameter::annotation::Record annotationParameterSet =
       genotypeParameterSet.Build(AT_ID, info,
                                  {static_cast<uint32_t>(recs.size()), 3000});
 
@@ -254,10 +254,10 @@ void encodeVariantGenotype(const std::string& _input_fpath,
 
   //--------------------------------------------------
   std::map<std::string,
-           genie::core::record::annotation_parameter_set::AttributeData>
+           genie::core::parameter::annotation::AttributeData>
       attributesInfo = info;  // datablock.attributeInfo;
 
-  std::map<std::string, genie::core::record::annotation_access_unit::TypedData>
+  std::map<std::string, genie::core::access_unit::annotation::TypedData>
       attributeTDStream;
   /* for (auto formatdata : datablock.attributeData) {
     auto& info = attributesInfo[formatdata.first];
@@ -275,25 +275,23 @@ void encodeVariantGenotype(const std::string& _input_fpath,
   std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
   descriptorStream[genie::core::AnnotDesc::GENOTYPE];
   {
-    genie::core::Writer writer(
-        &descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
-    genotypePayload.Write(writer.GetBinWriter());
+    genie::util::BitWriter writer(descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
+    genotypePayload.Write(writer);
   }
 
   descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
   {
-    genie::core::Writer writer(
-        &descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
+    genie::util::BitWriter writer(descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
     likelihoodPayload.write(writer);
   }
 
   // add LINK_ID default values
-  /* for (auto i = 0u; i < BLOCK_SIZE && i < recs.size(); ++i) {
+  /* for (auto idx_i = 0u; idx_i < BLOCK_SIZE && idx_i < recs.size(); ++idx_i) {
       const char val = '\xFF';
       descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
   }*/
   genie::variant_site::AccessUnitComposer accessUnitcomposer;
-  genie::core::record::annotation_access_unit::Record annotationAccessUnit;
+  genie::core::access_unit::annotation::Record annotationAccessUnit;
 
   accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream,
                                    attributesInfo, annotationParameterSet,
@@ -306,12 +304,12 @@ void encodeVariantGenotype(const std::string& _input_fpath,
   outputFile.open(_output_fpath, std::ios::binary | std::ios::out);
 
   if (outputFile.is_open()) {
-    genie::core::Writer dataUnitWriter(&outputFile);
+    genie::util::BitWriter dataUnitWriter(outputFile);
     APS_dataUnit.Write(dataUnitWriter);
     AAU_dataUnit.Write(dataUnitWriter);
 
     std::cerr << "bytes written: "
-              << std::to_string(dataUnitWriter.GetBitsWritten() / 8)
+              << std::to_string(dataUnitWriter.GetTotalBitsWritten() / 8)
               << std::endl;
     outputFile.close();
   } else {

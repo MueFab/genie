@@ -66,12 +66,12 @@ void Preprocessor::setup(const std::string &wdir, size_t num_thr, bool paired_en
     outfilequality[0] = temp_dir + "/quality_1";
     outfilequality[1] = temp_dir + "/quality_2";
 
-    for (int j = 0; j < 2; j++) {
-        if (j == 1 && !cp.paired_end) continue;
-        fout_clean[j].open(outfileclean[j], std::ios::binary);
-        fout_N[j].open(outfileN[j], std::ios::binary);
-        fout_order_N[j].open(outfileorderN[j], std::ios::binary);
-        if (cp.preserve_quality) fout_quality[j].open(outfilequality[j]);
+    for (int idx_j = 0; idx_j < 2; idx_j++) {
+        if (idx_j == 1 && !cp.paired_end) continue;
+        fout_clean[idx_j].open(outfileclean[idx_j], std::ios::binary);
+        fout_N[idx_j].open(outfileN[idx_j], std::ios::binary);
+        fout_order_N[idx_j].open(outfileorderN[idx_j], std::ios::binary);
+        if (cp.preserve_quality) fout_quality[idx_j].open(outfilequality[idx_j]);
     }
     if (cp.preserve_id) fout_id.open(outfileid);
 }
@@ -129,12 +129,12 @@ void Preprocessor::finish(size_t id) {
     }
     util::Section sec{id, 0, true};
     util::OrderedSection lsec(&lock, sec);
-    for (int j = 0; j < 2; j++) {
-        if (j == 1 && !cp.paired_end) continue;
-        fout_clean[j].close();
-        fout_N[j].close();
-        fout_order_N[j].close();
-        if (cp.preserve_quality) fout_quality[j].close();
+    for (int idx_j = 0; idx_j < 2; idx_j++) {
+        if (idx_j == 1 && !cp.paired_end) continue;
+        fout_clean[idx_j].close();
+        fout_N[idx_j].close();
+        fout_order_N[idx_j].close();
+        if (cp.preserve_quality) fout_quality[idx_j].close();
     }
     if (cp.preserve_id) fout_id.close();
 
@@ -150,7 +150,7 @@ void Preprocessor::finish(size_t id) {
         std::ifstream fin_order_N(outfileorderN[1], std::ios::binary);
         uint32_t num_N_file_2 = cp.num_reads - cp.num_reads_clean[1];
         uint32_t order_N;
-        for (uint32_t i = 0; i < num_N_file_2; i++) {
+        for (uint32_t idx_i = 0; idx_i < num_N_file_2; idx_i++) {
             fin_order_N.read(reinterpret_cast<char *>(&order_N), sizeof(uint32_t));
             order_N += cp.num_reads;
             fout_order_N_PE.write(reinterpret_cast<char *>(&order_N), sizeof(uint32_t));
@@ -176,21 +176,21 @@ core::stats::PerfStats &Preprocessor::getStats() { return stats; }
 
 Preprocessor::~Preprocessor() {
     if (!used) {
-        for (int j = 0; j < 2; j++) {
-            if (j == 1 && !cp.paired_end) continue;
-            fout_clean[j].close();
-            fout_N[j].close();
-            fout_order_N[j].close();
-            if (cp.preserve_quality) fout_quality[j].close();
+        for (int idx_j = 0; idx_j < 2; idx_j++) {
+            if (idx_j == 1 && !cp.paired_end) continue;
+            fout_clean[idx_j].close();
+            fout_N[idx_j].close();
+            fout_order_N[idx_j].close();
+            if (cp.preserve_quality) fout_quality[idx_j].close();
         }
         if (cp.preserve_id) fout_id.close();
 
-        for (int j = 0; j < 2; j++) {
-            if (j == 1 && !cp.paired_end) continue;
-            ghc::filesystem::remove(outfileclean[j]);
-            ghc::filesystem::remove(outfileN[j]);
-            ghc::filesystem::remove(outfileorderN[j]);
-            if (cp.preserve_quality) ghc::filesystem::remove(outfilequality[j]);
+        for (int idx_j = 0; idx_j < 2; idx_j++) {
+            if (idx_j == 1 && !cp.paired_end) continue;
+            ghc::filesystem::remove(outfileclean[idx_j]);
+            ghc::filesystem::remove(outfileN[idx_j]);
+            ghc::filesystem::remove(outfileorderN[idx_j]);
+            if (cp.preserve_quality) ghc::filesystem::remove(outfilequality[idx_j]);
         }
         if (cp.preserve_id) ghc::filesystem::remove(outfileid);
 

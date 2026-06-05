@@ -30,7 +30,7 @@ Label::Label(util::BitReader& reader) {
     reader.readBypass_null_terminated(label_ID);
     auto num_datasets = reader.read<uint16_t>();
 
-    for (size_t i = 0; i < num_datasets; ++i) {
+    for (size_t idx_i = 0; idx_i < num_datasets; ++idx_i) {
         dataset_infos.emplace_back(reader);
     }
     reader.flush();

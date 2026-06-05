@@ -104,10 +104,10 @@ class SupportValues {
 
     /**
      * @brief
-     * @param j
+     * @param idx_j
      * @param transformIdSubsym
      */
-    explicit SupportValues(nlohmann::json j, TransformIdSubsym transformIdSubsym);
+    explicit SupportValues(nlohmann::json idx_j, TransformIdSubsym transformIdSubsym);
 
     /**
      * @brief

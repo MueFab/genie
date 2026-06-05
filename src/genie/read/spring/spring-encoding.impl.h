@@ -24,14 +24,14 @@ template <size_t bitset_size>
 encoder_global_b<bitset_size>::encoder_global_b(int max_readlen_param) {
     max_readlen = max_readlen_param;
     basemask = new std::bitset<bitset_size> *[max_readlen_param];
-    for (int i = 0; i < max_readlen_param; i++) basemask[i] = new std::bitset<bitset_size>[128];
+    for (int idx_i = 0; idx_i < max_readlen_param; idx_i++) basemask[idx_i] = new std::bitset<bitset_size>[128];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
 encoder_global_b<bitset_size>::~encoder_global_b() {
-    for (int i = 0; i < max_readlen; i++) delete[] basemask[i];
+    for (int idx_i = 0; idx_i < max_readlen; idx_i++) delete[] basemask[idx_i];
     delete[] basemask;
 }
 
@@ -45,11 +45,11 @@ std::string bitsettostring(std::bitset<bitset_size> b, const uint16_t readlen,
     std::string s;
     s.resize(readlen);
     uint64_t ull;
-    for (int i = 0; i < 3 * readlen / 63 + 1; i++) {
+    for (int idx_i = 0; idx_i < 3 * readlen / 63 + 1; idx_i++) {
         ull = (b & egb.mask63).to_ullong();
         b >>= 63;
-        for (int j = 21 * i; j < 21 * i + 21 && j < readlen; j++) {
-            s[j] = revinttochar[ull % 8];
+        for (int idx_j = 21 * idx_i; idx_j < 21 * idx_i + 21 && idx_j < readlen; idx_j++) {
+            s[idx_j] = revinttochar[ull % 8];
             ull /= 8;
         }
     }
@@ -73,7 +73,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     std::bitset<bitset_size> *mask1 = new std::bitset<bitset_size>[eg.numdict_s];
     generateindexmasks<bitset_size>(mask1, dict, eg.numdict_s, 3);
     std::bitset<bitset_size> **mask = new std::bitset<bitset_size> *[eg.max_readlen];
-    for (int i = 0; i < eg.max_readlen; i++) mask[i] = new std::bitset<bitset_size>[eg.max_readlen];
+    for (int idx_i = 0; idx_i < eg.max_readlen; idx_i++) mask[idx_i] = new std::bitset<bitset_size>[eg.max_readlen];
     generatemasks<bitset_size>(mask, eg.max_readlen, 3);
 
     //
@@ -154,7 +154,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                        egb.basemask);
                         stringtobitset(reverse_complement(ref.substr(0, eg.max_readlen), eg.max_readlen),
                                        (uint16_t)eg.max_readlen, reverse_bitset, egb.basemask);
-                        for (int64_t j = 0; j < (int64_t)ref.size() - eg.max_readlen + 1; j++) {
+                        for (int64_t idx_j = 0; idx_j < (int64_t)ref.size() - eg.max_readlen + 1; idx_j++) {
                             // search for singleton reads
                             for (int rev = 0; rev < 2; rev++) {
                                 for (int l = 0; l < eg.numdict_s; l++) {
@@ -185,9 +185,9 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                         ((read[dict[l].read_id[dictidx[0]]] & mask1[l]) >> 3 * dict[l].start)
                                             .to_ullong();
                                     if (ull == ull1) {  // checking if ull is actually the key for this bin
-                                        for (int64_t i = dictidx[1] - 1; i >= dictidx[0] && i >= dictidx[1] - maxsearch;
-                                             i--) {
-                                            auto rid = dict[l].read_id[i];
+                                        for (int64_t idx_i = dictidx[1] - 1; idx_i >= dictidx[0] && idx_i >= dictidx[1] - maxsearch;
+                                             idx_i--) {
+                                            auto rid = dict[l].read_id[idx_i];
                                             int hamming;
                                             if (!rev)
                                                 hamming =
@@ -215,7 +215,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                                 flag = 0;
                                                 list_size++;
                                                 char l_rc = rev ? 'r' : 'd';
-                                                int64_t pos = rev ? (j + eg.max_readlen - read_lengths_s[rid]) : j;
+                                                int64_t pos = rev ? (idx_j + eg.max_readlen - read_lengths_s[rid]) : idx_j;
                                                 std::string read_string =
                                                     rev ? reverse_complement(bitsettostring<bitset_size>(
                                                                                  read[rid], read_lengths_s[rid], egb),
@@ -257,14 +257,14 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                         }
                                 }
                             }
-                            if (j != (int64_t)ref.size() - eg.max_readlen) {  // not at last position,shift bitsets
+                            if (idx_j != (int64_t)ref.size() - eg.max_readlen) {  // not at last position,shift bitsets
                                 forward_bitset >>= 3;
                                 forward_bitset = forward_bitset & mask[0][0];
-                                forward_bitset |= egb.basemask[eg.max_readlen - 1][(uint8_t)ref[j + eg.max_readlen]];
+                                forward_bitset |= egb.basemask[eg.max_readlen - 1][(uint8_t)ref[idx_j + eg.max_readlen]];
                                 reverse_bitset <<= 3;
                                 reverse_bitset = reverse_bitset & mask[0][0];
                                 reverse_bitset |=
-                                    egb.basemask[0][(uint8_t)chartorevchar[(uint8_t)ref[j + eg.max_readlen]]];
+                                    egb.basemask[0][(uint8_t)chartorevchar[(uint8_t)ref[idx_j + eg.max_readlen]]];
                             }
                         }  // end for
                     }      // end if
@@ -354,24 +354,24 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     uint32_t matched_s = eg.numreads_s;
     uint64_t len_unaligned = 0;
 
-    for (uint32_t i = 0; i < eg.numreads_s; i++)
-        if (remainingreads[i] == 1) {
+    for (uint32_t idx_i = 0; idx_i < eg.numreads_s; idx_i++)
+        if (remainingreads[idx_i] == 1) {
             matched_s--;
-            f_order.write(reinterpret_cast<char *>(&order_s[i]), sizeof(uint32_t));
-            f_readlength.write(reinterpret_cast<char *>(&read_lengths_s[i]), sizeof(uint16_t));
-            std::string unaligned_read = bitsettostring<bitset_size>(read[i], read_lengths_s[i], egb);
+            f_order.write(reinterpret_cast<char *>(&order_s[idx_i]), sizeof(uint32_t));
+            f_readlength.write(reinterpret_cast<char *>(&read_lengths_s[idx_i]), sizeof(uint16_t));
+            std::string unaligned_read = bitsettostring<bitset_size>(read[idx_i], read_lengths_s[idx_i], egb);
             write_dnaN_in_bits(unaligned_read, f_unaligned);
-            len_unaligned += read_lengths_s[i];
+            len_unaligned += read_lengths_s[idx_i];
         }
     uint32_t matched_N = eg.numreads_N;
-    for (uint32_t i = eg.numreads_s; i < eg.numreads_s + eg.numreads_N; i++)
-        if (remainingreads[i] == 1) {
+    for (uint32_t idx_i = eg.numreads_s; idx_i < eg.numreads_s + eg.numreads_N; idx_i++)
+        if (remainingreads[idx_i] == 1) {
             matched_N--;
-            std::string unaligned_read = bitsettostring<bitset_size>(read[i], read_lengths_s[i], egb);
+            std::string unaligned_read = bitsettostring<bitset_size>(read[idx_i], read_lengths_s[idx_i], egb);
             write_dnaN_in_bits(unaligned_read, f_unaligned);
-            f_order.write(reinterpret_cast<char *>(&order_s[i]), sizeof(uint32_t));
-            f_readlength.write(reinterpret_cast<char *>(&read_lengths_s[i]), sizeof(uint16_t));
-            len_unaligned += read_lengths_s[i];
+            f_order.write(reinterpret_cast<char *>(&order_s[idx_i]), sizeof(uint32_t));
+            f_readlength.write(reinterpret_cast<char *>(&read_lengths_s[idx_i]), sizeof(uint16_t));
+            len_unaligned += read_lengths_s[idx_i];
         }
     f_order.close();
     f_readlength.close();
@@ -381,7 +381,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     delete[] dict_lock;
     delete[] read_lock;
 #endif
-    for (int i = 0; i < eg.max_readlen; i++) delete[] mask[i];
+    for (int idx_i = 0; idx_i < eg.max_readlen; idx_i++) delete[] mask[idx_i];
     delete[] mask;
     delete[] mask1;
 
@@ -420,23 +420,23 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
 
 template <size_t bitset_size>
 void setglobalarrays(encoder_global &eg, encoder_global_b<bitset_size> &egb) {
-    for (int i = 0; i < 63; i++) egb.mask63[i] = 1;
-    for (int i = 0; i < eg.max_readlen; i++) {
-        egb.basemask[i][(uint8_t)'A'][3 * i] = 0;
-        egb.basemask[i][(uint8_t)'A'][3 * i + 1] = 0;
-        egb.basemask[i][(uint8_t)'A'][3 * i + 2] = 0;
-        egb.basemask[i][(uint8_t)'C'][3 * i] = 0;
-        egb.basemask[i][(uint8_t)'C'][3 * i + 1] = 0;
-        egb.basemask[i][(uint8_t)'C'][3 * i + 2] = 1;
-        egb.basemask[i][(uint8_t)'G'][3 * i] = 0;
-        egb.basemask[i][(uint8_t)'G'][3 * i + 1] = 1;
-        egb.basemask[i][(uint8_t)'G'][3 * i + 2] = 0;
-        egb.basemask[i][(uint8_t)'T'][3 * i] = 0;
-        egb.basemask[i][(uint8_t)'T'][3 * i + 1] = 1;
-        egb.basemask[i][(uint8_t)'T'][3 * i + 2] = 1;
-        egb.basemask[i][(uint8_t)'N'][3 * i] = 1;
-        egb.basemask[i][(uint8_t)'N'][3 * i + 1] = 0;
-        egb.basemask[i][(uint8_t)'N'][3 * i + 2] = 0;
+    for (int idx_i = 0; idx_i < 63; idx_i++) egb.mask63[idx_i] = 1;
+    for (int idx_i = 0; idx_i < eg.max_readlen; idx_i++) {
+        egb.basemask[idx_i][(uint8_t)'A'][3 * idx_i] = 0;
+        egb.basemask[idx_i][(uint8_t)'A'][3 * idx_i + 1] = 0;
+        egb.basemask[idx_i][(uint8_t)'A'][3 * idx_i + 2] = 0;
+        egb.basemask[idx_i][(uint8_t)'C'][3 * idx_i] = 0;
+        egb.basemask[idx_i][(uint8_t)'C'][3 * idx_i + 1] = 0;
+        egb.basemask[idx_i][(uint8_t)'C'][3 * idx_i + 2] = 1;
+        egb.basemask[idx_i][(uint8_t)'G'][3 * idx_i] = 0;
+        egb.basemask[idx_i][(uint8_t)'G'][3 * idx_i + 1] = 1;
+        egb.basemask[idx_i][(uint8_t)'G'][3 * idx_i + 2] = 0;
+        egb.basemask[idx_i][(uint8_t)'T'][3 * idx_i] = 0;
+        egb.basemask[idx_i][(uint8_t)'T'][3 * idx_i + 1] = 1;
+        egb.basemask[idx_i][(uint8_t)'T'][3 * idx_i + 2] = 1;
+        egb.basemask[idx_i][(uint8_t)'N'][3 * idx_i] = 1;
+        egb.basemask[idx_i][(uint8_t)'N'][3 * idx_i + 1] = 0;
+        egb.basemask[idx_i][(uint8_t)'N'][3 * idx_i + 2] = 0;
     }
 
     // enc_noise uses substitution statistics from Minoche et al.
@@ -471,27 +471,27 @@ void readsingletons(std::bitset<bitset_size> *read, uint32_t *order_s, uint16_t 
     // not parallelized right now since these are very small number of reads
     std::ifstream f(eg.infile + ".singleton", std::ifstream::in | std::ios::binary);
     std::string s;
-    for (uint32_t i = 0; i < eg.numreads_s; i++) {
+    for (uint32_t idx_i = 0; idx_i < eg.numreads_s; idx_i++) {
         read_dna_from_bits(s, f);
-        read_lengths_s[i] = static_cast<uint16_t>(s.length());
-        stringtobitset<bitset_size>(s, read_lengths_s[i], read[i], egb.basemask);
+        read_lengths_s[idx_i] = static_cast<uint16_t>(s.length());
+        stringtobitset<bitset_size>(s, read_lengths_s[idx_i], read[idx_i], egb.basemask);
     }
     f.close();
     remove((eg.infile + ".singleton").c_str());
     f.open(eg.infile_N, std::ios::binary);
-    for (uint32_t i = eg.numreads_s; i < eg.numreads_s + eg.numreads_N; i++) {
+    for (uint32_t idx_i = eg.numreads_s; idx_i < eg.numreads_s + eg.numreads_N; idx_i++) {
         read_dnaN_from_bits(s, f);
-        read_lengths_s[i] = static_cast<uint16_t>(s.length());
-        stringtobitset<bitset_size>(s, read_lengths_s[i], read[i], egb.basemask);
+        read_lengths_s[idx_i] = static_cast<uint16_t>(s.length());
+        stringtobitset<bitset_size>(s, read_lengths_s[idx_i], read[idx_i], egb.basemask);
     }
     std::ifstream f_order_s(eg.infile_order + ".singleton", std::ios::binary);
-    for (uint32_t i = 0; i < eg.numreads_s; i++)
-        f_order_s.read(reinterpret_cast<char *>(&order_s[i]), sizeof(uint32_t));
+    for (uint32_t idx_i = 0; idx_i < eg.numreads_s; idx_i++)
+        f_order_s.read(reinterpret_cast<char *>(&order_s[idx_i]), sizeof(uint32_t));
     f_order_s.close();
     remove((eg.infile_order + ".singleton").c_str());
     std::ifstream f_order_N(eg.infile_order_N, std::ios::binary);
-    for (uint32_t i = eg.numreads_s; i < eg.numreads_s + eg.numreads_N; i++)
-        f_order_N.read(reinterpret_cast<char *>(&order_s[i]), sizeof(uint32_t));
+    for (uint32_t idx_i = eg.numreads_s; idx_i < eg.numreads_s + eg.numreads_N; idx_i++)
+        f_order_N.read(reinterpret_cast<char *>(&order_s[idx_i]), sizeof(uint32_t));
     f_order_N.close();
 }
 

@@ -11,8 +11,15 @@ set(source_files
 
 add_executable(${PROJECT_NAME} ${source_files})
 
-if(MSVC)
-    set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
+target_include_directories(${PROJECT_NAME} PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/test/util
+)
+
+if(GENIE_CONTACT_BACKEND STREQUAL "xtensor")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC GENIE_CONTACT_BACKEND_XTENSOR)
+elseif(GENIE_CONTACT_BACKEND STREQUAL "eigen")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC GENIE_CONTACT_BACKEND_EIGEN)
 endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # GNU Compiler Collection
@@ -26,13 +33,17 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wdouble-promotion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=conversion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=sign-conversion")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Werror=maybe-uninitialized")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=maybe-uninitialized")
 endif ()
+
+if(MSVC)
+    set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
+endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE gtest gtest_main)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-contact)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
 
 

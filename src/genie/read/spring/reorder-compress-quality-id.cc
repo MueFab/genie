@@ -17,7 +17,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/access_unit.h"
 #include "genie/core/read_encoder.h"
 #include "genie/core/record/chunk.h"
 #include "genie/core/record/segment.h"
@@ -122,11 +122,11 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             read_block_start_end(file_blocks_id, block_start, block_end);
             std::string *id_array = new std::string[numreads / 2];
             std::ifstream f_id(file_id);
-            for (uint32_t i = 0; i < numreads / 2; i++) std::getline(f_id, id_array[i]);
+            for (uint32_t idx_i = 0; idx_i < numreads / 2; idx_i++) std::getline(f_id, id_array[idx_i]);
             reorder_compress_id_pe(id_array, temp_dir, file_order_id, block_start, block_end, file_id, cp, name_coder,
                                    entropy, params, stats, write_raw);
             delete[] id_array;
-            for (uint32_t i = 0; i < block_start.size(); i++) remove((file_order_id + "." + std::to_string(i)).c_str());
+            for (uint32_t idx_i = 0; idx_i < block_start.size(); idx_i++) remove((file_order_id + "." + std::to_string(idx_i)).c_str());
             remove(file_id.c_str());
             block_start.clear();
             block_end.clear();
@@ -158,9 +158,9 @@ void read_block_start_end(const std::string &file_blocks, std::vector<uint32_t> 
 void generate_order(const std::string &file_order, uint32_t *order_array, const uint32_t &numreads) {
     std::ifstream fin_order(file_order, std::ios::binary);
     uint32_t order;
-    for (uint32_t i = 0; i < numreads; i++) {
+    for (uint32_t idx_i = 0; idx_i < numreads; idx_i++) {
         fin_order.read(reinterpret_cast<char *>(&order), sizeof(uint32_t));
-        order_array[order] = i;
+        order_array[order] = idx_i;
     }
     fin_order.close();
 }
@@ -186,13 +186,13 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
         std::ifstream f_order_id(file_order_id + "." + std::to_string(block_num), std::ios::binary);
         std::string *id_array_block = new std::string[block_end[block_num] - block_start[block_num]];
         uint32_t index;
-        for (uint32_t j = block_start[block_num]; j < block_end[block_num]; j++) {
+        for (uint32_t idx_j = block_start[block_num]; idx_j < block_end[block_num]; idx_j++) {
             f_order_id.read(reinterpret_cast<char *>(&index), sizeof(uint32_t));
-            id_array_block[j - block_start[block_num]] = id_array[index];
+            id_array_block[idx_j - block_start[block_num]] = id_array[index];
         }
         genie::core::record::Chunk chunk;
-        for (size_t i = 0; i < block_end[block_num] - block_start[block_num]; ++i) {
-            chunk.getData().emplace_back((uint8_t)1, core::record::ClassType::CLASS_U, std::move(id_array_block[i]), "",
+        for (size_t idx_i = 0; idx_i < block_end[block_num] - block_start[block_num]; ++idx_i) {
+            chunk.getData().emplace_back((uint8_t)1, core::record::ClassType::CLASS_U, std::move(id_array_block[idx_i]), "",
                                          (uint8_t)0);
             chunk.getData().back().addSegment(core::record::Segment("N"));
         }
@@ -201,15 +201,15 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
         chunk.getData().clear();
 
         if (write_raw && block_num < 10) {
-            for (uint16_t i = 0; i < static_cast<uint16_t>(std::get<0>(raw_desc).getSize()); ++i) {
-                if (std::get<0>(raw_desc).get(i).isEmpty()) {
+            for (uint16_t idx_i = 0; idx_i < static_cast<uint16_t>(std::get<0>(raw_desc).getSize()); ++idx_i) {
+                if (std::get<0>(raw_desc).get(idx_i).isEmpty()) {
                     continue;
                 }
                 std::ofstream out_file_stream("rawstream_" + std::to_string(block_num) + "_" +
                                               std::to_string(static_cast<uint8_t>(genie::core::GenDesc::kReadName)) + "_" +
-                                              std::to_string(static_cast<uint8_t>(i)));
-                out_file_stream.write(static_cast<char *>(std::get<0>(raw_desc).get(i).getData().getData()),
-                                      std::get<0>(raw_desc).get(i).getData().getRawSize());
+                                              std::to_string(static_cast<uint8_t>(idx_i)));
+                out_file_stream.write(static_cast<char *>(std::get<0>(raw_desc).get(idx_i).getData().getData()),
+                                      std::get<0>(raw_desc).get(idx_i).getData().getRawSize());
             }
         }
         auto encoded = entropy->process(std::get<0>(raw_desc));
@@ -252,14 +252,14 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
             end_block_num++;
         }
         std::string temp_str;
-        for (int j = 0; j < 2; j++) {
-            std::ifstream f_in(file_quality[j]);
-            uint32_t num_reads_offset = j * (cp.num_reads / 2);
-            for (uint32_t i = 0; i < cp.num_reads / 2; i++) {
+        for (int idx_j = 0; idx_j < 2; idx_j++) {
+            std::ifstream f_in(file_quality[idx_j]);
+            uint32_t num_reads_offset = idx_j * (cp.num_reads / 2);
+            for (uint32_t idx_i = 0; idx_i < cp.num_reads / 2; idx_i++) {
                 std::getline(f_in, temp_str);
-                if (order_array[i + num_reads_offset] >= block_start[start_block_num] &&
-                    order_array[i + num_reads_offset] < block_end[end_block_num - 1])
-                    quality_array[order_array[i + num_reads_offset] - block_start[start_block_num]] = temp_str;
+                if (order_array[idx_i + num_reads_offset] >= block_start[start_block_num] &&
+                    order_array[idx_i + num_reads_offset] < block_end[end_block_num - 1])
+                    quality_array[order_array[idx_i + num_reads_offset] - block_start[start_block_num]] = temp_str;
             }
         }
 
@@ -271,10 +271,10 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
 
         for (int64_t block_num = start_block_num; block_num < end_block_num; block_num++) {
             genie::core::record::Chunk chunk;
-            for (size_t i = block_start[block_num]; i < block_end[block_num]; i++) {
+            for (size_t idx_i = block_start[block_num]; idx_i < block_end[block_num]; idx_i++) {
                 chunk.getData().emplace_back((uint8_t)2, core::record::ClassType::CLASS_U, "", "", (uint8_t)0);
-                core::record::Segment s(std::string(quality_array[i - block_start[start_block_num]].size(), 'N'));
-                s.addQualities(std::move(quality_array[i - block_start[start_block_num]]));
+                core::record::Segment s(std::string(quality_array[idx_i - block_start[start_block_num]].size(), 'N'));
+                s.addQualities(std::move(quality_array[idx_i - block_start[start_block_num]]));
                 chunk.getData().back().addSegment(std::move(s));
             }
 
@@ -285,15 +285,15 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
             chunk.getData().clear();
 
             if (write_raw && block_num < 10) {
-                for (uint16_t i = 0; i < static_cast<uint16_t>(std::get<1>(raw_desc).getSize()); ++i) {
-                    if (std::get<1>(raw_desc).get(i).isEmpty()) {
+                for (uint16_t idx_i = 0; idx_i < static_cast<uint16_t>(std::get<1>(raw_desc).getSize()); ++idx_i) {
+                    if (std::get<1>(raw_desc).get(idx_i).isEmpty()) {
                         continue;
                     }
                     std::ofstream out_file_stream("rawstream_" + std::to_string(block_num) + "_" +
                                                   std::to_string(static_cast<uint8_t>(genie::core::GenDesc::kQv)) + "_" +
-                                                  std::to_string(static_cast<uint8_t>(i)));
-                    out_file_stream.write(static_cast<char *>(std::get<1>(raw_desc).get(i).getData().getData()),
-                                          std::get<1>(raw_desc).get(i).getData().getRawSize());
+                                                  std::to_string(static_cast<uint8_t>(idx_i)));
+                    out_file_stream.write(static_cast<char *>(std::get<1>(raw_desc).get(idx_i).getData().getData()),
+                                          std::get<1>(raw_desc).get(idx_i).getData().getRawSize());
                 }
             }
 
@@ -335,10 +335,10 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
         // Read the file and pick up lines corresponding to this bin
         std::ifstream f_in(file_name);
         std::string temp_str;
-        for (uint32_t i = 0; i < num_reads_per_file; i++) {
+        for (uint32_t idx_i = 0; idx_i < num_reads_per_file; idx_i++) {
             std::getline(f_in, temp_str);
-            if (order_array[i] >= start_read_bin && order_array[i] < end_read_bin)
-                str_array[order_array[i] - start_read_bin] = temp_str;
+            if (order_array[idx_i] >= start_read_bin && order_array[idx_i] < end_read_bin)
+                str_array[order_array[idx_i] - start_read_bin] = temp_str;
         }
         f_in.close();
         uint64_t blocks = uint64_t(std::ceil(static_cast<float>(num_reads_bin) / num_reads_per_block));
@@ -379,9 +379,9 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 file_name.substr(file_name.find_last_of('/') + 1) + "." + std::to_string(block_num_offset + block_num);
             if (mode == "id") {
                 genie::core::record::Chunk chunk;
-                for (size_t i = 0; i < num_reads_block; i++) {
+                for (size_t idx_i = 0; idx_i < num_reads_block; idx_i++) {
                     chunk.getData().emplace_back((uint8_t)1, core::record::ClassType::CLASS_U,
-                                                 std::move(str_array[start_read_num + i]), "", (uint8_t)0);
+                                                 std::move(str_array[start_read_num + idx_i]), "", (uint8_t)0);
                     core::record::Segment s("N");
                     chunk.getData().back().addSegment(std::move(s));
                 }
@@ -390,16 +390,16 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 stat_vec[block_num].add(std::get<1>(name_raw));
 
                 if (write_raw && (block_num_offset + block_num) < 10) {
-                    for (uint16_t i = 0; i < static_cast<uint16_t>(std::get<0>(name_raw).getSize()); ++i) {
-                        if (std::get<0>(name_raw).get(i).isEmpty()) {
+                    for (uint16_t idx_i = 0; idx_i < static_cast<uint16_t>(std::get<0>(name_raw).getSize()); ++idx_i) {
+                        if (std::get<0>(name_raw).get(idx_i).isEmpty()) {
                             continue;
                         }
                         std::ofstream out_file_stream(
                             "rawstream_" + std::to_string(block_num_offset + block_num) + "_" +
                             std::to_string(static_cast<uint8_t>(genie::core::GenDesc::kReadName)) + "_" +
-                            std::to_string(static_cast<uint8_t>(i)));
-                        out_file_stream.write(static_cast<char *>(std::get<0>(name_raw).get(i).getData().getData()),
-                                              std::get<0>(name_raw).get(i).getData().getRawSize());
+                            std::to_string(static_cast<uint8_t>(idx_i)));
+                        out_file_stream.write(static_cast<char *>(std::get<0>(name_raw).get(idx_i).getData().getData()),
+                                              std::get<0>(name_raw).get(idx_i).getData().getRawSize());
                     }
                 }
 
@@ -413,10 +413,10 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 std::get<1>(encoded).write(bw);
             } else /* mode == "quality" */ {
                 genie::core::record::Chunk chunk;
-                for (auto i = (uint32_t)start_read_num; i < start_read_num + num_reads_block; i++) {
+                for (auto idx_i = (uint32_t)start_read_num; idx_i < start_read_num + num_reads_block; idx_i++) {
                     chunk.getData().emplace_back((uint8_t)1, core::record::ClassType::CLASS_U, "", "", (uint8_t)0);
-                    core::record::Segment s(std::string(str_array[i].size(), 'N'));
-                    s.addQualities(std::move(str_array[i]));
+                    core::record::Segment s(std::string(str_array[idx_i].size(), 'N'));
+                    s.addQualities(std::move(str_array[idx_i]));
                     chunk.getData().back().addSegment(std::move(s));
                 }
                 auto qv_str = qv_coder->process(chunk);
@@ -424,16 +424,16 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 params[block_num_offset + block_num].setQVDepth(std::get<1>(qv_str).isEmpty() ? 0 : 1);
 
                 if (write_raw && (block_num_offset + block_num) < 10) {
-                    for (uint16_t i = 0; i < static_cast<uint16_t>(std::get<1>(qv_str).getSize()); ++i) {
-                        if (std::get<1>(qv_str).get(i).isEmpty()) {
+                    for (uint16_t idx_i = 0; idx_i < static_cast<uint16_t>(std::get<1>(qv_str).getSize()); ++idx_i) {
+                        if (std::get<1>(qv_str).get(idx_i).isEmpty()) {
                             continue;
                         }
                         std::ofstream out_file_stream("rawstream_" + std::to_string(block_num_offset + block_num) +
                                                       "_" +
                                                       std::to_string(static_cast<uint8_t>(genie::core::GenDesc::kQv)) +
-                                                      "_" + std::to_string(static_cast<uint8_t>(i)));
-                        out_file_stream.write(static_cast<char *>(std::get<1>(qv_str).get(i).getData().getData()),
-                                              std::get<1>(qv_str).get(i).getData().getRawSize());
+                                                      "_" + std::to_string(static_cast<uint8_t>(idx_i)));
+                        out_file_stream.write(static_cast<char *>(std::get<1>(qv_str).get(idx_i).getData().getData()),
+                                              std::get<1>(qv_str).get(idx_i).getData().getRawSize());
                     }
                 }
 

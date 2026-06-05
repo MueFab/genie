@@ -63,7 +63,7 @@ RowColIdsPayload& RowColIdsPayload::operator=(RowColIdsPayload&& other) noexcept
 RowColIdsPayload::RowColIdsPayload(genie::util::BitReader& reader, size_t num_elements) {
 //    payload_.resize(num_elements);
   auto n_bits_per_elem = ComputeNBitsPerElem(num_elements);
-  for (auto i = 0u; i < num_elements; i++){
+  for (auto idx_i = 0u; idx_i < num_elements; idx_i++){
     row_col_ids_elements_.push_back(static_cast<uint32_t>(reader.ReadBits(n_bits_per_elem)));
   }
   reader.FlushHeldBits();
@@ -151,8 +151,8 @@ size_t RowColIdsPayload::GetSize() const {
 
 void RowColIdsPayload::Write(util::BitWriter writer) const {
   auto nbits_per_elem = GetNbitsPerElem();
-  for (auto i = 0u; i< GetNelements(); i++){
-    writer.WriteBits(row_col_ids_elements_[i], nbits_per_elem);
+  for (auto idx_i = 0u; idx_i< GetNelements(); idx_i++){
+    writer.WriteBits(row_col_ids_elements_[idx_i], nbits_per_elem);
   }
 
   writer.FlushBits();

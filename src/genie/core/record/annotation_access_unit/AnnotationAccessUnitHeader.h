@@ -9,16 +9,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
-
 #include "genie/core/constants.h"
-#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -69,13 +62,12 @@ class AnnotationAccessUnitHeader {
                                bool tile_index_2_exists,
                                uint64_t tile_index_2);
 
-    void read(util::BitReader& reader);
-    void read(util::BitReader& reader, bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
+    void Read(util::BitReader& reader);
+    void Read(util::BitReader& reader, bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
               bool variable_size_tiles, uint8_t ATCoordSize);
 
-    void write(core::Writer& writer) const;
-    void write(util::BitWriter& writer) const;
-    size_t getSize(core::Writer& writesize) const;
+    void Write(util::BitWriter& writer) const;
+    size_t GetSize(util::BitWriter& writesize) const;
 
     bool ISAttribute() const { return is_attribute; }
     uint16_t getAttributeID() const { return attribute_ID; }

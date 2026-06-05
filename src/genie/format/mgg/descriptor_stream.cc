@@ -50,14 +50,14 @@ DescriptorStream::DescriptorStream(util::BitReader& reader, const MasterIndexTab
     uint8_t class_index = 0;
     uint8_t descriptor_index = 0;
     bool found = false;
-    for (uint8_t i = 0; i < static_cast<uint8_t>(configs.size()); ++i) {
-        if (configs[i].getClassID() == header.getClassType()) {
-            class_index = i;
+    for (uint8_t idx_i = 0; idx_i < static_cast<uint8_t>(configs.size()); ++idx_i) {
+        if (configs[idx_i].getClassID() == header.getClassType()) {
+            class_index = idx_i;
             found = true;
             bool found2 = false;
-            for (uint8_t j = 0; j < static_cast<uint8_t>(configs[i].getDescriptorIDs().size()); ++j) {
-                if (configs[i].getDescriptorIDs()[j] == header.getDescriptorID()) {
-                    descriptor_index = j;
+            for (uint8_t idx_j = 0; idx_j < static_cast<uint8_t>(configs[idx_i].getDescriptorIDs().size()); ++idx_j) {
+                if (configs[idx_i].getDescriptorIDs()[idx_j] == header.getDescriptorID()) {
+                    descriptor_index = idx_j;
                     found2 = true;
                     break;
                 }
@@ -72,8 +72,8 @@ DescriptorStream::DescriptorStream(util::BitReader& reader, const MasterIndexTab
                                                          header.getClassType() == core::record::ClassType::CLASS_U,
                                                          length - (reader.getPos() - start_pos));
     UTILS_DIE_IF(payloadSizes.size() < header.getNumBlocks(), "DS payload sizes not available");
-    for (size_t i = 0; i < header.getNumBlocks(); ++i) {
-        payload.emplace_back(reader, payloadSizes[i]);
+    for (size_t idx_i = 0; idx_i < header.getNumBlocks(); ++idx_i) {
+        payload.emplace_back(reader, payloadSizes[idx_i]);
     }
 
     UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");

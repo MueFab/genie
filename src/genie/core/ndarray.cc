@@ -13,9 +13,9 @@ template<typename T>
 void NDArray<T>::computeStrides() {
     strides.resize(dimensions.size());
     size_t stride = 1;
-    for (int i = static_cast<int>(dimensions.size()) - 1; i >= 0; --i) {
-        strides[i] = stride;
-        stride *= dimensions[i];
+    for (int idx_i = static_cast<int>(dimensions.size()) - 1; idx_i >= 0; --idx_i) {
+        strides[idx_i] = stride;
+        stride *= dimensions[idx_i];
     }
 }
 
@@ -122,11 +122,11 @@ T& NDArray<T>::operator()(const std::vector<size_t>& indices) {
         throw std::invalid_argument("Invalid number of indices");
     }
     size_t index = 0;
-    for (size_t i = 0; i < indices.size(); ++i) {
-        if (indices[i] >= dimensions[i]) {
+    for (size_t idx_i = 0; idx_i < indices.size(); ++idx_i) {
+        if (indices[idx_i] >= dimensions[idx_i]) {
             throw std::out_of_range("Index out of range");
         }
-        index += indices[i] * strides[i];
+        index += indices[idx_i] * strides[idx_i];
     }
     return data[index];
 }
@@ -265,3 +265,15 @@ NDArray<T> operator/(const NDArray<T>& lhs, const NDArray<T>& rhs) {
 // -----------------------------------------------------------------------------
 
 }
+template class genie::core::NDArray<int>;
+template class genie::core::NDArrayFactory<int>;
+template class genie::core::NDArray<uint16_t>;
+template class genie::core::NDArrayFactory<uint16_t>;
+template class genie::core::NDArray<uint32_t>;
+template class genie::core::NDArrayFactory<uint32_t>;
+template class genie::core::NDArray<uint64_t>;
+template class genie::core::NDArrayFactory<uint64_t>;
+template class genie::core::NDArray<float>;
+template class genie::core::NDArrayFactory<float>;
+template class genie::core::NDArray<double>;
+template class genie::core::NDArrayFactory<double>;

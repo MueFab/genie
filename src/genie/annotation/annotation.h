@@ -19,16 +19,22 @@
 #include "genie/annotation/contact_annotation.h"
 #include "genie/annotation/compressors.h"
 #include "genie/core/constants.h"
-#include "genie/core/data_unit_record/record.h"
+#include "genie/core/record/data_unit/record.h"
 #include "genie/annotation/geno_annotation.h"
 #include "genie/annotation/site_annotation.h"
+#include "genie/annotation/sample_annotation.h"
+#include "genie/annotation/feature_annotation.h"
+#include "genie/annotation/gene_expression_annotation.h"
+#include "genie/annotation/functional_annotation.h"
+#include "genie/annotation/track_data_annotation.h"
+#include "genie/annotation/trackproperty_annotation.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum class RecType { SITE_FILE = 0, GENO_FILE, CM_FILE };
+enum class RecType { SITE_FILE = 0, GENO_FILE, SAMPLE_FILE, FEATURE_FILE, GENE_EXPRESSION_FILE, CM_FILE, FUNCTIONAL_ANNOTATIONS_FILE, TRACK_FILE, TRACK_PROPERTY_FILE };
 
 
 
@@ -45,6 +51,12 @@ class Annotation {
     defaultTileSizeWidth = _defaultTileSizeWidth;
     genoAnnotation.setTileSize(_defaultTileSizeHeight, defaultTileSizeWidth);
     siteAnnotation.setTileSize(_defaultTileSizeHeight);
+    sampleAnnotation.setTileSize(_defaultTileSizeWidth);
+    featureAnnotation.setTileSize(_defaultTileSizeHeight);
+    geneExpressionAnnotation.setTileSize(_defaultTileSizeHeight, _defaultTileSizeWidth);
+    functionalAnnotation.setTileSize(_defaultTileSizeHeight);
+    trackDataAnnotation.setTileSize(_defaultTileSizeHeight);
+    trackpropertyAnnotation.setTileSize(_defaultTileSizeHeight);
   }
 
   void startStream(RecType recType, std::string recordInputFileName,
@@ -68,14 +80,20 @@ class Annotation {
   genie::annotation::Compressor compressors;
   std::map<std::string, InfoField> attributeInfo;
 
-  std::vector<genie::core::record::annotation_parameter_set::Record>
+  std::vector<genie::core::parameter::annotation::Record>
       annotationParameterSet;
-  std::vector<genie::core::record::annotation_access_unit::Record>
+  std::vector<genie::core::access_unit::annotation::Record>
       annotationAccessUnit;
 
   GenoAnnotation genoAnnotation;
   SiteAnnotation siteAnnotation;
   CMAnnotation cmAnnotation;
+  SampleAnnotation sampleAnnotation;
+  FeatureAnnotation featureAnnotation;
+  GeneExpressionAnnotation geneExpressionAnnotation;
+  FunctionalAnnotation functionalAnnotation;
+  TrackDataAnnotation trackDataAnnotation;
+  TrackPropertyAnnotation trackpropertyAnnotation;
 
   uint32_t defaultTileSizeHeight{0};
   uint32_t defaultTileSizeWidth{0};

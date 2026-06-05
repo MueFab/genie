@@ -106,18 +106,18 @@ bool SupportValues::operator==(const SupportValues& val) const {
 
 // -----------------------------------------------------------------------------
 
-SupportValues::SupportValues(nlohmann::json j,
+SupportValues::SupportValues(nlohmann::json idx_j,
                              const TransformIdSubsym transform_id_subsym) {
   share_subsym_lut_flag_ = false;
   share_subsym_prv_flag_ = false;
-  output_symbol_size_ = j["output_symbol_size"];
-  coding_subsym_size_ = j["coding_subsym_size"];
-  coding_order_ = j["coding_order"];
+  output_symbol_size_ = idx_j["output_symbol_size"];
+  coding_subsym_size_ = idx_j["coding_subsym_size"];
+  coding_order_ = idx_j["coding_order"];
   if (coding_subsym_size_ < output_symbol_size_ && coding_order_ > 0) {
     if (transform_id_subsym == TransformIdSubsym::LUT_TRANSFORM) {
-      share_subsym_lut_flag_ = j["share_subsym_lut_flag"];
+      share_subsym_lut_flag_ = idx_j["share_subsym_lut_flag"];
     }
-    share_subsym_prv_flag_ = j["share_subsym_prv_flag"];
+    share_subsym_prv_flag_ = idx_j["share_subsym_prv_flag"];
   }
 }
 

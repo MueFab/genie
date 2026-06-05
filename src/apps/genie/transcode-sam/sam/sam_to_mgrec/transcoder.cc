@@ -146,8 +146,8 @@ genie::core::record::Record dealignRecord(genie::core::record::Record&& rec) {
                                     std::string(input.getName()), std::string(input.getGroup()), input.getFlags(),
                                     input.isRead1First());
 
-    for (auto& i : input.getSegments()) {
-        ret.getSegments().emplace_back(i);
+    for (auto& idx_i : input.getSegments()) {
+        ret.getSegments().emplace_back(idx_i);
     }
     ret.setQVDepth(1);
     return ret;
@@ -165,8 +165,8 @@ genie::core::record::Record stripAdditionalAlignments(genie::core::record::Recor
                                     std::string(input.getName()), std::string(input.getGroup()), input.getFlags(),
                                     input.isRead1First());
 
-    for (auto& i : input.getSegments()) {
-        ret.getSegments().emplace_back(i);
+    for (auto& idx_i : input.getSegments()) {
+        ret.getSegments().emplace_back(idx_i);
     }
 
     ret.addAlignment(input.getAlignmentSharedData().getSeqID(),
@@ -200,39 +200,39 @@ std::pair<std::vector<genie::core::record::Record>, CleanStatistics> cleanRecord
     CleanStatistics stats;
     stats.additional_alignments += input.getAlignments().empty() ? 0 : input.getAlignments().size() - 1;
     ret.emplace_back(stripAdditionalAlignments(std::move(input)));
-    for (size_t i = 0; i < ret.size(); ++i) {
-        /*       if (ret[i].getClassID() == genie::core::record::ClassType::CLASS_U &&
-                   ret[i].getSegments().size() != ret[i].getNumberOfTemplateSegments()) {
+    for (size_t idx_i = 0; idx_i < ret.size(); ++idx_i) {
+        /*       if (ret[idx_i].getClassID() == genie::core::record::ClassType::CLASS_U &&
+                   ret[idx_i].getSegments().size() != ret[idx_i].getNumberOfTemplateSegments()) {
                    return false;
                }*/
-        if (ret[i].getClassID() == genie::core::record::ClassType::CLASS_HM) {
-            ret[i] = dealignRecord(std::move(ret[i]));
+        if (ret[idx_i].getClassID() == genie::core::record::ClassType::CLASS_HM) {
+            ret[idx_i] = dealignRecord(std::move(ret[idx_i]));
             stats.hm_recs++;
             break;
         }
-        if (ret[i].getClassID() == genie::core::record::ClassType::CLASS_U) {
+        if (ret[idx_i].getClassID() == genie::core::record::ClassType::CLASS_U) {
             continue;
         }
-        if (!isECigarSupported(ret[i].getAlignments().front().getAlignment().getECigar())) {
-            ret[i] = dealignRecord(std::move(ret[i]));
+        if (!isECigarSupported(ret[idx_i].getAlignments().front().getAlignment().getECigar())) {
+            ret[idx_i] = dealignRecord(std::move(ret[idx_i]));
             stats.splice_recs++;
             break;
         }
-        for (const auto& s : ret[i].getAlignments().front().getAlignmentSplits()) {
+        for (const auto& s : ret[idx_i].getAlignments().front().getAlignmentSplits()) {
             if (s->getType() == genie::core::record::AlignmentSplit::Type::SAME_REC) {
                 if (!isECigarSupported(
                         dynamic_cast<genie::core::record::alignment_split::SameRec&>(*s).getAlignment().getECigar())) {
-                    ret[i] = dealignRecord(std::move(ret[i]));
+                    ret[idx_i] = dealignRecord(std::move(ret[idx_i]));
                     stats.splice_recs++;
                     break;
                 }
                 // Splits with more than 32767 delta must be encoded in separate records, which is not yet supported
                 if (std::abs(dynamic_cast<genie::core::record::alignment_split::SameRec&>(*s).getDelta()) > 32767) {
-                    auto split = splitRecord(std::move(ret[i]));
-                    ret[i] = std::move(split[0]);
+                    auto split = splitRecord(std::move(ret[idx_i]));
+                    ret[idx_i] = std::move(split[0]);
                     stats.distance++;
-                    for (size_t j = 1; j < split.size(); ++j) {
-                        ret.emplace_back(std::move(split[j]));
+                    for (size_t idx_j = 1; idx_j < split.size(); ++idx_j) {
+                        ret.emplace_back(std::move(split[idx_j]));
                     }
                     break;
                 }
@@ -260,7 +260,7 @@ void phase1_thread(SamReader& sam_reader, int& chunk_id, const std::string& tmp_
             std::lock_guard<std::mutex> guard(lock);
             this_chunk = chunk_id++;
             std::cerr << "Processing chunk " << this_chunk << "..." << std::endl;
-            for (int i = 0; i < PHASE2_BUFFER_SIZE; ++i) {
+            for (int idx_i = 0; idx_i < PHASE2_BUFFER_SIZE; ++idx_i) {
                 queries.emplace_back();
                 ret = sam_reader.readSamQuery(queries.back());
                 if (ret == EOF) {
@@ -281,17 +281,17 @@ void phase1_thread(SamReader& sam_reader, int& chunk_id, const std::string& tmp_
             }
             std::list<genie::core::record::Record> records;
             buffer.convert(records);
-            for (auto& m : records) {
+            for (auto& dim_m : records) {
                 std::vector<genie::core::record::Record> buf;
                 if (clean) {
-                    auto r = cleanRecord(std::move(m));
+                    auto r = cleanRecord(std::move(dim_m));
                     buf = std::move(r.first);
                     local_stats.splice_recs += r.second.splice_recs;
                     local_stats.distance += r.second.distance;
                     local_stats.additional_alignments += r.second.additional_alignments;
                     local_stats.hm_recs += r.second.hm_recs;
                 } else {
-                    buf.emplace_back(std::move(m));
+                    buf.emplace_back(std::move(dim_m));
                 }
                 for (auto& b : buf) {
                     output_buffer.push_back(std::move(b));
@@ -344,7 +344,7 @@ std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(Config& options,
     std::vector<std::thread> threads;
     threads.reserve(options.num_threads);
     CleanStatistics stats;
-    for (uint32_t i = 0; i < options.num_threads; ++i) {
+    for (uint32_t idx_i = 0; idx_i < options.num_threads; ++idx_i) {
         threads.emplace_back(
             [&]() { phase1_thread(sam_reader, chunk_id, options.tmp_dir_path, options.clean, lock, stats); });
     }
@@ -401,13 +401,13 @@ std::string patch_ecigar(const std::string& ref, const std::string& seq, const s
 
         size_t counter = 0;
 
-        for (size_t i = 0; i < length; ++i) {
-            if (*(bs.begin() + i) != *(rs.begin() + i)) {
+        for (size_t idx_i = 0; idx_i < length; ++idx_i) {
+            if (*(bs.begin() + idx_i) != *(rs.begin() + idx_i)) {
                 if (counter != 0) {
                     fixedCigar += std::to_string(counter) + "=";
                     counter = 0;
                 }
-                fixedCigar += std::string(1, *(bs.begin() + i));
+                fixedCigar += std::string(1, *(bs.begin() + idx_i));
 
             } else {
                 counter++;
@@ -553,20 +553,20 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
 
     std::vector<size_t> sam_hdr_to_fasta_lut;
     if (!options.no_ref) {
-        for (size_t i = 0; i < refs.size(); ++i) {
+        for (size_t idx_i = 0; idx_i < refs.size(); ++idx_i) {
             bool found = false;
-            for (size_t j = 0; j < refinf.getMgr()->getSequences().size(); ++j) {
-                if (refs[i].first == refinf.getMgr()->getSequences().at(j)) {
-                    sam_hdr_to_fasta_lut.push_back(j);
+            for (size_t idx_j = 0; idx_j < refinf.getMgr()->getSequences().size(); ++idx_j) {
+                if (refs[idx_i].first == refinf.getMgr()->getSequences().at(idx_j)) {
+                    sam_hdr_to_fasta_lut.push_back(idx_j);
                     found = true;
                     break;
                 }
             }
-            UTILS_DIE_IF(!found, "Did not find ref " + refs[i].first);
+            UTILS_DIE_IF(!found, "Did not find ref " + refs[idx_i].first);
         }
     } else {
-        for (size_t i = 0; i < refs.size(); ++i) {
-            sam_hdr_to_fasta_lut.push_back(i);
+        for (size_t idx_i = 0; idx_i < refs.size(); ++idx_i) {
+            sam_hdr_to_fasta_lut.push_back(idx_i);
         }
     }
 
@@ -584,9 +584,9 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
         return !compare(a->getRecord().get(), b->getRecord().get());
     };
     std::priority_queue<SubfileReader*, std::vector<SubfileReader*>, decltype(cmp)> heap(cmp);
-    for (int i = 0; i < num_chunks; ++i) {
+    for (int idx_i = 0; idx_i < num_chunks; ++idx_i) {
         readers.emplace_back(
-            genie::util::make_unique<SubfileReader>(options.tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT));
+            genie::util::make_unique<SubfileReader>(options.tmp_dir_path + "/" + std::to_string(idx_i) + PHASE1_EXT));
         if (!readers.back()->getRecord()) {
             auto path = readers.back()->getPath();
             std::cerr << path << " depleted" << std::endl;

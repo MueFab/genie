@@ -60,10 +60,10 @@ SubcontactMatrixParameters::SubcontactMatrixParameters(
   );
 
   // Deep copy for TileParameters if needed
-  for (size_t i = 0; i < other.GetNTilesInRow(); ++i) {
-    for (size_t j = 0; j < other.GetNTilesInCol(); ++j) {
-      tile_parameters_[i][j].diag_tranform_mode = other.tile_parameters_[i][j].diag_tranform_mode;
-      tile_parameters_[i][j].binarization_mode = other.tile_parameters_[i][j].binarization_mode;
+  for (size_t idx_i = 0; idx_i < other.GetNTilesInRow(); ++idx_i) {
+    for (size_t idx_j = 0; idx_j < other.GetNTilesInCol(); ++idx_j) {
+      tile_parameters_[idx_i][idx_j].diag_tranform_mode = other.tile_parameters_[idx_i][idx_j].diag_tranform_mode;
+      tile_parameters_[idx_i][idx_j].binarization_mode = other.tile_parameters_[idx_i][idx_j].binarization_mode;
     }
   }
 }
@@ -132,13 +132,13 @@ SubcontactMatrixParameters::SubcontactMatrixParameters(
     for (auto& v : tile_parameters_)
       v.resize(ntiles_in_col);
 
-    for (size_t i = 0u; i < ntiles_in_row; ++i) {
-        for (size_t j = 0u; j < ntiles_in_col; ++j) {
-            if (IsIntraSCM() && i > j) {
+    for (size_t idx_i = 0u; idx_i < ntiles_in_row; ++idx_i) {
+        for (size_t idx_j = 0u; idx_j < ntiles_in_col; ++idx_j) {
+            if (IsIntraSCM() && idx_i > idx_j) {
                 continue;
             }
 
-            auto& tile_parameter = tile_parameters_[i][j];
+            auto& tile_parameter = tile_parameters_[idx_i][idx_j];
 
             flags = reader.ReadAlignedInt<uint8_t>();
             tile_parameter.diag_tranform_mode = static_cast<DiagonalTransformMode>((flags >> 2) & 0x07);
@@ -169,13 +169,13 @@ bool SubcontactMatrixParameters::operator==(const SubcontactMatrixParameters& ot
     ret &= ntiles_in_col == other.GetNTilesInCol();
 
     if (ret) {
-        for (size_t i = 0; i < ntiles_in_row; ++i) {
-            for (size_t j = 0; j < ntiles_in_col; ++j) {
-                if (IsIntraSCM() && i > j) {
+        for (size_t idx_i = 0; idx_i < ntiles_in_row; ++idx_i) {
+            for (size_t idx_j = 0; idx_j < ntiles_in_col; ++idx_j) {
+                if (IsIntraSCM() && idx_i > idx_j) {
                     continue;
                 }
-                auto& tile1 = tile_parameters_[i][j];
-                auto& tile2 = tile_parameters_[i][j];
+                auto& tile1 = tile_parameters_[idx_i][idx_j];
+                auto& tile2 = tile_parameters_[idx_i][idx_j];
 
                 ret = ret && tile1.diag_tranform_mode == tile2.diag_tranform_mode;
                 ret = ret && tile1.binarization_mode == tile2.binarization_mode;
@@ -311,9 +311,9 @@ size_t SubcontactMatrixParameters::GetSize() const {
     size += sizeof(chr2_ID_);
     size += sizeof(codec_ID_);  // reserved + codec_ID_
 
-    for (size_t i = 0u; i < GetNTilesInRow(); ++i) {
-        for (size_t j = 0u; j < GetNTilesInCol(); ++j) {
-            if (IsIntraSCM() && i > j) {
+    for (size_t idx_i = 0u; idx_i < GetNTilesInRow(); ++idx_i) {
+        for (size_t idx_j = 0u; idx_j < GetNTilesInCol(); ++idx_j) {
+            if (IsIntraSCM() && idx_i > idx_j) {
                 continue;
             }
 
@@ -343,12 +343,12 @@ void SubcontactMatrixParameters::Write(util::BitWriter& writer) const {
     auto num_tiles_in_col = GetNTilesInCol();
 
     // Write the tile_parameters_
-    for (size_t i = 0; i < num_tiles_in_row; ++i) {
-        for (size_t j = 0; j < num_tiles_in_col; ++j) {
-            if (IsIntraSCM() && i > j) {
+    for (size_t idx_i = 0; idx_i < num_tiles_in_row; ++idx_i) {
+        for (size_t idx_j = 0; idx_j < num_tiles_in_col; ++idx_j) {
+            if (IsIntraSCM() && idx_i > idx_j) {
                 continue;
             }
-            auto& tile_param = tile_parameters_[i][j];
+            auto& tile_param = tile_parameters_[idx_i][idx_j];
 
             flags = 0u;
             flags |= static_cast<uint8_t>((static_cast<uint8_t>(tile_param.diag_tranform_mode) << 2));
@@ -363,40 +363,6 @@ void SubcontactMatrixParameters::Write(util::BitWriter& writer) const {
     writer.WriteBypassBE(flags);
 
     writer.FlushBits();
-}
-
-void SubcontactMatrixParameters::Write(core::Writer& writer) const {
-    writer.WriteBypassBE(parameter_set_ID_);
-    writer.WriteBypassBE(chr1_ID_);
-    writer.WriteBypassBE(chr2_ID_);
-
-    uint8_t flags = 0u;
-    flags |= (static_cast<uint8_t>(codec_ID_) & 0x1F);
-    writer.WriteBypassBE(flags);
-
-    auto num_tiles_in_row = GetNTilesInRow();
-    auto num_tiles_in_col = GetNTilesInCol();
-
-    for (size_t i = 0; i < num_tiles_in_row; ++i) {
-        for (size_t j = 0; j < num_tiles_in_col; ++j) {
-            if (IsIntraSCM() && i > j) {
-                continue;
-            }
-            auto& tile_param = tile_parameters_[i][j];
-
-            flags = 0u;
-            flags |= static_cast<uint8_t>((static_cast<uint8_t>(tile_param.diag_tranform_mode) << 2));
-            flags |= static_cast<uint8_t>(tile_param.binarization_mode);
-            writer.WriteBypassBE(flags);
-        }
-    }
-
-    flags = 0u;
-    flags |= static_cast<uint8_t>((static_cast<uint8_t>(row_mask_exists_flag_) << 1));
-    flags |= static_cast<uint8_t>(col_mask_exists_flag_);
-    writer.WriteBypassBE(flags);
-
-    writer.Flush();
 }
 
 // -----------------------------------------------------------------------------

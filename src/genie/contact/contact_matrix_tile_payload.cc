@@ -1,8 +1,8 @@
 /**
-* @file
-* @copyright This file is part of GENIE. See LICENSE and/or
-* https://github.com/mitogen/genie for more details.
-*/
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
 #include "contact_matrix_tile_payload.h"
 #include "genie/util/runtime_exception.h"
@@ -364,5 +364,3 @@ void ContactMatrixTilePayload::Write(util::BitWriter &writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace genie::contact
-
-// ---------------------------------------------------------------------------------------------------------------------

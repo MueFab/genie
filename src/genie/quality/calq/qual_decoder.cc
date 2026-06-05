@@ -32,8 +32,8 @@ QualDecoder::QualDecoder(const DecodingBlock& b, uint64_t positionOffset, uint8_
     out->qvalues.clear();
     for (const auto& q : b.codeBooks) {
         std::map<int, int> steps;
-        for (unsigned int i = 0; i < q.size(); ++i) {
-            steps[i] = q[i];
+        for (unsigned int idx_i = 0; idx_i < q.size(); ++idx_i) {
+            steps[idx_i] = q[idx_i];
         }
         quantizers_.emplace_back(steps);
     }
@@ -69,7 +69,7 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord) {
             case '=':
                 // Decode opLen quality value indices with computed
                 // quantizer indices
-                for (size_t i = 0; i < opLen; i++) {
+                for (size_t idx_i = 0; idx_i < opLen; idx_i++) {
                     uint8_t quantizerIndex = 0;
                     if (!in.quantizerIndices.empty()) {
                         quantizerIndex = in.quantizerIndices[qvciPos++];
@@ -86,7 +86,7 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord) {
             case '+':
             case ')':
                 // Decode opLen quality values with max quantizer index
-                for (size_t i = 0; i < opLen; i++) {
+                for (size_t idx_i = 0; idx_i < opLen; idx_i++) {
                     int qualityValueIndex =
                         in.stepindices.at(quantizers_.size() - 1)[qviIdx_[quantizers_.size() - 1]++];
                     int q = quantizers_.at(quantizers_.size() - 1).indexToReconstructionValue(qualityValueIndex);

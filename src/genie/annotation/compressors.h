@@ -23,8 +23,8 @@
 #include "genie/util/bit_writer.h"
 #include "genie/util/runtime_exception.h"
 
-#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
-#include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
+#include "genie/core/parameter/annotation/algorithm_parameters.h"
+#include "genie/core/parameter/annotation/compressor_parameter_set.h"
 
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
@@ -44,14 +44,14 @@ class Compressor {
 
     void compress(std::stringstream& input, std::stringstream& output, uint8_t compressorID);
 
-    const std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet>& getCompressorParameters()
+    const std::vector<genie::core::parameter::annotation::CompressorParameterSet>& getCompressorParameters()
         const {
         return compressorParameters;
     }
 
  private:
     uint8_t selectedCompressorID;
-    std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressorParameters;
+    std::vector<genie::core::parameter::annotation::CompressorParameterSet> compressorParameters;
 
     void parseCompressor(std::vector<std::string> commandline);
 

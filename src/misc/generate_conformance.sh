@@ -11,6 +11,6 @@ do
     for unit in "${au[@]}"
     do
         $lae --input-file $file.sam -o $file.$unit.mbg -t $unit
-        $reference_sw -v debug -i $file.$unit.mbg -o $file.$unit.mgrecs
+        $reference_sw -v debug -idx_i $file.$unit.mbg -o $file.$unit.mgrecs
     done
 done

@@ -18,9 +18,9 @@
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/core/constants.h"
-#include "genie/core/record/annotation_access_unit/TypedData.h"
+#include "genie/core/access_unit/annotation/typed_data.h"
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/jbig/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
@@ -28,7 +28,7 @@
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_payload.h"
 #include "genie/util/runtime_exception.h"
-#include "genie/variantsite/accessunit_composer.h"
+#include "genie/annotation/accessunit_composer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -51,10 +51,10 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(
   combined = std::move(blocksWPars.at(0));
   //--------------
 
-  for (auto i = 1; i < blocksWPars.size(); ++i) {
-    combined.blocks.push_back(std::move(blocksWPars.at(i).blocks.at(0)));
+  for (auto idx_i = 1; idx_i < blocksWPars.size(); ++idx_i) {
+    combined.blocks.push_back(std::move(blocksWPars.at(idx_i).blocks.at(0)));
   }
-  std::map<std::string, core::record::annotation_parameter_set::AttributeData>
+  std::map<std::string, core::parameter::annotation::AttributeData>
       attributeInfo;
   for (auto& attr : combined.blocks.at(0).attributes)
     attributeInfo[attr.first] = std::get<0>(attr.second);
@@ -87,12 +87,12 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(
 
     size_t linkIdRowCnt = 0;
     std::map<std::string,
-             genie::core::record::annotation_access_unit::TypedData>
+             genie::core::access_unit::annotation::TypedData>
         attributeTDStream;
     std::cerr << " attributeTDStream... " << std::endl;
     for (auto& formatdata : combined.blocks.at(blockIndex).attributes) {
       auto& info =
-          std::get<core::record::annotation_parameter_set::AttributeData>(
+          std::get<core::parameter::annotation::AttributeData>(
               formatdata.second);
       auto& values = std::get<1>(formatdata.second);
       // .genotypeDatablock.attributeInfo[formatdata.first];
@@ -118,22 +118,21 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(
     }
     variant_site::AccessUnitComposer accessUnitcomposer;
     accessUnitcomposer.setATtype(
-        core::record::annotation_access_unit::AnnotationType::VARIANTS, 1);
+        core::access_unit::annotation::AnnotationType::VARIANTS, 1);
 
     accessUnitcomposer.setCompressors(compressors);
 
     if (combined.blocks.at(blockIndex).likelihoodPayload.getNRows() > 0 &&
         combined.blocks.at(blockIndex).likelihoodPayload.getNCols() > 0) {
       descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
-      genie::core::Writer writer(
-          &descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
+      genie::util::BitWriter writer(descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
       combined.blocks.at(blockIndex).likelihoodPayload.write(writer);
     }
     // add LINK_ID default values
     std::cerr << " add link values... " << std::endl;
-    for (auto j = 0u;
-         j < defaultTileSizeHeight && linkIdRowCnt < parWBlocks.rows;
-         ++j, ++linkIdRowCnt) {
+    for (auto idx_j = 0u;
+         idx_j < defaultTileSizeHeight && linkIdRowCnt < parWBlocks.rows;
+         ++idx_j, ++linkIdRowCnt) {
       const char val = '\xFF';
       descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
     }
@@ -238,7 +237,7 @@ size_t genie::annotation::GenoAnnotation::readOneBlock(
 
   sort_format(varGenoType);
   std::map<std::string,
-           std::tuple<core::record::annotation_parameter_set::AttributeData,
+           std::tuple<core::parameter::annotation::AttributeData,
                       std::vector<std::vector<std::vector<AttrType>>>>>
       attributes;
   for (auto& attr : attrInfo)
@@ -273,7 +272,7 @@ void GenoAnnotation::sort_format(
   // fill all attribute data
   for (const auto& format : recs.at(0).GetFormat()) {
     const auto& formatName = format.GetFormat();
-    core::record::annotation_parameter_set::AttributeData attrData(
+    core::parameter::annotation::AttributeData attrData(
         formatName.size(), formatName, format.GetType(),
         format.GetArrayLength(), AttributeID);
     attrInfo[formatName] = attrData;
@@ -309,13 +308,14 @@ GenoAnnotation::RecData::RecData(
     genie::likelihood::LikelihoodPayload _likelihoodPayload, uint32_t _numSamples,
     uint8_t _formatCount,
     std::map<std::string,
-             std::tuple<core::record::annotation_parameter_set::AttributeData,
+             std::tuple<core::parameter::annotation::AttributeData,
                         std::vector<std::vector<std::vector<AttrType>>>>>
-        attributes)
+        _attributes)
     : rowStart(_rowStart),
       colStart(_colStart),
       pars(std::get<genie::genotype::GenotypeParameters>(_genotypeData)),
       payload(std::get<genie::genotype::GenotypePayload>(_genotypeData)),
+      attributes(std::move(_attributes)),
       likelihoodPayload(std::move(_likelihoodPayload)),
       numSamples(_numSamples),
       formatCount(_formatCount) {}
@@ -338,6 +338,7 @@ GenoAnnotation::RecData& GenoAnnotation::RecData::operator=(RecData&& other) noe
   attributes = std::move(other.attributes);
   likelihoodPayload = std::move(other.likelihoodPayload);
   numSamples = other.numSamples;
+  formatCount = other.formatCount;
   return *this;
 }
 
@@ -349,7 +350,7 @@ void GenoAnnotation::RecData::set(
     genie::likelihood::LikelihoodPayload _likelihoodPayload, uint32_t _numSamples,
     uint8_t _formatCount,
     std::map<std::string,
-             std::tuple<core::record::annotation_parameter_set::AttributeData,
+             std::tuple<core::parameter::annotation::AttributeData,
                         std::vector<std::vector<std::vector<AttrType>>>>>
         _attributes) {
   rowStart = _rowStart;

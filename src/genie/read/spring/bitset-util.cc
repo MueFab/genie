@@ -40,7 +40,7 @@ void bbhashdict::remove(int64_t *dictidx, const uint64_t &startposidx, const int
     }
     int64_t pos = std::lower_bound(read_id + dictidx[0], read_id + dictidx[1], current) - (read_id + dictidx[0]);
 
-    for (int64_t i = dictidx[0] + pos; i < dictidx[1] - 1; i++) read_id[i] = read_id[i + 1];
+    for (int64_t idx_i = dictidx[0] + pos; idx_i < dictidx[1] - 1; idx_i++) read_id[idx_i] = read_id[idx_i + 1];
     auto endidx = startpos[startposidx + 1];
     if (dictidx[1] == endidx) {  // this is first read to be deleted
         read_id[endidx - 1] = MAX_NUM_READS;

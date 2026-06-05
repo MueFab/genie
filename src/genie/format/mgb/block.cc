@@ -35,7 +35,7 @@ Block::Block(size_t qv_count, util::BitReader &reader) : payload(core::AccessUni
     reader.read_b(3);
     block_payload_size = reader.read<uint32_t>(29);
 
-    /*   for(size_t i = 0; i < block_payload_size; ++i) {
+    /*   for(size_t idx_i = 0; idx_i < block_payload_size; ++idx_i) {
            reader.read(8);
        } */
 

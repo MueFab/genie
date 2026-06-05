@@ -113,14 +113,14 @@ bool Binarization::operator==(const Binarization& bin) const {
 
 // -----------------------------------------------------------------------------
 
-Binarization::Binarization(nlohmann::json j) {
+Binarization::Binarization(nlohmann::json idx_j) {
   binarization_id_ =
-      static_cast<BinarizationParameters::BinarizationId>(j["binarization_ID"]);
-  bypass_flag_ = static_cast<bool>(static_cast<uint8_t>(j["bypass_flag"]));
+      static_cast<BinarizationParameters::BinarizationId>(idx_j["binarization_ID"]);
+  bypass_flag_ = static_cast<bool>(static_cast<uint8_t>(idx_j["bypass_flag"]));
   cabac_binarization_parameters_ = BinarizationParameters(
-      j["cabac_binarization_parameters"], binarization_id_);
+      idx_j["cabac_binarization_parameters"], binarization_id_);
   if (!bypass_flag_) {
-    cabac_context_parameters_ = Context(j["cabac_context_parameters"]);
+    cabac_context_parameters_ = Context(idx_j["cabac_context_parameters"]);
   }
 }
 

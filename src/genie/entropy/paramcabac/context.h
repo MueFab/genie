@@ -114,9 +114,9 @@ class Context final {
 
   /**
    * @brief Constructs a `Context` from a JSON object.
-   * @param j JSON object containing the context parameters.
+   * @param idx_j JSON object containing the context parameters.
    */
-  explicit Context(nlohmann::json j);
+  explicit Context(nlohmann::json idx_j);
 
   /**
    * @brief Converts the `Context` object to a JSON representation.

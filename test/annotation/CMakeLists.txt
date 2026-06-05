@@ -1,23 +1,10 @@
 project("genie-test-annotation")
 
-set(source_files
-        annotation-test.cc
-		annotation-contact-test.cc
-        helpers.cc
-        main.cc
-
-)
+file(GLOB source_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
 
 add_executable(${PROJECT_NAME} ${source_files})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-annotation)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-genotype)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-likelihood)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-bsc)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-lzma)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-zstd)
-target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
+target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main genie-core genie-util genie-annotation genie-genotype genie-contact genie-likelihood)
+
+add_subdirectory(parameter_set)
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

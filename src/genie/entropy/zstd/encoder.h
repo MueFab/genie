@@ -18,13 +18,13 @@
 
 #include <sstream>
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/access_unit.h"
 #include "genie/core/entropy_encoder.h"
 #include "genie/util/make_unique.h"
 #include "genie/util/stop_watch.h"
 
 #include "apps/genie/annotation/code.h"
-#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
+#include "genie/core/parameter/annotation/algorithm_parameters.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -40,8 +40,8 @@ class ZSTDParameters {
     ZSTDParameters(uint8_t _use_dictionary_flag, uint8_t _dictionary_size, std::string _dictionary)
         : use_dictionary_flag(_use_dictionary_flag), dictionary_size(_dictionary_size), dictionary(_dictionary) {}
 
-    genie::core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
-    genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet(
+    genie::core::parameter::annotation::AlgorithmParameters convertToAlgorithmParameters() const;
+    genie::core::parameter::annotation::CompressorParameterSet compressorParameterSet(
         uint8_t compressor_ID) const;
 
     bool parsAreDefault() const { return use_dictionary_flag == false && dictionary_size == 0 && dictionary.empty(); }

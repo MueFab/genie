@@ -1,17 +1,11 @@
-project("genie-vsite")
-
-
+project("genie-variantsite")
 
 set(source_files
-        variantsite_parser.cc
-        parameterset_composer.cc
-        accessunit_composer.cc
-        attributes.cc
-        descriptors.cc
-        tiles.cc
+    accessunit_composer.cc
+    parameterset_composer.cc
 )
 
-add_library(genie-vsite ${source_files})
+add_library(${PROJECT_NAME} ${source_files})
 
 if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
@@ -21,12 +15,3 @@ target_link_libraries(${PROJECT_NAME} PUBLIC genie-util)
 target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-core)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-annotation)
-target_link_libraries(${PROJECT_NAME} PUBLIC genie-bsc)
-target_link_libraries(${PROJECT_NAME} PUBLIC genie-lzma)
-target_link_libraries(${PROJECT_NAME} PUBLIC genie-zstd)
-target_link_libraries(${PROJECT_NAME} PUBLIC genie-jbig)
-
-get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-foreach(dir ${dirs})
-    message(STATUS "dir='${dir}'")
-endforeach()

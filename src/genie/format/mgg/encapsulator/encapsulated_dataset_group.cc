@@ -84,19 +84,19 @@ void EncapsulatedDatasetGroup::mergeReferences(genie::core::MpegMinorVersion ver
         genie::format::mgg::ReferenceMetadata ref_meta(0, 0, std::move(d->meta.getReference()->getInformation()));
         genie::format::mgg::Reference ref(0, 0, std::move(*d->meta.getReference()), version);
         bool found = false;
-        for (size_t i = 0; i < references.size(); ++i) {
-            if (references[i] == ref) {
-                if (reference_meta[i].getReferenceMetadataValue().empty()) {
-                    reference_meta[i] = genie::format::mgg::ReferenceMetadata(
-                        static_cast<uint8_t>(0), static_cast<uint8_t>(i), ref_meta.decapsulate());
+        for (size_t idx_i = 0; idx_i < references.size(); ++idx_i) {
+            if (references[idx_i] == ref) {
+                if (reference_meta[idx_i].getReferenceMetadataValue().empty()) {
+                    reference_meta[idx_i] = genie::format::mgg::ReferenceMetadata(
+                        static_cast<uint8_t>(0), static_cast<uint8_t>(idx_i), ref_meta.decapsulate());
                 } else {
                     UTILS_DIE_IF(
-                        !(ref_meta.getReferenceMetadataValue() == reference_meta[i].getReferenceMetadataValue()),
+                        !(ref_meta.getReferenceMetadataValue() == reference_meta[idx_i].getReferenceMetadataValue()),
                         "Reference Meta mismatch");
                 }
 
                 for (auto& d2 : d->datasets) {
-                    d2.patchRefID(ref.getReferenceID(), static_cast<uint8_t>(i));
+                    d2.patchRefID(ref.getReferenceID(), static_cast<uint8_t>(idx_i));
                 }
                 found = true;
                 break;
@@ -168,8 +168,8 @@ void EncapsulatedDatasetGroup::mergeLabels() {
 EncapsulatedDatasetGroup::EncapsulatedDatasetGroup(const std::vector<std::string>& input_files,
                                                    genie::core::MpegMinorVersion version) {
     datasets.reserve(input_files.size());
-    for (const auto& i : input_files) {
-        datasets.emplace_back(genie::util::make_unique<EncapsulatedDataset>(i, version));
+    for (const auto& idx_i : input_files) {
+        datasets.emplace_back(genie::util::make_unique<EncapsulatedDataset>(idx_i, version));
     }
     size_t index = 0;
     for (auto& d : datasets) {

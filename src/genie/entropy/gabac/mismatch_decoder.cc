@@ -55,10 +55,10 @@ MismatchDecoder::MismatchDecoder(util::DataBlock&& d,
 
       // Loop through the transformed sequences
       trnsf_subseq_data_.resize(num_trnsf_subseqs_);
-      for (size_t i = 0; i < num_trnsf_subseqs_; i++) {
+      for (size_t idx_i = 0; idx_i < num_trnsf_subseqs_; idx_i++) {
         uint64_t trnsf_subseq_payload_size_remain = 0;
 
-        if (i < num_trnsf_subseqs_ - 1) {
+        if (idx_i < num_trnsf_subseqs_ - 1) {
           subseq_payload_size_used += StreamHandler::ReadUInt(
               input_stream, trnsf_subseq_payload_size_remain, 4);
         } else {
@@ -79,12 +79,12 @@ MismatchDecoder::MismatchDecoder(util::DataBlock&& d,
           if (curr_numtrnsf_symbols > 0) {
             subseq_payload_size_used += StreamHandler::ReadBytes(
                 input_stream, trnsf_subseq_payload_size_remain,
-                &trnsf_subseq_data_[i]);
+                &trnsf_subseq_data_[idx_i]);
           }
 
           trnsf_symbols_decoder_.emplace_back(
-              &trnsf_subseq_data_[i],
-              subseq_cfg.GetTransformSubSeqCfg(static_cast<uint8_t>(i)),
+              &trnsf_subseq_data_[idx_i],
+              subseq_cfg.GetTransformSubSeqCfg(static_cast<uint8_t>(idx_i)),
               static_cast<unsigned int>(curr_numtrnsf_symbols));
         }
       }
@@ -97,10 +97,10 @@ MismatchDecoder::MismatchDecoder(util::DataBlock&& d,
 uint64_t MismatchDecoder::DecodeMismatch(const uint64_t ref) {
   std::vector<uint64_t> decoded_trnsf_symbols(num_trnsf_subseqs_, 0);
 
-  for (size_t i = 0; i < num_trnsf_subseqs_; i++) {
-    decoded_trnsf_symbols[i] =
-        trnsf_symbols_decoder_[i].SymbolsAvail() > 0
-            ? trnsf_symbols_decoder_[i].DecodeNextSymbol(&ref)
+  for (size_t idx_i = 0; idx_i < num_trnsf_subseqs_; idx_i++) {
+    decoded_trnsf_symbols[idx_i] =
+        trnsf_symbols_decoder_[idx_i].SymbolsAvail() > 0
+            ? trnsf_symbols_decoder_[idx_i].DecodeNextSymbol(&ref)
             : 0;
   }
 

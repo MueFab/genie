@@ -55,8 +55,8 @@ core::record::Chunk DecoderStub::decodeSequences(DecodingState& state, core::Acc
 void DecoderStub::decodeNames(DecodingState& state, core::record::Chunk& chunk) {
     auto names = namecoder->process(state.nameStream);
     chunk.getStats().add(std::get<1>(names));
-    for (size_t i = 0; i < std::get<0>(names).size(); ++i) {
-        chunk.getData()[i].setName(std::get<0>(names)[i]);
+    for (size_t idx_i = 0; idx_i < std::get<0>(names).size(); ++idx_i) {
+        chunk.getData()[idx_i].setName(std::get<0>(names)[idx_i]);
     }
 }
 

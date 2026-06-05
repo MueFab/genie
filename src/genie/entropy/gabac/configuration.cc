@@ -127,8 +127,8 @@ void IoConfiguration::Validate() const {
 
 // -----------------------------------------------------------------------------
 
-EncodingConfiguration::EncodingConfiguration(nlohmann::json j)
-    : sub_seq_cfg_(std::move(j)) {}
+EncodingConfiguration::EncodingConfiguration(nlohmann::json idx_j)
+    : sub_seq_cfg_(std::move(idx_j)) {}
 
 // -----------------------------------------------------------------------------
 

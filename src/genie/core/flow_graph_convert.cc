@@ -36,8 +36,8 @@ void FlowGraphConvert::AddImporter(std::unique_ptr<FormatImporter> dat) {
 void FlowGraphConvert::SetClassifier(std::unique_ptr<Classifier> classifier) {
   classifier_ = std::move(classifier);
 
-  for (const auto& i : importers_) {
-    i->SetClassifier(classifier_.get());
+  for (const auto& idx_i : importers_) {
+    idx_i->SetClassifier(classifier_.get());
   }
 }
 
@@ -77,8 +77,8 @@ void FlowGraphConvert::SetExporterSelector(
 void FlowGraphConvert::Run() {
   std::vector<util::OriginalSource*> imps;
   imps.reserve(importers_.size());
-  for (auto& i : importers_) {
-    imps.emplace_back(i.get());
+  for (auto& idx_i : importers_) {
+    imps.emplace_back(idx_i.get());
   }
   mgr_.SetSource(std::move(imps));
   mgr_.Run();

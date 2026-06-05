@@ -174,7 +174,7 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::encodeInsertion(CodingState &state) {
-    for (size_t i = 0; i < state.count; ++i) {
+    for (size_t idx_i = 0; idx_i < state.count; ++idx_i) {
         container.push(core::gen_sub::kMismatchPosTerminator, core::gen_const::kMismatchPositionPersist);
 
         const auto POSITION = state.read_pos - state.lastMisMatch - state.clips.softClips[0].length();
@@ -192,7 +192,7 @@ void Encoder::encodeInsertion(CodingState &state) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::encodeDeletion(CodingState &state) {
-    for (size_t i = 0; i < state.count; ++i) {
+    for (size_t idx_i = 0; idx_i < state.count; ++idx_i) {
         container.push(core::gen_sub::kMismatchPosTerminator, core::gen_const::kMismatchPositionPersist);
 
         const auto POSITION = state.read_pos - state.lastMisMatch - state.clips.softClips[0].length();
@@ -210,7 +210,7 @@ void Encoder::encodeHardClip(CodingState &state) { state.clips.hardClips[state.i
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::encodeSoftClip(CodingState &state) {
-    for (size_t i = 0; i < state.count; ++i) {
+    for (size_t idx_i = 0; idx_i < state.count; ++idx_i) {
         if (state.read_pos >= state.read.length()) {
             UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
         }
@@ -248,7 +248,7 @@ void Encoder::encodeSubstitution(CodingState &state) {
 
 void Encoder::encodeMatch(CodingState &state) {
     state.isRightClip = true;
-    for (size_t i = 0; i < state.count; ++i) {
+    for (size_t idx_i = 0; idx_i < state.count; ++idx_i) {
         if (state.read_pos >= state.read.length()) {
             UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
         }

@@ -34,9 +34,9 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
     std::vector<std::string> ecigars;
     std::vector<uint64_t> positions;
     // FIXME: loop condition is only correct if all records have the full number of reads
-    size_t i = 0;
+    size_t idx_i = 0;
     size_t rec_i = 0;
-    while (i < data.getNumReads()) {
+    while (idx_i < data.getNumReads()) {
         core::record::Record rec(uint8_t(data.getParameters().getNumberTemplateSegments()),
                                  core::record::ClassType::CLASS_U,
                                  std::get<0>(names).empty() ? "" : std::move(std::get<0>(names)[rec_i]), "", 0);
@@ -53,7 +53,7 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
             }
         }
 
-        for (size_t j = 0; j < num_segments; ++j) {
+        for (size_t idx_j = 0; idx_j < num_segments; ++idx_j) {
             size_t length = data.getParameters().getReadLength();
             ecigars.emplace_back(length, '+');
             positions.emplace_back(std::numeric_limits<uint64_t>::max());
@@ -72,7 +72,7 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
         }
 
         ret.getData().push_back(std::move(rec));
-        i += num_segments;
+        idx_i += num_segments;
         rec_i++;
     }
 

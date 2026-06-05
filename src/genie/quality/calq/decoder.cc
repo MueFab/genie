@@ -55,7 +55,7 @@ std::vector<std::string> Decoder::decodeUnaligned(const quality::paramqv1::Quali
             ecigar, core::getECigarInfo(),
             [&qv, &desc, &param_casted](uint8_t cigar, const util::StringView& bs, const util::StringView&) -> bool {
                 (void)cigar;
-                for (size_t i = 0; i < bs.length(); ++i) {
+                for (size_t idx_i = 0; idx_i < bs.length(); ++idx_i) {
                     auto index = (uint8_t)desc.get((uint16_t)(2)).pull();
                     qv.back().push_back(param_casted.getCodebook(0).getEntries()[index]);
                 }
@@ -70,11 +70,11 @@ std::vector<std::string> Decoder::decodeUnaligned(const quality::paramqv1::Quali
 void Decoder::fillInput(calq::DecodingBlock& input, core::AccessUnit::Descriptor& desc,
                         const quality::paramqv1::QualityValues1& param) {
     // quantizerIndices + istepIndices
-    for (uint16_t i = 1; i < desc.getSize(); ++i) {
-        auto data = static_cast<uint8_t*>(desc.get(i).getData().getData());
-        auto size = desc.get(i).getData().size();
+    for (uint16_t idx_i = 1; idx_i < desc.getSize(); ++idx_i) {
+        auto data = static_cast<uint8_t*>(desc.get(idx_i).getData().getData());
+        auto size = desc.get(idx_i).getData().size();
 
-        if (i == 1) {
+        if (idx_i == 1) {
             input.quantizerIndices = std::vector<uint8_t>(data, data + size);
         } else {
             input.stepindices.emplace_back(data, data + size);
@@ -82,8 +82,8 @@ void Decoder::fillInput(calq::DecodingBlock& input, core::AccessUnit::Descriptor
     }
 
     // codebooks
-    for (size_t i = 0; i < param.getNumberCodeBooks(); ++i) {
-        input.codeBooks.push_back(param.getCodebook(i).getEntries());
+    for (size_t idx_i = 0; idx_i < param.getNumberCodeBooks(); ++idx_i) {
+        input.codeBooks.push_back(param.getCodebook(idx_i).getEntries());
     }
 }
 

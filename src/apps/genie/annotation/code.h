@@ -16,10 +16,10 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/record/annotation_access_unit/record.h"
-#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
-#include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/core/variant_site_record/record.h"
+#include "genie/core/access_unit/annotation/record.h"
+#include "genie/core/parameter/annotation/descriptor_configuration.h"
+#include "genie/core/parameter/annotation/record.h"
+#include "genie/core/record/site/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -44,10 +44,10 @@ class Code {
          const std::string& _infoFieldsFileName, const std::string& rec = (std::string&)"all");
 
  private:
-    using AnnotationParameterSet = genie::core::record::annotation_parameter_set::Record;
-    using AnnotationAccessUnit = genie::core::record::annotation_access_unit::Record;
-    using DescriptorConfiguration = genie::core::record::annotation_parameter_set::DescriptorConfiguration;
-    using AnnotationEncodingParameters = genie::core::record::annotation_parameter_set::AnnotationEncodingParameters;
+    using AnnotationParameterSet = genie::core::parameter::annotation::Record;
+    using AnnotationAccessUnit = genie::core::access_unit::annotation::Record;
+    using DescriptorConfiguration = genie::core::parameter::annotation::DescriptorConfiguration;
+    using AnnotationEncodingParameters = genie::core::parameter::annotation::AnnotationEncodingParameters;
 };
 
 void encodeVariantSite(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,

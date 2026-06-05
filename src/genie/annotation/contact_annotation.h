@@ -14,7 +14,7 @@
 #include "genie/core/constants.h"
 
 #include "genie/contact/contact_coder.h"
-#include "genie/core/variant_genotype_record/record.h"
+#include "genie/core/record/variant/record.h"
 
 #include "genie/annotation/compressors.h"
 // -----------------------------------------------------------------------------
@@ -23,8 +23,8 @@ namespace genie {
 namespace annotation {
 
 struct CMUnits {
-    core::record::annotation_parameter_set::Record annotationParameterSet;
-    std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
+    core::parameter::annotation::Record annotationParameterSet;
+    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
 };
 struct ContactMatrixParameters {
     bool REMOVE_UNALIGNED_REGION{false};

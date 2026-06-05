@@ -17,13 +17,13 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/arrayType.h"
+#include "genie/core/array_type.h"
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
-#include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/core/record/annotation_parameter_set/AttributeData.h"
+#include "genie/core/parameter/annotation/record.h"
+#include "genie/core/parameter/annotation/attribute_data.h"
 #include "genie/annotation/compressors.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,20 +34,20 @@ class ParameterSetComposer {
  public:
     ParameterSetComposer() {}
 
-    genie::core::record::annotation_parameter_set::Record setParameterSet(
+    genie::core::parameter::annotation::Record setParameterSet(
         std::vector<genie::core::AnnotDesc> descrList,
-        std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
+        std::map<std::string, genie::core::parameter::annotation::AttributeData>& info,
         uint64_t defaultTileSize, uint8_t AT_ID);
 
-    genie::core::record::annotation_parameter_set::Record setParameterSet(
+    genie::core::parameter::annotation::Record setParameterSet(
         std::vector<genie::core::AnnotDesc> descrList,
-        std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
-        const std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet>& compressors,
+        std::map<std::string, genie::core::parameter::annotation::AttributeData>& info,
+        const std::vector<genie::core::parameter::annotation::CompressorParameterSet>& compressors,
         uint64_t defaultTileSize, uint8_t _AT_ID);
 
-    genie::core::record::annotation_parameter_set::Record setParameterSet(
+    genie::core::parameter::annotation::Record setParameterSet(
         std::vector<genie::core::AnnotDesc> descrList,
-        std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
+        std::map<std::string, genie::core::parameter::annotation::AttributeData>& info,
         genie::annotation::Compressor compressors,
         uint64_t defaultTileSize);
 

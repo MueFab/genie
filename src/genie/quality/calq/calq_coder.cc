@@ -47,15 +47,15 @@ void encode(const EncodingOptions& opt, const SideInformation& sideInformation, 
 
     std::map<int, Quantizer> quantizers;
 
-    for (auto i = static_cast<int>(opt.quantizationMin); i <= static_cast<int>(opt.quantizationMax); ++i) {
+    for (auto idx_i = static_cast<int>(opt.quantizationMin); idx_i <= static_cast<int>(opt.quantizationMax); ++idx_i) {
         if (opt.quantizerType == QuantizerType::UNIFORM) {
             UniformMinMaxQuantizer quantizer(static_cast<const int&>(opt.qualityValueMin),
-                                             static_cast<const int&>(opt.qualityValueMax), i);
-            quantizers.insert(std::pair<int, Quantizer>(static_cast<const int&>(i - opt.quantizationMin), quantizer));
+                                             static_cast<const int&>(opt.qualityValueMax), idx_i);
+            quantizers.insert(std::pair<int, Quantizer>(static_cast<const int&>(idx_i - opt.quantizationMin), quantizer));
         } else if (opt.quantizerType == QuantizerType::LLOYD_MAX) {
-            LloydMaxQuantizer quantizer(static_cast<size_t>(i));
+            LloydMaxQuantizer quantizer(static_cast<size_t>(idx_i));
             quantizer.build(pdf);
-            quantizers.insert(std::pair<int, Quantizer>(static_cast<const int&>(i - opt.quantizationMin), quantizer));
+            quantizers.insert(std::pair<int, Quantizer>(static_cast<const int&>(idx_i - opt.quantizationMin), quantizer));
         } else {
             throwErrorException("Quantization Type not supported");
         }
@@ -64,9 +64,9 @@ void encode(const EncodingOptions& opt, const SideInformation& sideInformation, 
     // Encode the quality values
     QualEncoder qualEncoder(opt, quantizers, output);
 
-    for (size_t i = 0; i < sideInformation.positions.size(); ++i) {
-        EncodingRecord record = {input.qvalues[i], sideInformation.sequences[i], sideInformation.cigars[i],
-                                 sideInformation.positions[i]};
+    for (size_t idx_i = 0; idx_i < sideInformation.positions.size(); ++idx_i) {
+        EncodingRecord record = {input.qvalues[idx_i], sideInformation.sequences[idx_i], sideInformation.cigars[idx_i],
+                                 sideInformation.positions[idx_i]};
         qualEncoder.addMappedRecordToBlock(record);
     }
 
@@ -81,8 +81,8 @@ void decode(const DecodingOptions&, const SideInformation& sideInformation, cons
     QualDecoder qualDecoder(input, sideInformation.positions[0][0], sideInformation.qualOffset, output);
     output->qvalues.clear();
     output->qvalues.emplace_back();
-    for (size_t i = 0; i < sideInformation.positions[0].size(); ++i) {
-        DecodingRead r = {sideInformation.positions[0][i], sideInformation.cigars[0][i]};
+    for (size_t idx_i = 0; idx_i < sideInformation.positions[0].size(); ++idx_i) {
+        DecodingRead r = {sideInformation.positions[0][idx_i], sideInformation.cigars[0][idx_i]};
         qualDecoder.decodeMappedRecordFromBlock(r);
     }
 }

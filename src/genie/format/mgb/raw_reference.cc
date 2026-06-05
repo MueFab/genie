@@ -29,7 +29,7 @@ RawReference::RawReference(util::BitReader &reader, bool headerOnly, bool header
         reader.read<uint64_t>();
     }
     auto count = reader.read<uint16_t>();
-    for (size_t i = 0; i < count; ++i) {
+    for (size_t idx_i = 0; idx_i < count; ++idx_i) {
         seqs.emplace_back(reader, headerOnly);
     }
 }
@@ -51,16 +51,16 @@ void RawReference::write(util::BitWriter &writer) const {
     if (!headerless) {
         DataUnit::write(writer);
         uint64_t size = 0;
-        for (auto &i : seqs) {
-            size += i.getTotalSize();
+        for (auto &idx_i : seqs) {
+            size += idx_i.getTotalSize();
         }
         size += (8 + 64 + 16) / 8;  // data_unit_type, data_unit_size, seq_count
         writer.write(size, 64);
     }
     writer.write(seqs.size(), 16);
 
-    for (auto &i : seqs) {
-        i.write(writer);
+    for (auto &idx_i : seqs) {
+        idx_i.write(writer);
     }
 }
 

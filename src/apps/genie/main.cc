@@ -5,10 +5,11 @@
  */
 
 #define NOMINMAX
+#include "cli_handler.h"
 #include "genie/run/main.h"
 #include <iostream>
 #include <string>
-#include "cli11/CLI11.hpp"
+#include <algorithm>
 #include "genie/annotation/main.h"
 #include "genie/gabac/main.h"
 #include "genie/module/manager.h"
@@ -22,8 +23,8 @@
 
 static void printCmdLine(int argc, char* argv[]) {
     std::cerr << "genie: command line: ";
-    for (int i = 0; i < argc; i++) {
-        std::cerr << argv[i] << " ";
+    for (int idx_i = 0; idx_i < argc; idx_i++) {
+        std::cerr << argv[idx_i] << " ";
     }
     std::cerr << std::endl;
 }

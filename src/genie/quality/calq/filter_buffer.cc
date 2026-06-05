@@ -60,9 +60,9 @@ void FilterBuffer::push(double activityScore) { buffer.push(activityScore); }
 // Calculate filter score at offset position
 double FilterBuffer::filter() const {
     double result = 0.0;
-    for (size_t i = 0; i < kernel.size(); ++i) {
-        result += kernel[i] * buffer[i];
-        // std::cout << kernel[i] << " " << buffer[i] << std::endl;
+    for (size_t idx_i = 0; idx_i < kernel.size(); ++idx_i) {
+        result += kernel[idx_i] * buffer[idx_i];
+        // std::cout << kernel[idx_i] << " " << buffer[idx_i] << std::endl;
     }
     return result;
 }
@@ -77,8 +77,8 @@ FilterBuffer::FilterBuffer(const std::function<double(size_t, size_t)>& kernelBu
     }
     kernel.resize(kernelSize, 0.0);
 
-    for (size_t i = 0; i < kernel.size(); ++i) {
-        kernel[i] = kernelBuilder(i, kernelSize);
+    for (size_t idx_i = 0; idx_i < kernel.size(); ++idx_i) {
+        kernel[idx_i] = kernelBuilder(idx_i, kernelSize);
     }
 }
 

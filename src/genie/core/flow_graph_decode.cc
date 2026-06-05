@@ -196,8 +196,8 @@ void FlowGraphDecode::SetQvCoder(std::unique_ptr<QvDecoder> dat,
 void FlowGraphDecode::Run() {
   std::vector<util::OriginalSource*> imps;
   imps.reserve(importers_.size());
-  for (auto& i : importers_) {
-    imps.emplace_back(i.get());
+  for (auto& idx_i : importers_) {
+    imps.emplace_back(idx_i.get());
   }
   mgr_.SetSource(std::move(imps));
   mgr_.Run();

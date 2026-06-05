@@ -20,7 +20,7 @@ void Box::print_offset(std::ostream& output, uint8_t depth, uint8_t max_depth, c
     if (depth > max_depth) {
         return;
     }
-    for (int i = 0; i < depth; ++i) {
+    for (int idx_i = 0; idx_i < depth; ++idx_i) {
         output << "\t";
     }
     output << msg << std::endl;

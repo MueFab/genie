@@ -29,7 +29,7 @@ MITClassConfig::MITClassConfig(genie::util::BitReader& reader, bool block_header
     id = reader.read<genie::core::record::ClassType>(4);
     if (!block_header_flag) {
         auto num_descriptors = reader.read<uint8_t>(5);
-        for (size_t i = 0; i < num_descriptors; ++i) {
+        for (size_t idx_i = 0; idx_i < num_descriptors; ++idx_i) {
             descriptor_ids.emplace_back(reader.read<genie::core::GenDesc>(7));
         }
     }

@@ -171,7 +171,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
     dataset_type = reader.read<genie::core::parameter::DataUnit::DatasetType>(4);
     if ((block_header_on != boost::none && block_header_on->getMITFlag()) || block_header_on == boost::none) {
         auto num_classes = reader.read<uint8_t>(4);
-        for (size_t i = 0; i < num_classes; ++i) {
+        for (size_t idx_i = 0; idx_i < num_classes; ++idx_i) {
             mit_configs.emplace_back(reader, block_header_flag);
         }
     }
@@ -181,9 +181,9 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
     if (num_U_access_units) {
         u_options = dataset_header::UOptions(reader);
     }
-    for (size_t i = 0; i < referenceOptions.getSeqIDs().size(); ++i) {
+    for (size_t idx_i = 0; idx_i < referenceOptions.getSeqIDs().size(); ++idx_i) {
         bool flag = reader.read<bool>(1);
-        UTILS_DIE_IF(flag == false && i == 0, "First ref must provide treshold");
+        UTILS_DIE_IF(flag == false && idx_i == 0, "First ref must provide treshold");
         if (flag) {
             thresholds.emplace_back(reader.read<uint32_t>(31));
         } else {

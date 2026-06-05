@@ -9,36 +9,55 @@
 
 #include <vector>
 #include <sstream>
+#include <xtensor/xtensor.hpp>
 #include "likelihood_types.h"
-#include "genie/core/variant_genotype_record/record.h"
+#include "genie/core/record/variant/record.h"
 #include "likelihood_parameters.h"
 
 namespace genie::likelihood {
     struct EncodingOptions;
-    struct EncodingBlock;
     class LikelihoodPayload;
 }
 
-namespace genie::likelihood::detail::xtensor {
+namespace genie::likelihood::detail {
+
+struct LikelihoodEncodingBlock {
+    uint32_t nrows;
+    uint32_t ncols;
+    std::stringstream serialized_mat;
+    std::stringstream serialized_arr;
+    
+    // XTensor specific members
+    xt::xtensor<uint32_t, 2> likelihood_mat;
+    xt::xtensor<uint32_t, 1> lut;
+    xt::xtensor<uint32_t, 2> idx_mat;
+    
+    uint32_t nelems;
+    core::DataType dtype_id = core::DataType::UINT32;
+
+    LikelihoodEncodingBlock() : nrows(0), ncols(0), nelems(0) {}
+};
+
+namespace xtensor {
 
 void extract_likelihoods(
     const EncodingOptions& opt,
-    EncodingBlock& block,
+    LikelihoodEncodingBlock& block,
     std::vector<core::record::VariantGenotype>& recs);
 
-void transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block);
+void transform_likelihood_mat(const EncodingOptions& opt, LikelihoodEncodingBlock& block);
 
-void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block);
+void inverse_transform_likelihood_mat(const EncodingOptions& opt, LikelihoodEncodingBlock& block);
 
-void transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, uint32_t& nelems, UInt32MatDtype& idx_mat,
+void transform_lut(xt::xtensor<uint32_t, 2>& likelihood_mat, xt::xtensor<uint32_t, 1>& lut, uint32_t& nelems, xt::xtensor<uint32_t, 2>& idx_mat,
                    core::DataType& dtype_id);
 
-void inverse_transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, UInt32MatDtype& idx_mat);
+void inverse_transform_lut(xt::xtensor<uint32_t, 2>& likelihood_mat, xt::xtensor<uint32_t, 1>& lut, xt::xtensor<uint32_t, 2>& idx_mat);
 
-void serialize_mat(UInt32MatDtype mat, core::DataType dtype_id, uint32_t& nrows, uint32_t& ncols,
+void serialize_mat(const xt::xtensor<uint32_t, 2>& mat, core::DataType dtype_id, uint32_t& nrows, uint32_t& ncols,
                    std::stringstream& payload);
 
-void serialize_arr(UInt32ArrDtype arr, uint32_t nelems, std::stringstream& payload);
+void serialize_arr(const xt::xtensor<uint32_t, 1>& arr, uint32_t nelems, std::stringstream& payload);
 
 void encode_likelihood(
     std::vector<core::record::VariantGenotype>& recs,
@@ -49,6 +68,7 @@ void decode_likelihood(
     const LikelihoodParameters& params, LikelihoodPayload& payload,
     std::vector<core::record::VariantGenotype>& recs);
 
-} // namespace genie::likelihood::detail::xtensor
+} // namespace xtensor
+} // namespace genie::likelihood::detail
 
 #endif // GENIE_LIKELIHOOD_LIKELIHOOD_CODER_XTENSOR_H

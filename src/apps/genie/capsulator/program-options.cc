@@ -10,7 +10,7 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include "cli11/CLI11.hpp"
+#include "cli11/CLI11_RESTORED.hpp"
 #include "filesystem/filesystem.hpp"
 #include "genie/util/runtime_exception.h"
 #include "genie/util/string_helpers.h"

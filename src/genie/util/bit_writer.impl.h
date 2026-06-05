@@ -31,6 +31,12 @@ void BitWriter::WriteBypassBE(T val) {
     static_assert(SIZE > 0, "SIZE == 0");
     static_assert(SIZE <= sizeof(T), "SIZE > sizeof(T)");
 
+    m_bitsWritten += (SIZE * 8);
+
+    if (stream == nullptr) {
+        return;
+    }
+
     // Swap Endianness if necessary
     if (SIZE > 1) {
         SwapEndianness<T, SIZE>(val);

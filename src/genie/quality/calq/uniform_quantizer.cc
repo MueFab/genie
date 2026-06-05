@@ -42,7 +42,7 @@ UniformQuantizer::UniformQuantizer(const int& valueMin, const int& valueMax, con
     int newBorder = valueMin;
     borders.push(valueMin);
     reconstructionValues.push(valueMin + static_cast<int>(round(static_cast<double>(stepSize) / 2.0)));
-    for (int i = 0; i < (nrSteps - 1); i++) {
+    for (int idx_i = 0; idx_i < (nrSteps - 1); idx_i++) {
         newBorder += stepSize;
         borders.push(newBorder);
         reconstructionValues.push(newBorder + static_cast<int>(round((static_cast<double>(stepSize) / 2.0))));

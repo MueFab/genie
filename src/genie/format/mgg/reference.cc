@@ -39,7 +39,7 @@ Reference::Reference(util::BitReader& reader, genie::core::MpegMinorVersion _ver
     reader.readBypass_null_terminated(reference_name);
     ref_version = reference::Version(reader);
     auto seq_count = reader.readBypassBE<uint16_t>();
-    for (size_t i = 0; i < seq_count; ++i) {
+    for (size_t idx_i = 0; idx_i < seq_count; ++idx_i) {
         sequences.emplace_back(reader, version);
     }
 
@@ -175,9 +175,9 @@ void Reference::print_debug(std::ostream& output, uint8_t depth, uint8_t max_dep
     if (reference_location->isExternal()) {
         location = "External at " + dynamic_cast<const reference::location::External&>(*reference_location).getURI();
     } else {
-        const auto& i = dynamic_cast<const reference::location::Internal&>(*reference_location);
-        location = "Internal at (Dataset Group " + std::to_string(static_cast<int>(i.getDatasetGroupID())) +
-                   ", Dataset " + std::to_string(static_cast<int>(i.getDatasetID())) + ")";
+        const auto& idx_i = dynamic_cast<const reference::location::Internal&>(*reference_location);
+        location = "Internal at (Dataset Group " + std::to_string(static_cast<int>(idx_i.getDatasetGroupID())) +
+                   ", Dataset " + std::to_string(static_cast<int>(idx_i.getDatasetID())) + ")";
     }
     print_offset(output, depth + 1, max_depth, "Reference location: " + location);
 }

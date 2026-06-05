@@ -88,10 +88,10 @@ class Decoder : public genie::core::ReadDecoder {
 
     /**
      * @brief
-     * @param i
+     * @param idx_i
      * @param r
      */
-    static void readRec(std::ifstream& i, Record& r);
+    static void readRec(std::ifstream& idx_i, Record& r);
 
     /**
      * @brief

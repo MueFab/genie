@@ -5,16 +5,8 @@
  */
 
 #include "BlockPayload.h"
-#include <algorithm>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
 
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,7 +28,7 @@ BlockPayload::BlockPayload(AnnotDesc descriptorID, uint32_t block_payload_size,
 BlockPayload::BlockPayload(util::BitReader& reader, AnnotDesc descriptorID, uint8_t numChrs) {
     descriptor_ID = descriptorID;
     num_chrs = numChrs;
-    read(reader);
+    Read(reader);
 }
 
 BlockPayload::BlockPayload(AnnotDesc descriptorID, uint8_t numChrs, uint32_t block_payload_size,
@@ -52,7 +44,7 @@ BlockPayload::BlockPayload(AnnotDesc descriptorID, uint8_t numChrs, uint32_t blo
     generic_payload_stream << _generic_payload_stream.rdbuf();
 }
 
-void BlockPayload::read(util::BitReader& reader) {
+void BlockPayload::Read(util::BitReader& reader) {
     if (descriptor_ID == AnnotDesc::GENOTYPE) {
     } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
     } else if (descriptor_ID == AnnotDesc::CONTACT) {
@@ -62,32 +54,25 @@ void BlockPayload::read(util::BitReader& reader) {
     reader.FlushHeldBits();
 }
 
-void BlockPayload::read(util::BitReader& reader, AnnotDesc descriptorID, uint8_t numChrs) {
+void BlockPayload::Read(util::BitReader& reader, AnnotDesc descriptorID, uint8_t numChrs) {
     descriptor_ID = descriptorID;
     num_chrs = numChrs;
-    read(reader);
+    Read(reader);
 }
 
-void BlockPayload::write(core::Writer& writer) const {
+void BlockPayload::Write(util::BitWriter& writer) const {
     if (generic_payload_stream.str().size() > 0)
-      writer.Write(const_cast<std::stringstream*>(&generic_payload_stream));
+        writer.Write(generic_payload_stream.str());
     else
-    for (const auto& byte : generic_payload) writer.Write(byte, 8, true);
-    writer.Flush();
+        for (const auto& byte : generic_payload) writer.WriteBits(byte, 8);
+    writer.FlushBits();
 }
 
-void BlockPayload::write(util::BitWriter& writer) const {
-  if (generic_payload_stream.str().size() > 0)
-    writer.Write(const_cast<std::stringstream*>(&generic_payload_stream));
-  else
-    for (const auto& byte : generic_payload) writer.Write(byte, 8, true);
-  writer.FlushBits();
+size_t BlockPayload::GetSize(util::BitWriter& writesize) const {
+    Write(writesize);
+    return writesize.GetTotalBitsWritten();
 }
 
-size_t BlockPayload::getSize(core::Writer& writesize) const {
-    write(writesize);
-    return writesize.GetBitsWritten();
-}
 
 }  // namespace annotation_access_unit
 }  // namespace record

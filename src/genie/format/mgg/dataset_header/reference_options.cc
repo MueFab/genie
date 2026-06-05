@@ -30,10 +30,10 @@ ReferenceOptions::ReferenceOptions(genie::util::BitReader& reader) {
         return;
     }
     reference_ID = reader.read<uint8_t>();
-    for (uint16_t i = 0; i < seq_count; ++i) {
+    for (uint16_t idx_i = 0; idx_i < seq_count; ++idx_i) {
         seq_ID.emplace_back(reader.read<uint16_t>());
     }
-    for (uint16_t i = 0; i < seq_count; ++i) {
+    for (uint16_t idx_i = 0; idx_i < seq_count; ++idx_i) {
         seq_blocks.emplace_back(reader.read<uint32_t>());
     }
 }
@@ -47,8 +47,8 @@ void ReferenceOptions::write(genie::util::BitWriter& writer) const {
     }
     writer.write(reference_ID, 8);
 
-    for (auto& i : seq_ID) {
-        writer.write(i, 16);
+    for (auto& idx_i : seq_ID) {
+        writer.write(idx_i, 16);
     }
 
     for (auto& b : seq_blocks) {

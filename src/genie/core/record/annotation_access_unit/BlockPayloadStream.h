@@ -9,20 +9,11 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <fstream>
-#include <iostream>
-#include <memory>
 #include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
 
-#include "genie/core/constants.h"
-#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
-#include "genie/core/record/annotation_parameter_set/GenotypeParameters.h"
-#include "genie/core/writer.h"
-#include "genie/util/bit_reader.h"
+#include "genie/core/parameter/annotation/descriptor_configuration.h"
+#include "genie/util/bit_writer.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -34,14 +25,14 @@ namespace annotation_access_unit {
 
 class BlockPayloadStream {
  private:
-    genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID;
+    parameter::annotation::DescriptorID descriptor_ID;
     uint32_t block_payload_size;
     std::stringstream generic_payload;
 
  public:
     BlockPayloadStream();
 
-    BlockPayloadStream(genie::core::record::annotation_parameter_set::DescriptorID _descriptorID,
+    BlockPayloadStream(parameter::annotation::DescriptorID _descriptorID,
                        uint32_t _block_payload_size, const std::stringstream& _generic_payload);
 
     BlockPayloadStream(const BlockPayloadStream& bp);

@@ -7,7 +7,6 @@
 #define GENIE_CONTACT_SUBCONTACT_MATRIX_PARAMETERS_H
 
 #include <genie/core/constants.h>
-#include <genie/core/writer.h>
 #include <genie/util/bit_reader.h>
 #include <genie/util/bit_writer.h>
 #include <cstdint>
@@ -230,7 +229,7 @@ class SubcontactMatrixParameters {
     * @param i_tile The row index of the tile parameter.
     * @param j_tile The column index of the tile parameter.
     * @return A reference to the tile parameter at the specified indices.
-    * @throws std::runtime_error If i_tile is out of bounds (i.e., i_tile >= GetNTilesInRow()) or j_tile is out of bounds (i.e., j_tile >= GetNTilesInCol()).
+    * @throws std::runtime_error If i_tile is out of bounds (idx_i.e., i_tile >= GetNTilesInRow()) or j_tile is out of bounds (idx_i.e., j_tile >= GetNTilesInCol()).
     * @throws std::runtime_error If i_tile > j_tile and IsIntraSCM() is true, indicating an attempt to access the lower triangle of an intra SCM, which is not allowed.
     */
     TileParameter& GetTileParameter(
@@ -239,7 +238,7 @@ class SubcontactMatrixParameters {
     );
 
     /**
-     * This method sets the tile parameter for the tile in the position i and j.
+     * This method sets the tile parameter for the tile in the position idx_i and idx_j.
      *
      * @param i_tile index of the tile in the row
      * @param j_tile index of the tile in the column
@@ -298,7 +297,6 @@ class SubcontactMatrixParameters {
      * @param writer The BitWriter to write to.
      */
     void Write(util::BitWriter& writer) const;
-    void Write(core::Writer& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -15,6 +15,11 @@ namespace likelihood {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+LikelihoodPayload::LikelihoodPayload()
+    : nrows(0), ncols(0), transform_flag(false), payload(), additionalPayload(), payloadStream(), additionalPayloadStream() {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 LikelihoodPayload::LikelihoodPayload(LikelihoodParameters _parameters, uint32_t _nrows, uint32_t _ncols,
                                      std::vector<uint8_t> _payload, std::vector<uint8_t> _additionalPayload)
     : nrows(_nrows),
@@ -29,7 +34,7 @@ LikelihoodPayload::LikelihoodPayload(LikelihoodParameters _parameters, uint32_t 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-LikelihoodPayload::LikelihoodPayload(genie::likelihood::EncodingBlock& block) {
+LikelihoodPayload::LikelihoodPayload(detail::LikelihoodEncodingBlock& block) {
     nrows = block.nrows;
     ncols = block.ncols;
     payloadStream << block.serialized_mat.rdbuf();
@@ -37,7 +42,7 @@ LikelihoodPayload::LikelihoodPayload(genie::likelihood::EncodingBlock& block) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-LikelihoodPayload::LikelihoodPayload(genie::likelihood::LikelihoodParameters parameters, genie::likelihood::EncodingBlock& data)
+LikelihoodPayload::LikelihoodPayload(LikelihoodParameters parameters, detail::LikelihoodEncodingBlock& data)
     : LikelihoodPayload(data)
 {
     transform_flag = parameters.GetTransformFlag();
@@ -54,8 +59,10 @@ LikelihoodPayload::LikelihoodPayload(LikelihoodPayload&& other) noexcept
       transform_flag(other.transform_flag),
       payload(std::move(other.payload)),
       additionalPayload(std::move(other.additionalPayload)),
-      payloadStream(std::move(other.payloadStream)),
-      additionalPayloadStream(std::move(other.additionalPayloadStream)) {}
+      payloadStream{std::move(other.payloadStream)},
+      additionalPayloadStream{std::move(other.additionalPayloadStream)} {}
+
+// -----------------------------------------------------------------------------
 
 LikelihoodPayload& LikelihoodPayload::operator=(LikelihoodPayload&& other) noexcept {
     if (this != &other) {
@@ -114,35 +121,56 @@ void LikelihoodPayload::setTransformFlag(bool flag) { transform_flag = flag; }
 
 void LikelihoodPayload::setPayload(const std::vector<uint8_t>& _payload) { payload = _payload; }
 
+void LikelihoodPayload::setAdditionalPayload(const std::vector<uint8_t>& _payload) { additionalPayload = _payload; }
+
 // -----------------------------------------------------------------------------
 
-void LikelihoodPayload::write(core::Writer& writer) const {
-  writer.Write(nrows, 32u);
-    writer.Write(ncols, 32u);
+void LikelihoodPayload::write(util::BitWriter& writer) const {
+    writer.WriteBits(nrows, 32);
+    writer.WriteBits(ncols, 32);
+    writer.WriteBits(transform_flag ? 1 : 0, 8);
 
     if (!payload.empty()) {
-      writer.Write(payload.size(), 32u);
-        for(unsigned char i : payload) writer.Write(i, 8);
+        writer.WriteBits(payload.size(), 32);
+        for (unsigned char idx_i : payload) writer.WriteBits(idx_i, 8);
         if (transform_flag) {
-          writer.Write(additionalPayload.size(), 32u);
-            for (unsigned char val : additionalPayload) writer.Write(val, 8);
+            writer.WriteBits(additionalPayload.size(), 32);
+            for (unsigned char val : additionalPayload) writer.WriteBits(val, 8);
         }
-    } else{
-      writer.Write(payloadStream.str().size(), 32);
-        std::istream writestream(payloadStream.rdbuf());
-        writer.Write(&writestream);
+    } else {
+        std::string str = payloadStream.str();
+        writer.WriteBits(str.size(), 32);
+        for (unsigned char c : str) writer.WriteBits(c, 8);
+
         if (transform_flag) {
-          writer.Write(additionalPayloadStream.str().size(), 32);
-            std::istream additionalWritestream(additionalPayloadStream.rdbuf());
-            writer.Write(&additionalWritestream);
+            std::string addStr = additionalPayloadStream.str();
+            writer.WriteBits(addStr.size(), 32);
+            for (unsigned char c : addStr) writer.WriteBits(c, 8);
         }
     }
+}
 
+void LikelihoodPayload::read(util::BitReader& reader) {
+    nrows = static_cast<uint32_t>(reader.ReadBits(32));
+    ncols = static_cast<uint32_t>(reader.ReadBits(32));
+    transform_flag = reader.ReadBits(8) != 0;
+
+    uint32_t payload_size = static_cast<uint32_t>(reader.ReadBits(32));
+    payload.resize(payload_size);
+    for (uint32_t idx_i = 0; idx_i < payload_size; ++idx_i) {
+        payload[idx_i] = static_cast<uint8_t>(reader.ReadBits(8));
+    }
+
+    if (transform_flag) {
+        uint32_t additional_size = static_cast<uint32_t>(reader.ReadBits(32));
+        additionalPayload.resize(additional_size);
+        for (uint32_t idx_i = 0; idx_i < additional_size; ++idx_i) {
+            additionalPayload[idx_i] = static_cast<uint8_t>(reader.ReadBits(8));
+        }
+    }
 }
 
 // -----------------------------------------------------------------------------
 
 }  // namespace likelihood
 }  // namespace genie
-
-// -----------------------------------------------------------------------------

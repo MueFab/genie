@@ -293,7 +293,7 @@ class SamRecord {
 
     /**
      * @brief SamRecord are correctly oriented with respect to one another,
-     * i.e. that one of the mate pairs maps to the forward strand and the other maps to the reverse strand.
+     * idx_i.e. that one of the mate pairs maps to the forward strand and the other maps to the reverse strand.
      * If the mates don't map in a proper pair, that may mean that both reads map to the forward or reverse strand.
      * This includes that the reads are mapped to the same chromosomes.
      * @return

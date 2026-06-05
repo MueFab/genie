@@ -296,8 +296,8 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Hyperparameter Search')
 
-    parser.add_argument('-j', '--nproc', required=False, default=None, type=int, help='Number of processes')
-    parser.add_argument('-i', '--input', required=True, type=str, help='Path to data')
+    parser.add_argument('-idx_j', '--nproc', required=False, default=None, type=int, help='Number of processes')
+    parser.add_argument('-idx_i', '--input', required=True, type=str, help='Path to data')
     parser.add_argument('-o', '--output', required=True, type=str, help='Path to result')
 
     args = parser.parse_args()

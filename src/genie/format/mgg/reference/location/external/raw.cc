@@ -37,7 +37,7 @@ Raw::Raw(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo)
 // ---------------------------------------------------------------------------------------------------------------------
 
 Raw::Raw(genie::util::BitReader& reader, size_t seq_count) : location::External(reader) {
-    for (size_t i = 0; i < seq_count; ++i) {
+    for (size_t idx_i = 0; idx_i < seq_count; ++idx_i) {
         seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
         reader.readBypass(seq_checksums.back());
     }
@@ -47,7 +47,7 @@ Raw::Raw(genie::util::BitReader& reader, size_t seq_count) : location::External(
 
 Raw::Raw(genie::util::BitReader& reader, uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, size_t seq_count)
     : External(_reserved, std::move(_uri), algo, RefType::RAW_REF) {
-    for (size_t i = 0; i < seq_count; ++i) {
+    for (size_t idx_i = 0; idx_i < seq_count; ++idx_i) {
         seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
         reader.readBypass(seq_checksums.back());
     }

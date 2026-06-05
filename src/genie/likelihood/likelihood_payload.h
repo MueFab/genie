@@ -1,8 +1,8 @@
 /**
-* @file
-* @copyright This file is part of GENIE. See LICENSE and/or
-* https://github.com/mitogen/genie for more details.
-*/
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
 #ifndef GENIE_LIKELIHOOD_LIKELIHOOD_PAYLOAD_H
 #define GENIE_LIKELIHOOD_LIKELIHOOD_PAYLOAD_H
@@ -15,7 +15,6 @@
 #include <utility>
 #include <vector>
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_parameters.h"
 #include "genie/util/bit_reader.h"
@@ -38,16 +37,18 @@ class LikelihoodPayload {
     std::stringstream additionalPayloadStream;
 
  public:
+     LikelihoodPayload();
+
      LikelihoodPayload(
          LikelihoodParameters _parameters,
          uint32_t _nrows,
          uint32_t _ncols,
-        std::vector<uint8_t> _payload,
-        std::vector<uint8_t> _additionalPayload
-    );
+         std::vector<uint8_t> _payload,
+         std::vector<uint8_t> _additionalPayload
+     );
 
-    LikelihoodPayload(genie::likelihood::EncodingBlock& block);
-    LikelihoodPayload(genie::likelihood::LikelihoodParameters parameters, genie::likelihood::EncodingBlock& data);
+    LikelihoodPayload(detail::LikelihoodEncodingBlock& block);
+    LikelihoodPayload(LikelihoodParameters parameters, detail::LikelihoodEncodingBlock& data);
 
     LikelihoodPayload(LikelihoodPayload&& other) noexcept;
     LikelihoodPayload& operator=(LikelihoodPayload&& other) noexcept;
@@ -69,8 +70,10 @@ class LikelihoodPayload {
     void setNCols(uint32_t cols);
     void setTransformFlag(bool flag);
     void setPayload(const std::vector<uint8_t>& _payload);
+    void setAdditionalPayload(const std::vector<uint8_t>& _payload);
 
-    void write(core::Writer& writer) const;
+    void write(util::BitWriter& writer) const;
+    void read(util::BitReader& reader);
 };
 
 // -----------------------------------------------------------------------------

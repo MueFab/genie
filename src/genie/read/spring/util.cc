@@ -37,7 +37,7 @@ std::vector<int64_t> read_vector_from_file(const std::string &file_name) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void reverse_complement(char *s, char *s1, const int readlen) {
-    for (int j = 0; j < readlen; j++) s1[j] = chartorevchar[(uint8_t)s[readlen - j - 1]];
+    for (int idx_j = 0; idx_j < readlen; idx_j++) s1[idx_j] = chartorevchar[(uint8_t)s[readlen - idx_j - 1]];
     s1[readlen] = '\0';
     return;
 }
@@ -47,7 +47,7 @@ void reverse_complement(char *s, char *s1, const int readlen) {
 std::string reverse_complement(const std::string &s, const int readlen) {
     std::string s1;
     s1.resize(readlen);
-    for (int j = 0; j < readlen; j++) s1[j] = chartorevchar[(uint8_t)s[readlen - j - 1]];
+    for (int idx_j = 0; idx_j < readlen; idx_j++) s1[idx_j] = chartorevchar[(uint8_t)s[readlen - idx_j - 1]];
     return s1;
 }
 
@@ -79,16 +79,16 @@ void write_dna_in_bits(const std::string &read, std::ofstream &fout) {
     uint8_t pos_in_bitarray = 0;
     auto readlen = static_cast<uint16_t>(read.size());
     fout.write(reinterpret_cast<char *>(&readlen), sizeof(uint16_t));
-    for (int i = 0; i < readlen / 4; i++) {
+    for (int idx_i = 0; idx_i < readlen / 4; idx_i++) {
         bitarray[pos_in_bitarray] = 0;
-        for (int j = 0; j < 4; j++) bitarray[pos_in_bitarray] |= (dna2int[(uint8_t)read[4 * i + j]] << (2 * j));
+        for (int idx_j = 0; idx_j < 4; idx_j++) bitarray[pos_in_bitarray] |= (dna2int[(uint8_t)read[4 * idx_i + idx_j]] << (2 * idx_j));
         pos_in_bitarray++;
     }
     if (readlen % 4 != 0) {
-        int i = readlen / 4;
+        int idx_i = readlen / 4;
         bitarray[pos_in_bitarray] = 0;
-        for (int j = 0; j < readlen % 4; j++)
-            bitarray[pos_in_bitarray] |= (dna2int[(uint8_t)read[4 * i + j]] << (2 * j));
+        for (int idx_j = 0; idx_j < readlen % 4; idx_j++)
+            bitarray[pos_in_bitarray] |= (dna2int[(uint8_t)read[4 * idx_i + idx_j]] << (2 * idx_j));
         pos_in_bitarray++;
     }
     fout.write(reinterpret_cast<char *>(&bitarray[0]), pos_in_bitarray);
@@ -106,17 +106,17 @@ void read_dna_from_bits(std::string &read, std::ifstream &fin) {
     uint16_t num_bytes_to_read = ((uint32_t)readlen + 4 - 1) / 4;
     fin.read(reinterpret_cast<char *>(&bitarray[0]), num_bytes_to_read);
     uint8_t pos_in_bitarray = 0;
-    for (int i = 0; i < readlen / 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            read[4 * i + j] = int2dna[bitarray[pos_in_bitarray] & 3];
+    for (int idx_i = 0; idx_i < readlen / 4; idx_i++) {
+        for (int idx_j = 0; idx_j < 4; idx_j++) {
+            read[4 * idx_i + idx_j] = int2dna[bitarray[pos_in_bitarray] & 3];
             bitarray[pos_in_bitarray] >>= 2;
         }
         pos_in_bitarray++;
     }
     if (readlen % 4 != 0) {
-        int i = readlen / 4;
-        for (int j = 0; j < readlen % 4; j++) {
-            read[4 * i + j] = int2dna[bitarray[pos_in_bitarray] & 3];
+        int idx_i = readlen / 4;
+        for (int idx_j = 0; idx_j < readlen % 4; idx_j++) {
+            read[4 * idx_i + idx_j] = int2dna[bitarray[pos_in_bitarray] & 3];
             bitarray[pos_in_bitarray] >>= 2;
         }
         pos_in_bitarray++;
@@ -136,16 +136,16 @@ void write_dnaN_in_bits(const std::string &read, std::ofstream &fout) {
     uint8_t pos_in_bitarray = 0;
     auto readlen = static_cast<uint16_t>(read.size());
     fout.write(reinterpret_cast<char *>(&readlen), sizeof(uint16_t));
-    for (int i = 0; i < readlen / 2; i++) {
+    for (int idx_i = 0; idx_i < readlen / 2; idx_i++) {
         bitarray[pos_in_bitarray] = 0;
-        for (int j = 0; j < 2; j++) bitarray[pos_in_bitarray] |= (dna2int[(uint8_t)read[2 * i + j]] << (4 * j));
+        for (int idx_j = 0; idx_j < 2; idx_j++) bitarray[pos_in_bitarray] |= (dna2int[(uint8_t)read[2 * idx_i + idx_j]] << (4 * idx_j));
         pos_in_bitarray++;
     }
     if (readlen % 2 != 0) {
-        int i = readlen / 2;
+        int idx_i = readlen / 2;
         bitarray[pos_in_bitarray] = 0;
-        for (int j = 0; j < readlen % 2; j++)
-            bitarray[pos_in_bitarray] |= (dna2int[(uint8_t)read[2 * i + j]] << (4 * j));
+        for (int idx_j = 0; idx_j < readlen % 2; idx_j++)
+            bitarray[pos_in_bitarray] |= (dna2int[(uint8_t)read[2 * idx_i + idx_j]] << (4 * idx_j));
         pos_in_bitarray++;
     }
     fout.write(reinterpret_cast<char *>(&bitarray[0]), pos_in_bitarray);
@@ -163,17 +163,17 @@ void read_dnaN_from_bits(std::string &read, std::ifstream &fin) {
     uint16_t num_bytes_to_read = ((uint32_t)readlen + 2 - 1) / 2;
     fin.read(reinterpret_cast<char *>(&bitarray[0]), num_bytes_to_read);
     uint8_t pos_in_bitarray = 0;
-    for (int i = 0; i < readlen / 2; i++) {
-        for (int j = 0; j < 2; j++) {
-            read[2 * i + j] = int2dna[bitarray[pos_in_bitarray] & 15];
+    for (int idx_i = 0; idx_i < readlen / 2; idx_i++) {
+        for (int idx_j = 0; idx_j < 2; idx_j++) {
+            read[2 * idx_i + idx_j] = int2dna[bitarray[pos_in_bitarray] & 15];
             bitarray[pos_in_bitarray] >>= 4;
         }
         pos_in_bitarray++;
     }
     if (readlen % 2 != 0) {
-        int i = readlen / 2;
-        for (int j = 0; j < readlen % 2; j++) {
-            read[2 * i + j] = int2dna[bitarray[pos_in_bitarray] & 15];
+        int idx_i = readlen / 2;
+        for (int idx_j = 0; idx_j < readlen % 2; idx_j++) {
+            read[2 * idx_i + idx_j] = int2dna[bitarray[pos_in_bitarray] & 15];
             bitarray[pos_in_bitarray] >>= 4;
         }
         pos_in_bitarray++;

@@ -61,9 +61,9 @@ const char config_json[] =
 
 /* Utility just for this example */
 void print_block(const gabac_data_block* block) {
-    int i;
-    for (i = 0; i < block->values_size; ++i) {
-        printf("%lu ", gabac_data_block_get(block, i));
+    int idx_i;
+    for (idx_i = 0; idx_i < block->values_size; ++idx_i) {
+        printf("%lu ", gabac_data_block_get(block, idx_i));
     }
     printf("\n");
 }

@@ -80,9 +80,9 @@ std::vector<double> Haplotyper::calcPriors(double hetero) {
     hetero = log10(hetero);
     std::vector<double> result(polyploidy + 1, hetero);
     double sum = -std::numeric_limits<double>::infinity();
-    for (size_t i = 1; i < polyploidy + 1; ++i) {
-        result[i] -= log10(i);
-        sum = log10sum(sum, result[i]);
+    for (size_t idx_i = 1; idx_i < polyploidy + 1; ++idx_i) {
+        result[idx_i] -= log10(idx_i);
+        sum = log10sum(sum, result[idx_i]);
     }
     result[0] = log10(1.0 - pow(10, sum));
 
@@ -96,13 +96,13 @@ std::vector<double> Haplotyper::calcNonRefLikelihoods(char ref, const std::strin
     std::vector<double> result(polyploidy + 1, 0.0);
     std::map<std::string, double> SNPlikelihoods = genotyper.getGenotypelikelihoods(seqPile, qualPile);
 
-    for (const auto& m : SNPlikelihoods) {
-        size_t altCount = polyploidy - std::count(m.first.begin(), m.first.end(), ref);
-        result[altCount] += m.second;
+    for (const auto& dim_m : SNPlikelihoods) {
+        size_t altCount = polyploidy - std::count(dim_m.first.begin(), dim_m.first.end(), ref);
+        result[altCount] += dim_m.second;
     }
 
-    for (double& i : result) {
-        i = log10(i);
+    for (double& idx_i : result) {
+        idx_i = log10(idx_i);
     }
 
     return result;
@@ -125,8 +125,8 @@ double Haplotyper::calcActivityScore(char ref, const std::string& seqPile, const
     // --------------Calc Posteriors like in GATK ------------------------------
     double posteriori0 = likelihoods[0] + priors[0];
     bool map0 = true;
-    for (size_t i = 1; i < polyploidy + 1; ++i) {
-        if (likelihoods[i] + priors[i] > posteriori0) {
+    for (size_t idx_i = 1; idx_i < polyploidy + 1; ++idx_i) {
+        if (likelihoods[idx_i] + priors[idx_i] > posteriori0) {
             map0 = false;
             break;
         }
@@ -139,9 +139,9 @@ double Haplotyper::calcActivityScore(char ref, const std::string& seqPile, const
     double altLikelihoodSum = -std::numeric_limits<double>::infinity();
     double altPriorSum = -std::numeric_limits<double>::infinity();
 
-    for (size_t i = 1; i < polyploidy + 1; ++i) {
-        altLikelihoodSum = log10sum(altLikelihoodSum, likelihoods[i]);
-        altPriorSum = log10sum(altPriorSum, priors[i]);
+    for (size_t idx_i = 1; idx_i < polyploidy + 1; ++idx_i) {
+        altLikelihoodSum = log10sum(altLikelihoodSum, likelihoods[idx_i]);
+        altPriorSum = log10sum(altPriorSum, priors[idx_i]);
     }
 
     double altPosteriorSum = altLikelihoodSum + altPriorSum;

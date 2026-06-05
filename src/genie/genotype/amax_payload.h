@@ -31,7 +31,7 @@ namespace genie::genotype {
 class AmaxPayload {
  private:
  std::vector<uint64_t> amax_elements_;
- 
+
  uint8_t nbits_per_elem_;
 
  public:

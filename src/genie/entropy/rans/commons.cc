@@ -45,18 +45,18 @@ uint8_t* read_file(char const* filename, size_t* out_size)
 
 void SymbolStats::count_freqs(uint8_t const* in, size_t nbytes)
 {
-    for (int i=0; i < 256; i++)
-        freqs[i] = 0;
+    for (int idx_i=0; idx_i < 256; idx_i++)
+        freqs[idx_i] = 0;
 
-    for (size_t i=0; i < nbytes; i++)
-        freqs[in[i]]++;
+    for (size_t idx_i=0; idx_i < nbytes; idx_i++)
+        freqs[in[idx_i]]++;
 }
 
 void SymbolStats::calc_cum_freqs()
 {
     cum_freqs[0] = 0;
-    for (int i=0; i < 256; i++)
-        cum_freqs[i+1] = cum_freqs[i] + freqs[i];
+    for (int idx_i=0; idx_i < 256; idx_i++)
+        cum_freqs[idx_i+1] = cum_freqs[idx_i] + freqs[idx_i];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -69,49 +69,49 @@ void SymbolStats::normalize_freqs(uint32_t target_total)
     uint32_t cur_total = cum_freqs[256];
 
     // resample distribution based on cumulative freqs
-    for (int i = 1; i <= 256; i++)
-        cum_freqs[i] = ((uint64_t)target_total * cum_freqs[i])/cur_total;
+    for (int idx_i = 1; idx_i <= 256; idx_i++)
+        cum_freqs[idx_i] = ((uint64_t)target_total * cum_freqs[idx_i])/cur_total;
 
     // if we nuked any non-0 frequency symbol to 0, we need to steal
     // the range to make the frequency nonzero from elsewhere.
-    for (int i=0; i < 256; i++) {
-        if (freqs[i] && cum_freqs[i+1] == cum_freqs[i]) {
-            // symbol i was set to zero freq
+    for (int idx_i=0; idx_i < 256; idx_i++) {
+        if (freqs[idx_i] && cum_freqs[idx_i+1] == cum_freqs[idx_i]) {
+            // symbol idx_i was set to zero freq
 
             // find best symbol to steal frequency from (try to steal from low-freq ones)
             uint32_t best_freq = ~0u;
             int best_steal = -1;
-            for (int j=0; j < 256; j++) {
-                uint32_t freq = cum_freqs[j+1] - cum_freqs[j];
+            for (int idx_j=0; idx_j < 256; idx_j++) {
+                uint32_t freq = cum_freqs[idx_j+1] - cum_freqs[idx_j];
                 if (freq > 1 && freq < best_freq) {
                     best_freq = freq;
-                    best_steal = j;
+                    best_steal = idx_j;
                 }
             }
             assert(best_steal != -1);
 
             // and steal from it!
-            if (best_steal < i) {
-                for (int j = best_steal + 1; j <= i; j++)
-                    cum_freqs[j]--;
+            if (best_steal < idx_i) {
+                for (int idx_j = best_steal + 1; idx_j <= idx_i; idx_j++)
+                    cum_freqs[idx_j]--;
             } else {
-                assert(best_steal > i);
-                for (int j = i + 1; j <= best_steal; j++)
-                    cum_freqs[j]++;
+                assert(best_steal > idx_i);
+                for (int idx_j = idx_i + 1; idx_j <= best_steal; idx_j++)
+                    cum_freqs[idx_j]++;
             }
         }
     }
 
     // calculate updated freqs and make sure we didn't screw anything up
     assert(cum_freqs[0] == 0 && cum_freqs[256] == target_total);
-    for (int i=0; i < 256; i++) {
-        if (freqs[i] == 0)
-            assert(cum_freqs[i+1] == cum_freqs[i]);
+    for (int idx_i=0; idx_i < 256; idx_i++) {
+        if (freqs[idx_i] == 0)
+            assert(cum_freqs[idx_i+1] == cum_freqs[idx_i]);
         else
-            assert(cum_freqs[i+1] > cum_freqs[i]);
+            assert(cum_freqs[idx_i+1] > cum_freqs[idx_i]);
 
         // calc updated freq
-        freqs[i] = cum_freqs[i+1] - cum_freqs[i];
+        freqs[idx_i] = cum_freqs[idx_i+1] - cum_freqs[idx_i];
     }
 }
 

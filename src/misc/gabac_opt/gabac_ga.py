@@ -138,7 +138,7 @@ class GeneticAlgorithmForGabac(object):
 
     def show_plot(self):
         plt.plot(np.arange(self.num_generations), self.result[:, 2], 'r')
-        plt.plot(np.arange(self.num_generations), self.result[:, 3], 'k')
+        plt.plot(np.arange(self.num_generations), self.result[:, 3], 'idx_k')
         plt.show()
 
     def result_as_csv(self, path, filename):

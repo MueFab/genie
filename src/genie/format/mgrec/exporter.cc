@@ -24,8 +24,8 @@ void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
     core::record::Chunk data = std::move(t);
     util::OrderedSection section(&lock, id);
     getStats().add(data.getStats());
-    for (auto &i : data.getData()) {
-        i.write(writer);
+    for (auto &idx_i : data.getData()) {
+        idx_i.write(writer);
     }
 }
 

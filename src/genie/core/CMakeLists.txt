@@ -28,43 +28,45 @@ set(source_files
         record/alignment_box.cc
         record/alignment.cc
 
-        variant_site_record/record.cc
+        record/variant/record.cc
+        record/variant/format_field.cc
 
-        variant_genotype_record/record.cc
-        variant_genotype_record/format_field.cc
-        variant_genotype_record/format_field.h
-
-        linked_record/linked_record.h
         linked_record/linked_record.cc
 
-        contact_record/record.cc
+        record/site/record.cc
+        record/data_unit/record.cc
 
-        data_unit_record/record.cc
+        feature_record/record.cc
+        functional_annotation_record/record.cc
+        gene_expression_record/record.cc
+        sample_record/record.cc
+        track_property_record/record.cc
+        track_record/record.cc
 
-        record/annotation_access_unit/record.cc
-        record/annotation_access_unit/block.cc
-        record/annotation_access_unit/BlockHeader.cc
-        record/annotation_access_unit/BlockPayload.cc
-        record/annotation_access_unit/AnnotationAccessUnitHeader.cc
-        record/annotation_access_unit/TypedData.cc
+        access_unit/annotation/record.cc
+        access_unit/annotation/block.cc
+        access_unit/annotation/block_header.cc
+        access_unit/annotation/block_payload.cc
+        access_unit/annotation/block_payload_stream.cc
+        access_unit/annotation/annotation_access_unit_header.cc
+        access_unit/annotation/typed_data.cc
 
-        record/annotation_parameter_set/record.cc
-        record/annotation_parameter_set/AttributeParameterSet.cc
-        record/annotation_parameter_set/AlgorithmParameters.cc
-        record/annotation_parameter_set/ContactMatrixParameters.cc
-        record/annotation_parameter_set/TileConfiguation.cc
-        record/annotation_parameter_set/TileStructure.cc
-        record/annotation_parameter_set/DescriptorConfiguration.cc
-        record/annotation_parameter_set/CompressorParameterSet.cc
-        record/annotation_parameter_set/AnnotationEncodingParameters.cc
-        record/annotation_parameter_set/AttributeData.cc
+        parameter/annotation/record.cc
+        parameter/annotation/attribute_parameter_set.cc
+        parameter/annotation/algorithm_parameters.cc
+        parameter/annotation/tile_configuration.cc
+        parameter/annotation/tile_structure.cc
+        parameter/annotation/descriptor_configuration.cc
+        parameter/annotation/compressor_parameter_set.cc
+        parameter/annotation/annotation_encoding_parameters.cc
+        parameter/annotation/attribute_data.cc
 
-        arrayType.cc
+        array_type.cc
         writer.cc
 
         stats/perf_stats.cc
 
-        access_unit.cc
+        access_unit/access_unit.cc
         classifier_bypass.cc
         classifier_regroup.cc
         constants.cc
@@ -105,17 +107,49 @@ set(source_files
         api.cc
         c_api.cc
         payload.cc
-        ndarray.cc
+        record/contact/record.cc
 )
 
-add_library(genie-core ${source_files})
+# Unified coder files
+list(APPEND source_files
+)
 
+# Convert remaining relative paths to absolute
+set(absolute_source_files "")
+foreach(f IN LISTS source_files)
+    if(IS_ABSOLUTE "${f}")
+        list(APPEND absolute_source_files "${f}")
+    else()
+        list(APPEND absolute_source_files "${CMAKE_CURRENT_LIST_DIR}/${f}")
+    endif()
+endforeach()
 
-target_link_libraries(genie-core PUBLIC genie-util)
-target_link_libraries(genie-core PUBLIC genie-likelihood)
-target_link_libraries(genie-core PUBLIC genie-contact)
+# Convert remaining relative paths to absolute
+set(absolute_source_files "")
+foreach(f IN LISTS source_files)
+    if(IS_ABSOLUTE "${f}")
+        list(APPEND absolute_source_files "${f}")
+    else()
+        list(APPEND absolute_source_files "${CMAKE_CURRENT_LIST_DIR}/${f}")
+    endif()
+endforeach()
 
-get_filename_component(THIS_DIR ./ ABSOLUTE)
+add_library(${PROJECT_NAME} ${absolute_source_files})
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # GNU Compiler Collection
+    target_compile_options(${PROJECT_NAME} PRIVATE "-pedantic")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-fno-common")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wall")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wshadow")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wextra")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wundef")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wconversion")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wdouble-promotion")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=conversion")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=maybe-uninitialized")
+endif ()
+
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-util genie-backend)
+
 get_filename_component(TOP_DIR ../../ ABSOLUTE)
-message("topdir='${TOP_DIR}'")
-target_include_directories(genie-core PUBLIC "${TOP_DIR}")
+target_include_directories(${PROJECT_NAME} PUBLIC "${TOP_DIR}")

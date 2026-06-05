@@ -169,10 +169,10 @@ void LuTsSubSymbolTransform::DecodeLutOrder1(Reader& reader,
                                              const uint64_t num_alpha_subsym,
                                              const uint8_t coding_subsym_size,
                                              LutOrder1& lut) {
-  for (uint32_t i = 0; i < num_alpha_subsym; i++) {
-    lut[i].num_max_elems = reader.ReadLutSymbol(coding_subsym_size);
-    for (uint32_t j = 0; j <= lut[i].num_max_elems; j++) {
-      lut[i].entries[j].value = reader.ReadLutSymbol(coding_subsym_size);
+  for (uint32_t idx_i = 0; idx_i < num_alpha_subsym; idx_i++) {
+    lut[idx_i].num_max_elems = reader.ReadLutSymbol(coding_subsym_size);
+    for (uint32_t idx_j = 0; idx_j <= lut[idx_i].num_max_elems; idx_j++) {
+      lut[idx_i].entries[idx_j].value = reader.ReadLutSymbol(coding_subsym_size);
     }
   }
 }
@@ -190,9 +190,9 @@ void LuTsSubSymbolTransform::DecodeLuTs(Reader& reader) {
     SetupLutsOrder2(static_cast<uint8_t>(state_vars_.GetNumSubsymbols()),
                     num_alpha_subsym);
     for (uint32_t s = 0; s < num_luts_; s++) {
-      for (uint32_t k = 0; k < num_alpha_subsym; k++) {
+      for (uint32_t idx_k = 0; idx_k < num_alpha_subsym; idx_k++) {
         DecodeLutOrder1(reader, num_alpha_subsym, coding_subsym_size,
-                        luts_o_2_[s][k]);
+                        luts_o_2_[s][idx_k]);
       }
     }
   } else if (coding_order == 1) {
@@ -222,11 +222,11 @@ void LuTsSubSymbolTransform::EncodeLutOrder1(Writer& writer,
                                              const uint64_t num_alpha_subsym,
                                              const uint8_t coding_subsym_size,
                                              LutOrder1& lut) {
-  for (uint32_t i = 0; i < num_alpha_subsym; i++) {
-    SortLutRow(lut[i]);
-    writer.WriteLutSymbol(lut[i].num_max_elems, coding_subsym_size);
-    for (uint32_t j = 0; j <= lut[i].num_max_elems; j++) {
-      writer.WriteLutSymbol(lut[i].entries[j].value, coding_subsym_size);
+  for (uint32_t idx_i = 0; idx_i < num_alpha_subsym; idx_i++) {
+    SortLutRow(lut[idx_i]);
+    writer.WriteLutSymbol(lut[idx_i].num_max_elems, coding_subsym_size);
+    for (uint32_t idx_j = 0; idx_j <= lut[idx_i].num_max_elems; idx_j++) {
+      writer.WriteLutSymbol(lut[idx_i].entries[idx_j].value, coding_subsym_size);
     }
   }
 }
@@ -248,9 +248,9 @@ void LuTsSubSymbolTransform::EncodeLuTs(Writer& writer,
   // encode LUTs
   if (coding_order == 2) {
     for (uint32_t s = 0; s < num_luts_; s++) {
-      for (uint32_t k = 0; k < num_alpha_subsym; k++) {
+      for (uint32_t idx_k = 0; idx_k < num_alpha_subsym; idx_k++) {
         EncodeLutOrder1(writer, num_alpha_subsym, coding_subsym_size,
-                        luts_o_2_[s][k]);
+                        luts_o_2_[s][idx_k]);
       }
     }
   } else if (coding_order == 1) {
