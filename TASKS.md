@@ -24,4 +24,5 @@
 | 2026-04-27-parallelize-contact-tiles | 2026-04-27 | Parallelize contact tile encoding with OpenMP | Pending |
 | 2026-04-28-common-attribute-field | 2026-04-28 | Standardize AttributeField - unify all parser field types | Pending |
 | 2026-06-05-genotype-merge-develop-part6-with-temp-part6 | 2026-06-05 | Merge develop-part6 with origin/temp_part6 | Done |
+| 2026-06-05-merge-develop-with-develop-part6 | 2026-06-05 | Merge develop with develop-part6 | Active |
 

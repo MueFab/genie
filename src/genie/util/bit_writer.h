@@ -121,6 +121,8 @@ class BitWriter {
      */
     template <typename T, size_t SIZE = sizeof(T), typename = std::enable_if<std::is_integral<T>::value>>
     void WriteBypassBE(T val);
+    template <typename T, size_t NumBytes = sizeof(T), typename = std::enable_if<std::is_integral<T>::value>>
+    void WriteAlignedInt(T val);
     void WriteReserved(uint8_t bits);
     void Write(uint64_t value, uint8_t bits, bool reserved);
     void WriteAlignedStream(std::istream& in);

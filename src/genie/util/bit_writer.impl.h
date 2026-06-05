@@ -47,6 +47,13 @@ void BitWriter::WriteBypassBE(T val) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+template <typename T, size_t NumBytes, typename>
+void BitWriter::WriteAlignedInt(T val) {
+    WriteBypassBE<T, NumBytes>(val);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace util
 }  // namespace genie
 
