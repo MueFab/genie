@@ -19,7 +19,7 @@
 
 #include <tuple>
 
-#include "genie/core/access_unit/access_unit.h"
+#include "genie/core/access_unit.h"
 #include "genie/core/entropy_decoder.h"
 
 // -----------------------------------------------------------------------------

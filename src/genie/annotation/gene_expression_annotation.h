@@ -14,6 +14,7 @@
 #include "genie/annotation/compressors.h"
 #include "genie/core/gene_expression_record/record.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
+#include "genie/core/parameter/annotation/record.h"
 #include "genie/core/access_unit/annotation/record.h"
 #include "genie/core/access_unit/annotation/typed_data.h"
 // #include "genie/core/data_unit_record/record.h"

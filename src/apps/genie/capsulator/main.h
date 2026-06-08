@@ -1,16 +1,16 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_APPS_GENIE_CAPSULATOR_MAIN_H_
 #define SRC_APPS_GENIE_CAPSULATOR_MAIN_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genieapp {
-namespace capsulator {
+namespace genie_app::capsulator {
 
 /**
  *
@@ -20,12 +20,11 @@ namespace capsulator {
  */
 int main(int argc, char* argv[]);
 
-}  // namespace capsulator
-}  // namespace genieapp
+}  // namespace genie_app::capsulator
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_APPS_GENIE_CAPSULATOR_MAIN_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

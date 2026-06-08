@@ -2,59 +2,78 @@ project("genie")
 
 set(source_files
         main.cc
-        cli_handler.cc
         run/main.cc
-        run/program-options.cc
+        run/program_options.cc
+        transcode-fasta/main.cc
+        transcode-fasta/program_options.cc
+        transcode-fastq/main.cc
+        transcode-fastq/program_options.cc
         gabac/code.cc
         gabac/main.cc
-        gabac/program-options.cc
+        gabac/program_options.cc
+        capsulator/program_options.cc
+        capsulator/main.cc
         annotation/main.cc
         annotation/program-options.cc
         annotation/code.cc
-        )
+)
 
-add_executable(${PROJECT_NAME} ${source_files})
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # GNU Compiler Collection
-    target_compile_options(${PROJECT_NAME} PRIVATE "-pedantic")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-fno-common")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wall")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wshadow")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wextra")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wundef")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wconversion")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wdouble-promotion")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=conversion")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=maybe-uninitialized")
+if (${GENIE_SAM_SUPPORT})
+    set(source_files ${source_files}
+            transcode-sam/main.cc
+            transcode-sam/program_options.h
+            transcode-sam/program_options.cc
+    )
 endif ()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-annotation)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-bsc)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-lzma)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-zstd)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-module)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-gabac)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-genotype)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-likelihood)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-contact)
-target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
+add_executable(genie ${source_files})
 
-#target_link_libraries(${PROJECT_NAME} PRIVATE libbsc)
-#target_link_libraries(${PROJECT_NAME} PRIVATE Api)
-# TODO: To be implemented later
-#target_link_libraries(${PROJECT_NAME} PRIVATE genie-mgrec)
-#target_link_libraries(${PROJECT_NAME} PRIVATE genie-mgg)
-#target_link_libraries(${PROJECT_NAME} PRIVATE genie-mgb)
+target_link_libraries(genie PRIVATE genie-mgg)
+target_link_libraries(genie PRIVATE genie-gabac)
+target_link_libraries(genie PRIVATE genie-zstd)
+target_link_libraries(genie PRIVATE genie-lzma)
+target_link_libraries(genie PRIVATE genie-bsc)
+target_link_libraries(genie PRIVATE genie-module)
+target_link_libraries(genie PRIVATE genie-spring)
+target_link_libraries(genie PRIVATE genie-lowlatency)
+target_link_libraries(genie PRIVATE genie-fastq)
+target_link_libraries(genie PRIVATE genie-fasta)
+target_link_libraries(genie PRIVATE genie-sam)
+target_link_libraries(genie PRIVATE genie-mgrec)
+target_link_libraries(genie PRIVATE genie-mgb)
+target_link_libraries(genie PRIVATE genie-localassembly)
+target_link_libraries(genie PRIVATE genie-refcoder)
+target_link_libraries(genie PRIVATE genie-basecoder)
+target_link_libraries(genie PRIVATE genie-qvwriteout)
+target_link_libraries(genie PRIVATE genie-calq)
+target_link_libraries(genie PRIVATE genie-paramcabac)
+target_link_libraries(genie PRIVATE genie-paramqv1)
+target_link_libraries(genie PRIVATE genie-nametoken)
+target_link_libraries(genie PRIVATE genie-namewriteout)
+target_link_libraries(genie PRIVATE genie-util)
+target_link_libraries(genie PRIVATE genie-annotation)
+target_link_libraries(genie PRIVATE genie-genotype)
+target_link_libraries(genie PRIVATE genie-likelihood)
+target_link_libraries(genie PRIVATE genie-contact)
+target_include_directories(genie PRIVATE "${CMAKE_SOURCE_DIR}/src/genie")
 
-#target_link_libraries(${PROJECT_NAME} PRIVATE genie-spring)
-#target_link_libraries(${PROJECT_NAME} PRIVATE genie-lowlatency)
-#target_link_libraries(${PROJECT_NAME} PRIVATE genie-fastq)
-#target_link_libraries(${PROJECT_NAME} PRIVATE genie-localassembly)
-#target_link_libraries(${PROJECT_NAME} PRIVATE genie-qvwriteout)
-#target_link_libraries(${PROJECT_NAME} PRIVATE genie-calq)
+if (${GENIE_USE_OPENMP})
+    target_compile_definitions(genie PRIVATE GENIE_USE_OPENMP)
+    target_link_libraries(genie PRIVATE ${OpenMP_CXX_LIBRARIES})
+endif ()
 
-install(TARGETS ${PROJECT_NAME}
-        RUNTIME DESTINATION "usr/bin")
+if (${GENIE_SAM_SUPPORT})
+    target_compile_definitions(genie PRIVATE GENIE_SAM_SUPPORT)
+    target_link_libraries(genie ${LIBLZMA_LIBRARIES})
+    target_link_libraries(genie ${BZIP2_LIBRARIES})
+    target_link_libraries(genie ${ZLIB_LIBRARIES})
+
+    find_package(HTSlib REQUIRED)  # NOLINT
+    target_include_directories(genie PRIVATE ${HTSlib_INCLUDE_DIRS})
+    target_link_libraries(genie PRIVATE ${HTSlib_LIBRARIES})
+endif ()
+
+
+set_target_properties(genie PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+install(TARGETS genie
+        RUNTIME DESTINATION "/usr/local/bin")

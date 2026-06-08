@@ -182,7 +182,7 @@ struct GenieHierarchy {
   uint64_t dataset_groups_count; /*!< @brief */
   uint64_t* dataset_group_id;    /*!< @brief [datasetGroupsCount] */
   uint64_t* datasets_count;      /*!< @brief [datasetGroupsCount] */
-  uint64_t** dataset_id; /*!< @brief [datasetGroupsCount][datasetsCount[idx_i]] */
+  uint64_t** dataset_id; /*!< @brief [datasetGroupsCount][datasetsCount[i]] */
 };
 
 /**

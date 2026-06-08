@@ -10,7 +10,7 @@
 
 // -----------------------------------------------------------------------------
 
-#define NOMINMAX
+#define NOMINMAX  // NOLINT
 #include <algorithm>
 #include <boost/variant/variant.hpp>
 #include <cmath>
@@ -95,8 +95,6 @@ constexpr GenSubIndex kReverseComplement = {GenDesc::kReverseComplement, 0_u16};
 constexpr GenSubIndex kFlagsPcrDuplicate = {GenDesc::kFlags, 0_u16};
 constexpr GenSubIndex kFlagsQualityFail = {GenDesc::kFlags, 1_u16};
 constexpr GenSubIndex kFlagsProperPair = {GenDesc::kFlags, 2_u16};
-constexpr GenSubIndex kFlagsNotPrimary = {GenDesc::kFlags, 3_u16};
-constexpr GenSubIndex kFlagsSupplementary = {GenDesc::kFlags, 4_u16};
 constexpr GenSubIndex kMismatchPosTerminator = {GenDesc::kMismatchPosition,
                                                 0_u16};
 constexpr GenSubIndex kMismatchPosDelta = {GenDesc::kMismatchPosition, 1_u16};
@@ -157,10 +155,6 @@ constexpr uint8_t kFlagsQualityFailPos = 1;
 constexpr uint8_t kFlagsQualityFailMask = 1u << kFlagsQualityFailPos;
 constexpr uint8_t kFlagsProperPairPos = 2;
 constexpr uint8_t kFlagsProperPairMask = 1u << kFlagsProperPairPos;
-constexpr uint8_t kFlagsNotPrimaryPos = 3;
-constexpr uint8_t kFlagsNotPrimaryMask = 1u << kFlagsNotPrimaryPos;
-constexpr uint8_t kFlagsSupplementaryPos = 4;
-constexpr uint8_t kFlagsSupplementaryMask = 1u << kFlagsSupplementaryPos;
 constexpr uint8_t kMismatchTypeSubstitution = 0;
 constexpr uint8_t kMismatchTypeInsertion = 1;
 constexpr uint8_t kMismatchTypeDeletion = 2;
@@ -280,8 +274,7 @@ uint8_t Bits2Bytes(uint8_t bits);
  * @param range
  * @return
  */
-uint8_t Range2Bytes(std::pair<int64_t, int64_t> range);
-
+uint8_t Range2Bytes(const std::pair<int64_t, int64_t>& range);
 
 enum class AnnotDesc : uint8_t {
     SEQUENCEID = 1,
@@ -349,11 +342,11 @@ typedef boost::variant<std::string, char, bool, int8_t, uint8_t, int16_t, uint16
                        uint64_t, float, double>
     DynamicDataType;
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace core
+}  // namespace genie::core
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_CONSTANTS_H_
 

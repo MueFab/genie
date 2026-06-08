@@ -6,6 +6,7 @@
 
 #include "record.h"
 #include <algorithm>
+#include <cstring>
 #include <string>
 #include <utility>
 #include "genie/util/bit_reader.h"
@@ -456,7 +457,9 @@ void ContactRecord::Write(util::BitWriter& writer) const {
 
   for (const auto& norm_count_vals : norm_counts_) {
     for (const auto& v : norm_count_vals) {
-      writer.WriteBypassBE(v);
+      uint64_t tmp_val;
+      std::memcpy(&tmp_val, &v, sizeof(tmp_val));
+      writer.WriteBypassBE(tmp_val);
     }
   }
 

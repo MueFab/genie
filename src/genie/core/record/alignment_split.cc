@@ -28,7 +28,7 @@ AlignmentSplit::AlignmentSplit(const Type split_alignment)
 // -----------------------------------------------------------------------------
 
 void AlignmentSplit::Write(util::BitWriter& writer) const {
-  writer.WriteBypassBE(split_alignment_);
+  writer.WriteAlignedInt(split_alignment_);
 }
 
 // -----------------------------------------------------------------------------

@@ -89,18 +89,18 @@ uint64_t EncodeDescSubsequence(const IoConfiguration& conf,
     const size_t num_transformed_sub_seqs = transformed_sub_seqs.size();
 
     // Loop through the transformed sequences
-    for (size_t idx_i = 0; idx_i < num_transformed_sub_seqs; idx_i++) {
-      const uint64_t num_transformed_symbols = transformed_sub_seqs[idx_i].Size();
+    for (size_t i = 0; i < num_transformed_sub_seqs; i++) {
+      const uint64_t num_transformed_symbols = transformed_sub_seqs[i].Size();
       uint64_t transformed_sub_seq_payload_size = 0;
       if (num_transformed_symbols > 0) {
         // Encoding
         transformed_sub_seq_payload_size = EncodeTransformSubSeq(
-            sub_seq_cfg.GetTransformSubSeqCfg(static_cast<uint8_t>(idx_i)),
-            &transformed_sub_seqs[idx_i],
+            sub_seq_cfg.GetTransformSubSeqCfg(static_cast<uint8_t>(i)),
+            &transformed_sub_seqs[i],
             !dependency.Empty() ? &dependency : nullptr);
       }
 
-      if (idx_i < num_transformed_sub_seqs - 1) {
+      if (i < num_transformed_sub_seqs - 1) {
         sub_seq_payload_size += StreamHandler::WriteUInt(
             *conf.output_stream, transformed_sub_seq_payload_size + 4, 4);
       }
@@ -112,7 +112,7 @@ uint64_t EncodeDescSubsequence(const IoConfiguration& conf,
 
       if (transformed_sub_seq_payload_size > 0) {
         sub_seq_payload_size += StreamHandler::WriteBytes(
-            *conf.output_stream, &transformed_sub_seqs[idx_i]);
+            *conf.output_stream, &transformed_sub_seqs[i]);
       }
     }
   }

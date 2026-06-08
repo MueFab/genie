@@ -44,81 +44,76 @@ std::string parent_dir(const std::string& path) {
 
 // -----------------------------------------------------------------------------
 
-ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help_(false) {
+ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help(false) {
   CLI::App app("Genie MPEG-G reference encoder\n");
 
-  app.add_option("-i,--input-file", input_file_,
+  app.add_option("-i,--input-file", inputFile,
                  "Input file (fastq or mgrec or mgb)\n")
       ->mandatory(true);
-  app.add_option("-o,--output-file", output_file_,
+  app.add_option("-o,--output-file", outputFile,
                  "Output file (fastq or mgrec or mgb)\n")
       ->mandatory(true);
 
-  input_sup_file_ = "";
-  app.add_option("-j, --input-suppl-file", input_sup_file_,
+  inputSupFile = "";
+  app.add_option("-j, --input-suppl-file", inputSupFile,
                  "Paired input fastq file\n");
 
-  output_sup_file_ = "";
-  app.add_option("-u, --output-suppl-file", output_sup_file_,
+  outputSupFile = "";
+  app.add_option("-u, --output-suppl-file", outputSupFile,
                  "Paired output fastq file\n");
 
-  input_ref_file_ = "";
+  inputRefFile = "";
   app.add_option(
-      "-r,--input-ref-file", input_ref_file_,
+      "-r,--input-ref-file", inputRefFile,
       "Path to a reference fasta file. \n"
       "Only relevant for aligned records. \nIf no path is provided, a \n"
       "computed reference will be used instead.\n");
 
-  working_directory_ = "";
-  app.add_option("-w,--working-dir", working_directory_,
+  workingDirectory = "";
+  app.add_option("-w,--working-dir", workingDirectory,
                  "Path to a directory where \n"
                  "temporary files can be stored. \nIf no path is provided, "
                  "\nthe current working dir is used. \n"
                  "Please make sure that \nenough space is available.\n");
 
-  qv_mode_ = "lossless";
-  app.add_option("--qv", qv_mode_,
+  qvMode = "lossless";
+  app.add_option("--qv", qvMode,
                  "How to encode quality values. \nPossible values are \n"
                  "\"lossless\" (default, keep all values), \n\"calq\" "
                  "(quantize values with calq) and \n\"none\" "
                  "(discard all values).\n");
 
-  read_name_mode_ = "lossless";
-  app.add_option("--read-ids", read_name_mode_,
+  readNameMode = "lossless";
+  app.add_option("--read-ids", readNameMode,
                  "How to encode read ids. Possible values \n"
                  "are \"lossless\" (default, keep all values) and \n\"none\" "
                  "(discard all values).\n");
 
-  entropy_mode_ = "zstd";
-  app.add_option("--entropy", entropy_mode_,
-                 "Which entropy codec to use. Possible values \n"
-                 "are \"zstd\" (default), \"gabac\", \"lzma\", \"bsc\"\n");
-
-  force_overwrite_ = false;
-  app.add_flag("-f,--force", force_overwrite_,
+  forceOverwrite = false;
+  app.add_flag("-f,--force", forceOverwrite,
                "Flag, if set already existing output \n"
                "files are overridden.\n");
 
-  combine_pairs_flag_ = false;
-  app.add_flag("--combine-pairs", combine_pairs_flag_,
+  combinePairsFlag = false;
+  app.add_flag("--combine-pairs", combinePairsFlag,
                "Flag, if provided to a decoding \n"
                "operation, unaligned reads will \nget matched to their mate "
                "again. \nNote: has no effect if encoded with \n"
                "--low-latency in case of aligned reads only. \nDoes not work "
                "if encoded with --read-ids \"none\"\n");
 
-  low_latency_ = false;
-  app.add_flag("--low-latency", low_latency_,
+  lowLatency = false;
+  app.add_flag("--low-latency", lowLatency,
                "Flag, if set no global reference will be \n"
                "calculated for unaligned records. \nThis will increase "
                "encoding speed, \nbut decrease compression rate.\n");
 
-  raw_streams_ = false;
+  rawStreams = false;
   app.add_flag(
-      "--write-raw-streams", raw_streams_,
+      "--write-raw-streams", rawStreams,
       "Flag, if set raw uncompressed descriptors will be written out\n");
 
-  ref_mode_ = "none";
+  refMode = "none";
   // Deactivated for now, as broken in connection with part 1
   /*  app.add_option("--embedded-ref", refMode,
                    "How to encode the reference. Possible \n"
@@ -126,11 +121,11 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help_(false) {
      kept externally for decompression),\n" " \"relevant\" (only parts of the
      reference \nneeded for decoding are encoded)\n");*/
 
-  number_of_threads_ = std::thread::hardware_concurrency();
-  app.add_option("-t,--threads", number_of_threads_,
+  numberOfThreads = std::thread::hardware_concurrency();
+  app.add_option("-t,--threads", numberOfThreads,
                  "Number of threads to use.\n");
 
-  raw_reference_ = false;
+  rawReference = false;
   // Deactivated for now, as broken in connection with part 1
   /* app.add_flag("--raw-ref", rawReference,
                 "Flag, if set references will be encoded raw \n"
@@ -140,16 +135,16 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help_(false) {
   try {
     app.parse(argc, argv);
 
-    if (working_directory_.empty()) {
-      working_directory_ = parent_dir(output_file_);
+    if (workingDirectory.empty()) {
+      workingDirectory = parent_dir(outputFile);
     }
 
-    while (working_directory_.back() == '/') {
-      working_directory_.pop_back();
+    while (workingDirectory.back() == '/') {
+      workingDirectory.pop_back();
     }
   } catch (const CLI::CallForHelp&) {
     UTILS_LOG(genie::util::Logger::Severity::ERROR, app.help());
-    help_ = true;
+    help = true;
     return;
   } catch (const CLI::ParseError& e) {
     UTILS_DIE("Command line parsing failed:" + std::to_string(app.exit(e)));
@@ -278,108 +273,102 @@ void ValidateOutputFile(const std::string& file, const bool forced) {
 // -----------------------------------------------------------------------------
 
 void ProgramOptions::validate() {
-  ValidateInputFile(input_file_);
-  if (input_file_.substr(0, 2) != "-.") {
-    input_file_ = std::filesystem::canonical(input_file_).string();
-    std::replace(input_file_.begin(), input_file_.end(), '\\', '/');
+  ValidateInputFile(inputFile);
+  if (inputFile.substr(0, 2) != "-.") {
+    inputFile = std::filesystem::canonical(inputFile).string();
+    std::replace(inputFile.begin(), inputFile.end(), '\\', '/');
     UTILS_LOG(genie::util::Logger::Severity::INFO,
-              "Input file 1: " + input_file_ + " with size " +
-                  size_string(std::filesystem::file_size(input_file_)));
+              "Input file 1: " + inputFile + " with size " +
+                  size_string(std::filesystem::file_size(inputFile)));
   } else {
     UTILS_LOG(genie::util::Logger::Severity::INFO, "Input file: stdin");
   }
 
-  if (!input_sup_file_.empty()) {
-    ValidateInputFile(input_sup_file_);
-    ValidatePairedFiles(input_file_, input_sup_file_);
-    input_sup_file_ = std::filesystem::canonical(input_sup_file_).string();
-    std::replace(input_sup_file_.begin(), input_sup_file_.end(), '\\', '/');
+  if (!inputSupFile.empty()) {
+    ValidateInputFile(inputSupFile);
+    ValidatePairedFiles(inputFile, inputSupFile);
+    inputSupFile = std::filesystem::canonical(inputSupFile).string();
+    std::replace(inputSupFile.begin(), inputSupFile.end(), '\\', '/');
     UTILS_LOG(genie::util::Logger::Severity::INFO,
-              "Input file 2: " + input_sup_file_ + " with Size " +
-                  size_string(std::filesystem::file_size(input_sup_file_)));
+              "Input file 2: " + inputSupFile + " with Size " +
+                  size_string(std::filesystem::file_size(inputSupFile)));
   }
-  if (!input_ref_file_.empty()) {
-    ValidateInputFile(input_ref_file_);
-    input_ref_file_ = std::filesystem::canonical(input_ref_file_).string();
-    std::replace(input_ref_file_.begin(), input_ref_file_.end(), '\\', '/');
+  if (!inputRefFile.empty()) {
+    ValidateInputFile(inputRefFile);
+    inputRefFile = std::filesystem::canonical(inputRefFile).string();
+    std::replace(inputRefFile.begin(), inputRefFile.end(), '\\', '/');
     UTILS_LOG(genie::util::Logger::Severity::INFO,
-              "Input reference file: " + input_ref_file_ + " with Size " +
-                  size_string(std::filesystem::file_size(input_ref_file_)));
-  }
-
-  if (!paramset_path_.empty()) {
-    ValidateInputFile(paramset_path_);
-    UTILS_LOG(genie::util::Logger::Severity::INFO,
-              "Parameter input file: " + paramset_path_ + " with Size " +
-                  size_string(std::filesystem::file_size(paramset_path_)));
+              "Input reference file: " + inputRefFile + " with Size " +
+                  size_string(std::filesystem::file_size(inputRefFile)));
   }
 
-  ValidateWorkingDir(working_directory_);
-  working_directory_ = std::filesystem::canonical(working_directory_).string();
-  std::replace(working_directory_.begin(), working_directory_.end(), '\\', '/');
+  if (!paramsetPath.empty()) {
+    ValidateInputFile(paramsetPath);
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "Parameter input file: " + paramsetPath + " with Size " +
+                  size_string(std::filesystem::file_size(paramsetPath)));
+  }
+
+  ValidateWorkingDir(workingDirectory);
+  workingDirectory = std::filesystem::canonical(workingDirectory).string();
+  std::replace(workingDirectory.begin(), workingDirectory.end(), '\\', '/');
   UTILS_LOG(
       genie::util::Logger::Severity::INFO,
-      "Working directory: " + working_directory_ + " with " +
-          size_string(std::filesystem::space(working_directory_).available) +
+      "Working directory: " + workingDirectory + " with " +
+          size_string(std::filesystem::space(workingDirectory).available) +
           " available");
 
-  ValidateOutputFile(output_file_, force_overwrite_);
-  if (output_file_.substr(0, 2) != "-.") {
-    output_file_ = std::filesystem::weakly_canonical(output_file_).string();
-    std::replace(output_file_.begin(), output_file_.end(), '\\', '/');
+  ValidateOutputFile(outputFile, forceOverwrite);
+  if (outputFile.substr(0, 2) != "-.") {
+    outputFile = std::filesystem::weakly_canonical(outputFile).string();
+    std::replace(outputFile.begin(), outputFile.end(), '\\', '/');
     UTILS_LOG(
         genie::util::Logger::Severity::INFO,
-        "Output file: " + output_file_ + " with " +
+        "Output file: " + outputFile + " with " +
             size_string(
-                std::filesystem::space(parent_dir(output_file_)).available) +
+                std::filesystem::space(parent_dir(outputFile)).available) +
             " available");
   } else {
     UTILS_LOG(genie::util::Logger::Severity::INFO, "Output file: stdout");
   }
 
-  if (!output_sup_file_.empty()) {
-    ValidateOutputFile(output_sup_file_, force_overwrite_);
-    ValidatePairedFiles(output_file_, output_sup_file_);
-    output_sup_file_ =
-        std::filesystem::weakly_canonical(output_sup_file_).string();
-    std::replace(output_sup_file_.begin(), output_sup_file_.end(), '\\', '/');
+  if (!outputSupFile.empty()) {
+    ValidateOutputFile(outputSupFile, forceOverwrite);
+    ValidatePairedFiles(outputFile, outputSupFile);
+    outputSupFile = std::filesystem::weakly_canonical(outputSupFile).string();
+    std::replace(outputSupFile.begin(), outputSupFile.end(), '\\', '/');
     UTILS_LOG(
         genie::util::Logger::Severity::INFO,
-        "Output supplementary file: " + output_sup_file_ + " with " +
-            size_string(std::filesystem::space(parent_dir(output_sup_file_))
-                            .available) +
+        "Output supplementary file: " + outputSupFile + " with " +
+            size_string(
+                std::filesystem::space(parent_dir(outputSupFile)).available) +
             " available");
   }
 
-  UTILS_DIE_IF(
-      qv_mode_ != "none" && qv_mode_ != "lossless" && qv_mode_ != "calq",
-      "QVMode " + qv_mode_ + " unknown");
-  UTILS_DIE_IF(
-      ref_mode_ != "none" && ref_mode_ != "relevant" && ref_mode_ != "full",
-      "RefMode " + ref_mode_ + " unknown");
-  UTILS_DIE_IF(read_name_mode_ != "none" && read_name_mode_ != "lossless",
-               "Read name mode " + read_name_mode_ + " unknown");
-  UTILS_DIE_IF(entropy_mode_ != "gabac" && entropy_mode_ != "zstd" &&
-                   entropy_mode_ != "lzma" && entropy_mode_ != "bsc",
-               "Entropy mode " + entropy_mode_ + " unknown");
+  UTILS_DIE_IF(qvMode != "none" && qvMode != "lossless" && qvMode != "calq",
+               "QVMode " + qvMode + " unknown");
+  UTILS_DIE_IF(refMode != "none" && refMode != "relevant" && refMode != "full",
+               "RefMode " + refMode + " unknown");
+  UTILS_DIE_IF(readNameMode != "none" && readNameMode != "lossless",
+               "Read name mode " + readNameMode + " unknown");
 
   if (std::thread::hardware_concurrency()) {
     UTILS_DIE_IF(
-        number_of_threads_ < 1 ||
-            number_of_threads_ > std::thread::hardware_concurrency(),
-        "Invalid number of threads: " + std::to_string(number_of_threads_) +
+        numberOfThreads < 1 ||
+            numberOfThreads > std::thread::hardware_concurrency(),
+        "Invalid number of threads: " + std::to_string(numberOfThreads) +
             ". Your system supports between 1 and " +
             std::to_string(std::thread::hardware_concurrency()) + " threads.");
     UTILS_LOG(genie::util::Logger::Severity::INFO,
-              "Threads: " + std::to_string(number_of_threads_) + " with " +
+              "Threads: " + std::to_string(numberOfThreads) + " with " +
                   std::to_string(std::thread::hardware_concurrency()) +
                   " supported");
   } else {
-    UTILS_DIE_IF(!number_of_threads_,
+    UTILS_DIE_IF(!numberOfThreads,
                  "Could not detect hardware concurrency level. Please provide "
                  "a number of threads manually.");
     UTILS_LOG(genie::util::Logger::Severity::INFO,
-              "Threads: " + std::to_string(number_of_threads_) +
+              "Threads: " + std::to_string(numberOfThreads) +
                   " (could not detected supported number automatically)");
   }
 }

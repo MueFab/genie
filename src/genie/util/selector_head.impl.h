@@ -37,11 +37,11 @@ namespace genie::util {
 
 template <typename Tin>
 void SelectorHead<Tin>::Route(Tin&& t, const size_t mod_id, Section global_id) {
-  for (size_t idx_i = 0; idx_i < mods_.size(); ++idx_i) {
-    if (idx_i == mod_id) {
-      mods_[idx_i]->FlowIn(std::move(t), global_id);
+  for (size_t i = 0; i < mods_.size(); ++i) {
+    if (i == mod_id) {
+      mods_[i]->FlowIn(std::move(t), global_id);
     } else {
-      mods_[idx_i]->SkipIn(Section{global_id.start, global_id.length, false});
+      mods_[i]->SkipIn(Section{global_id.start, global_id.length, false});
     }
   }
 }
@@ -92,8 +92,8 @@ void SelectorHead<Tin>::FlowIn(Tin&& t, const Section& id) {
 
 template <typename Tin>
 void SelectorHead<Tin>::FlushIn(uint64_t& pos) {
-  for (const auto& dim_m : mods_) {
-    dim_m->FlushIn(pos);
+  for (const auto& m : mods_) {
+    m->FlushIn(pos);
   }
 }
 
@@ -102,13 +102,13 @@ void SelectorHead<Tin>::FlushIn(uint64_t& pos) {
 template <typename Tin>
 void SelectorHead<Tin>::SkipIn(const Section& id) {
   bool first = true;
-  for (const auto& dim_m : mods_) {
+  for (const auto& m : mods_) {
     if (first) {
-      dim_m->SkipIn(id);
+      m->SkipIn(id);
       first = false;
     } else {
       Section loc_id = id;
-      dim_m->SkipIn(loc_id);
+      m->SkipIn(loc_id);
     }
   }
 }

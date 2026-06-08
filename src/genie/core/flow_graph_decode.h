@@ -44,14 +44,14 @@ class FlowGraphDecode final : public FlowGraph {
   std::vector<std::unique_ptr<ReadDecoder>> read_coders_;    //!< @brief
   util::Selector<AccessUnit, record::Chunk> read_selector_;  //!< @brief
 
-    std::vector<std::unique_ptr<genie::core::QvDecoder>> qv_coders_;  //!< @brief
-    genie::core::ReadDecoder::qv_selector qv_selector_;                //!< @brief
+  std::vector<std::unique_ptr<QvDecoder>> qv_coders_;  //!< @brief
+  ReadDecoder::qv_selector qv_selector_;               //!< @brief
 
-    std::vector<std::unique_ptr<genie::core::NameDecoder>> name_coders_;  //!< @brief
-    core::ReadDecoder::name_selector name_selector_;                       //!< @brief
+  std::vector<std::unique_ptr<NameDecoder>> name_coders_;  //!< @brief
+  ReadDecoder::name_selector name_selector_;               //!< @brief
 
-    std::vector<std::unique_ptr<genie::core::EntropyDecoder>> entropy_coders_;  //!< @brief
-    genie::core::ReadDecoder::entropy_selector entropy_selector_;                //!< @brief
+  std::vector<std::unique_ptr<EntropyDecoder>> entropy_coders_;  //!< @brief
+  ReadDecoder::entropy_selector entropy_selector_;               //!< @brief
 
   std::vector<std::unique_ptr<FormatExporter>> exporters_;  //!< @brief
   util::SelectorHead<record::Chunk> exporter_selector_;     //!< @brief
@@ -69,11 +69,11 @@ class FlowGraphDecode final : public FlowGraph {
    */
   [[nodiscard]] ReferenceManager& GetRefMgr() const;
 
-    /**
-     * @brief
-     * @param _refDecoder
-     */
-    void SetRefDecoder(genie::core::RefDecoder* _refDecoder);
+  /**
+   * @brief
+   * @param ref_decoder
+   */
+  void SetRefDecoder(RefDecoder* ref_decoder);
 
   /**
    * @brief
@@ -197,12 +197,12 @@ class FlowGraphDecode final : public FlowGraph {
    */
   void AddQvCoder(std::unique_ptr<QvDecoder> dat);
 
-    /**
-     * @brief
-     * @param dat
-     * @param index
-     */
-    void SetQvCoder(std::unique_ptr<genie::core::QvDecoder> dat, size_t index);
+  /**
+   * @brief
+   * @param dat
+   * @param index
+   */
+  void SetQvCoder(std::unique_ptr<QvDecoder> dat, size_t index);
 
   /**
    * @brief

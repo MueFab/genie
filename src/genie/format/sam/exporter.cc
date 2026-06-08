@@ -186,7 +186,7 @@ void ProcessSecondMappedSegment(const size_t s,
 
 // -----------------------------------------------------------------------------
 
-uint16_t ComputeSamFlags(const size_t s,
+uint16_t ComputeSamFlags(const size_t s, const size_t a,
                          const core::record::Record& record) {
   uint16_t flags = 0;
   if (record.GetNumberOfTemplateSegments() > 1) {
@@ -212,34 +212,14 @@ uint16_t ComputeSamFlags(const size_t s,
     flags |= 0x80;
   }
   // Secondary alignment
-  if (record.GetFlags() & core::gen_const::kFlagsNotPrimaryMask) {
+  if (a > 0) {
     flags |= 0x100;
-  }
-  if (record.GetFlags() & core::gen_const::kFlagsSupplementaryMask) {
-    flags |= 0x800;
   }
   if (record.GetFlags() & core::gen_const::kFlagsQualityFailMask) {
     flags |= 0x200;
   }
   if (record.GetFlags() & core::gen_const::kFlagsPcrDuplicateMask) {
     flags |= 0x400;
-  }
-
-  // If 0x4 is set, no assumptions can be made about 0x2, 0x100, and 0x800.
-  if (flags & 0x4) {
-    flags &= ~0x2;
-    flags &= ~0x100;
-    flags &= ~0x800;
-  }
-
-  // If 0x1 is unset, no assumptions can be made about 0x2, 0x8, 0x20,
-  // 0x40 and 0x80
-  if (!(flags & 0x1)) {
-    flags &= ~0x2;
-    flags &= ~0x8;
-    flags &= ~0x20;
-    flags &= ~0x40;
-    flags &= ~0x80;
   }
   return flags;
 }
@@ -331,7 +311,7 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
            ++a) {
         std::string sam_record = record.GetName() + "\t";
 
-        uint16_t flags = ComputeSamFlags(s, record);
+        uint16_t flags = ComputeSamFlags(s, a, record);
         bool mapped = !(flags & 0x4);
         bool other_mapped = !(flags & 0x8);
 
@@ -365,12 +345,15 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
         if (other_mapped && record.GetNumberOfTemplateSegments() == 2) {
           ProcessSecondMappedSegment(s, record, tlen, flags, pnext, rnext,
                                      refinf);
-          // Use "=" shorthand
-          if (rnext == rname && rnext != "*") {
-            rnext = "=";
-          }
         } else {
+          rnext = rname;
+          pnext = pos;
           tlen = 0;
+        }
+
+        // Use "=" shorthand
+        if (rnext == rname && rnext != "*") {
+          rnext = "=";
         }
 
         if (record.GetClassId() == core::record::ClassType::kClassHm ||

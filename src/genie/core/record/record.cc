@@ -198,30 +198,32 @@ const std::vector<AlignmentBox>& Record::GetAlignments() const {
 
 // -----------------------------------------------------------------------------
 
-void Record::Write(util::BitWriter &writer) const {
-  writer.WriteBypassBE(number_of_template_segments_);
-  writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(reads_.size()));
-  writer.WriteBypassBE<uint16_t>(static_cast<uint16_t>(alignment_info_.size()));
-  writer.WriteBypassBE(class_id_);
-  writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(read_group_.length()));
-  writer.WriteBypassBE(read_1_first_);
+void Record::Write(util::BitWriter& writer) const {
+  writer.WriteAlignedInt(number_of_template_segments_);
+  writer.WriteAlignedInt<uint8_t>(static_cast<uint8_t>(reads_.size()));
+  writer.WriteAlignedInt<uint16_t>(
+      static_cast<uint16_t>(alignment_info_.size()));
+  writer.WriteAlignedInt(class_id_);
+  writer.WriteAlignedInt<uint8_t>(static_cast<uint8_t>(read_group_.length()));
+  writer.WriteAlignedInt(read_1_first_);
   if (!alignment_info_.empty()) {
     shared_alignment_info_.Write(writer);
   }
-  for (const auto &a : reads_) {
-    writer.WriteBypassBE<uint32_t, 3>(static_cast<uint32_t>(a.GetSequence().length()));
+  for (const auto& a : reads_) {
+    writer.WriteAlignedInt<uint32_t, 3>(
+        static_cast<uint32_t>(a.GetSequence().length()));
   }
-  writer.WriteBypassBE(qv_depth_);
-  writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(read_name_.length()));
+  writer.WriteAlignedInt(qv_depth_);
+  writer.WriteAlignedInt<uint8_t>(static_cast<uint8_t>(read_name_.length()));
   writer.WriteAlignedBytes(read_name_.data(), read_name_.length());
   writer.WriteAlignedBytes(read_group_.data(), read_group_.length());
-  for (const auto &r : reads_) {
+  for (const auto& r : reads_) {
     r.Write(writer);
   }
-  for (const auto &a : alignment_info_) {
+  for (const auto& a : alignment_info_) {
     a.Write(writer);
   }
-  writer.WriteBypassBE(flags_);
+  writer.WriteAlignedInt(flags_);
   more_alignment_info_->Write(writer);
 }
 
@@ -326,11 +328,11 @@ void Record::SetAlignment(const size_t id, AlignmentBox&& b) {
 std::pair<size_t, size_t> Record::GetTemplatePosition() const {
   std::pair ret = {GetPosition(0, 0),
                    GetPosition(0, 0) + GetMappedLength(0, 0)};
-  for (size_t idx_i = 0; idx_i < GetAlignments().front().GetAlignmentSplits().size();
-       ++idx_i) {
-    auto pos = GetPosition(0, idx_i);
+  for (size_t i = 0; i < GetAlignments().front().GetAlignmentSplits().size();
+       ++i) {
+    auto pos = GetPosition(0, i);
     ret.first = std::min(ret.first, pos);
-    ret.second = std::max(ret.second, pos + GetMappedLength(0, idx_i));
+    ret.second = std::max(ret.second, pos + GetMappedLength(0, i));
   }
   return ret;
 }

@@ -21,54 +21,54 @@ namespace genie::entropy::gabac {
  * @brief
  */
 class BitInputStream {
-public:
- /**
-  * @brief
-  * @param bitstream
-  */
- explicit BitInputStream(util::DataBlock* bitstream);
+ public:
+  /**
+   * @brief
+   * @param bitstream
+   */
+  explicit BitInputStream(util::DataBlock* bitstream);
 
- /**
-  * @brief
-  * @return
-  */
- [[nodiscard]] unsigned int GetNumBitsUntilByteAligned() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] unsigned int GetNumBitsUntilByteAligned() const;
 
- /**
-  * @brief
-  * @return
-  */
- [[nodiscard]] size_t GetNumBytesRead() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] size_t GetNumBytesRead() const;
 
- /**
-  * @brief
-  * @return
-  */
- unsigned char ReadByte();
+  /**
+   * @brief
+   * @return
+   */
+  unsigned char ReadByte();
 
- /**
-  * @brief
-  * @param num_bits
-  * @return
-  */
- unsigned int Read(unsigned int num_bits);
+  /**
+   * @brief
+   * @param num_bits
+   * @return
+   */
+  unsigned int Read(unsigned int num_bits);
 
- /**
-  * @brief
-  * @param num_bytes
-  */
- [[maybe_unused]] void SkipBytes(unsigned int num_bytes);
+  /**
+   * @brief
+   * @param num_bytes
+   */
+  [[maybe_unused]] void SkipBytes(unsigned int num_bytes);
 
- /**
-  * @brief
-  */
- void Reset();
+  /**
+   * @brief
+   */
+  void Reset();
 
-private:
- util::DataBlock* bitstream_;
- util::BlockStepper reader_;
- unsigned char held_bits_;
- unsigned int num_held_bits_;
+ private:
+  util::DataBlock* bitstream_;
+  util::BlockStepper reader_;
+  unsigned char held_bits_;
+  unsigned int num_held_bits_;
 };
 
 // -----------------------------------------------------------------------------

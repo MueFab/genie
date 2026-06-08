@@ -14,7 +14,7 @@
 #include <tuple>
 #include <vector>
 
-#include "genie/core/access_unit/access_unit.h"
+#include "genie/core/access_unit.h"
 #include "genie/core/entropy_decoder.h"
 #include "genie/core/module.h"
 #include "genie/core/name_decoder.h"

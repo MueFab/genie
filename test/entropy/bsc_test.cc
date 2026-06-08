@@ -77,10 +77,10 @@ TEST_F(BSCTestCase, BSCEncodeDecodeTest) {  // NOLINT(cert-err58-cpp)
 
 TEST_F(BSCTestCase, BSCparametersTest) {  // NOLINT(cert-err58-cpp)
     genie::entropy::bsc::BSCParameters bscParameters;
-    EXPECT_EQ(bscParameters.lzpHashSize, MPEGG_BSC_DEFAULT_LZPHASHSIZE);
-    EXPECT_EQ(bscParameters.lzpMinLen, MPEGG_BSC_DEFAULT_LZPMINLEN);
-    EXPECT_EQ(bscParameters.blockSorter, MPEGG_BSC_DEFAULT_BLOCKSORTER);
-    EXPECT_EQ(bscParameters.coder, MPEGG_BSC_CODER_QLFC_STATIC);
+    EXPECT_EQ(bscParameters.lzpHashSize, LIBBSC_DEFAULT_LZPHASHSIZE);
+    EXPECT_EQ(bscParameters.lzpMinLen, LIBBSC_DEFAULT_LZPMINLEN);
+    EXPECT_EQ(bscParameters.blockSorter, LIBBSC_DEFAULT_BLOCKSORTER);
+    EXPECT_EQ(bscParameters.coder, LIBBSC_CODER_QLFC_STATIC);
 
     auto parameters = bscParameters.convertToAlgorithmParameters();
     EXPECT_EQ(parameters.getNumberOfPars(), 4);

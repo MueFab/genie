@@ -1,5 +1,5 @@
-# Look for the libbsc header and library
-find_path(LZMA_INCLUDE_DIR libbsc.h)
+# Look for the lzma header and library
+find_path(LZMA_INCLUDE_DIR lzma.h)
 find_library(LZMA_LIBRARY NAMES lzma liblzma)
 
 # Check if the library and header were found
@@ -17,7 +17,7 @@ message(STATUS "   LZMA libraries: ${LZMA_LIBRARIES}")
 
 # If REQUIRED is passed and LZMA is not found, fail with an error
 if(NOT LZMA_FOUND AND REQUIRED)
-    message(FATAL_ERROR "Could not find libbsc. Please make sure the library and headers are installed.")
+    message(FATAL_ERROR "Could not find LZMA. Please make sure the library and headers are installed.")
 endif()
 
 # Mark the found paths as advanced (optional)

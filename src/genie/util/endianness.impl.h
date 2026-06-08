@@ -36,10 +36,10 @@ template <typename T, size_t Size>
 void SwapEndianness(T& u) {
   static_assert(CHAR_BIT == 8, "CHAR_BIT != 8");
 
-  for (size_t idx_k = 0; idx_k < Size / 2; idx_k++) {
-    const char tmp = reinterpret_cast<char*>(&u)[idx_k];
-    reinterpret_cast<char*>(&u)[idx_k] = reinterpret_cast<char*>(&u)[Size - idx_k - 1];
-    reinterpret_cast<char*>(&u)[Size - idx_k - 1] = tmp;
+  for (size_t k = 0; k < Size / 2; k++) {
+    const char tmp = reinterpret_cast<char*>(&u)[k];
+    reinterpret_cast<char*>(&u)[k] = reinterpret_cast<char*>(&u)[Size - k - 1];
+    reinterpret_cast<char*>(&u)[Size - k - 1] = tmp;
   }
 }
 

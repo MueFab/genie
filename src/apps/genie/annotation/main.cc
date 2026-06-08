@@ -16,7 +16,7 @@
 #include "apps/genie/annotation/program-options.h"
 
 #include "genie/core/constants.h"
-#include "genie/module/default-setup.h"
+#include "genie/module/default_setup.h"
 #include "genie/util/stop_watch.h"
 
 // TODO(Fabian): For some reason, compilation on windows fails if we move this include further up. Investigate.

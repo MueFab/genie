@@ -90,8 +90,8 @@ nlohmann::json Dataset::ToJson() const {
   }
   ret["version"] = version_;
   auto tmp = header_cfg_->ToJson();
-  for (const auto& idx_i : tmp.items()) {
-    ret[idx_i.key()] = idx_i.value();
+  for (const auto& i : tmp.items()) {
+    ret[i.key()] = i.value();
   }
   ret["DT_metadata_value"] = dt_metadata_value_;
   ret["DT_protection_value"] = dt_protection_value_;

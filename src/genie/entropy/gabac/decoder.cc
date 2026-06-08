@@ -51,7 +51,7 @@ core::AccessUnit::Descriptor DecompressTokens(
     num_token_type_descriptors = reader.Read<uint16_t>();
   }
   int32_t type_num = -1;
-  for (size_t idx_i = 0; idx_i < num_token_type_descriptors; ++idx_i) {
+  for (size_t i = 0; i < num_token_type_descriptors; ++i) {
     uint64_t num_symbols = 0;
     size_t mapped_type_id = 0;
     {
@@ -78,10 +78,10 @@ core::AccessUnit::Descriptor DecompressTokens(
     }
 
     std::vector<util::DataBlock> transformed_seqs;
-    for (size_t idx_j = 0;
-         idx_j < conf0.GetSubSeqConfig().GetNumTransformSubSeqConfigs(); ++idx_j) {
+    for (size_t j = 0;
+         j < conf0.GetSubSeqConfig().GetNumTransformSubSeqConfigs(); ++j) {
       size_t payload_size = 0;
-      if (idx_j < conf0.GetSubSeqConfig().GetNumTransformSubSeqConfigs() - 1) {
+      if (j < conf0.GetSubSeqConfig().GetNumTransformSubSeqConfigs() - 1) {
         auto tmp = util::DataBlock(
             static_cast<uint8_t*>(remaining_data.GetData()) + offset, 4,
             remaining_data.GetWordSize());
@@ -110,7 +110,7 @@ core::AccessUnit::Descriptor DecompressTokens(
           payload_size, remaining_data.GetWordSize());
       offset +=
           DecodeTransformSubSeq(conf0.GetSubSeqConfig().GetTransformSubSeqCfg(
-                                    static_cast<uint8_t>(idx_j)),
+                                    static_cast<uint8_t>(j)),
                                 num_transformed_symbols, &tmp, 4);
 
       transformed_seqs.emplace_back(std::move(tmp));

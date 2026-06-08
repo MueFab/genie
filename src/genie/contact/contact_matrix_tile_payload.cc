@@ -350,7 +350,7 @@ size_t ContactMatrixTilePayload::GetSize() const {
 
 void ContactMatrixTilePayload::Write(util::BitWriter &writer) const {
 
-    writer.WriteBypassBE(codec_ID_);
+    writer.WriteBypassBE(static_cast<uint8_t>(codec_ID_));
 
     if (codec_ID_ != core::AlgoID::JBIG){
         writer.WriteBypassBE(nrows_);

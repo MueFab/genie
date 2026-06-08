@@ -70,7 +70,7 @@ class ReferenceCollection {
    * @brief Retrieves coverage information for a specific reference.
    *
    * This function returns a list of start and end positions representing the
-   * regions of the reference sequence that have been covered (idx_i.e., regions
+   * regions of the reference sequence that have been covered (i.e., regions
    * that have been loaded or registered). The list contains pairs of
    * positions indicating the start and end of each covered region.
    *

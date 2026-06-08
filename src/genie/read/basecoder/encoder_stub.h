@@ -55,6 +55,9 @@ class EncoderStub : public core::ReadEncoder {
     /// Indicates if records are paired-end.
     bool paired_end;
 
+    /// Length of the read being encoded.
+    size_t read_length;
+
     /// Class type of the record.
     core::record::ClassType class_type;
 

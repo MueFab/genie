@@ -81,11 +81,11 @@ class FlowGraphConvert final : public FlowGraph {
   void SetExporterSelector(
       const std::function<size_t(const record::Chunk&)>& fun);
 
-    /**
-     * @brief
-     * @param _classifier
-     */
-    void SetClassifier(std::unique_ptr<genie::core::Classifier> _classifier);
+  /**
+   * @brief
+   * @param classifier
+   */
+  void SetClassifier(std::unique_ptr<Classifier> classifier);
 
   /**
    * @brief

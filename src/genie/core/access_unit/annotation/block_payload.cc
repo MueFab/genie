@@ -78,10 +78,12 @@ void BlockPayload::read(util::BitReader& reader, AnnotDesc descriptorID, uint8_t
 // }
 
 void BlockPayload::write(util::BitWriter& writer) const {
-  if (generic_payload_stream.str().size() > 0)
-    writer.Write(const_cast<std::stringstream*>(&generic_payload_stream));
-  else
-    for (const auto& byte : generic_payload) writer.Write(byte, 8, true);
+  if (generic_payload_stream.str().size() > 0) {
+    auto* ss = const_cast<std::stringstream*>(&generic_payload_stream);
+    writer.Write(static_cast<std::istream*>(ss));
+  } else {
+    for (const auto& byte : generic_payload) writer.WriteBits(byte, 8);
+  }
   writer.FlushBits();
 }
 

@@ -9,6 +9,7 @@
 set(HTSLIB_SEARCH_DIRS
         ${HTSLIB_SEARCH_DIRS}
         $ENV{HTLSIB_ROOT}
+        $ENV{CONDA_PREFIX}
         /gsc/pkg/bio/htslib
         /usr
         /usr/local
@@ -34,7 +35,7 @@ find_library(HTSlib_LIBRARY
         NAMES hts libhts.a hts.a
         PATHS ${HTSlib_INCLUDE_DIR} ${HTSLIB_SEARCH_DIRS}
         NO_DEFAULT_PATH
-        PATH_SUFFIXES lib lib64 ${_htslib_ver_path}
+        PATH_SUFFIXES lib lib64 lib/x86_64-linux-gnu ${_htslib_ver_path}
         HINTS ENV HTSLIB_ROOT
         )
 

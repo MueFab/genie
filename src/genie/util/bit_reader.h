@@ -124,7 +124,7 @@ class BitReader {
    * boundary. A byte is aligned if no bits are being held from a previous
    * byte.
    *
-   * @return true if the reader is byte-aligned (idx_i.e., no held bits), false
+   * @return true if the reader is byte-aligned (i.e., no held bits), false
    * otherwise.
    */
   [[nodiscard]] bool IsByteAligned() const;

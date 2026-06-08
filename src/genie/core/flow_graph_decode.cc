@@ -11,7 +11,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/core/flow_graph_decode.h"
 
 // -----------------------------------------------------------------------------
 
@@ -196,8 +195,8 @@ void FlowGraphDecode::SetQvCoder(std::unique_ptr<QvDecoder> dat,
 void FlowGraphDecode::Run() {
   std::vector<util::OriginalSource*> imps;
   imps.reserve(importers_.size());
-  for (auto& idx_i : importers_) {
-    imps.emplace_back(idx_i.get());
+  for (auto& i : importers_) {
+    imps.emplace_back(i.get());
   }
   mgr_.SetSource(std::move(imps));
   mgr_.Run();

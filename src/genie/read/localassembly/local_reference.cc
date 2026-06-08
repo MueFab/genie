@@ -131,8 +131,7 @@ void LocalReference::AddRead(const core::record::Record& s) {
   const auto pos1 = s.GetAlignments().front().GetPosition();
   AddSingleRead(seq1, cigar1, pos1);
 
-  if (s.GetSegments().size() == 1 ||
-      s.GetClassId() == core::record::ClassType::kClassHm) {
+  if (s.GetSegments().size() == 1) {
     return;
   }
 

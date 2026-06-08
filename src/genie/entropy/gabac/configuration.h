@@ -134,9 +134,9 @@ class EncodingConfiguration {
    * Initializes the configuration using values from a JSON object
    * representation.
    *
-   * @param idx_j The JSON object containing configuration parameters.
+   * @param j The JSON object containing configuration parameters.
    */
-  explicit EncodingConfiguration(nlohmann::json idx_j);
+  explicit EncodingConfiguration(nlohmann::json j);
 
   /**
    * @brief Serializes the configuration to a JSON object.

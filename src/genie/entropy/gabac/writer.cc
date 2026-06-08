@@ -70,10 +70,10 @@ void Writer::WriteAsBiCabac(const uint64_t input,
   const unsigned int c_length = bin_params[0];
   const unsigned int cm = bin_params[3];
   auto scan = context_models_.begin() + cm;
-  for (int idx_i = static_cast<int>(c_length) - 1; idx_i >= 0;
-       idx_i--) {  // idx_i must be signed
+  for (int i = static_cast<int>(c_length) - 1; i >= 0;
+       i--) {  // i must be signed
     const unsigned int bin =
-        static_cast<unsigned int>(input >> static_cast<uint8_t>(idx_i)) & 0x1u;
+        static_cast<unsigned int>(input >> static_cast<uint8_t>(i)) & 0x1u;
     binary_arithmetic_encoder_.EncodeBin(bin, &*scan++);
   }
 }
@@ -83,7 +83,7 @@ void Writer::WriteAsBiCabac(const uint64_t input,
 void Writer::WriteAsTuBypass(const uint64_t input,
                              const std::vector<unsigned int>& bin_params) {
   const unsigned int c_max = bin_params[0];
-  for (uint64_t idx_i = 0; idx_i < input; idx_i++) {
+  for (uint64_t i = 0; i < input; i++) {
     binary_arithmetic_encoder_.EncodeBinEp(1);
   }
   if (c_max > input) {
@@ -98,7 +98,7 @@ void Writer::WriteAsTuCabac(const uint64_t input,
   const unsigned int c_max = bin_params[0];
   const unsigned int cm = bin_params[3];
   auto scan = context_models_.begin() + cm;
-  for (uint64_t idx_i = 0; idx_i < input; idx_i++) {
+  for (uint64_t i = 0; i < input; i++) {
     binary_arithmetic_encoder_.EncodeBin(1, &*scan++);
   }
   if (c_max > input) {
@@ -175,13 +175,13 @@ void Writer::WriteAsSutuBypass(const uint64_t input,
   const unsigned int output_sym_size = bin_params[0];
   const unsigned int split_unit_size = bin_params[1];
 
-  unsigned int idx_i, idx_j;
-  for (idx_i = 0, idx_j = output_sym_size; idx_i < output_sym_size; idx_i += split_unit_size) {
-    const unsigned int unit_size = idx_i == 0 && output_sym_size % split_unit_size
+  unsigned int i, j;
+  for (i = 0, j = output_sym_size; i < output_sym_size; i += split_unit_size) {
+    const unsigned int unit_size = i == 0 && output_sym_size % split_unit_size
                                        ? output_sym_size % split_unit_size
                                        : split_unit_size;
     unsigned int c_max = (1u << unit_size) - 1;
-    const unsigned int val = input >> (idx_j -= unit_size) & c_max;
+    const unsigned int val = input >> (j -= unit_size) & c_max;
     WriteAsTuBypass(val, std::vector({c_max}));
   }
 }
@@ -194,13 +194,13 @@ void Writer::WriteAsSutuCabac(const uint64_t input,
   const unsigned int split_unit_size = bin_params[1];
 
   unsigned int cm = bin_params[3];
-  unsigned int idx_i, idx_j;
-  for (idx_i = 0, idx_j = output_sym_size; idx_i < output_sym_size; idx_i += split_unit_size) {
-    const unsigned int unit_size = idx_i == 0 && output_sym_size % split_unit_size
+  unsigned int i, j;
+  for (i = 0, j = output_sym_size; i < output_sym_size; i += split_unit_size) {
+    const unsigned int unit_size = i == 0 && output_sym_size % split_unit_size
                                        ? output_sym_size % split_unit_size
                                        : split_unit_size;
     unsigned int c_max = (1u << unit_size) - 1;
-    const unsigned int val = input >> (idx_j -= unit_size) & c_max;
+    const unsigned int val = input >> (j -= unit_size) & c_max;
     WriteAsTuCabac(val, std::vector<unsigned int>({c_max, 0, 0, cm}));
     cm += c_max;
   }

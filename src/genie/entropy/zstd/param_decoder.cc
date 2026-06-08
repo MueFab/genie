@@ -25,10 +25,10 @@ DecoderRegular::DecoderRegular()
 
 DecoderRegular::DecoderRegular(core::GenDesc desc)
     : core::parameter::desc_pres::DecoderRegular(kModeZstd) {
-  for (size_t idx_i = 0;
-       idx_i < core::GetDescriptors()[static_cast<uint8_t>(desc)].sub_seqs.size();
-       ++idx_i) {
-    auto bits_p2 = core::Range2Bytes(GetDescriptor(desc).sub_seqs[idx_i].range);
+  for (size_t i = 0;
+       i < core::GetDescriptors()[static_cast<uint8_t>(desc)].sub_seqs.size();
+       ++i) {
+    auto bits_p2 = core::Range2Bytes(GetDescriptor(desc).sub_seqs[i].range);
     descriptor_subsequence_configs_.emplace_back(bits_p2);
   }
 }
@@ -38,7 +38,7 @@ DecoderRegular::DecoderRegular(core::GenDesc desc)
 DecoderRegular::DecoderRegular(core::GenDesc, util::BitReader& reader)
     : core::parameter::desc_pres::DecoderRegular(kModeZstd) {
   const uint8_t num_descriptor_subsequence_configs = reader.Read<uint8_t>() + 1;
-  for (size_t idx_i = 0; idx_i < num_descriptor_subsequence_configs; ++idx_i) {
+  for (size_t i = 0; i < num_descriptor_subsequence_configs; ++i) {
     descriptor_subsequence_configs_.emplace_back(reader.Read<uint8_t>(6));
   }
 }
@@ -81,8 +81,8 @@ DecoderRegular::create(core::GenDesc desc, util::BitReader& reader) {
 void DecoderRegular::Write(util::BitWriter& writer) const {
   Decoder::Write(writer);
   writer.WriteBits(descriptor_subsequence_configs_.size() - 1, 8);
-  for (auto& idx_i : descriptor_subsequence_configs_) {
-    idx_i.write(writer);
+  for (auto& i : descriptor_subsequence_configs_) {
+    i.write(writer);
   }
 }
 

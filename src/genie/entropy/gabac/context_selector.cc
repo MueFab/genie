@@ -1,5 +1,5 @@
 /**
-* Copyright 2018-2024 The Genie Authors.
+ * Copyright 2018-2024 The Genie Authors.
  * @file
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
@@ -40,10 +40,10 @@ unsigned int ContextSelector::GetContextIdxOrderGt0(
   ctx_idx += state_vars_.GetNumCtxLuts();
   ctx_idx += static_cast<unsigned int>(subsym_idx *
                                        state_vars_.GetCodingSizeCtxOffset());
-  for (uint8_t idx_i = 1; idx_i <= coding_order; idx_i++) {
+  for (uint8_t i = 1; i <= coding_order; i++) {
     ctx_idx +=
-        static_cast<unsigned int>(subsymbols[prv_idx].prv_values[idx_i - 1] *
-                                  state_vars_.GetCodingOrderCtxOffset(idx_i));
+        static_cast<unsigned int>(subsymbols[prv_idx].prv_values[i - 1] *
+                                  state_vars_.GetCodingOrderCtxOffset(i));
   }
 
   return ctx_idx;

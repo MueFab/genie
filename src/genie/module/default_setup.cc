@@ -17,8 +17,8 @@
 
 #include "genie/module/default_setup.h"
 
-#include <name/write_out/decoder.h>
-#include <name/write_out/encoder.h>
+#include "genie/name/write_out/decoder.h"
+#include "genie/name/write_out/encoder.h"
 
 #include <memory>
 #include <string>
@@ -55,7 +55,7 @@ namespace genie::module {
 
 // -----------------------------------------------------------------------------
 
-std::unique_ptr<core::FlowGraphEncode> build_default_encoder(
+std::unique_ptr<core::FlowGraphEncode> BuildDefaultEncoder(
     size_t threads, const std::string& working_dir, size_t block_size,
     core::ClassifierRegroup::RefMode external_ref, bool raw_ref,
     bool write_raw_streams, const std::string& entropy_mode) {

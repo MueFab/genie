@@ -25,7 +25,7 @@
 
 // -----------------------------------------------------------------------------
 
-#include "genie/core/access_unit/access_unit.h"
+#include "genie/core/access_unit.h"
 #include "genie/core/entropy_encoder.h"
 #include "genie/entropy/gabac/gabac.h"
 #include "genie/entropy/gabac/gabac_seq_conf_set.h"
@@ -85,7 +85,8 @@ class Encoder : public core::EntropyEncoder {
   GabacSeqConfSet
       config_set_;  //!< @brief Configuration set for GABAC compression. This
                     //!< set remains static over time.
-  bool write_out_streams_{};  //!< @brief Flag to indicate whether to write
+  [[maybe_unused]] bool
+      write_out_streams_{};  //!< @brief Flag to indicate whether to write
                              //!< out streams for debugging or analysis.
 
   /**

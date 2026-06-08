@@ -1,37 +1,34 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @brief Defines a BSC-specific encoder for entropy compression using the GABAC
+ * algorithm.
+ * @details This file contains the implementation of the `Encoder` class, which
+ * performs compression of raw access units into entropy-coded block payloads
+ * using the GABAC library. The class inherits from the base `EntropyEncoder`
+ *          interface and implements the necessary functionality to process
+ * MPEG-G descriptors.
+ * @copyright This file is part of Genie
+ *            See LICENSE and/or https://github.com/MueFab/genie for more
+ * details.
  */
 
 #ifndef SRC_GENIE_ENTROPY_BSC_ENCODER_H_
 #define SRC_GENIE_ENTROPY_BSC_ENCODER_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-#ifdef _WIN32
-#include <windows.h>
-#define SYSERROR() GetLastError()
-#else
-#include <errno.h>
-#define SYSERROR() errno
-#endif
+// -----------------------------------------------------------------------------
 
-#include <sstream>
-
-#include "genie/core/access_unit/access_unit.h"
+#include "genie/core/access_unit.h"
 #include "genie/core/entropy_encoder.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/stop_watch.h"
-
-#include "apps/genie/annotation/code.h"
-#include "codecs/include/mpegg-codecs.h"
+#include "genie/core/parameter/descriptor_present/decoder_regular.h"
 #include "genie/core/parameter/annotation/algorithm_parameters.h"
+#include "genie/core/parameter/annotation/compressor_parameter_set.h"
+#include "genie/util/stop_watch.h"
+#include <libbsc.h>
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace bsc {
+namespace genie::entropy::bsc {
 
 class BSCParameters {
  public:
@@ -41,10 +38,11 @@ class BSCParameters {
     uint8_t coder;
     uint16_t features;
     BSCParameters()
-        : lzpHashSize(MPEGG_BSC_DEFAULT_LZPHASHSIZE),
-          lzpMinLen(MPEGG_BSC_DEFAULT_LZPMINLEN),
-          blockSorter(MPEGG_BSC_BLOCKSORTER_BWT),
-          coder(MPEGG_BSC_CODER_QLFC_STATIC) {}
+        : lzpHashSize(LIBBSC_DEFAULT_LZPHASHSIZE),
+          lzpMinLen(LIBBSC_DEFAULT_LZPMINLEN),
+          blockSorter(LIBBSC_DEFAULT_BLOCKSORTER),
+          coder(LIBBSC_DEFAULT_CODER),
+          features(0) {}
     BSCParameters(uint8_t _lzpHashSize, uint8_t _lzpMinLen, uint8_t _blockSorter, uint8_t _coder,
                   uint16_t _features = 0)
         : lzpHashSize(_lzpHashSize),
@@ -58,8 +56,8 @@ class BSCParameters {
         uint8_t compressor_ID) const;
 
     bool parsAreDefault() const {
-        return lzpHashSize == MPEGG_BSC_DEFAULT_LZPHASHSIZE && lzpMinLen == MPEGG_BSC_DEFAULT_LZPMINLEN &&
-               blockSorter == MPEGG_BSC_BLOCKSORTER_BWT && coder == MPEGG_BSC_CODER_QLFC_STATIC;
+        return lzpHashSize == LIBBSC_DEFAULT_LZPHASHSIZE && lzpMinLen == LIBBSC_DEFAULT_LZPMINLEN &&
+               blockSorter == LIBBSC_DEFAULT_BLOCKSORTER && coder == LIBBSC_DEFAULT_CODER;
     }
 };
 
@@ -85,15 +83,46 @@ class BSCEncoder {
     uint8_t coder;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+/**
+ * @brief Module to Compress raw access units into block payloads using GABAC.
+ * @details The `Encoder` class is responsible for handling entropy compression
+ * of raw MPEG-G access units. It implements the core entropy encoding interface
+ * and integrates GABAC-specific algorithms to achieve high compression
+ * efficiency.
+ */
+class Encoder : public core::EntropyEncoder {
+ public:
+  bool writeOutStreams{};  //!< @brief Flag to enable or disable writing out
+                           //!< streams for debugging.
 
-}  // namespace bsc
-}  // namespace entropy
-}  // namespace genie
+  /**
+   * @brief Compress the given descriptor using GABAC.
+   * @param desc Reference to the descriptor to be compressed.
+   * @return The compressed entropy-coded data.
+   * @details The function compresses an MPEG-G descriptor using the GABAC
+   * library, returning the entropy-coded representation. The resulting data is
+   * stored in a structure that encapsulates all necessary metadata and
+   * bitstream information.
+   */
+  entropy_coded Process(core::AccessUnit::Descriptor& desc) override;
 
-// ---------------------------------------------------------------------------------------------------------------------
+  /**
+   * @brief Construct a new Encoder object.
+   * @param write_out_streams Flag to enable or disable writing out streams for
+   * debugging purposes.
+   * @details This constructor initializes the encoder with the specified stream
+   * writing configuration.
+   */
+  explicit Encoder(bool write_out_streams);
+};
+
+// -----------------------------------------------------------------------------
+
+}  // namespace genie::entropy::bsc
+
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_ENTROPY_BSC_ENCODER_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

@@ -1,62 +1,58 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/dataset_header/u_signature.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace dataset_header {
+namespace genie::format::mgg::dataset_header {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool USignature::operator==(const USignature& other) const { return const_length == other.const_length; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-USignature::USignature() : const_length(boost::none) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-USignature::USignature(uint8_t _const_length) : const_length(_const_length) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-USignature::USignature(genie::util::BitReader& reader) {
-    bool U_signature_constant_length = reader.read<bool>(1);
-    if (U_signature_constant_length) {
-        const_length = reader.read<uint8_t>(8);
-    }
+bool USignature::operator==(const USignature& other) const {
+  return const_length_ == other.const_length_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void USignature::write(genie::util::BitWriter& writer) const {
-    writer.write(isConstLength(), 1);
-    if (isConstLength()) {
-        writer.write(getConstLength(), 8);
-    }
+USignature::USignature() : const_length_(std::nullopt) {}
+
+// -----------------------------------------------------------------------------
+
+USignature::USignature(uint8_t const_length) : const_length_(const_length) {}
+
+// -----------------------------------------------------------------------------
+
+USignature::USignature(util::BitReader& reader) {
+  if (reader.Read<bool>(1)) {
+    const_length_ = reader.Read<uint8_t>(8);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool USignature::isConstLength() const { return const_length != boost::none; }
+void USignature::Write(util::BitWriter& writer) const {
+  writer.WriteBits(IsConstLength(), 1);
+  if (IsConstLength()) {
+    writer.WriteBits(GetConstLength(), 8);
+  }
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint8_t USignature::getConstLength() const { return *const_length; }
+bool USignature::IsConstLength() const { return const_length_ != std::nullopt; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace dataset_header
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+uint8_t USignature::GetConstLength() const { return *const_length_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+}  // namespace genie::format::mgg::dataset_header
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

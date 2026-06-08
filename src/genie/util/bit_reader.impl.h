@@ -88,8 +88,8 @@ T BitReader::ReadAlignedInt() {
     if (NumBytes < sizeof(T) &&
         (reinterpret_cast<unsigned char*>(&result)[NumBytes - 1] &
          0x80)) {  // NOLINT
-      for (size_t idx_i = NumBytes; idx_i < sizeof(T); ++idx_i) {
-        reinterpret_cast<unsigned char*>(&result)[idx_i] =
+      for (size_t i = NumBytes; i < sizeof(T); ++i) {
+        reinterpret_cast<unsigned char*>(&result)[i] =
             static_cast<unsigned char>(0xFF);
       }
     }

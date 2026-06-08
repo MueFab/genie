@@ -64,11 +64,12 @@ uint8_t Alignment::GetRComp() const { return this->reverse_comp_; }
 // -----------------------------------------------------------------------------
 
 void Alignment::Write(util::BitWriter& writer) const {
-  writer.WriteBypassBE<uint32_t, 3>(static_cast<uint32_t>(e_cigar_string_.length()));
+  writer.WriteAlignedInt<uint32_t, 3>(
+      static_cast<uint32_t>(e_cigar_string_.length()));
   writer.WriteAlignedBytes(e_cigar_string_.data(), e_cigar_string_.length());
-  writer.WriteBypassBE(reverse_comp_);
-  for (auto s : mapping_score_) {
-    writer.WriteBypassBE(s);
+  writer.WriteAlignedInt(reverse_comp_);
+  for (const auto s : mapping_score_) {
+    writer.WriteAlignedInt(s);
   }
 }
 

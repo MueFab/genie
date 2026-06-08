@@ -1,13 +1,27 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * Copyright 2018-2024 The Genie Authors.
+ * @file bit_writer.impl.h
+ *
+ * @copyright This file is part of Genie
+ * See LICENSE and/or visit https://github.com/MueFab/genie for more details.
+ *
+ * @brief Implementation of BitWriter utility class template methods for
+ * specific tasks.
+ *
+ * This file contains the implementation of the BitWriter class's template
+ * methods, specifically specialized functions like writing aligned integers to
+ * the output stream while managing endianness.
+ *
+ * @details The BitWriter class template method writeAlignedInt is implemented
+ * here to handle writing of integral types to the output stream in a
+ * byte-aligned manner. This method ensures data integrity by handling
+ * endianness swapping when necessary.
  */
 
-#ifndef SRC_GENIE_UTIL_BITWRITER_IMPL_H_
-#define SRC_GENIE_UTIL_BITWRITER_IMPL_H_
+#ifndef SRC_GENIE_UTIL_BIT_WRITER_IMPL_H_
+#define SRC_GENIE_UTIL_BIT_WRITER_IMPL_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // Suppress MSVC warning about constants in template if-conditions
 #ifdef _MSC_VER
@@ -15,57 +29,52 @@
 #pragma warning(disable : 4127)
 #endif
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include "genie/util/endianness.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename T, size_t SIZE, typename>
-void BitWriter::WriteBypassBE(T val) {
-    static_assert(SIZE > 0, "SIZE == 0");
-    static_assert(SIZE <= sizeof(T), "SIZE > sizeof(T)");
-
-    m_bitsWritten += (SIZE * 8);
-
-    if (stream == nullptr) {
-        return;
-    }
-
-    // Swap Endianness if necessary
-    if (SIZE > 1) {
-        SwapEndianness<T, SIZE>(val);
-    }
-
-    stream->write(reinterpret_cast<char*>(&val), SIZE);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 template <typename T, size_t NumBytes, typename>
 void BitWriter::WriteAlignedInt(T val) {
-    WriteBypassBE<T, NumBytes>(val);
+  static_assert(NumBytes > 0, "NUM_BYTES should be greater than 0.");
+  static_assert(
+      NumBytes <= sizeof(T),
+      "NUM_BYTES should be less than or equal to the Size of type T.");
+
+  // Swap Endianness if necessary
+  if (NumBytes > 1) {
+    SwapEndianness<T, NumBytes>(val);
+  }
+
+  if (stream_) {
+    stream_->write(reinterpret_cast<char*>(&val), NumBytes);
+  }
+  total_bits_written_ += NumBytes * 8;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+template <typename T, size_t NumBytes, typename>
+void BitWriter::WriteBypassBE(T val) {
+  WriteAlignedInt<T, NumBytes>(val);
+}
 
-}  // namespace util
-}  // namespace genie
+// -----------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------------------------------------------
+}  // namespace genie::util
+
+// -----------------------------------------------------------------------------
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_UTIL_BITWRITER_IMPL_H_
+#endif  // SRC_GENIE_UTIL_BIT_WRITER_IMPL_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

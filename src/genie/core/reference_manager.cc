@@ -51,8 +51,8 @@ void ReferenceManager::Touch(const std::string& name, size_t num) {
 
 void ReferenceManager::ValidateRefId(const size_t id) {
   std::unique_lock lock2(cache_info_lock_);
-  for (size_t idx_i = 0; idx_i <= id; ++idx_i) {
-    auto s = std::to_string(idx_i);
+  for (size_t i = 0; i <= id; ++i) {
+    auto s = std::to_string(i);
     data_[std::string(s.size() < 3 ? 3 - s.size() : 0, '0') + s];
   }
 }
@@ -106,10 +106,10 @@ void ReferenceManager::ReferenceExcerpt::Merge(ReferenceExcerpt& e) {
     return;
   }
   Extend(e.global_end_);
-  for (size_t idx_i = e.global_start_ / chunk_size_;
-       idx_i < (e.global_end_ - 1) / chunk_size_ + 1; idx_i++) {
-    if (e.IsMapped(idx_i * chunk_size_)) {
-      MapChunkAt(idx_i * chunk_size_, e.GetChunkAt(idx_i * chunk_size_));
+  for (size_t i = e.global_start_ / chunk_size_;
+       i < (e.global_end_ - 1) / chunk_size_ + 1; i++) {
+    if (e.IsMapped(i * chunk_size_)) {
+      MapChunkAt(i * chunk_size_, e.GetChunkAt(i * chunk_size_));
     }
   }
 }
@@ -183,7 +183,7 @@ void ReferenceManager::ReferenceExcerpt::Extend(const size_t new_end) {
     return;
   }
   const size_t id = (new_end - 1) / chunk_size_;
-  for (size_t idx_i = data_.size() - 1; idx_i < id; ++idx_i) {
+  for (size_t i = data_.size() - 1; i < id; ++i) {
     data_.push_back(UndefPage());
   }
   global_end_ = new_end;
@@ -256,7 +256,7 @@ std::string ReferenceManager::ReferenceExcerpt::GetString(
   auto stepper = GetStepper();
   std::string ret;
   stepper.Inc(start - global_start_);
-  for (size_t idx_i = start; idx_i < end; ++idx_i) {
+  for (size_t i = start; i < end; ++i) {
     ret += stepper.Get();
     stepper.Inc();
   }
@@ -278,7 +278,7 @@ void ReferenceManager::AddRef(size_t index, std::unique_ptr<Reference> ref) {
   const auto sequence = data_.find(ref->GetName());
   const size_t cur_chunks =
       sequence == data_.end() ? 0 : sequence->second.size();
-  for (size_t idx_i = cur_chunks; idx_i < (ref->GetEnd() - 1) / chunk_size_ + 1; idx_i++) {
+  for (size_t i = cur_chunks; i < (ref->GetEnd() - 1) / chunk_size_ + 1; i++) {
     data_[ref->GetName()].push_back(std::make_unique<CacheLine>());
   }
   mgr_.RegisterRef(std::move(ref));
@@ -341,8 +341,8 @@ std::shared_ptr<const std::string> ReferenceManager::LoadAt(
 ReferenceManager::ReferenceExcerpt ReferenceManager::Load(
     const std::string& name, const size_t start, const size_t end) {
   ReferenceExcerpt ret(name, start, end);
-  for (size_t idx_i = start / chunk_size_; idx_i <= (end - 1) / chunk_size_; idx_i++) {
-    ret.MapChunkAt(idx_i * chunk_size_, LoadAt(name, idx_i * chunk_size_));
+  for (size_t i = start / chunk_size_; i <= (end - 1) / chunk_size_; i++) {
+    ret.MapChunkAt(i * chunk_size_, LoadAt(name, i * chunk_size_));
   }
   return ret;
 }

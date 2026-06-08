@@ -15,6 +15,8 @@
 
 #include "genie/contact/contact_coder.h"
 #include "genie/core/record/variant/record.h"
+#include "genie/core/parameter/annotation/record.h"
+#include "genie/core/access_unit/annotation/record.h"
 
 #include "genie/annotation/compressors.h"
 // -----------------------------------------------------------------------------

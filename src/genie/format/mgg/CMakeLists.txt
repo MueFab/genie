@@ -4,15 +4,7 @@ set(source_files
         file_header.cc
         dataset_group.cc
         dataset_group_header.cc
-        #        dataset/access_unit_p1.cc
-        #        dataset.cc
-        #        dataset_header.cc
         block.cc
-        #        dataset/master_index_table/access_unit_info/extended_au_info.cc
-        #        dataset/master_index_table/access_unit_info/access_unit_info.cc
-        #        dataset/master_index_table/u_access_unit_info/u_access_unit_info.cc
-        #        dataset/master_index_table/master_index_table.cc
-        #        dataset/master_index_table/ref_seq_info.cpp
         block_header.cc
         reference/location.cc
         reference/location.cc
@@ -51,8 +43,8 @@ set(source_files
         dataset_header/u_options.cc
         dataset_header/u_signature.cc
         data_stream.cc
-        dataset_parameterset/u_signature.cc
-        dataset_parameterset/update_info.cc
+        dataset_parameter_set/u_signature.cc
+        dataset_parameter_set/update_info.cc
         descriptor_stream_protection.cc
         master_index_table/aligned_au_index.cc
         master_index_table/unaligned_au_index.cc
@@ -67,9 +59,7 @@ set(source_files
         encapsulator/encapsulated_dataset_group.cc
         encapsulator/encapsulated_file.cc
         encapsulator/decapsulated_file.cc
-        encapsulator/decapsulated_dataset_group.cc
-        annotation_table/annotation_table.cc
-)
+        encapsulator/decapsulated_dataset_group.cc)
 
 add_library(genie-mgg ${source_files})
 

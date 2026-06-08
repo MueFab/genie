@@ -23,7 +23,7 @@ namespace genie::core::record {
 // -----------------------------------------------------------------------------
 
 void AlignmentBox::Write(util::BitWriter& writer) const {
-  writer.WriteBypassBE<uint64_t, 5>(mapping_pos_);
+  writer.WriteAlignedInt<uint64_t, 5>(mapping_pos_);
   alignment_.Write(writer);
   for (const auto& a : split_alignment_info_) {
     a->Write(writer);

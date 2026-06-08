@@ -12,9 +12,7 @@
 
 #include <tuple>
 
-#include "genie/core/access_unit/access_unit.h"
-#include "genie/core/module.h"
-#include "genie/core/parameter/descriptor_present/decoder.h"
+#include "genie/core/access_unit.h"
 
 // -----------------------------------------------------------------------------
 

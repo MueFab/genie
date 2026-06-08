@@ -15,8 +15,9 @@
 #include <vector>
 #include <map>
 
-#include "genie/core/record/class_type.h"
 #include "genie/util/runtime_exception.h"
+
+#include "genie/core/record/class_type.h"
 
 // -----------------------------------------------------------------------------
 
@@ -390,8 +391,8 @@ const Alphabet& GetAlphabetProperties(AlphabetId id) {
     for (auto& l : loc) {
       l.inverse_lut = std::vector<char>(
           *std::max_element(l.lut.begin(), l.lut.end()) + 1, 0);
-      for (size_t idx_i = 0; idx_i < l.lut.size(); ++idx_i) {
-        l.inverse_lut[l.lut[idx_i]] = static_cast<char>(idx_i);
+      for (size_t i = 0; i < l.lut.size(); ++i) {
+        l.inverse_lut[l.lut[i]] = static_cast<char>(i);
       }
     }
     return loc;
@@ -462,16 +463,16 @@ uint8_t Bits2Bytes(const uint8_t bits) {
 
 // -----------------------------------------------------------------------------
 
-uint8_t Range2Bytes(std::pair<int64_t, int64_t> range) {
-  auto bits = static_cast<uint8_t>(std::ceil(std::log2(std::abs(range.first) + 1)));
-  bits = std::max(bits, static_cast<uint8_t>(std::ceil(std::log2(std::abs(range.second) + 1))));
+uint8_t Range2Bytes(const std::pair<int64_t, int64_t>& range) {
+  auto bits =
+      static_cast<uint8_t>(std::ceil(std::log2(std::abs(range.first) + 1)));
+  bits = std::max(bits, static_cast<uint8_t>(
+                            std::ceil(std::log2(std::abs(range.second) + 1))));
   if (range.first < 0) {
     bits++;
   }
   return Bits2Bytes(bits);
 }
-
-// -----------------------------------------------------------------------------
 
 std::string AnnotDescToString(AnnotDesc desc) {
     switch (desc) {
@@ -551,7 +552,7 @@ AlgoID stringToAlgoID(std::string& algostring)
 
 // -----------------------------------------------------------------------------
 
-}  // namespace core
+}  // namespace genie::core
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

@@ -22,7 +22,6 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
-#include <sstream>
 
 // -----------------------------------------------------------------------------
 
@@ -81,7 +80,7 @@ void Logger::LogLine(const Severity severity, const std::string& message,
               .count() %
           1000;
       const std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-      time_stream << std::put_time(std::localtime(&now_c), "%Y-%dim_m-%d %H:%M:%S")
+      time_stream << std::put_time(std::localtime(&now_c), "%Y-%m-%d %H:%M:%S")
                   << "." << std::setw(3) << std::setfill('0') << millis;
     }
     if (time_setting_ == TimeSetting::RUNTIME ||

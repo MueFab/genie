@@ -3,6 +3,7 @@ find_path(BSC_INCLUDE_DIR
     NAMES libbsc.h
     HINTS
         $ENV{CONDA_PREFIX}/include
+        ${CMAKE_SOURCE_DIR}/thirdparty/codecs/libbsc
     PATH_SUFFIXES .
 )
 
@@ -14,9 +15,13 @@ find_library(BSC_LIBRARY
 )
 
 # Check if the library and header were found
-if(BSC_INCLUDE_DIR AND BSC_LIBRARY)
+if(BSC_INCLUDE_DIR AND (BSC_LIBRARY OR TARGET mpeggCodecs-static))
     set(BSC_FOUND TRUE)
-    set(BSC_LIBRARIES ${BSC_LIBRARY})
+    if(BSC_LIBRARY)
+        set(BSC_LIBRARIES ${BSC_LIBRARY})
+    else()
+        set(BSC_LIBRARIES mpeggCodecs-static)
+    endif()
     set(BSC_INCLUDE_DIRS ${BSC_INCLUDE_DIR})
 else()
     set(BSC_FOUND FALSE)
@@ -27,7 +32,7 @@ message(STATUS "   BSC include dirs: ${BSC_INCLUDE_DIRS}")
 message(STATUS "   BSC libraries: ${BSC_LIBRARIES}")
 
 # If REQUIRED is passed and BSC is not found, fail with an error
-if(NOT BSC_FOUND AND REQUIRED)
+if(NOT BSC_FOUND AND BSC_FIND_REQUIRED)
     message(FATAL_ERROR "Could not find libbsc. Please make sure the library and headers are installed.")
 endif()
 

@@ -10,7 +10,7 @@
 
 // -----------------------------------------------------------------------------
 
-#include "genie/core/access_unit/access_unit.h"
+#include "genie/core/access_unit.h"
 #include "genie/util/original_source.h"
 #include "genie/util/source.h"
 

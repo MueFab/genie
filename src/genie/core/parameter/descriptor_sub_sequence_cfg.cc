@@ -74,7 +74,7 @@ DescriptorSubSequenceCfg::DescriptorSubSequenceCfg(const size_t num_classes,
   if (class_specific_dec_cfg_flag_ == 0) {
     descriptor_configurations_.emplace_back(Descriptor::Factory(desc, reader));
   } else {
-    for (size_t idx_i = 0; idx_i < num_classes; ++idx_i) {
+    for (size_t i = 0; i < num_classes; ++i) {
       descriptor_configurations_.emplace_back(
           Descriptor::Factory(desc, reader));
     }
@@ -122,8 +122,8 @@ void DescriptorSubSequenceCfg::EnableClassSpecific(const uint8_t num_classes) {
   }
   class_specific_dec_cfg_flag_ = true;
   descriptor_configurations_.resize(num_classes);
-  for (size_t idx_i = 1; idx_i < descriptor_configurations_.size(); ++idx_i) {
-    descriptor_configurations_[idx_i] = descriptor_configurations_[0]->Clone();
+  for (size_t i = 1; i < descriptor_configurations_.size(); ++i) {
+    descriptor_configurations_[i] = descriptor_configurations_[0]->Clone();
   }
 }
 
@@ -137,8 +137,8 @@ bool DescriptorSubSequenceCfg::IsClassSpecific() const {
 
 void DescriptorSubSequenceCfg::Write(util::BitWriter& writer) const {
   writer.WriteBits(class_specific_dec_cfg_flag_, 1);
-  for (auto& idx_i : descriptor_configurations_) {
-    idx_i->Write(writer);
+  for (auto& i : descriptor_configurations_) {
+    i->Write(writer);
   }
 }
 
@@ -158,9 +158,9 @@ bool DescriptorSubSequenceCfg::DescComp(
       descriptor_configurations_.size()) {
     return false;
   }
-  for (size_t idx_i = 0; idx_i < cfg.descriptor_configurations_.size(); ++idx_i) {
-    if (!descriptor_configurations_[idx_i]->Equals(
-            cfg.descriptor_configurations_[idx_i].get())) {
+  for (size_t i = 0; i < cfg.descriptor_configurations_.size(); ++i) {
+    if (!descriptor_configurations_[i]->Equals(
+            cfg.descriptor_configurations_[i].get())) {
       return false;
     }
   }

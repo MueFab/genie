@@ -26,8 +26,8 @@ AlignmentExternal::AlignmentExternal(const Type more_alignment_info_type)
 
 // -----------------------------------------------------------------------------
 
-void AlignmentExternal::Write(util::BitWriter &writer) const {
-  writer.WriteBypassBE(more_alignment_info_type_);
+void AlignmentExternal::Write(util::BitWriter& writer) const {
+  writer.WriteAlignedInt(more_alignment_info_type_);
 }
 
 // -----------------------------------------------------------------------------

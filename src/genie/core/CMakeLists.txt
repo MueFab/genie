@@ -30,12 +30,10 @@ set(source_files
 
         record/variant/record.cc
         record/variant/format_field.cc
-
         linked_record/linked_record.cc
-
         record/site/record.cc
         record/data_unit/record.cc
-
+        record/contact/record.cc
         feature_record/record.cc
         functional_annotation_record/record.cc
         gene_expression_record/record.cc
@@ -66,7 +64,7 @@ set(source_files
 
         stats/perf_stats.cc
 
-        access_unit/access_unit.cc
+        access_unit.cc
         classifier_bypass.cc
         classifier_regroup.cc
         constants.cc
@@ -106,50 +104,13 @@ set(source_files
         meta/block_header/disabled.cc
         api.cc
         c_api.cc
-        payload.cc
-        record/contact/record.cc
-)
+        payload.cc)
 
-# Unified coder files
-list(APPEND source_files
-)
+add_library(genie-core ${source_files})
 
-# Convert remaining relative paths to absolute
-set(absolute_source_files "")
-foreach(f IN LISTS source_files)
-    if(IS_ABSOLUTE "${f}")
-        list(APPEND absolute_source_files "${f}")
-    else()
-        list(APPEND absolute_source_files "${CMAKE_CURRENT_LIST_DIR}/${f}")
-    endif()
-endforeach()
 
-# Convert remaining relative paths to absolute
-set(absolute_source_files "")
-foreach(f IN LISTS source_files)
-    if(IS_ABSOLUTE "${f}")
-        list(APPEND absolute_source_files "${f}")
-    else()
-        list(APPEND absolute_source_files "${CMAKE_CURRENT_LIST_DIR}/${f}")
-    endif()
-endforeach()
+target_link_libraries(genie-core PUBLIC genie-util genie-backend)
 
-add_library(${PROJECT_NAME} ${absolute_source_files})
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # GNU Compiler Collection
-    target_compile_options(${PROJECT_NAME} PRIVATE "-pedantic")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-fno-common")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wall")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wshadow")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wextra")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wundef")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wconversion")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wdouble-promotion")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=conversion")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=maybe-uninitialized")
-endif ()
-
-target_link_libraries(${PROJECT_NAME} PUBLIC genie-util genie-backend)
-
+get_filename_component(THIS_DIR ./ ABSOLUTE)
 get_filename_component(TOP_DIR ../../ ABSOLUTE)
-target_include_directories(${PROJECT_NAME} PUBLIC "${TOP_DIR}")
+target_include_directories(genie-core PUBLIC "${TOP_DIR}")

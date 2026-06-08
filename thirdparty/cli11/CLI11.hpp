@@ -38,6 +38,7 @@
 
 // Standard combined includes:
 
+#include <cstdint>
 #include <algorithm>
 #include <cmath>
 #include <deque>
@@ -2428,12 +2429,12 @@ class AsSizeValue : public AsNumberWithUnit {
 
   private:
     /// Get <size unit, factor> mapping
-    static std::map<std::string, result_t> init_mapping(bool kb_is_1000) {
-        std::map<std::string, result_t> m;
-        result_t k_factor = kb_is_1000 ? 1000 : 1024;
-        result_t ki_factor = 1024;
-        result_t k = 1;
-        result_t ki = 1;
+    static std::map<std::string, uint64_t> init_mapping(bool kb_is_1000) {
+        std::map<std::string, uint64_t> m;
+        uint64_t k_factor = kb_is_1000 ? 1000 : 1024;
+        uint64_t ki_factor = 1024;
+        uint64_t k = 1;
+        uint64_t ki = 1;
         m["b"] = 1;
         for(std::string p : {"k", "m", "g", "t", "p", "e"}) {
             k *= k_factor;
@@ -2447,7 +2448,7 @@ class AsSizeValue : public AsNumberWithUnit {
     }
 
     /// Cache calculated mapping
-    static std::map<std::string, result_t> get_mapping(bool kb_is_1000) {
+    static std::map<std::string, uint64_t> get_mapping(bool kb_is_1000) {
         if(kb_is_1000) {
             static auto m = init_mapping(true);
             return m;

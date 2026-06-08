@@ -44,15 +44,15 @@ bool ClassifierRegroup::IsCovered(const size_t start, const size_t end) const {
 // -----------------------------------------------------------------------------
 
 bool ClassifierRegroup::IsCovered(const record::Record& r) const {
-  for (size_t idx_i = 0;
-       idx_i < r.GetAlignments().front().GetAlignmentSplits().size() + 1; ++idx_i) {
-    if (idx_i > 0 &&
-        r.GetAlignments().front().GetAlignmentSplits()[idx_i - 1]->GetType() !=
+  for (size_t i = 0;
+       i < r.GetAlignments().front().GetAlignmentSplits().size() + 1; ++i) {
+    if (i > 0 &&
+        r.GetAlignments().front().GetAlignmentSplits()[i - 1]->GetType() !=
             record::AlignmentSplit::Type::kSameRec) {
       continue;
     }
-    if (const auto pos = r.GetPosition(0, idx_i);
-        !IsCovered(pos, pos + r.GetMappedLength(0, idx_i))) {
+    if (const auto pos = r.GetPosition(0, i);
+        !IsCovered(pos, pos + r.GetMappedLength(0, i))) {
       return false;
     }
   }
@@ -64,21 +64,21 @@ bool ClassifierRegroup::IsCovered(const record::Record& r) const {
 void ClassifierRegroup::QueueFinishedChunk(record::Chunk& data) {
   if (!data.GetRef().IsEmpty()) {
     if (ref_mode_ == RefMode::kRelevant) {
-      for (size_t idx_i = data.GetRef().GetGlobalStart() /
+      for (size_t i = data.GetRef().GetGlobalStart() /
                       ReferenceManager::GetChunkSize();
-           idx_i <= (data.GetRef().GetGlobalEnd() - 1) /
+           i <= (data.GetRef().GetGlobalEnd() - 1) /
                     ReferenceManager::GetChunkSize();
-           ++idx_i) {
-        if (IsWritten(data.GetRef().GetRefName(), idx_i)) {
+           ++i) {
+        if (IsWritten(data.GetRef().GetRefName(), i)) {
           continue;
         }
-        ref_state_.at(data.GetRef().GetRefName()).at(idx_i) = 1;
+        ref_state_.at(data.GetRef().GetRefName()).at(i) = 1;
 
         if (raw_ref_mode_) {
           size_t length = ref_mgr_->GetLength(data.GetRef().GetRefName());
           data.AddRefToWrite(
-              idx_i * ReferenceManager::GetChunkSize(),
-              std::min((idx_i + 1) * ReferenceManager::GetChunkSize(), length));
+              i * ReferenceManager::GetChunkSize(),
+              std::min((i + 1) * ReferenceManager::GetChunkSize(), length));
         } else {
           size_t length = ref_mgr_->GetLength(data.GetRef().GetRefName());
           record::Chunk ref_chunk;
@@ -87,9 +87,9 @@ void ClassifierRegroup::QueueFinishedChunk(record::Chunk& data) {
           ref_chunk.GetRef() = data.GetRef();
           record::Record rec(1, record::ClassType::kClassU, "", "", 0);
           std::string seq =
-              *data.GetRef().GetChunkAt(idx_i * ReferenceManager::GetChunkSize());
-          if ((idx_i + 1) * ReferenceManager::GetChunkSize() > length) {
-            seq = seq.substr(0, length - idx_i * ReferenceManager::GetChunkSize());
+              *data.GetRef().GetChunkAt(i * ReferenceManager::GetChunkSize());
+          if ((i + 1) * ReferenceManager::GetChunkSize() > length) {
+            seq = seq.substr(0, length - i * ReferenceManager::GetChunkSize());
           }
           record::Segment segment(std::move(seq));
           rec.AddSegment(std::move(segment));
@@ -248,8 +248,8 @@ record::Chunk ClassifierRegroup::GetChunk() {
 
 #define AU_DEBUG_WRITE 0
 #if AU_DEBUG_WRITE
-  static int idx_i = 0;
-  std::ofstream tmpOut("AU_" + std::to_string(idx_i++) + ".mgrec");
+  static int i = 0;
+  std::ofstream tmpOut("AU_" + std::to_string(i++) + ".mgrec");
   util::BitWriter bw(&tmpOut);
   for (const auto& r : ret.getData()) {
     r.write(bw);

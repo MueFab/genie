@@ -10,7 +10,7 @@
 
 // -----------------------------------------------------------------------------
 
-#include "genie/core/access_unit/access_unit.h"
+#include "genie/core/access_unit.h"
 #include "genie/core/record/chunk.h"
 #include "genie/util/drain.h"
 

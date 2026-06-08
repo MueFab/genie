@@ -80,7 +80,7 @@ Subsequence::Subsequence(const bool token_type, core::GenDesc desc,
     case TransformedParameters::TransformIdSubseq::MERGE_CODING:
       UTILS_DIE("MERGE core unsupported");
   }
-  for (size_t idx_i = 0; idx_i < num_subseq; ++idx_i) {
+  for (size_t i = 0; i < num_subseq; ++i) {
     transform_sub_seq_configs_.emplace_back(reader, sub_seq);
   }
 }
@@ -99,8 +99,8 @@ void Subsequence::write(util::BitWriter& writer) const {
     writer.WriteBits(*descriptor_subsequence_id_, 10);
   }
   transform_sub_seq_parameters_.write(writer);
-  for (auto& idx_i : transform_sub_seq_configs_) {
-    idx_i.write(writer);
+  for (auto& i : transform_sub_seq_configs_) {
+    i.write(writer);
   }
 }
 
@@ -154,14 +154,14 @@ bool Subsequence::operator==(const Subsequence& seq) const {
 
 // -----------------------------------------------------------------------------
 
-Subsequence::Subsequence(nlohmann::json idx_j) {
-  if (idx_j.contains("descriptor_subsequence_ID")) {
-    descriptor_subsequence_id_ = idx_j["descriptor_subsequence_ID"];
+Subsequence::Subsequence(nlohmann::json j) {
+  if (j.contains("descriptor_subsequence_ID")) {
+    descriptor_subsequence_id_ = j["descriptor_subsequence_ID"];
   }
   transform_sub_seq_parameters_ =
-      TransformedParameters(idx_j["transform_subseq_parameters"]);
-  auto remaining_seqs = idx_j["transform_subseq_cfgs"].size();
-  for (const auto& it : idx_j["transform_subseq_cfgs"]) {
+      TransformedParameters(j["transform_subseq_parameters"]);
+  auto remaining_seqs = j["transform_subseq_cfgs"].size();
+  for (const auto& it : j["transform_subseq_cfgs"]) {
     remaining_seqs--;
     transform_sub_seq_configs_.emplace_back(it, !remaining_seqs);
   }

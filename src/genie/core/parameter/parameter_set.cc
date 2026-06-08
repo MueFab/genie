@@ -37,14 +37,14 @@ EncodingSet::EncodingSet(util::BitReader& bit_reader) {
   qv_depth_ = bit_reader.Read<uint8_t>(3);
   as_depth_ = bit_reader.Read<uint8_t>(3);
   auto num_classes = bit_reader.Read<uint8_t>(4);
-  for (size_t idx_i = 0; idx_i < num_classes; ++idx_i) {
+  for (size_t i = 0; i < num_classes; ++i) {
     class_i_ds_.push_back(bit_reader.Read<record::ClassType>(4));
   }
-  for (size_t idx_i = 0; idx_i < GetDescriptors().size(); ++idx_i) {
-    descriptors_.emplace_back(num_classes, static_cast<GenDesc>(idx_i), bit_reader);
+  for (size_t i = 0; i < GetDescriptors().size(); ++i) {
+    descriptors_.emplace_back(num_classes, static_cast<GenDesc>(i), bit_reader);
   }
   const auto num_groups = bit_reader.Read<uint16_t>();
-  for (size_t idx_i = 0; idx_i < num_groups; ++idx_i) {
+  for (size_t i = 0; i < num_groups; ++i) {
     read_group_index_ds_.emplace_back();
     char c = 0;
     do {
@@ -61,7 +61,7 @@ EncodingSet::EncodingSet(util::BitReader& bit_reader) {
       signature_cfg_->signature_length = bit_reader.Read<uint8_t>(8);
     }
   }
-  for (size_t idx_i = 0; idx_i < num_classes; ++idx_i) {
+  for (size_t i = 0; i < num_classes; ++i) {
     if (const auto mode = bit_reader.Read<uint8_t>(4); mode == 1) {
       qv_coding_configs_.emplace_back(
           GlobalCfg::GetSingleton()
@@ -200,16 +200,16 @@ void EncodingSet::Write(util::BitWriter& writer) const {
   writer.WriteBits(qv_depth_, 3);
   writer.WriteBits(as_depth_, 3);
   writer.WriteBits(class_i_ds_.size(), 4);  // num_classes
-  for (auto& idx_i : class_i_ds_) {
-    writer.WriteBits(static_cast<uint8_t>(idx_i), 4);
+  for (auto& i : class_i_ds_) {
+    writer.WriteBits(static_cast<uint8_t>(i), 4);
   }
-  for (auto& idx_i : descriptors_) {
-    idx_i.Write(writer);
+  for (auto& i : descriptors_) {
+    i.Write(writer);
   }
   writer.WriteBits(read_group_index_ds_.size(), 16);  // num_groups
-  for (auto& idx_i : read_group_index_ds_) {
-    for (auto& idx_j : idx_i) {
-      writer.WriteBits(static_cast<uint8_t>(idx_j), 8);
+  for (auto& i : read_group_index_ds_) {
+    for (auto& j : i) {
+      writer.WriteBits(static_cast<uint8_t>(j), 8);
     }
     writer.WriteBits('\0', 8);  // NULL termination
   }
@@ -223,8 +223,8 @@ void EncodingSet::Write(util::BitWriter& writer) const {
       writer.WriteBits(*signature_cfg_->signature_length, 8);
     }
   }
-  for (auto& idx_i : qv_coding_configs_) {
-    idx_i->Write(writer);
+  for (auto& i : qv_coding_configs_) {
+    i->Write(writer);
   }
   writer.WriteBits(static_cast<bool>(computed_reference_), 1);
   if (computed_reference_) {
@@ -418,9 +418,9 @@ EncodingSet::EncodingSet(EncodingSet&& other) noexcept
 // -----------------------------------------------------------------------------
 
 const QualityValues& EncodingSet::GetQvConfig(record::ClassType type) const {
-  for (size_t idx_i = 0; idx_i < class_i_ds_.size(); ++idx_i) {
-    if (class_i_ds_[idx_i] == type) {
-      return *qv_coding_configs_[idx_i];
+  for (size_t i = 0; i < class_i_ds_.size(); ++i) {
+    if (class_i_ds_[i] == type) {
+      return *qv_coding_configs_[i];
     }
   }
   UTILS_DIE("No matching qv config " + std::to_string(static_cast<int>(type)) +
@@ -469,8 +469,8 @@ bool EncodingSet::QualityValueCmp(const EncodingSet& ps) const {
   if (ps.qv_coding_configs_.size() != qv_coding_configs_.size()) {
     return false;
   }
-  for (size_t idx_i = 0; idx_i < ps.qv_coding_configs_.size(); ++idx_i) {
-    if (!qv_coding_configs_[idx_i]->Equals(ps.qv_coding_configs_[idx_i].get())) {
+  for (size_t i = 0; i < ps.qv_coding_configs_.size(); ++i) {
+    if (!qv_coding_configs_[i]->Equals(ps.qv_coding_configs_[i].get())) {
       return false;
     }
   }

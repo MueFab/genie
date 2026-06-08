@@ -144,7 +144,7 @@ bool BinarizationParameters::operator==(
 
 // -----------------------------------------------------------------------------
 
-BinarizationParameters::BinarizationParameters(nlohmann::json idx_j,
+BinarizationParameters::BinarizationParameters(nlohmann::json j,
                                                const BinarizationId bin_id) {
   cmax_ = 0;
   cmax_teg_ = 0;
@@ -152,18 +152,18 @@ BinarizationParameters::BinarizationParameters(nlohmann::json idx_j,
   split_unit_size_ = 0;
   switch (bin_id) {
     case BinarizationId::TU:
-      cmax_ = idx_j["cmax"];
+      cmax_ = j["cmax"];
       break;
     case BinarizationId::TEG:
     case BinarizationId::STEG:
-      cmax_ = idx_j["cmax_teg"];
+      cmax_ = j["cmax_teg"];
       break;
     case BinarizationId::DTU:
     case BinarizationId::SDTU:
-      cmax_dtu_ = idx_j["cmax_dtu"];  // Fall-through
+      cmax_dtu_ = j["cmax_dtu"];  // Fall-through
     case BinarizationId::SUTU:
     case BinarizationId::SSUTU:
-      cmax_dtu_ = idx_j["split_unit_size"];
+      cmax_dtu_ = j["split_unit_size"];
       break;
     default:
       break;

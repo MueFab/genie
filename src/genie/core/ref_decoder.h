@@ -12,7 +12,7 @@
 
 #include <string>
 
-#include "genie/core/access_unit/access_unit.h"
+#include "genie/core/access_unit.h"
 
 // -----------------------------------------------------------------------------
 

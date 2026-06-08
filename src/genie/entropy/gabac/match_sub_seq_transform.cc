@@ -48,20 +48,20 @@ void TransformMatchCoding(
   }
 
   // Perform the match transformation
-  for (uint64_t idx_i = 0; idx_i < symbols_size; idx_i++) {
+  for (uint64_t i = 0; i < symbols_size; i++) {
     uint64_t pointer = 0;
     uint64_t length = 0;
-    const uint64_t window_start_idx = idx_i - match_buffer_size;
-    const uint64_t window_end_idx = idx_i;
+    const uint64_t window_start_idx = i - match_buffer_size;
+    const uint64_t window_end_idx = i;
 
     for (uint64_t w = window_start_idx; w < window_end_idx; w++) {
-      uint64_t offset = idx_i;
+      uint64_t offset = i;
       while (offset < symbols_size &&
-             (symbols.Get(offset) == symbols.Get(w + offset - idx_i) &&
-              offset - idx_i < match_buffer_size - 1u)) {
+             (symbols.Get(offset) == symbols.Get(w + offset - i) &&
+              offset - i < match_buffer_size - 1u)) {
         offset++;
       }
-      offset -= idx_i;
+      offset -= i;
       if (offset >= length) {
         length = offset;
         pointer = w;
@@ -69,11 +69,11 @@ void TransformMatchCoding(
     }
     if (length < 2) {
       lengths->PushBack(0);
-      raw_values->PushBack(symbols.Get(idx_i));
+      raw_values->PushBack(symbols.Get(i));
     } else {
-      pointers->PushBack(idx_i - pointer);
+      pointers->PushBack(i - pointer);
       lengths->PushBack(length);
-      idx_i += length - 1;
+      i += length - 1;
     }
   }
 
