@@ -12,11 +12,11 @@
 
 #define NOMINMAX  // NOLINT
 #include <algorithm>
-#include <boost/variant/variant.hpp>
 #include <cmath>
 #include <cstdint>
 #include <string>
 #include <utility>
+#include <variant>
 #include <vector>
 
 #include "genie/util/literal.h"
@@ -338,7 +338,7 @@ enum class DataType : uint8_t {
     DOUBLE = 12
 };
 
-typedef boost::variant<std::string, char, bool, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t,
+typedef std::variant<std::string, char, bool, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t,
                        uint64_t, float, double>
     DynamicDataType;
 

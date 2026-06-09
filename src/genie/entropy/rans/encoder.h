@@ -11,8 +11,6 @@
 
 #include "rans64.h"
 #include "commons.h"
-
-#include <boost/mpl/size.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <istream>

@@ -10,8 +10,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <fstream>
+#include <optional>
 #include <string>
-#include "boost/optional/optional.hpp"
 #include "genie/core/record/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -30,7 +30,7 @@ class SubfileReader {
  private:
     std::ifstream reader;                              //!< @brief
     genie::util::BitReader bitreader;                  //!< @brief
-    boost::optional<genie::core::record::Record> rec;  //!< @brief
+    std::optional<genie::core::record::Record> rec;  //!< @brief
     std::string path;                                  //!< @brief
 
  public:
@@ -55,7 +55,7 @@ class SubfileReader {
      * @brief
      * @return
      */
-    const boost::optional<genie::core::record::Record>& getRecord() const;
+    const std::optional<genie::core::record::Record>& getRecord() const;
 
     /**
      * @brief

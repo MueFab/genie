@@ -9,7 +9,6 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <boost/optional/optional.hpp>
 #include <cstdint>
 #include <memory>
 #include <optional>

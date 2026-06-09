@@ -16,7 +16,7 @@
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_reader.h"
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sorter.h"
 #include "apps/genie/transcode-sam/utils.h"
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "filesystem/filesystem.hpp"
 #include "genie/core/record/alignment_split/other-rec.h"
 
@@ -868,19 +868,19 @@ void processSecondMappedSegment(size_t s, const genie::core::record::Record& rec
 void transcode_mpg2sam(Config& options) {
     std::istream* input_file = &std::cin;
     std::ostream* output_file = &std::cout;
-    boost::optional<std::ifstream> input_stream;
-    boost::optional<std::ofstream> output_stream;
+    std::optional<std::ifstream> input_stream;
+    std::optional<std::ofstream> output_stream;
 
     RefInfo refinf(options.fasta_file_path);
 
     if (options.inputFile.substr(0, 2) != "-.") {
         input_stream = std::ifstream(options.inputFile);
-        input_file = &input_stream.get();
+        input_file = &(*input_stream);
     }
 
     if (options.outputFile.substr(0, 2) != "-.") {
         output_stream = std::ofstream(options.outputFile);
-        output_file = &output_stream.get();
+        output_file = &(*output_stream);
     }
 
     genie::util::BitReader reader(*input_file);

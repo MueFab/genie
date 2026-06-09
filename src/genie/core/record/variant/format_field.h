@@ -8,11 +8,11 @@
 #ifndef GENIE_CORE_RECORD_FORMAT_FIELD_FORMAT_FIELD_H
 #define GENIE_CORE_RECORD_FORMAT_FIELD_FORMAT_FIELD_H
 
-#include <boost/variant/variant.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
+#include <variant>
 #include <vector>
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"

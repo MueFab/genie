@@ -7,7 +7,6 @@
 #ifndef GENIE_LIKELIHOOD_PARAMETERS_H
 #define GENIE_LIKELIHOOD_PARAMETERS_H
 
-#include <boost/optional/optional.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
