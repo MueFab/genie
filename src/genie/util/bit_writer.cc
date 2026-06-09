@@ -190,19 +190,19 @@ void BitWriter::SetStreamPosition(const int64_t pos) const {
 // -----------------------------------------------------------------------------
 
 void BitWriter::Write(const std::string& str) {
-  FlushBits();  // Ensure byte-alignment before raw write
-  if (stream_) {
-    stream_->write(str.data(), static_cast<std::streamsize>(str.size()));
+  for (const auto& a : str) {
+    WriteBits(static_cast<uint8_t>(a), 8);
   }
-  total_bits_written_ += str.size() * kBitsPerByte;
 }
 
 // -----------------------------------------------------------------------------
 
 void BitWriter::Write(std::istream* in) {
   if (in) {
-    FlushBits();  // Ensure byte-alignment before bulk write
-    WriteAlignedStream(*in);
+    char byte = 0;
+    while (in->read(&byte, 1)) {
+      WriteBits(static_cast<uint8_t>(byte), 8);
+    }
   }
 }
 
