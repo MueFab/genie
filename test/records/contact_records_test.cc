@@ -95,7 +95,7 @@ TEST(ContactRecord, IntraContactRecord_LR_Raw) {
 
     {
         std::stringstream ss;
-        genie::util::BitWriter writer(&ss);
+        genie::util::BitWriter writer(ss);
 
         rec.Write(writer);
 
@@ -158,7 +158,7 @@ TEST(ContactRecord, IntraContactRecord_LR_All) {
         ASSERT_TRUE(abs(rec.GetNormCounts()[0].back() - 70297.121260L) < 1e-5L);
 
         std::stringstream ss;
-        genie::util::BitWriter writer(&ss);
+        genie::util::BitWriter writer(ss);
 
         rec.Write(writer);
 
@@ -217,7 +217,7 @@ TEST(ContactRecord, IntraContactRecord_HR_Raw) {
 
     {
         std::stringstream ss;
-        genie::util::BitWriter writer(&ss);
+        genie::util::BitWriter writer(ss);
 
         rec.Write(writer);
 
@@ -276,7 +276,7 @@ TEST(ContactRecord, IntraContactRecord_HR_All) {
 
     {
         std::stringstream ss;
-        genie::util::BitWriter writer(&ss);
+        genie::util::BitWriter writer(ss);
 
         rec.Write(writer);
 
@@ -335,7 +335,7 @@ TEST(ContactRecord, InterContactRecord_LR_Raw) {
 
     {
         std::stringstream ss;
-        genie::util::BitWriter writer(&ss);
+        genie::util::BitWriter writer(ss);
 
         rec.Write(writer);
 
@@ -394,7 +394,7 @@ TEST(ContactRecord, InterContactRecord_HR_Raw) {
 
     {
         std::stringstream ss;
-        genie::util::BitWriter writer(&ss);
+        genie::util::BitWriter writer(ss);
 
         rec.Write(writer);
 

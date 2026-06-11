@@ -38,11 +38,6 @@ constexpr uint8_t kByteMask = 0xffu;
 // -----------------------------------------------------------------------------
 
 BitWriter::BitWriter(std::ostream& str)
-    : stream_(&str), held_bits_(0), num_held_bits_(0), total_bits_written_(0) {}
-
-// -----------------------------------------------------------------------------
-
-BitWriter::BitWriter(std::ostream* str)
     : stream_(str), held_bits_(0), num_held_bits_(0), total_bits_written_(0) {}
 
 // -----------------------------------------------------------------------------
@@ -138,9 +133,7 @@ bool BitWriter::IsByteAligned() const { return num_held_bits_ == 0; }
 // -----------------------------------------------------------------------------
 
 inline void BitWriter::WriteAlignedByte(uint8_t byte) {
-  if (stream_) {
-    stream_->write(reinterpret_cast<char*>(&byte), 1);
-  }
+  stream_.write(reinterpret_cast<char*>(&byte), 1);
   total_bits_written_ += kBitsPerByte;
 }
 
@@ -149,10 +142,8 @@ inline void BitWriter::WriteAlignedByte(uint8_t byte) {
 void BitWriter::WriteAlignedBytes(const void* in, const size_t size) {
   this->total_bits_written_ += size * kBitsPerByte;
   UTILS_DIE_IF(!IsByteAligned(), "Writer not aligned when it should be");
-  if (stream_) {
-    stream_->write(static_cast<const char*>(in),
-                  static_cast<std::streamsize>(size));
-  }
+  stream_.write(static_cast<const char*>(in),
+                static_cast<std::streamsize>(size));
 }
 
 // -----------------------------------------------------------------------------
@@ -163,47 +154,19 @@ void BitWriter::WriteAlignedStream(std::istream& in) {
   do {
     char byte[kWriteBufferSize];
     in.read(byte, kWriteBufferSize);
-    if (stream_) {
-      stream_->write(byte, in.gcount());
-    }
+    stream_.write(byte, in.gcount());
     this->total_bits_written_ += in.gcount() * kBitsPerByte;
   } while (in.gcount() == kWriteBufferSize);
 }
 
 // -----------------------------------------------------------------------------
 
-int64_t BitWriter::GetStreamPosition() const {
-  if (stream_) {
-    return static_cast<int64_t>(stream_->tellp());
-  }
-  return 0;
-}
+int64_t BitWriter::GetStreamPosition() const { return stream_.tellp(); }
 
 // -----------------------------------------------------------------------------
 
 void BitWriter::SetStreamPosition(const int64_t pos) const {
-  if (stream_) {
-    stream_->seekp(pos, std::ios::beg);
-  }
-}
-
-// -----------------------------------------------------------------------------
-
-void BitWriter::Write(const std::string& str) {
-  for (const auto& a : str) {
-    WriteBits(static_cast<uint8_t>(a), 8);
-  }
-}
-
-// -----------------------------------------------------------------------------
-
-void BitWriter::Write(std::istream* in) {
-  if (in) {
-    char byte = 0;
-    while (in->read(&byte, 1)) {
-      WriteBits(static_cast<uint8_t>(byte), 8);
-    }
-  }
+  stream_.seekp(pos, std::ios::beg);
 }
 
 // -----------------------------------------------------------------------------

@@ -75,7 +75,7 @@ void Record::write(util::BitWriter& writer) const {
   writer.WriteBits(parameter_set_ID, 8);
   writer.WriteBits(AT_ID, 8);
   writer.WriteBits(static_cast<uint8_t>(AT_alphabet_ID), 8);
-  writer.WriteReserved(2);
+  writer.WriteBits(0, 2);
   writer.WriteBits(AT_coord_size, 2);
   writer.WriteBits(AT_pos_40_bits_flag, 1);
   writer.WriteBits(n_aux_attribute_groups, 3);

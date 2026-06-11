@@ -62,12 +62,12 @@ void Record::Write(util::BitWriter& writer, uint64_t write_size) const {
     case 2:
       break;
     case 3:
-      writer.WriteReserved(10);
+      writer.WriteBits(0, 10);
       writer.WriteBits(write_size, 22);
       annotation_parameter_set_.write(writer);
       break;
     case 4:
-      writer.WriteReserved(3);
+      writer.WriteBits(0, 3);
       writer.WriteBits(write_size, 29);
       annotation_access_unit_.write(writer);
       break;
@@ -141,13 +141,13 @@ uint64_t genie::core::record::data_unit::Record::Write(util::BitWriter& writer) 
     case 2:
       break;
     case 3:
-      writer.WriteReserved(10);
+      writer.WriteBits(0, 10);
       writesize = (annotation_parameter_set_.getSize() + 40) / 8;
       writer.WriteBits(writesize, 22);
       annotation_parameter_set_.write(writer);
       break;
     case 4:
-      writer.WriteReserved(3);
+      writer.WriteBits(0, 3);
       writesize = (annotation_access_unit_.getSize() + 40) / 8;
       writer.WriteBits(writesize, 29);
       annotation_access_unit_.write(writer);

@@ -120,15 +120,15 @@ void serialize_mat(
     uint32_t ncols,
     std::ostream& payload
 ) {
-    util::BitWriter writer(&payload);
+    util::BitWriter writer(payload);
     for (size_t idx_i = 0; idx_i < nrows; idx_i++) {
         for (size_t idx_j = 0; idx_j < ncols; idx_j++) {
             if (dtype_id == static_cast<uint32_t>(core::DataType::UINT8))
-                writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(mat[idx_i][idx_j]));
+                writer.WriteAlignedInt<uint8_t>(static_cast<uint8_t>(mat[idx_i][idx_j]));
             else if (dtype_id == static_cast<uint32_t>(core::DataType::UINT16))
-                writer.WriteBypassBE<uint16_t>(static_cast<uint16_t>(mat[idx_i][idx_j]));
+                writer.WriteAlignedInt<uint16_t>(static_cast<uint16_t>(mat[idx_i][idx_j]));
             else
-                writer.WriteBypassBE<uint32_t>(mat[idx_i][idx_j]);
+                writer.WriteAlignedInt<uint32_t>(mat[idx_i][idx_j]);
         }
     }
 }
@@ -138,9 +138,9 @@ void serialize_arr(
     uint32_t nelems,
     std::ostream& payload
 ) {
-    util::BitWriter writer(&payload);
+    util::BitWriter writer(payload);
     for (size_t idx_i = 0; idx_i < nelems; idx_i++)
-        writer.WriteBypassBE<uint32_t>(arr[idx_i]);
+        writer.WriteAlignedInt<uint32_t>(arr[idx_i]);
 }
 
 void deserialize_mat(

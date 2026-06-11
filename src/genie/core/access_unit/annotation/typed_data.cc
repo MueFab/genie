@@ -25,13 +25,13 @@ namespace annotation {
 
 void TypedData::writeElement(std::vector<CustomType> matrixRow) {
     ArrayType arrayType;
-    util::BitWriter bitWriter(&dataStream);
+    util::BitWriter bitWriter(dataStream);
     for (auto elem : matrixRow) arrayType.toFile(data_type_ID, elem, bitWriter);
 }
 
 void TypedData::convertToTypedData(util::BitReader& reader) {
     ArrayType arrayType;
-    util::BitWriter bitWriter(&dataStream);
+    util::BitWriter bitWriter(dataStream);
     uint64_t n_elements = 1;
     for (uint8_t idx_i = 0; idx_i < num_array_dims; ++idx_i) {
         n_elements *= array_dims[idx_i];
@@ -41,7 +41,7 @@ void TypedData::convertToTypedData(util::BitReader& reader) {
 
 void TypedData::convertToTypedData(CustomType value) {
     ArrayType arrayType;
-    util::BitWriter bitWriter(&dataStream);
+    util::BitWriter bitWriter(dataStream);
     arrayType.toFile(data_type_ID, value, bitWriter);
 }
 
@@ -53,7 +53,7 @@ void TypedData::convertToTypedData(std::vector<CustomType> matrix) {
         n_elements *= array_dims[idx_i];
     }
     ArrayType arrayType;
-    util::BitWriter bitWriter(&dataStream);
+    util::BitWriter bitWriter(dataStream);
     for (uint64_t idx_i = 0; idx_i < matrix.size(); ++idx_i) arrayType.toFile(data_type_ID, matrix.at(idx_i), bitWriter);
 }
 
@@ -66,7 +66,7 @@ void TypedData::convertToTypedData(std::vector<std::vector<CustomType>> matrix) 
         n_elements *= array_dims[idx_i];
     }
     ArrayType arrayType;
-    util::BitWriter bitWriter(&dataStream);
+    util::BitWriter bitWriter(dataStream);
 
     for (uint32_t idx_j = 0; idx_j < matrix.size(); ++idx_j)
         for (uint32_t idx_k = 0; idx_k < matrix.at(0).size(); ++idx_k) {
@@ -87,7 +87,7 @@ void TypedData::convertToTypedData(std::vector<std::vector<std::vector<CustomTyp
     }
 
     ArrayType arrayType;
-    util::BitWriter bitWriter(&dataStream);
+    util::BitWriter bitWriter(dataStream);
 
     for (uint32_t idx_i = 0; idx_i < matrix.size(); ++idx_i)
         for (uint32_t idx_j = 0; idx_j < matrix.at(0).size(); ++idx_j)
@@ -135,11 +135,31 @@ void TypedData::write(util::BitWriter& writer) const {
         writer.WriteBits(encoded, 1);
         auto size = compressedDataStream.str().size();
         writer.WriteBits(size, 32);
-        writer.Write(const_cast<std::stringstream*>(&compressedDataStream));
+        auto* ss = const_cast<std::stringstream*>(&compressedDataStream);
+        ss->clear();
+        ss->seekg(0, std::ios::beg);
+        if (writer.IsByteAligned()) {
+            writer.WriteAlignedStream(*ss);
+        } else {
+            char byte;
+            while (ss->read(&byte, 1)) {
+                writer.WriteBits(static_cast<uint8_t>(byte), 8);
+            }
+        }
     } else {
         bool encoded = false;
         writer.WriteBits(encoded, 1);
-        writer.Write(const_cast<std::stringstream*>(&dataStream));
+        auto* ss = const_cast<std::stringstream*>(&dataStream);
+        ss->clear();
+        ss->seekg(0, std::ios::beg);
+        if (writer.IsByteAligned()) {
+            writer.WriteAlignedStream(*ss);
+        } else {
+            char byte;
+            while (ss->read(&byte, 1)) {
+                writer.WriteBits(static_cast<uint8_t>(byte), 8);
+            }
+        }
     }
     writer.FlushBits();
 }

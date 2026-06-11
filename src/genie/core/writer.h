@@ -7,6 +7,7 @@
 #ifndef SRC_GENIE_CORE_WRITER_H_
 #define SRC_GENIE_CORE_WRITER_H_
 
+#include <istream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -41,20 +42,38 @@ class FilePos {
     }
 };
 
+/**
+ * @brief Deprecated wrapper class for logging and binary writes.
+ * @deprecated This class was introduced as temporary code in develop-part6
+ * and is planned for complete removal in the future. New code should use
+ * genie::util::BitWriter directly.
+ */
 class Writer {
  private:
+    class NullBuffer : public std::streambuf {
+    public:
+        int overflow(int c) override { return c; }
+    };
+    class NullStream : public std::ostream {
+    private:
+        NullBuffer m_sb;
+    public:
+        NullStream() : std::ostream(&m_sb) {}
+    };
+
     std::ostream* logwriter;
-    util::BitWriter binwriter{logwriter};
+    NullStream nullStream;
+    util::BitWriter binwriter;
     bool writingLog;
     bool getWriteSize;
     size_t writeBitSize;
     const char endVal = '\n';
 
  public:
-    Writer() : logwriter(nullptr), writingLog(false), getWriteSize(true), writeBitSize(0) {}
+    Writer() : logwriter(nullptr), nullStream(), binwriter(nullStream), writingLog(false), getWriteSize(true), writeBitSize(0) {}
 
     explicit Writer(std::ostream* writer, bool log = false)
-        : logwriter(writer), binwriter(writer), writingLog(log), getWriteSize(false), writeBitSize(0) {}
+        : logwriter(writer), nullStream(), binwriter(writer ? *writer : nullStream), writingLog(log), getWriteSize(false), writeBitSize(0) {}
 
     bool IsLogWriter() const { return writingLog; }
     util::BitWriter& GetBinWriter() { return binwriter; }
@@ -101,7 +120,11 @@ class Writer {
             else
                 *logwriter << '"' << str << '"' << endVal;
         } else {
-            if (!str.empty()) binwriter.Write(str);
+            if (!str.empty()) {
+                for (char c : str) {
+                    binwriter.WriteBits(static_cast<uint8_t>(c), 8);
+                }
+            }
         }
     }
     /**

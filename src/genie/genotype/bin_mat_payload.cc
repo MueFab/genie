@@ -252,10 +252,10 @@ size_t BinMatPayload::GetSize() const {
 }
 // -----------------------------------------------------------------------------
 
-void BinMatPayload::Write(util::BitWriter writer) const {
+void BinMatPayload::Write(util::BitWriter& writer) const {
   if (codec_ID_ != genie::core::AlgoID::JBIG){
-    writer.WriteBypassBE(GetNRows());
-    writer.WriteBypassBE(GetNCols());
+    writer.WriteAlignedInt(GetNRows());
+    writer.WriteAlignedInt(GetNCols());
   }
   writer.WriteAlignedBytes(payload_.data(), GetPayloadSize());
 }

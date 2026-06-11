@@ -149,7 +149,7 @@ size_t RowColIdsPayload::GetSize() const {
 
 // -----------------------------------------------------------------------------
 
-void RowColIdsPayload::Write(util::BitWriter writer) const {
+void RowColIdsPayload::Write(util::BitWriter& writer) const {
   auto nbits_per_elem = GetNbitsPerElem();
   for (auto idx_i = 0u; idx_i< GetNelements(); idx_i++){
     writer.WriteBits(row_col_ids_elements_[idx_i], nbits_per_elem);

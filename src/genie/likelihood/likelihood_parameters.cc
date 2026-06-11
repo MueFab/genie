@@ -72,10 +72,10 @@ size_t LikelihoodParameters::GetSize() const {
 void LikelihoodParameters::Write(genie::util::BitWriter& writer) const {
 //  writer.WriteBits(num_gl_per_sample, 8);
 //  writer.WriteBits(transform_flag, 1);
-  writer.WriteBypassBE(num_gl_per_sample);
-  writer.WriteBypassBE(static_cast<uint8_t>(transform_flag));
+  writer.WriteAlignedInt(num_gl_per_sample);
+  writer.WriteAlignedInt(static_cast<uint8_t>(transform_flag));
   if (transform_flag){
-    writer.WriteBypassBE(static_cast<uint8_t>(dtype_id));
+    writer.WriteAlignedInt(static_cast<uint8_t>(dtype_id));
   }
 }
 

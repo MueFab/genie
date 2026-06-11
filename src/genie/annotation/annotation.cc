@@ -111,8 +111,7 @@ void Annotation::writeToFile(std::string& outputFileName) {
     std::ofstream testfile;
     std::string filename = outputFileName;
     testfile.open(filename + ".bin", std::ios::binary | std::ios::out);
-    //genie::core::Writer testwriter(&testfile);
-    genie::util::BitWriter testwriter(&testfile);
+    genie::util::BitWriter testwriter(testfile);
     std::ofstream txtfile;
     txtfile.open(filename + ".txt", std::ios::out);
     genie::util::BitWriter txtwriter(txtfile);

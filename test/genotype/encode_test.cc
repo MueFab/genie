@@ -392,7 +392,7 @@ TEST(Genotype, RoundTrip_EncodeAndSortBinMat) {
           genie::genotype::encode_and_sort_bin_mat(bin_mat, sorted_bin_mat_payload, sort_row_method, sort_col_method, CODEC_ID);
 
           std::stringstream bitstream;
-          genie::util::BitWriter writer(&bitstream);
+          genie::util::BitWriter writer(bitstream);
           sorted_bin_mat_payload.Write(writer);
 
           std::istream& reader_st = bitstream;
@@ -553,7 +553,7 @@ TEST(Genotype, DISABLED_GenerateGoldenMaster) {
     );
 
     std::ofstream writer(outputFile, std::ios::binary);
-    genie::util::BitWriter bitwriter(&writer);
+    genie::util::BitWriter bitwriter(writer);
     payload.Write(bitwriter);
     bitwriter.FlushBits();
     writer.close();
@@ -603,7 +603,7 @@ TEST(Genotype, CrossBackend_GoldenMaster) {
 
     // Write to buffer
     std::stringstream buffer;
-    genie::util::BitWriter bitwriter(&buffer);
+    genie::util::BitWriter bitwriter(buffer);
     payload.Write(bitwriter);
     bitwriter.FlushBits();
 

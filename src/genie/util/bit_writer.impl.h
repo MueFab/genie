@@ -51,15 +51,8 @@ void BitWriter::WriteAlignedInt(T val) {
     SwapEndianness<T, NumBytes>(val);
   }
 
-  if (stream_) {
-    stream_->write(reinterpret_cast<char*>(&val), NumBytes);
-  }
+  stream_.write(reinterpret_cast<char*>(&val), NumBytes);
   total_bits_written_ += NumBytes * 8;
-}
-
-template <typename T, size_t NumBytes, typename>
-void BitWriter::WriteBypassBE(T val) {
-  WriteAlignedInt<T, NumBytes>(val);
 }
 
 // -----------------------------------------------------------------------------

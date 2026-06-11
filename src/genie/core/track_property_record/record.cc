@@ -40,7 +40,7 @@ void Record::Write(util::BitWriter& writer) {
     ArrayType writeType;
     for (auto i = 0; i < track_property_count_; ++i) {
         writer.WriteBits(properties_[i].track_property_len, 8);
-        writer.Write(properties_[i].track_property);
+        writer.WriteAlignedBytes(properties_[i].track_property.data(), properties_[i].track_property.size());
         writer.WriteBits(properties_[i].track_property_type, 8);
         writer.WriteBits(properties_[i].track_property_array_len, 8);
 
@@ -54,7 +54,7 @@ void Record::Write(util::BitWriter& writer) {
     writer.WriteBits(linked_record_, 1);
     if (linked_record_) {
         writer.WriteBits(link_name_len_, 8);
-        writer.Write(link_name_);
+        writer.WriteAlignedBytes(link_name_.data(), link_name_.size());
         writer.WriteBits(reference_box_id_, 8);
     }
 }

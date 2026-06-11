@@ -272,27 +272,6 @@ void GenotypeParameters::Write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void GenotypeParameters::Write(core::Writer& writer) const {
-  writer.WriteReserved(3);
-  writer.Write(static_cast<uint64_t>(binarization_ID_), 3);
-  writer.Write(static_cast<uint64_t>(concat_axis_), 2);
-
-  writer.WriteReserved(2);
-  writer.Write(GetSortVariantsRowsFlag(), 1);
-  writer.Write(GetSortVariantsColsFlag(), 1);
-  writer.Write(GetTransposeVariantsMatFlag(), 1);
-  writer.Write(static_cast<uint64_t>(GetVariantsCodecID()), 3);
-
-  writer.WriteReserved(1);
-  writer.Write(GetEncodePhasesDataFlag(), 1);
-  writer.Write(GetSortPhasesRowsFlag(), 1);
-  writer.Write(GetSortPhasesColsFlag(), 1);
-  writer.Write(GetTransposePhasesMatFlag(), 1);
-  writer.Write(static_cast<uint64_t>(GetPhasesCodecID()), 3);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 // Read from BitReader
 void GenotypeParameters::read(util::BitReader& reader) {
   UTILS_DIE_IF(!reader.IsByteAligned(), "Not byte aligned!");

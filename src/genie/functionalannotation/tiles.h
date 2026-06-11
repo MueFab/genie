@@ -31,7 +31,7 @@ class Tiles {
  public:
     Tiles() {
         tileData.emplace_back("");
-        tileWriter.emplace_back(&tileData.back());
+        tileWriter.emplace_back(tileData.back());
     }
     std::vector<std::stringstream> tileData;
     std::vector<util::BitWriter> tileWriter;

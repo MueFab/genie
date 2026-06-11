@@ -126,29 +126,18 @@ const std::vector<uint64_t>& AmaxPayload::GetAmaxElements() const {
 
 size_t AmaxPayload::GetSize() const {
   std::stringstream bitstream;
-  genie::util::BitWriter writer(&bitstream);
+  genie::util::BitWriter writer(bitstream);
   Write(writer);
 
   size_t payload_size = bitstream.str().size();
   return payload_size;
-
-//  size_t size_in_bits = 32 + 8;  // size of nelems_ + size of nbits_per_elem_
-//  size_in_bits += amax_elements_.size(); // Bits for the flag
-//  for (unsigned long amax_element : amax_elements_) {
-//    if (amax_element > 1) {
-//      size_in_bits += nbits_per_elem_;  // nbits_per_entry == nbits_per_elem_
-//    }
-//  }
-//  uint8_t remain = 8 - (size_in_bits & 8);
-//
-//  return (size_in_bits + remain) >> 3;
 }
 
 // -----------------------------------------------------------------------------
 
 void AmaxPayload::Write(util::BitWriter& writer) const {
   UTILS_DIE_IF(!writer.IsByteAligned(), "Byte is not aligned!");
-  writer.WriteBypassBE(static_cast<uint32_t>(GetNElems()));
+  writer.WriteAlignedInt(static_cast<uint32_t>(GetNElems()));
   writer.WriteBits(GetNBitsPerElem(), 4);
 
   for (auto amax_element : GetAmaxElements()) {

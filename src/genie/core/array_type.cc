@@ -238,7 +238,9 @@ void ArrayType::toFile(core::DataType type, std::vector<uint8_t> bytearray, util
     std::string stringOut;
     if (bytearray.size() > 0)
       for (auto byte : bytearray) stringOut += byte;
-    writer.Write(stringOut);
+    for (char c : stringOut) {
+      writer.WriteBits(static_cast<uint8_t>(c), 8);
+    }
     writer.WriteBits(0, static_cast<uint8_t>(8));
   } else {
     uint64_t writeValue = 0;
@@ -278,7 +280,9 @@ void ArrayType::toFile(core::DataType type, util::BitReader& reader, util::BitWr
   if (type == core::DataType::STRING) {
     for (uint64_t idx_i = 0; idx_i < number; ++idx_i) {
       std::string temp = reader.ReadAlignedStringTerminated();
-      writer.Write(temp);
+      for (char c : temp) {
+        writer.WriteBits(static_cast<uint8_t>(c), 8);
+      }
       writer.WriteBits(0, static_cast<uint8_t>(8));
     }
   } else {

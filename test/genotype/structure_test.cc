@@ -76,7 +76,7 @@ TEST(GenotypeStructure, RoundTrip_GenotypeParameters) {
 
         // Serialize to bitstream
         std::stringstream bitstream;
-        genie::util::BitWriter writer(&bitstream);
+        genie::util::BitWriter writer(bitstream);
         orig_params.Write(writer);
 
         // Verify size
@@ -139,7 +139,7 @@ TEST(GenotypeStructure, RoundTrip_GenotypeParameters) {
 
     // Serialize to bitstream
     std::stringstream bitstream;
-    genie::util::BitWriter writer(&bitstream);
+    genie::util::BitWriter writer(bitstream);
     orig_params.Write(writer);
 
     // Verify size
@@ -207,7 +207,7 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
-        auto bit_writer = genie::util::BitWriter(&writer);
+        auto bit_writer = genie::util::BitWriter(writer);
         bin_mat_payload.Write(bit_writer);
 
         auto payload_size = obj_payload.str().size();
@@ -247,7 +247,7 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
 
       auto obj_payload = std::stringstream();
       std::ostream& writer = obj_payload;
-      auto bit_writer = genie::util::BitWriter(&writer);
+      auto bit_writer = genie::util::BitWriter(writer);
       bin_mat_payload.Write(bit_writer);
 
       auto payload_size = obj_payload.str().size();
@@ -287,7 +287,7 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
 
       auto obj_payload = std::stringstream();
       std::ostream& writer = obj_payload;
-      auto bit_writer = genie::util::BitWriter(&writer);
+      auto bit_writer = genie::util::BitWriter(writer);
       bin_mat_payload.Write(bit_writer);
 
       auto payload_size = obj_payload.str().size();
@@ -327,7 +327,7 @@ TEST(GenotypeStructure, RoundTrip_BinMatPayload) {
 
       auto obj_payload = std::stringstream();
       std::ostream& writer = obj_payload;
-      auto bit_writer = genie::util::BitWriter(&writer);
+      auto bit_writer = genie::util::BitWriter(writer);
       bin_mat_payload.Write(bit_writer);
 
       auto payload_size = obj_payload.str().size();
@@ -368,7 +368,7 @@ TEST(GenotypeStructure, RoundTrip_RowColIdsPayload) {
     // Serialize
     std::stringstream obj_payload;
     std::ostream& writer = obj_payload;
-    auto bit_writer = genie::util::BitWriter(&writer);
+    auto bit_writer = genie::util::BitWriter(writer);
     orig_obj.Write(bit_writer);
 
     // Deserialize
@@ -398,7 +398,7 @@ TEST(GenotypeStructure, RoundTrip_RowColIdsPayload) {
     // Serialize
     std::stringstream obj_payload;
     std::ostream& writer = obj_payload;
-    auto bit_writer = genie::util::BitWriter(&writer);
+    auto bit_writer = genie::util::BitWriter(writer);
     orig_obj.Write(bit_writer);
 
     // Deserialize
@@ -426,7 +426,7 @@ TEST(GenotypeStructure, RoundTrip_RowColIdsPayload) {
     // Serialize
     std::stringstream obj_payload;
     std::ostream& writer = obj_payload;
-    auto bit_writer = genie::util::BitWriter(&writer);
+    auto bit_writer = genie::util::BitWriter(writer);
     orig_obj.Write(bit_writer);
 
     // Deserialize
@@ -549,7 +549,7 @@ TEST(GenotypeStructure, RoundTrip_AmaxPayload) {
 
     auto obj_payload = std::stringstream();
     std::ostream& writer = obj_payload;
-    auto bit_writer = genie::util::BitWriter(&writer);
+    auto bit_writer = genie::util::BitWriter(writer);
     orig_obj.Write(bit_writer);
 
     auto payload_size = obj_payload.str().size();
@@ -614,7 +614,7 @@ TEST(GenotypeStructure, RoundTrip_Structure_GenotypePayload) {
 //
 //  // Serialize to bitstream
 //  std::stringstream bitstream;
-//  genie::util::BitWriter writer(&bitstream);
+//  genie::util::BitWriter writer(bitstream);
 //  orig_payload.Write(writer);
 //
 //  // Deserialize from bitstream

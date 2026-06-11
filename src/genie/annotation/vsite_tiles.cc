@@ -21,7 +21,9 @@ namespace variant_site {
 
 void TiledStream::write(std::string value) {
     setTile();
-    tiles.tileWriter.back().Write(value);
+    for (char c : value) {
+        tiles.tileWriter.back().WriteBits(static_cast<uint8_t>(c), 8);
+    }
     tiles.tileWriter.back().WriteBits(0, 8);
 }
 

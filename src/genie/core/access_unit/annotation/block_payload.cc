@@ -80,7 +80,16 @@ void BlockPayload::read(util::BitReader& reader, AnnotDesc descriptorID, uint8_t
 void BlockPayload::write(util::BitWriter& writer) const {
   if (generic_payload_stream.str().size() > 0) {
     auto* ss = const_cast<std::stringstream*>(&generic_payload_stream);
-    writer.Write(static_cast<std::istream*>(ss));
+    ss->clear();
+    ss->seekg(0, std::ios::beg);
+    if (writer.IsByteAligned()) {
+      writer.WriteAlignedStream(*ss);
+    } else {
+      char byte;
+      while (ss->read(&byte, 1)) {
+        writer.WriteBits(static_cast<uint8_t>(byte), 8);
+      }
+    }
   } else {
     for (const auto& byte : generic_payload) writer.WriteBits(byte, 8);
   }

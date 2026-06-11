@@ -76,9 +76,9 @@ TEST_F(payloadStreamTests, testcopy) {  // NOLINT(cert-err58-cpp)
     std::stringstream testout;
     std::stringstream testout2;
     std::stringstream testout3;
-    genie::util::BitWriter testWriter(&testout);
-    genie::util::BitWriter test2Writer(&testout2);
-    genie::util::BitWriter test3Writer(&testout3);
+    genie::util::BitWriter testWriter(testout);
+    genie::util::BitWriter test2Writer(testout2);
+    genie::util::BitWriter test3Writer(testout3);
 
     payload.write(testWriter);
     payload2.write(test2Writer);

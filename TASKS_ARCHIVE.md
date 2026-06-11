@@ -23,3 +23,5 @@
 | 2026-04-27-optimize-contact-loop | 2026-04-27 | Optimize contact loop (remove dead code, cache sizes) | Done |
 | 2026-06-05-genotype-merge-develop-part6-with-temp-part6 | 2026-06-05 | Merge develop-part6 with origin/temp_part6 | Done |
 | 2026-06-05-merge-develop-with-develop-part6 | 2026-06-05 | Merge develop with develop-part6 | Done |
+| 2026-06-09-revert-bitwriter-to-develop | 2026-06-09 | Revert BitWriter and Utilities to origin/develop Standard | Done |
+

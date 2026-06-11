@@ -21,7 +21,9 @@ namespace track {
 
 void TiledStream::write(std::string value) {
     setTile();
-    tiles.tileWriter.back().Write(value);
+    for (char c : value) {
+        tiles.tileWriter.back().WriteBits(static_cast<uint8_t>(c), 8);
+    }
     tiles.tileWriter.back().WriteBits(0, 8);  // string-terminator
 }
 
@@ -32,7 +34,7 @@ void TiledStream::setTile() {
     } else {
         tiles.tileWriter.back().FlushBits();
         tiles.tileData.emplace_back("");
-        tiles.tileWriter.emplace_back(&tiles.tileData.back());
+        tiles.tileWriter.emplace_back(tiles.tileData.back());
         rowInTile = 1;
     }
 }

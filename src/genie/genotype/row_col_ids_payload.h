@@ -79,7 +79,7 @@ class RowColIdsPayload {
    [[nodiscard]] size_t GetSize() const;
 
    // Function to write to writer
-   void Write(util::BitWriter writer) const;
+   void Write(util::BitWriter& writer) const;
 
  };
 

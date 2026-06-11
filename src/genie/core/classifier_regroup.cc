@@ -250,7 +250,7 @@ record::Chunk ClassifierRegroup::GetChunk() {
 #if AU_DEBUG_WRITE
   static int i = 0;
   std::ofstream tmpOut("AU_" + std::to_string(i++) + ".mgrec");
-  util::BitWriter bw(&tmpOut);
+  util::BitWriter bw(tmpOut);
   for (const auto& r : ret.getData()) {
     r.write(bw);
   }

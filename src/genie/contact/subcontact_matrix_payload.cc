@@ -351,10 +351,10 @@ size_t SubcontactMatrixPayload::GetSize() const{
 // ---------------------------------------------------------------------------------------------------------------------
 
 void SubcontactMatrixPayload::Write(util::BitWriter &writer) const{
-    writer.WriteBypassBE(parameter_set_ID_);
-    writer.WriteBypassBE(sample_ID_);
-    writer.WriteBypassBE(chr1_ID_);
-    writer.WriteBypassBE(chr2_ID_);
+    writer.WriteAlignedInt(parameter_set_ID_);
+    writer.WriteAlignedInt(sample_ID_);
+    writer.WriteAlignedInt(chr1_ID_);
+    writer.WriteAlignedInt(chr2_ID_);
 
     for (auto idx_i = 0u; idx_i< GetNTilesInRow(); idx_i++){
         for (auto idx_j = 0u; idx_j< GetNTilesInCol(); idx_j++){
@@ -362,7 +362,7 @@ void SubcontactMatrixPayload::Write(util::BitWriter &writer) const{
                 auto& tile_payload = tile_payloads_[idx_i][idx_j];
                 auto tile_payload_size = tile_payload.GetSize();
 
-                writer.WriteBypassBE(static_cast<uint32_t>(tile_payload_size));
+                writer.WriteAlignedInt(static_cast<uint32_t>(tile_payload_size));
 
                 tile_payload.Write(writer);
             }
@@ -376,13 +376,13 @@ void SubcontactMatrixPayload::Write(util::BitWriter &writer) const{
 
     if (row_mask_payload_.has_value()){
         auto row_mask_payload_size = row_mask_payload_->GetSize();
-        writer.WriteBypassBE(static_cast<uint32_t>(row_mask_payload_size));
+        writer.WriteAlignedInt(static_cast<uint32_t>(row_mask_payload_size));
         row_mask_payload_->Write(writer);
     }
 
     if (!IsIntraScm() && col_mask_payload_.has_value()){
         auto col_mask_payload_size = col_mask_payload_->GetSize();
-        writer.WriteBypassBE(static_cast<uint32_t>(col_mask_payload_size));
+        writer.WriteAlignedInt(static_cast<uint32_t>(col_mask_payload_size));
         col_mask_payload_->Write(writer);
     }
 }

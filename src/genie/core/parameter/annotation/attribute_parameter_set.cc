@@ -206,7 +206,9 @@ void AttributeParameterSet::write(util::BitWriter& writer) const {
   ArrayType curType;
   writer.WriteBits(attribute_ID, 16);
   writer.WriteBits(attribute_name_len, 8);
-  writer.Write(attribute_name);
+  for (char c : attribute_name) {
+    writer.WriteBits(static_cast<uint8_t>(c), 8);
+  }
   writer.WriteBits(static_cast<uint8_t>(attribute_type), 8);
   writer.WriteBits(attribute_num_array_dims, 2);
   for (auto attribute_dim : attribute_array_dims)
@@ -217,8 +219,10 @@ void AttributeParameterSet::write(util::BitWriter& writer) const {
   if (attribute_miss_val_flag) {
     writer.WriteBits(attribute_miss_default_flag, 1);
     if (!attribute_miss_default_flag) curType.toFile(attribute_type, attribute_miss_val, writer);
-    writer.Write(attribute_miss_str);
-    writer.WriteReserved(8);
+    for (char c : attribute_miss_str) {
+      writer.WriteBits(static_cast<uint8_t>(c), 8);
+    }
+    writer.WriteBits(0, 8);
   }
 
   writer.WriteBits(compressor_ID, 8);

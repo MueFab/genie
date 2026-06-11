@@ -89,9 +89,22 @@ Replace all `core::Writer` usage with `util::BitWriter` directly (like develop),
 
 ---
 
-## Phase 7: Delete src/genie/core/writer.h (Pending)
+## Phase 7: Comprehensive Verification & Regression Tests (Pending)
+Before deleting `core::Writer`, we must guarantee that the refactored code produces identical serializations.
+- **Serialization Comparison Tests**:
+  - Implement unit tests for all record types (e.g. sample, feature, track, variantsite) and parameter sets.
+  - Serialize identical records using both `core::Writer` and `util::BitWriter` onto separate output streams and assert that the generated binary streams match byte-for-byte.
+  - Verify alignment and tracking: assert that `GetTotalBitsWritten()` matches `GetBitsWritten()` for identical states.
+- **Restore Deprecated Tests**:
+  - Uncomment and refactor `AnnotationParameterSetTests.AnnotationParameterSetRandom` and `TileStructureTests.TileStructureRandom` to use `util::BitWriter` directly, ensuring full functional coverage.
+- **Decoder Conformance Verification**:
+  - Run full export/import cycle conformance tests to ensure data encoded with `util::BitWriter` is successfully parsed by existing decoders.
 
-**Status**: Phase 6 complete. Build clean, all 29 tests pass (2 deprecated tests commented out). Phase 7 pending.
+---
+
+## Phase 8: Safe Deletion of src/genie/core/writer.h (Pending)
+
+**Status**: Phase 6 complete. Build clean, all 29 tests pass (2 deprecated tests commented out). Phase 7 & 8 pending.
 
 ---
 

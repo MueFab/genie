@@ -47,7 +47,16 @@ BlockPayloadStream::BlockPayloadStream(const BlockPayloadStream& bp) {
 std::stringstream& BlockPayloadStream::getPayload() { return generic_payload; }
 
 void BlockPayloadStream::write(util::BitWriter& writer) {
-    writer.Write(&generic_payload);
+    generic_payload.clear();
+    generic_payload.seekg(0, std::ios::beg);
+    if (writer.IsByteAligned()) {
+        writer.WriteAlignedStream(generic_payload);
+    } else {
+        char byte;
+        while (generic_payload.read(&byte, 1)) {
+            writer.WriteBits(static_cast<uint8_t>(byte), 8);
+        }
+    }
     writer.FlushBits();
 }
 

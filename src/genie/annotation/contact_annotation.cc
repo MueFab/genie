@@ -87,7 +87,7 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
     std::map<std::string, genie::core::access_unit::annotation::TypedData> attributeTDStream;
     std::map<std::string, core::parameter::annotation::AttributeData> attributeInfo;
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
-    util::BitWriter writer(&descriptorStream[genie::core::AnnotDesc::CONTACT]);
+    util::BitWriter writer(descriptorStream[genie::core::AnnotDesc::CONTACT]);
     scm_payload.Write(writer);
     core::access_unit::annotation::Record annotationAccessUnit;
     // add LINK_ID default values

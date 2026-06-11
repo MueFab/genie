@@ -339,7 +339,7 @@ size_t GenotypePayload::GetSize() const {
 void GenotypePayload::Write(util::BitWriter& writer) const {
   UTILS_DIE_IF(!writer.IsByteAligned(), "Not byte aligned!");
 
-  writer.WriteBypassBE(GetMaxPloidy());
+  writer.WriteAlignedInt(GetMaxPloidy());
 
   uint8_t flag = 0;
   if (GetNoReferenceFlag()) {
@@ -351,16 +351,16 @@ void GenotypePayload::Write(util::BitWriter& writer) const {
   if (GetPhasesValue()) {
     flag |= static_cast<uint8_t>(GenotypePayloadFlags::PHASE_VALUES_BIT);
   }
-  writer.WriteBypassBE(flag);
+  writer.WriteAlignedInt(flag);
 
-  writer.WriteBypassBE(GetNumBitPlanes());
+  writer.WriteAlignedInt(GetNumBitPlanes());
   for (const auto& variant_payload: GetVariantsPayloads()){
     variant_payload.Write(writer);
   }
 
   if (IsAmaxPayloadExist()) {
     auto amax_payload_size = static_cast<uint32_t>(GetVariantsAmaxPayload()->GetSize());
-    writer.WriteBypassBE(amax_payload_size);
+    writer.WriteAlignedInt(amax_payload_size);
     GetVariantsAmaxPayload()->Write(writer);
   }
 

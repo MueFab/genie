@@ -89,7 +89,7 @@ class BinMatPayload {
 //  void WriteCompressed(core::Writer& writer) const;
 
   // Function to write to writer
-  void Write(util::BitWriter writer) const;
+  void Write(util::BitWriter& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

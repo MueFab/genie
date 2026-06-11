@@ -197,18 +197,18 @@ void SortedBinMatPayload::Write(util::BitWriter& writer) const {
   UTILS_DIE_IF(!writer.IsByteAligned(), "Byte is not aligned!");
 
   auto bin_mat_payload_size = static_cast<uint32_t>(bin_mat_payload_.GetSize());
-  writer.WriteBypassBE(bin_mat_payload_size);
+  writer.WriteAlignedInt(bin_mat_payload_size);
   bin_mat_payload_.Write(writer);
 
   if (IsRowsSorted()){
     auto row_ids_size = static_cast<uint32_t>(GetRowIdsPayload()->GetSize());
-    writer.WriteBypassBE(row_ids_size);
+    writer.WriteAlignedInt(row_ids_size);
     GetRowIdsPayload()->Write(writer);
   }
 
   if (IsColsSorted()){
     auto col_ids_size = static_cast<uint32_t>(GetColIdsPayload()->GetSize());
-    writer.WriteBypassBE(col_ids_size);
+    writer.WriteAlignedInt(col_ids_size);
     GetColIdsPayload()->Write(writer);
   }
 

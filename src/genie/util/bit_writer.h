@@ -23,8 +23,6 @@
 // -----------------------------------------------------------------------------
 
 #include <cstdint>
-#include <cstring>
-#include <istream>
 #include <ostream>
 #include <string>
 
@@ -37,7 +35,7 @@ namespace genie::util {
  */
 class BitWriter {
   /// Where to direct output. A file for example.
-  std::ostream* stream_;
+  std::ostream& stream_;
 
   /// Contains bits which cannot be written yet, as no byte is full.
   uint64_t held_bits_;
@@ -50,18 +48,12 @@ class BitWriter {
 
  public:
   /**
-   * @brief Constructs a BitWriter from an output stream reference.
+   * @brief Constructs a BitWriter and initializes the output stream.
    *
-   * @param str Reference to an output stream where bits will be written.
+   * @param str Pointer to an output stream (std::ostream) where bits will be
+   * written.
    */
   explicit BitWriter(std::ostream& str);
-
-  /**
-   * @brief Constructs a BitWriter from an output stream pointer (Part 6 compat).
-   *
-   * @param str Pointer to an output stream. When null, writes are silently ignored.
-   */
-  explicit BitWriter(std::ostream* str);
 
   /**
    * @brief Destructor for the BitWriter class.
@@ -86,24 +78,6 @@ class BitWriter {
    * @param bits The number of bits to write from the provided value.
    */
   void WriteBits(uint64_t value, uint8_t bits);
-
-  /**
-   * @brief Writes all characters of string to the stream (Part 6 compat).
-   * @param str String to write.
-   */
-  void Write(const std::string& str);
-
-  /**
-   * @brief Writes all data from an input stream (Part 6 compat).
-   * @param in Pointer to input stream.
-   */
-  void Write(std::istream* in);
-
-  /**
-   * @brief Writes reserved (zero) bits - byte-aligned padding (Part 6 compat).
-   * @param bits Number of zero bits to write.
-   */
-  void WriteReserved(uint8_t bits) { WriteBits(0, bits); }
 
   /**
    * @brief Flushes any remaining bits that are currently held and writes them
@@ -197,25 +171,6 @@ class BitWriter {
   template <typename T, size_t NumBytes = sizeof(T),
             typename = std::enable_if<std::is_integral_v<T>>>
   void WriteAlignedInt(T val);
-
-  template <typename T, size_t NumBytes = sizeof(T),
-            typename = std::enable_if_t<std::is_integral_v<T>>>
-  void WriteBypassBE(T val);
-
-  /**
-   * @brief Writes a floating-point value to the stream in big-endian byte order
-   * (Part 6 compat).
-   * @param val The floating-point value to write.
-   */
-  template <typename T, size_t NumBytes = sizeof(T),
-            std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
-  void WriteBypassBEFloat(T val) {
-    // Reinterpret as uint representation and write raw bytes
-    static_assert(NumBytes == sizeof(T), "NumBytes must equal sizeof(T) for float types");
-    uint8_t buf[NumBytes];
-    std::memcpy(buf, &val, NumBytes);
-    WriteAlignedBytes(buf, NumBytes);
-  }
 
   /**
    * @brief Writes the contents of an input stream to the output stream in

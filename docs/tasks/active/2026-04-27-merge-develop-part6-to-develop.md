@@ -3,6 +3,61 @@
 ## Goal
 Merge `develop-part6` branch into `develop` with minimal disruption, using a 12-step phased approach based on dependency hierarchy.
 
+## Updated Merge Strategy (Post-BitWriter Reversion)
+
+Now that the **`BitWriter` reversion is complete**, we have successfully eliminated the custom pointer-based constructor/bypass conflicts in `util`. This significantly reduces the risk of structural conflicts in downstream files (like records and test cases) during the merge.
+
+The refined strategy for the next step of merging `develop-part6` and `develop` is:
+
+### Step 0: Git History Alignment (Prerequisite)
+Since `develop-part6` and `develop` have divergent/unrelated Git histories, we must create a shared base before starting the phased merge:
+1. Create local backup bundles of both branches.
+2. Checkout a new merge-working branch off `develop`.
+3. Fetch `develop-part6` and merge it with `--no-commit` to align history and resolve any baseline file conflicts (e.g. root `.gitignore` or `README.md`).
+
+### Step 1: Phased Module-by-Module Merge Plan
+We will merge the codebase in order of dependency flow:
+
+#### Phase 1: Base Libraries & New Backend (Steps 1–3)
+* **`genie-util` & `genie-module`**: Merge these base layers. The utility layer will now compile cleanly since `BitWriter` matches upstream `develop`.
+* **`genie-backend`**: Import this new module (~10 files). It is 100% new code providing the Eigen/xtensor dispatch logic, so it has no direct overlap with `develop`.
+
+#### Phase 2: Codecs & File Formats (Steps 4–5)
+* **`genie-entropy` (ZSTD Adaptation)**:
+  * **Critical action**: Adapt `develop-part6`'s standalone `ZSTDEncoder` to use the `develop` `EntropyEncoder` and `EntropyDecoder` base classes.
+  * Restore `decoder.cc`/`param_decoder.cc` from `develop` and preserve `develop`'s external `find_package(Zstd)` pattern rather than `part6`'s static thirdparty build.
+* **`genie-format` (MGB & FASTA Renames)**:
+  * Run `git mv` for renamed files to preserve history:
+    * `data_unit_factory.cc/h` $\rightarrow$ `data-unit-factory.cc/h` (MGB)
+    * `fai_file.cc`/`fasta_source.cc` $\rightarrow$ `fai-file.cc`/`fasta-source.cc` (FASTA)
+  * Ingest the new MGG subdirectories (`annotation_access_unit/`, `annotation_table/`, and `dataset_parameterset/`).
+
+#### Phase 3: Core Restructuring & Coder Unification (Steps 6–9)
+* **`genie-core` Restructuring**:
+  * Restructure `genie-core` to the hierarchical directory model (under `access_unit/annotation/` and `parameter/annotation/`).
+  * Add the new core record types (`variant/`, `site/`, `contact/`, `data_unit/`, `linked_record/`).
+* **Unify Coders**: Remove backend-specific files (e.g., `contact_coder_std.cc`, `contact_coder_eigen.cc`, `contact_coder_xtensor.cc`) and replace them with the unified coders that route through the backend dispatcher.
+
+#### Phase 4: High-Level Annotation & Verification (Steps 10–12)
+* **`genie-annotation`**: Merge the new annotation module (100% new, ~30 files) and link it.
+* **Build Matrix & Verification**: Rebuild the root CMakeLists.txt and verify all test suites across all 9 backend combinations (Contact/Genotype/Likelihood $\times$ {STD, Eigen, XTensor}).
+
+### Self-Criticism & Risks
+* **ZSTD Divergence**: The ZSTD codec implementation in `develop-part6` deviates significantly from the inheritance architecture of other codecs in `develop`. Step 4 will require manual rewriting of the ZSTD I/O layer.
+* **Circular Dependency Risk**: `genie-core` now relies on `genie-backend`, which relies on `genie-util`. We must verify the linker doesn't complain about circular inclusion paths during Step 6.
+
+### Relationship with Other Active Tasks
+
+The following table maps other active tasks in the repository to their relevant merge phases and steps:
+
+| Task ID & Link | Description | Relationship to Merge | Target Merge Phase/Step |
+| :--- | :--- | :--- | :--- |
+| [2026-04-29-refactor-core-writer-to-bitwriter.md](file:///home/adhisant/workspace/genie-part6/docs/tasks/active/2026-04-29-refactor-core-writer-to-bitwriter.md) | Migrate from `core::Writer` to `util::BitWriter` and remove deprecated `core::Writer` completely. | **Post-Merge Cleanup**: Removal of `core/writer.h` (Phase 7 of the task) requires all modules to be successfully merged and compiled first. | Step 11/12 (Verification) / Post-Merge |
+| [2026.04.28-common_attribute_field_unification.md](file:///home/adhisant/workspace/genie-part6/docs/tasks/active/2026.04.28-common_attribute_field_unification.md) | Standardize `AttributeField` structure to unify all annotation parser field types. | **Restructuring Prerequisite / Integration Core**: Must be integrated as part of `genie-core` (Step 6) and `genie-annotation` (Step 10) to avoid compiler/linker errors. | Step 6 (Merge `genie-core`) & Step 10 (Add `genie-annotation`) |
+| [2026.04.28-annotation_parser_integration.md](file:///home/adhisant/workspace/genie-part6/docs/tasks/active/2026.04.28-annotation_parser_integration.md) | Integrate all annotation parsers into `annotation.cc`. Currently blocked by `Attributes::add()` type mismatch. | **Blocking Core Integration**: Relies on the `AttributeField` unification task. Needs to be executed as part of `genie-annotation` module integration. | Step 10 (Add `genie-annotation`) |
+| [2026.04.28-annot_integration_incorporate_new_annotations.md](file:///home/adhisant/workspace/genie-part6/docs/tasks/active/2026.04.28-annot_integration_incorporate_new_annotations.md) | Add new annotation types to build system and fix include paths. | **Module-level Integration**: Executed during Phase 4 of the merge to bring in GTF, BED, track, and track property annotations. | Step 10 (Add `genie-annotation`) |
+| [2026.04.28-core_writer_refactor.md](file:///home/adhisant/workspace/genie-part6/docs/tasks/active/2026.04.28-core_writer_refactor.md) | Refactor `core/writer` dependencies (superseded by bitwriter migration). | **Obsolete**: Superseded by the direct `BitWriter` migration task. To be archived. | N/A (Archived) |
+
 ## Context
 The `develop-part6` branch introduces:
 - **New modules**: annotation, backend, variantsite
@@ -70,35 +125,35 @@ flowchart TD
         LZMA[LZMA codec]
         JBIG[JBIG codec]
         BSC[BSC codec]
-        JSON[nlohmann/json]
+        JSON["nlohmann/json"]
         FS[filesystem]
     end
 
     subgraph "Infrastructure"
-        UTIL[genie-util<br/>~45 files<br/>LOW DIFF]
+        UTIL["genie-util<br/>~45 files<br/>LOW DIFF"]
     end
 
     subgraph "Core System"
-        CORE[genie-core<br/>~150 files<br/>HIGH DIFF]
+        CORE["genie-core<br/>~150 files<br/>HIGH DIFF"]
     end
 
     subgraph "Backend Abstraction [NEW]"
-        BACKEND[genie-backend<br/>10 files<br/>100% NEW]
+        BACKEND["genie-backend<br/>10 files<br/>100% NEW"]
     end
 
     subgraph "Codec Modules"
-        ENTROPY[genie-entropy<br/>~120 files<br/>MEDIUM DIFF]
+        ENTROPY["genie-entropy<br/>~120 files<br/>MEDIUM DIFF"]
     end
 
     subgraph "Format Handlers"
-        FORMAT[genie-format<br/>~210 files<br/>MEDIUM DIFF]
+        FORMAT["genie-format<br/>~210 files<br/>MEDIUM DIFF"]
     end
 
     subgraph "High-Level Modules [NEW/REFACTORED]"
-        CONTACT[genie-contact<br/>~20 files<br/>UNIFIED]
-        GENOTYPE[genie-genotype<br/>~12 files<br/>UNIFIED]
-        LIKELIHOOD[genie-likelihood<br/>~10 files<br/>UNIFIED]
-        ANNOTATION[genie-annotation<br/>~30 files<br/>100% NEW]
+        CONTACT["genie-contact<br/>~20 files<br/>UNIFIED"]
+        GENOTYPE["genie-genotype<br/>~12 files<br/>UNIFIED"]
+        LIKELIHOOD["genie-likelihood<br/>~10 files<br/>UNIFIED"]
+        ANNOTATION["genie-annotation<br/>~30 files<br/>100% NEW"]
     end
 
     UTIL --> CORE
@@ -108,11 +163,15 @@ flowchart TD
     CORE --> BACKEND
     CORE --> ENTROPY
     CORE --> FORMAT
+    CORE --> CONTACT
+    CORE --> GENOTYPE
+    CORE --> LIKELIHOOD
 
     BACKEND --> CONTACT
     BACKEND --> GENOTYPE
     BACKEND --> LIKELIHOOD
 
+    ENTROPY --> GENOTYPE
     ENTROPY --> ANNOTATION
     CORE --> ANNOTATION
 
@@ -148,19 +207,19 @@ flowchart TB
     end
 
     subgraph "genie-backend" #90EE90
-        BACKEND["genie-backend<br/>~10 files<br/>100% NEW<br/>Risk: MEDIUM"]
+        BACKEND["✅ genie-backend<br/>~10 files<br/>100% NEW<br/>Risk: MEDIUM"]
     end
 
     subgraph "genie-core" #FFB6C1
-        CORE["genie-core<br/>~150 files<br/>Risk: HIGH"]
+        CORE["✅ genie-core<br/>~150 files<br/>Risk: HIGH"]
     end
 
     subgraph "genie-entropy" #FFFF99
-        ENTROPY["genie-entropy<br/>~120 files<br/>Risk: MEDIUM"]
+        ENTROPY["✅ genie-entropy<br/>~120 files<br/>Risk: MEDIUM"]
     end
 
     subgraph "genie-format" #FFFF99
-        FORMAT["genie-format<br/>~210 files<br/>Risk: MEDIUM"]
+        FORMAT["✅ genie-format<br/>~210 files<br/>Risk: MEDIUM"]
     end
 
     subgraph "genie-module" #90EE90
@@ -168,31 +227,31 @@ flowchart TB
     end
 
     subgraph "genie-name" #90EE90
-        NAME["genie-name<br/>~2 files<br/>Risk: LOW"]
+        NAME["✅ genie-name<br/>~2 files<br/>Risk: LOW"]
     end
 
     subgraph "genie-quality" #90EE90
-        QUAL["genie-quality<br/>~20 files<br/>Risk: LOW"]
+        QUAL["✅ genie-quality<br/>~20 files<br/>Risk: LOW"]
     end
 
     subgraph "genie-read" #90EE90
-        READ["genie-read<br/>~40 files<br/>Risk: LOW"]
+        READ["✅ genie-read<br/>~40 files<br/>Risk: LOW"]
     end
 
     subgraph "genie-contact" #FFFF99
-        CONTACT["genie-contact<br/>~20 files<br/>UNIFIED<br/>Risk: MEDIUM"]
+        CONTACT["✅ genie-contact<br/>~20 files<br/>UNIFIED<br/>Risk: MEDIUM"]
     end
 
     subgraph "genie-genotype" #FFFF99
-        GENO["genie-genotype<br/>~12 files<br/>UNIFIED<br/>Risk: MEDIUM"]
+        GENO["✅ genie-genotype<br/>~12 files<br/>UNIFIED<br/>Risk: MEDIUM"]
     end
 
     subgraph "genie-likelihood" #FFFF99
-        LIKE["genie-likelihood<br/>~10 files<br/>UNIFIED<br/>Risk: MEDIUM"]
+        LIKE["✅ genie-likelihood<br/>~10 files<br/>UNIFIED<br/>Risk: MEDIUM"]
     end
 
     subgraph "genie-annotation" #FFB6C1
-        ANNOT["genie-annotation<br/>~30 files<br/>100% NEW<br/>Risk: HIGH"]
+        ANNOT["✅ genie-annotation<br/>~30 files<br/>100% NEW<br/>Risk: HIGH"]
     end
 
     %% External dependencies
@@ -217,6 +276,9 @@ flowchart TB
     CORE --> NAME
     CORE --> QUAL
     CORE --> READ
+    CORE --> CONTACT
+    CORE --> GENO
+    CORE --> LIKE
 
     %% Backend dependencies
     BACKEND --> CONTACT
@@ -227,6 +289,7 @@ flowchart TB
     FORMAT --> READ
 
     %% High-level modules
+    ENTROPY --> GENO
     ENTROPY --> ANNOT
     CORE --> ANNOT
     CONTACT --> ANNOT
@@ -239,11 +302,9 @@ flowchart TB
     classDef LOW risk fill:#90EE90,stroke:#228B22,stroke-width:1px
     classDef DONE stroke:#228B22,stroke-width:2px,fill:#90EE90
 
-    class UTIL DONE
-    class MOD DONE
+    class UTIL,MOD,NAME,QUAL,READ LOW
     class BACKEND,ENTROPY,FORMAT,CONTACT,GENO,LIKE MEDIUM
     class CORE,ANNOT HIGH
-    class NAME,QUAL,READ LOW
 ```
 
 ### Internal Structure of genie-core

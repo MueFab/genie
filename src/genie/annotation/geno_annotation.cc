@@ -113,7 +113,7 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(
     descriptorStream[genie::core::AnnotDesc::GENOTYPE];
     {
       genie::util::BitWriter writer(
-          &descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
+          descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
       combined.blocks.at(blockIndex).payload.Write(writer);
     }
     variant_site::AccessUnitComposer accessUnitcomposer;

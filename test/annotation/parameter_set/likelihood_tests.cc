@@ -69,7 +69,7 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
 
     std::stringstream outputfile;
 
-    genie::util::BitWriter strwriter(&outputfile);
+    genie::util::BitWriter strwriter(outputfile);
     genie::util::BitReader strreader(outputfile);
     likelihoodParameters.Write(strwriter);
     strwriter.FlushBits();

@@ -205,14 +205,14 @@ void ContactMatrixBinPayload::ReadWeightValuesFromFileAtIndex(const std::string&
 
 void ContactMatrixBinPayload::Write(util::BitWriter& writer) const {
   UTILS_DIE_IF(!writer.IsByteAligned(), "Not byte aligned!");
-  writer.WriteBypassBE(GetSampleID());
-  writer.WriteBypassBE(GetChrID());
-  writer.WriteBypassBE(GetBinSizeMultiplier());
+  writer.WriteAlignedInt(GetSampleID());
+  writer.WriteAlignedInt(GetChrID());
+  writer.WriteAlignedInt(GetBinSizeMultiplier());
 
   for (const auto &norm_weights: GetWeightValue()){
     for (const auto &weight_value: norm_weights){
       const uint64_t bits = *reinterpret_cast<const uint64_t*>(&weight_value);
-      writer.WriteBypassBE(bits);
+      writer.WriteAlignedInt(bits);
     }
   }
 }

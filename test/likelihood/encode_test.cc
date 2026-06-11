@@ -203,7 +203,7 @@ TEST(Likelihood, DISABLED_GenerateGoldenMaster) {
     encode_likelihood(recs, params, payload, 256, false);
 
     std::ofstream writer(goldenFile, std::ios::binary);
-    util::BitWriter bitwriter(&writer);
+    util::BitWriter bitwriter(writer);
     payload.write(bitwriter);
     bitwriter.FlushBits();
     writer.close();
@@ -235,7 +235,7 @@ TEST(Likelihood, CrossBackend_GoldenMaster) {
 
 
     std::stringstream buffer;
-    util::BitWriter bitwriter(&buffer);
+    util::BitWriter bitwriter(buffer);
     payload.write(bitwriter);
     bitwriter.FlushBits();
 

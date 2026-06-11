@@ -37,43 +37,45 @@ void Record::Write(genie::util::BitWriter& writer) {
   writer.WriteBits(pos_, 40);
   writer.WriteBits(strand_, 8);
   writer.WriteBits(id_len_, 8);
-  writer.Write(id_);
+  writer.WriteAlignedBytes(id_.data(), id_.size());
   writer.WriteBits(description_len_, 8);
-  writer.Write(description_);
+  writer.WriteAlignedBytes(description_.data(), description_.size());
   writer.WriteBits(ref_len_, 32);
-  writer.Write(ref_);
+  writer.WriteAlignedBytes(ref_.data(), ref_.size());
 
   writer.WriteBits(alt_count_, 8);
   for (auto idx_i = 0; idx_i < alt_count_; ++idx_i) {
     writer.WriteBits(alt_len_[idx_i], 32);
-    writer.Write(altern_[idx_i]);
+    for (char c : altern_[idx_i]) {
+      writer.WriteBits(static_cast<uint8_t>(c), 8);
+    }
   }
   writer.WriteBits(depth_, 32);
   writer.WriteBits(seq_qual_, 32);
   writer.WriteBits(map_qual_, 32);
   writer.WriteBits(map_num_qual_0_, 32);
   writer.WriteBits(filters_len_, 8);
-  writer.Write(filters_);
+  writer.WriteAlignedBytes(filters_.data(), filters_.size());
 
   auto info_tag = info_.GetFields();
   writer.WriteBits(static_cast<uint8_t>(info_tag.size()), 8);
   for (auto idx_i = 0u; idx_i < info_tag.size(); ++idx_i) {
     writer.WriteBits(info_tag[idx_i].name.size(), 8);
-    writer.Write(info_tag[idx_i].name);
+    writer.WriteAlignedBytes(info_tag[idx_i].name.data(), info_tag[idx_i].name.size());
     writer.WriteBits(static_cast<uint8_t>(info_tag[idx_i].type), 8);
     writer.WriteBits(info_tag[idx_i].values.size(), 8);
     ArrayType writeType;
     for (auto idx_j = 0u; idx_j < info_tag[idx_i].values.size(); ++idx_j) {
       writeType.toFile(info_tag[idx_i].type, info_tag.at(idx_i).values.at(idx_j), writer);
       if (info_tag[idx_i].type == DataType::STRING)
-        writer.WriteReserved(8);
+        writer.WriteBits(0, 8);
     }
   }
-  writer.WriteReserved(7);
+  writer.WriteBits(0, 7);
   writer.WriteBits(linked_record_, 1);
   if (linked_record_) {
     writer.WriteBits(link_name_len_, 8);
-    writer.Write(link_name_);
+    writer.WriteAlignedBytes(link_name_.data(), link_name_.size());
     writer.WriteBits(reference_box_id_, 8);
   }
 }

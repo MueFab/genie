@@ -275,8 +275,7 @@ void SubcontactMatrixMaskPayload::Write(util::BitWriter &writer) const{
 
     // Write everything on-memory before dumping it to the writer
     auto payload = std::stringstream();
-    std::ostream& _writer = payload;
-    auto onmem_writer = genie::util::BitWriter(&_writer);
+    auto onmem_writer = genie::util::BitWriter(payload);
 
     onmem_writer.WriteBits(static_cast<uint64_t>(transform_ID_), TRANSFORM_ID_BLEN);
 
@@ -305,7 +304,7 @@ void SubcontactMatrixMaskPayload::Write(util::BitWriter &writer) const{
 
     auto payload_str = payload.str();
     for (auto& v: payload_str){
-        writer.WriteBypassBE(v);
+        writer.WriteAlignedInt(v);
     }
 }
 

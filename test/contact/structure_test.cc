@@ -55,7 +55,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixTilePayload){
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
-        auto bitwriter = genie::util::BitWriter(&writer);
+        auto bitwriter = genie::util::BitWriter(writer);
         orig_obj.Write(bitwriter);
 
         auto tile_payload_size = obj_payload.str().size();
@@ -105,7 +105,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixTilePayload){
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
-        auto bitwriter = genie::util::BitWriter(&writer);
+        auto bitwriter = genie::util::BitWriter(writer);
         orig_obj.Write(bitwriter);
 
         auto tile_payload_size = obj_payload.str().size();
@@ -150,7 +150,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 
             auto obj_payload = std::stringstream();
             std::ostream& writer = obj_payload;
-            auto bitwriter = genie::util::BitWriter(&writer);
+            auto bitwriter = genie::util::BitWriter(writer);
             orig_obj.Write(bitwriter);
 
             ASSERT_EQ(obj_payload.str().size(), orig_obj.GetSize());
@@ -182,7 +182,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 
             auto obj_payload = std::stringstream();
             std::ostream& writer = obj_payload;
-            auto bitwriter = genie::util::BitWriter(&writer);
+            auto bitwriter = genie::util::BitWriter(writer);
             orig_obj.Write(bitwriter);
 
             ASSERT_EQ(obj_payload.str().size(), orig_obj.GetSize());
@@ -226,7 +226,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
-        auto bitwriter = genie::util::BitWriter(&writer);
+        auto bitwriter = genie::util::BitWriter(writer);
         orig_obj.Write(bitwriter);
 
         ASSERT_EQ(obj_payload.str().size(), orig_obj.GetSize());
@@ -268,7 +268,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         orig_obj.SetRlEntries(TRANSFORM_ID, FIRST_VAL, orig_rl_entries);
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
-        auto bitwriter = genie::util::BitWriter(&writer);
+        auto bitwriter = genie::util::BitWriter(writer);
         orig_obj.Write(bitwriter);
 
         ASSERT_EQ(obj_payload.str().size(), orig_obj.GetSize());
@@ -311,7 +311,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
-        auto bitwriter = genie::util::BitWriter(&writer);
+        auto bitwriter = genie::util::BitWriter(writer);
         orig_obj.Write(bitwriter);
 
         ASSERT_EQ(obj_payload.str().size(), orig_obj.GetSize());
@@ -374,12 +374,12 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixParameter){
 
 //        std::stringstream obj_payload;
 //        std::ostream& writer = obj_payload;
-//        auto CMWriter = genie::util::BitWriter(&writer);
+//        auto CMWriter = genie::util::BitWriter(writer);
 //        ORIG_CM_PARAM.Write(CMWriter);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
-        auto bitwriter = genie::util::BitWriter(&writer);
+        auto bitwriter = genie::util::BitWriter(writer);
         ORIG_CM_PARAM.Write(bitwriter);
 
         ASSERT_EQ(obj_payload.str().size(), ORIG_CM_PARAM.GetSize());
@@ -449,7 +449,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
         orig_obj = ORIG_SCM_PARAM;
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
-        auto bitwriter = genie::util::BitWriter(&writer);
+        auto bitwriter = genie::util::BitWriter(writer);
         orig_obj.Write(bitwriter);
 
         ASSERT_EQ(obj_payload.str().size(), orig_obj.GetSize());
@@ -537,7 +537,7 @@ TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
         orig_obj = ORIG_SCM_PARAM;
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
-        auto bitwriter = genie::util::BitWriter(&writer);
+        auto bitwriter = genie::util::BitWriter(writer);
         orig_obj.Write(bitwriter);
 
         ASSERT_EQ(obj_payload.str().size(), orig_obj.GetSize());
@@ -645,7 +645,7 @@ TEST(ContactStructure, RoundTrip_Structure_ContactMatrixBinPayload){
 
     auto obj_payload = std::stringstream();
     std::ostream& writer = obj_payload;
-    auto bit_writer = genie::util::BitWriter(&writer);
+    auto bit_writer = genie::util::BitWriter(writer);
     bin_payload.Write(bit_writer);
 
     std::istream& reader = obj_payload;

@@ -409,63 +409,63 @@ void ContactRecord::SetCMValues(std::vector<uint64_t>&& start_pos1,
 // TODO (Yeremia): Implement this
 void ContactRecord::Write(util::BitWriter& writer) const {
   // Sample
-  writer.WriteBypassBE(sample_id_);
-  writer.WriteBypassBE(static_cast<uint8_t>(sample_name_.length()));
+  writer.WriteAlignedInt(sample_id_);
+  writer.WriteAlignedInt(static_cast<uint8_t>(sample_name_.length()));
   writer.WriteAlignedBytes(sample_name_.data(), sample_name_.length());
-  writer.WriteBypassBE(bin_size_);
+  writer.WriteAlignedInt(bin_size_);
 
   // chr1
-  writer.WriteBypassBE(chr1_id_);
-  writer.WriteBypassBE(static_cast<uint8_t>(chr1_name_.length()));
+  writer.WriteAlignedInt(chr1_id_);
+  writer.WriteAlignedInt(static_cast<uint8_t>(chr1_name_.length()));
   writer.WriteAlignedBytes(chr1_name_.data(), chr1_name_.length());
-  writer.WriteBypassBE(chr1_length_);
+  writer.WriteAlignedInt(chr1_length_);
 
   // chr2
-  writer.WriteBypassBE(chr2_id_);
-  writer.WriteBypassBE(static_cast<uint8_t>(chr2_name_.length()));
+  writer.WriteAlignedInt(chr2_id_);
+  writer.WriteAlignedInt(static_cast<uint8_t>(chr2_name_.length()));
   writer.WriteAlignedBytes(chr2_name_.data(), chr2_name_.length());
-  writer.WriteBypassBE(chr2_length_);
+  writer.WriteAlignedInt(chr2_length_);
 
   // num_entries and num_norm_counts
-  writer.WriteBypassBE(GetNumEntries());
-  writer.WriteBypassBE(GetNumNormCounts());
+  writer.WriteAlignedInt(GetNumEntries());
+  writer.WriteAlignedInt(GetNumNormCounts());
 
   for (auto idx_i = 0; idx_i < GetNumNormCounts(); idx_i++) {
-    writer.WriteBypassBE(static_cast<uint8_t>(norm_count_names_[idx_i].length()));
+    writer.WriteAlignedInt(static_cast<uint8_t>(norm_count_names_[idx_i].length()));
     writer.WriteAlignedBytes(norm_count_names_[idx_i].data(), norm_count_names_[idx_i].length());
   }
 
   for (const auto& v : start_pos1_) {
-    writer.WriteBypassBE(v);
+    writer.WriteAlignedInt(v);
   }
 
   for (const auto& v : end_pos1_) {
-    writer.WriteBypassBE(v);
+    writer.WriteAlignedInt(v);
   }
 
   for (const auto& v : start_pos2_) {
-    writer.WriteBypassBE(v);
+    writer.WriteAlignedInt(v);
   }
 
   for (const auto& v : end_pos2_) {
-    writer.WriteBypassBE(v);
+    writer.WriteAlignedInt(v);
   }
 
   for (const auto& v : counts_) {
-    writer.WriteBypassBE(v);
+    writer.WriteAlignedInt(v);
   }
 
   for (const auto& norm_count_vals : norm_counts_) {
     for (const auto& v : norm_count_vals) {
       uint64_t tmp_val;
       std::memcpy(&tmp_val, &v, sizeof(tmp_val));
-      writer.WriteBypassBE(tmp_val);
+      writer.WriteAlignedInt(tmp_val);
     }
   }
 
   // TODO(yeremia): fix the flag
   //    auto link_record_flag = reader.ReadAlignedInt<uint8_t>();
-  writer.WriteBypassBE(static_cast<uint8_t>(0));
+  writer.WriteAlignedInt(static_cast<uint8_t>(0));
   //    UTILS_DIE_IF(link_record_flag, "Not yet implemented for link_record!");
 }
 

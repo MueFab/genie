@@ -104,12 +104,12 @@ class TypedData {
     void setCompressedData(std::stringstream& _compressed_data_block) {
         compressedDataStream.str("");
         compressedDataStream.clear();
-        util::BitWriter compressedWriter(const_cast<std::stringstream*>(&compressedDataStream));
-        compressedWriter.Write(&_compressed_data_block);
+        util::BitWriter compressedWriter(compressedDataStream);
+        compressedWriter.WriteAlignedStream(_compressed_data_block);
     }
 
     void setCompressedData(std::vector<uint8_t>& _compressed_data_block) {
-        util::BitWriter compressedWriter(&compressedDataStream);
+        util::BitWriter compressedWriter(compressedDataStream);
         for (auto byte : _compressed_data_block)
           compressedWriter.WriteBits(byte, 8);
     }

@@ -477,14 +477,14 @@ void ContactMatrixParameters::Write(util::BitWriter& writer) const {
   for(const auto& sample_info : sample_infos_) {
     writer.WriteBits(sample_info.second.ID, 16);
     writer.WriteBits(static_cast<uint16_t>(sample_info.second.name.size()), 8);
-    writer.Write(sample_info.second.name);
+    writer.WriteAlignedBytes(sample_info.second.name.data(), sample_info.second.name.size());
   }
 
   writer.WriteBits(static_cast<uint8_t>(chr_infos_.size()), 8);
   for(const auto& chr_info : chr_infos_) {
     writer.WriteBits(chr_info.second.ID, 8);
     writer.WriteBits(static_cast<uint16_t>(chr_info.second.name.size()), 8);
-    writer.Write(chr_info.second.name);
+    writer.WriteAlignedBytes(chr_info.second.name.data(), chr_info.second.name.size());
     writer.WriteBits(chr_info.second.length, 64);
   }
 
@@ -500,8 +500,8 @@ void ContactMatrixParameters::Write(util::BitWriter& writer) const {
   for(const auto& method_info : norm_method_infos_) {
     writer.WriteBits(method_info.second.ID, 8);
     writer.WriteBits(static_cast<uint16_t>(method_info.second.name.size()), 8);
-    writer.Write(method_info.second.name);
-    writer.WriteReserved(7);
+    writer.WriteAlignedBytes(method_info.second.name.data(), method_info.second.name.size());
+    writer.WriteBits(0, 7);
     writer.WriteBits(method_info.second.mult_flag, 1);
   }
 
@@ -509,7 +509,7 @@ void ContactMatrixParameters::Write(util::BitWriter& writer) const {
   for(const auto& mat_info : norm_mat_infos_) {
     writer.WriteBits(mat_info.second.ID, 8);
     writer.WriteBits(static_cast<uint16_t>(mat_info.second.name.size()), 8);
-    writer.Write(mat_info.second.name);
+    writer.WriteAlignedBytes(mat_info.second.name.data(), mat_info.second.name.size());
   }
 }
 
