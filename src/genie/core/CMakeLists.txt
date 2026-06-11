@@ -60,7 +60,7 @@ set(source_files
         parameter/annotation/attribute_data.cc
 
         array_type.cc
-        writer.cc
+        # writer.cc
 
         stats/perf_stats.cc
 

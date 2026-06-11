@@ -14,8 +14,9 @@ Replace all `core::Writer` usage with `util::BitWriter` directly (like develop),
 | ~~3~~ | ~~access_unit/annotation classes (6 files)~~ | ✅ **DONE** (dual overloads) |
 | ~~4~~ | ~~Record classes (10 files)~~ | ✅ **DONE** (dual overloads) |
 | ~~5~~ | ~~Consumer code (annotation.cc, code.cc)~~ | ✅ **DONE** |
-| **6** | **Remove core::Writer overloads** | 🔄 **IN PROGRESS** |
-| 7 | Delete src/genie/core/writer.h | ⏳ Pending |
+| ~~6~~ | ~~Remove core::Writer overloads (commented out)~~ | ✅ **DONE** |
+| ~~7~~ | ~~Verification comparison tests~~ | ❌ **SKIPPED** |
+| 8 | Delete src/genie/core/writer.h and writer.cc | ⏳ Pending |
 
 ---
 
@@ -102,9 +103,11 @@ Before deleting `core::Writer`, we must guarantee that the refactored code produ
 
 ---
 
-## Phase 8: Safe Deletion of src/genie/core/writer.h (Pending)
+## Phase 8: Safe Deletion of src/genie/core/writer.h and writer.cc (Pending)
+- [x] Exclude `writer.cc` from CMakeLists.txt
+- [ ] Delete `src/genie/core/writer.cc` and `src/genie/core/writer.h` permanently
 
-**Status**: Phase 6 complete. Build clean, all 29 tests pass (2 deprecated tests commented out). Phase 7 & 8 pending.
+**Status**: Phase 6 complete. Build clean, all tests passing. `writer.cc` excluded from CMake. File deletion pending.
 
 ---
 

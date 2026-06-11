@@ -24,4 +24,9 @@
 | 2026-06-05-genotype-merge-develop-part6-with-temp-part6 | 2026-06-05 | Merge develop-part6 with origin/temp_part6 | Done |
 | 2026-06-05-merge-develop-with-develop-part6 | 2026-06-05 | Merge develop with develop-part6 | Done |
 | 2026-06-09-revert-bitwriter-to-develop | 2026-06-09 | Revert BitWriter and Utilities to origin/develop Standard | Done |
+| 2026-04-27-merge-develop-part6-to-develop | 2026-04-27 | Merge develop-part6 to develop branch | Done |
+| 2026-04-28-common-attribute-field | 2026-04-28 | Standardize AttributeField - unify all parser field types | Done |
+| 2026.04.28-core-writer-refactor | 2026-04-28 | Refactor core/writer dependencies | Done |
+| 2026.04.28-annotation-parser-integration | 2026-04-28 | Integrate all annotation parsers into annotation.cc | Done |
+| 2026.04.28-annot-integration-incorporate-new-annotations | 2026-04-28 | Add new annotation types to the build system | Done |
 
