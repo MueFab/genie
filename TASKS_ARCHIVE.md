@@ -29,4 +29,5 @@
 | 2026.04.28-core-writer-refactor | 2026-04-28 | Refactor core/writer dependencies | Done |
 | 2026.04.28-annotation-parser-integration | 2026-04-28 | Integrate all annotation parsers into annotation.cc | Done |
 | 2026.04.28-annot-integration-incorporate-new-annotations | 2026-04-28 | Add new annotation types to the build system | Done |
+| 2026-06-12-reorganize-docs | 2026-06-12 | Reorganize Documentation Hub (Category-level INDEX.md sub-folders) | Done |
 
