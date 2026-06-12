@@ -5,6 +5,7 @@
  */
 
 #include "encoder.h"
+#include "jbig_interface.h"
 #include <iostream>
 #include <cstring>
 
@@ -32,27 +33,31 @@ void JBIGEncoder::encode(
     uint32_t nrows
 ) {
     const size_t srcLen = input.str().size();
-    unsigned char* compressedBuffer;
-    size_t compSize;
+    unsigned char* compressedBuffer = nullptr;
+    size_t compSize = 0;
 
     auto buf_nrows = (unsigned long) nrows;
     auto buf_ncols = (unsigned long) ncols;
 
-    int ret = mpegg_jbig_compress_default(
+    int ret = mpegg_jbig_compress(
         &compressedBuffer,
         &compSize,
         (const unsigned char* )input.str().c_str(),
         srcLen,
         buf_nrows,
-        buf_ncols
+        buf_ncols,
+        num_lines_per_stripe,
+        deterministic_pred,
+        typical_pred,
+        diff_layer_typical_pred,
+        two_line_template
     );
     if (ret != 0) {
         std::cerr << "error with jbig compression\n";
     }
     for (size_t idx_i = 0; idx_i < compSize; ++idx_i)
         output << compressedBuffer[idx_i];
- 
-
+    free(compressedBuffer);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -64,65 +69,37 @@ void JBIGEncoder::encode(
     uint32_t nrows
 ) {
     const size_t srcLen = input.size();
-    unsigned char* inputBuffer = NULL;
-    inputBuffer = (unsigned char*)malloc(sizeof(*inputBuffer) * srcLen);
-    memcpy(inputBuffer, &input[0], srcLen);
+    if (srcLen == 0) return;
 
-    unsigned char* decompressedBuffer = NULL;
-    size_t dest_data_len;
+    unsigned char* compressedBuffer = nullptr;
+    size_t dest_data_len = 0;
 
-    auto buf_nrows = (unsigned long) ncols;
-    auto buf_ncols = (unsigned long) nrows;
+    auto buf_nrows = (unsigned long) nrows;
+    auto buf_ncols = (unsigned long) ncols;
 
-    int ret = mpegg_jbig_compress_default(
-        &decompressedBuffer,
+    int ret = mpegg_jbig_compress(
+        &compressedBuffer,
         &dest_data_len,
-        inputBuffer,
+        input.data(),
         srcLen,
         buf_nrows,
-        buf_ncols
+        buf_ncols,
+        num_lines_per_stripe,
+        deterministic_pred,
+        typical_pred,
+        diff_layer_typical_pred,
+        two_line_template
     );
     if (ret != 0) {
-        std::cerr << "error with decompression\n";
+        std::cerr << "error with compression\n";
     }
+    output.clear();
+    output.reserve(dest_data_len);
     for (size_t idx_i = 0; idx_i < dest_data_len; ++idx_i)
-        output.push_back(decompressedBuffer[idx_i]);
+        output.push_back(compressedBuffer[idx_i]);
+    free(compressedBuffer);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void JBIGEncoder::decode(
-    std::stringstream& input,
-    std::stringstream& output,
-    uint32_t& ncols,
-    uint32_t& nrows
-) {
-
-    const size_t srcLen = input.str().size();
-     unsigned char* decompressedBuffer;
-    size_t dest_data_len;
-
-    unsigned long buf_nrows, buf_ncols;
-
-    int ret = mpegg_jbig_decompress_default(
-        &decompressedBuffer,
-        &dest_data_len,
-        (const unsigned char* )input.str().c_str(),
-        srcLen,
-        &buf_nrows,
-        &buf_ncols
-    );
-
-    nrows = (uint32_t) buf_nrows;
-    ncols = (uint32_t) buf_ncols;
-
-    if (ret != 0) {
-        std::cerr << "error with decompression\n";
-    }
-    for (size_t idx_i = 0; idx_i < dest_data_len; ++idx_i) {
-        output << decompressedBuffer[idx_i];
-    }
-}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

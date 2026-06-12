@@ -2,6 +2,10 @@
 #include <genie/util/runtime_exception.h>
 #include <genie/backend/backend.h>
 #include <codecs/include/mpegg-codecs.h>
+#include <genie/entropy/jbig/encoder.h>
+#include <genie/entropy/jbig/decoder.h>
+#include <genie/entropy/zstd/encoder.h>
+#include <genie/entropy/zstd/decoder.h>
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -420,15 +424,16 @@ void entropy_encode_bin_mat(
 
     switch (codec_ID) {
         case genie::core::AlgoID::JBIG: {
-            mpegg_jbig_compress_default(
-                &compressed_data, &compressed_data_len,
-                raw_data, raw_data_len,
-                static_cast<unsigned long>(nrows),
-                static_cast<unsigned long>(ncols)
-            );
+            std::vector<uint8_t> input_vec(raw_data, raw_data + raw_data_len);
+            std::vector<uint8_t> compressed_vec;
+            ::genie::entropy::jbig::JBIGEncoder encoder;
+            encoder.encode(input_vec, compressed_vec, (uint32_t)ncols, (uint32_t)nrows);
+            payload.assign(compressed_vec.begin(), compressed_vec.end());
         } break;
         case genie::core::AlgoID::ZSTD: {
-            mpegg_zstd_compress(&compressed_data, &compressed_data_len, raw_data, raw_data_len, 3);
+            std::vector<uint8_t> input_vec(raw_data, raw_data + raw_data_len);
+            ::genie::entropy::zstd::ZSTDEncoder encoder;
+            encoder.encode(input_vec, payload);
         } break;
         case genie::core::AlgoID::BSC: {
             mpegg_bsc_compress(&compressed_data, &compressed_data_len, raw_data, raw_data_len, 20, 8, 1, 1);
@@ -456,15 +461,28 @@ void entropy_decode_bin_mat(
 
     switch (codec_ID) {
         case genie::core::AlgoID::JBIG: {
-            mpegg_jbig_decompress_default(
-                &raw_data, &raw_data_len,
-                payload.data(), payload.size(),
-                reinterpret_cast<unsigned long*>(&nrows),
-                reinterpret_cast<unsigned long*>(&ncols)
-            );
+            std::stringstream compressed_stream;
+            for (uint8_t byte : payload) {
+                compressed_stream << byte;
+            }
+            std::stringstream decompressed_stream;
+            uint32_t out_ncols = 0, out_nrows = 0;
+            ::genie::entropy::jbig::JBIGDecoder decoder;
+            decoder.decode(compressed_stream, decompressed_stream, out_ncols, out_nrows);
+            nrows = out_nrows;
+            ncols = out_ncols;
+            
+            raw_data_len = decompressed_stream.str().size();
+            raw_data = (uint8_t*)malloc(raw_data_len);
+            memcpy(raw_data, decompressed_stream.str().data(), raw_data_len);
         } break;
         case genie::core::AlgoID::ZSTD: {
-            mpegg_zstd_decompress(&raw_data, &raw_data_len, payload.data(), payload.size());
+            std::vector<uint8_t> decompressed_vec;
+            ::genie::entropy::zstd::ZSTDDecoder decoder;
+            decoder.decode(payload, decompressed_vec);
+            raw_data_len = decompressed_vec.size();
+            raw_data = (uint8_t*)malloc(raw_data_len);
+            memcpy(raw_data, decompressed_vec.data(), raw_data_len);
         } break;
         case genie::core::AlgoID::BSC: {
             mpegg_bsc_decompress(&raw_data, &raw_data_len, payload.data(), payload.size());

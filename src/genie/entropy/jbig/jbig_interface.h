@@ -12,6 +12,10 @@
 #include "libjbig/jbig85.h"
 #include "libjbig/jbig.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 void *checkedmalloc(size_t n);
@@ -41,8 +45,58 @@ void jbg85_set_enc_options(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void jbg85_set_def_enc_options(struct jbg85_enc_state *s);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // JBIG_CODEC_H
+int mpegg_jbig_compress_default(
+    unsigned char      **dest,
+    size_t              *dest_len,
+    const unsigned char  *src,
+    size_t                scr_len,
+    unsigned long nrows,
+    unsigned long ncols
+);
+
+int mpegg_jbig_compress(
+    unsigned char      **dest,
+    size_t              *dest_len,
+    const unsigned char *src,
+    size_t               scr_len,
+    unsigned long nrows,
+    unsigned long ncols,
+    unsigned long num_lines_per_stripe,
+    bool deterministic_pred,
+    bool typical_pred,
+    bool diff_layer_typical_pred,
+    bool two_line_template
+);
+
+int mpegg_jbig_decompress_default(
+    unsigned char      **dest,
+    size_t              *dest_len,
+    const unsigned char *src,
+    size_t               src_len,
+    unsigned long       *nrows,
+    unsigned long       *ncols
+);
+
+int mpegg_jbig_decompress(
+    unsigned char      **dest,
+    size_t              *dest_len,
+    const unsigned char *src,
+    size_t               src_len,
+    unsigned long       *nrows,
+    unsigned long       *ncols,
+    size_t               buf_len,
+    size_t               xmax
+);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif  // JBIG_INTERFACE_H
+

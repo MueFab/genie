@@ -35,6 +35,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
 endif()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-core genie-util genie-backend genie-bsc genie-lzma genie-zstd)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
 
 get_filename_component(TOP_DIR ../../ ABSOLUTE)
 target_include_directories(${PROJECT_NAME} PUBLIC "${TOP_DIR}")

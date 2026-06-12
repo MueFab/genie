@@ -46,7 +46,6 @@ add_subdirectory ("libbsc")
 add_subdirectory ("lzma")
 # add_subdirectory ("procrustes")
 add_subdirectory ("zstd")
-add_subdirectory ("jbig")
 add_subdirectory ("lib")
 
 #add_subdirectory ("debug")

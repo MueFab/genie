@@ -144,31 +144,35 @@ Encoder::Encoder(const bool write_out_streams)
 ZSTDEncoder::ZSTDEncoder() : use_dictionary_flag(false), dictionary_size(0), dictionary{} {}
 
 void ZSTDEncoder::encode(std::stringstream &input, std::stringstream &output) {
-    const size_t srcLen = input.str().size();
-    unsigned char *destination = nullptr;
-    size_t destLen = srcLen;
+    const std::string inStr = input.str();
+    const size_t srcLen = inStr.size();
+    if (srcLen == 0) return;
+    const size_t maxCompressedSize = ZSTD_compressBound(srcLen);
+    std::vector<uint8_t> destBuffer(maxCompressedSize);
 
-    int ret = mpegg_zstd_compress(&destination, &destLen, (const unsigned char *)input.str().c_str(), srcLen, 0);
-
-    if (ret != 0) {
-        std::cerr << "error with zstd compression\n";
+    const size_t compressedSize = ZSTD_compress(destBuffer.data(), maxCompressedSize, inStr.data(), srcLen, 3);
+    if (ZSTD_isError(compressedSize)) {
+        std::cerr << "error with zstd compression: " << ZSTD_getErrorName(compressedSize) << "\n";
+        return;
     }
-    output.write((const char *)destination, destLen);
-    if (destination) free(destination);
+    output.write(reinterpret_cast<const char*>(destBuffer.data()), compressedSize);
 }
 
-void ZSTDEncoder::decode(std::stringstream &input, std::stringstream &output) {
-    const size_t srcLen = input.str().size();
-    char *dest = new char[srcLen];
-    unsigned char *destination = nullptr;
-    size_t destLen = srcLen;
-    int ret = mpegg_zstd_decompress(&destination, &destLen, (const unsigned char *)input.str().c_str(), srcLen);
-    if (ret != 0) {
-        std::cerr << "error with decompression\n";
+void ZSTDEncoder::encode(const std::vector<uint8_t> &input, std::vector<uint8_t> &output) {
+    const size_t srcLen = input.size();
+    if (srcLen == 0) {
+        output.clear();
+        return;
     }
-    output.write((const char *)destination, destLen);
-    if (destination) free(destination);
-    delete[] dest;
+    const size_t maxCompressedSize = ZSTD_compressBound(srcLen);
+    output.resize(maxCompressedSize);
+
+    const size_t compressedSize = ZSTD_compress(output.data(), maxCompressedSize, input.data(), srcLen, 3);
+    if (ZSTD_isError(compressedSize)) {
+        std::cerr << "error with zstd compression: " << ZSTD_getErrorName(compressedSize) << "\n";
+        return;
+    }
+    output.resize(compressedSize);
 }
 
 genie::core::parameter::annotation::AlgorithmParameters ZSTDParameters::convertToAlgorithmParameters()

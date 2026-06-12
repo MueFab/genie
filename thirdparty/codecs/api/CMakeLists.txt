@@ -5,8 +5,6 @@ set(INC_LIBRARIES
         Libbsc
         Lzma
         Zstd
-        jbigkit
-        jbig-interface
         )
 
 include(apply_dependencies NO_POLICY_SCOPE)

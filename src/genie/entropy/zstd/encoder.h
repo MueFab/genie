@@ -50,7 +50,7 @@ class ZSTDEncoder {
 
     void encode(std::stringstream &input, std::stringstream &output);
 
-    void decode(std::stringstream &input, std::stringstream &output);
+    void encode(const std::vector<uint8_t> &input, std::vector<uint8_t> &output);
 
     void configure(const ZSTDParameters zstdParameters) {
         use_dictionary_flag = zstdParameters.use_dictionary_flag;

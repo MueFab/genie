@@ -6,8 +6,6 @@ set(SOURCE_LIB_TARGETS
         Libbsc
         Lzma
         Zstd
-        jbigkit
-        jbig-interface
         ) # SOURCE_LIB_TARGETS
 
 include_directories(

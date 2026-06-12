@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include <random>
 #include "genie/entropy/jbig/encoder.h"
+#include "genie/entropy/jbig/decoder.h"
 
 class JBIGTestCase : public ::testing::Test {
  protected:
@@ -82,7 +83,8 @@ TEST_F(JBIGTestCase, JBIGEncodeDecodeTest) {  // NOLINT(cert-err58-cpp)
     ASSERT_EQ(ORIG_COMPRESSED_PAYLOAD_LEN, compressed_output.str().size());
 
     std::stringstream uncompressed_output;
-    encoder.decode(compressed_output, uncompressed_output, ncols, nrows);
+    genie::entropy::jbig::JBIGDecoder decoder;
+    decoder.decode(compressed_output, uncompressed_output, ncols, nrows);
 
     ASSERT_EQ(NrOfInputBytes, uncompressed_output.str().size());
     for (size_t i = 0; i < NrOfInputBytes; ++i)
@@ -95,3 +97,129 @@ TEST_F(JBIGTestCase, JBIGparametersTest) {  // NOLINT(cert-err58-cpp)
     auto parameters = jbigParameters.convertToAlgorithmParameters();
     EXPECT_EQ(parameters.getNumberOfPars(), 5);
 }
+
+TEST_F(JBIGTestCase, JBIGEncodeDecodeOptionsTest) {  // NOLINT(cert-err58-cpp)
+    const size_t NrOfInputBytes = 15;
+    std::vector<uint8_t> testDataUncompressed = { 0x7c, 0xe2, 0x38, 0x04, 0x92, 0x40, 0x04, 0xe2,
+                                                  0x5c, 0x44, 0x92, 0x44, 0x38, 0xe2, 0x38 };
+    uint32_t ncols = 23;
+    uint32_t nrows = 5;
+
+    // Test with non-default options
+    genie::entropy::jbig::JBIGparameters params(2, false, true, false, true);
+    genie::entropy::jbig::JBIGEncoder encoder;
+    encoder.configure(params);
+
+    std::stringstream uncompressed_input;
+    for (uint8_t byte : testDataUncompressed) uncompressed_input << byte;
+    std::stringstream compressed_output;
+
+    encoder.encode(uncompressed_input, compressed_output, ncols, nrows);
+
+    std::stringstream uncompressed_output;
+    uint32_t out_ncols = 0;
+    uint32_t out_rows = 0;
+    genie::entropy::jbig::JBIGDecoder decoder;
+    decoder.decode(compressed_output, uncompressed_output, out_ncols, out_rows);
+
+    ASSERT_EQ(NrOfInputBytes, uncompressed_output.str().size());
+    EXPECT_EQ(ncols, out_ncols);
+    EXPECT_EQ(nrows, out_rows);
+    for (size_t i = 0; i < NrOfInputBytes; ++i) {
+        EXPECT_EQ(testDataUncompressed.at(i), static_cast<uint8_t>(uncompressed_output.str().at(i)));
+    }
+}
+
+TEST_F(JBIGTestCase, JBIGVectorEncodeDecodeTest) {  // NOLINT(cert-err58-cpp)
+    const size_t NrOfInputBytes = 15;
+    std::vector<uint8_t> testDataUncompressed = { 0x7c, 0xe2, 0x38, 0x04, 0x92, 0x40, 0x04, 0xe2,
+                                                  0x5c, 0x44, 0x92, 0x44, 0x38, 0xe2, 0x38 };
+    uint32_t ncols = 8;
+    uint32_t nrows = 15;
+
+    genie::entropy::jbig::JBIGEncoder encoder;
+    std::vector<uint8_t> compressed_output;
+    encoder.encode(testDataUncompressed, compressed_output, ncols, nrows);
+
+    genie::entropy::jbig::JBIGDecoder decoder;
+    std::vector<uint8_t> decompressed_output;
+    uint32_t out_ncols = 0;
+    uint32_t out_nrows = 0;
+    decoder.decode(compressed_output, decompressed_output, out_ncols, out_nrows);
+
+    ASSERT_EQ(NrOfInputBytes, decompressed_output.size());
+    EXPECT_EQ(out_ncols, ncols);
+    EXPECT_EQ(out_nrows, nrows);
+    for (size_t i = 0; i < NrOfInputBytes; ++i) {
+        EXPECT_EQ(testDataUncompressed.at(i), decompressed_output.at(i));
+    }
+}
+
+TEST_F(JBIGTestCase, JBIGRoundTripRandomDimensionsTest) {  // NOLINT(cert-err58-cpp)
+    std::mt19937 rng(42); // deterministic seed
+    
+    // Test various dimensions
+    std::vector<std::pair<uint32_t, uint32_t>> dimensions = {
+        {8, 1},
+        {8, 8},
+        {16, 16},
+        {64, 50},
+        {128, 100},
+        {1024, 16}
+    };
+    
+    for (const auto& dim : dimensions) {
+        uint32_t ncols = dim.first;
+        uint32_t nrows = dim.second;
+        
+        size_t bytes_per_line = (ncols + 7) / 8;
+        size_t total_bytes = bytes_per_line * nrows;
+        
+        std::vector<uint8_t> original_data(total_bytes);
+        for (size_t i = 0; i < total_bytes; ++i) {
+            original_data[i] = static_cast<uint8_t>(rng() % 256);
+        }
+        
+        genie::entropy::jbig::JBIGparameters params(static_cast<int32_t>(rng() % 5 + 1), rng() % 2 == 0, rng() % 2 == 0, false, rng() % 2 == 0);
+        genie::entropy::jbig::JBIGEncoder encoder;
+        encoder.configure(params);
+        
+        // Test stringstream interface
+        std::stringstream uncompressed_input;
+        for (uint8_t byte : original_data) uncompressed_input << byte;
+        std::stringstream compressed_output;
+        
+        encoder.encode(uncompressed_input, compressed_output, ncols, nrows);
+        
+        std::stringstream uncompressed_output;
+        uint32_t out_ncols = 0;
+        uint32_t out_nrows = 0;
+        genie::entropy::jbig::JBIGDecoder decoder;
+        decoder.decode(compressed_output, uncompressed_output, out_ncols, out_nrows);
+        
+        ASSERT_EQ(total_bytes, uncompressed_output.str().size());
+        EXPECT_EQ(ncols, out_ncols);
+        EXPECT_EQ(nrows, out_nrows);
+        for (size_t i = 0; i < total_bytes; ++i) {
+            EXPECT_EQ(original_data.at(i), static_cast<uint8_t>(uncompressed_output.str().at(i)));
+        }
+        
+        // Test vector interface
+        std::vector<uint8_t> comp_vec;
+        encoder.encode(original_data, comp_vec, ncols, nrows);
+        
+        std::vector<uint8_t> decomp_vec;
+        uint32_t out_ncols2 = 0;
+        uint32_t out_nrows2 = 0;
+        decoder.decode(comp_vec, decomp_vec, out_ncols2, out_nrows2);
+        
+        ASSERT_EQ(total_bytes, decomp_vec.size());
+        EXPECT_EQ(ncols, out_ncols2);
+        EXPECT_EQ(nrows, out_nrows2);
+        for (size_t i = 0; i < total_bytes; ++i) {
+            EXPECT_EQ(original_data.at(i), decomp_vec.at(i));
+        }
+    }
+}
+
+

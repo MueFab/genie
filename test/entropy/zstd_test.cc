@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include <random>
 #include "genie/entropy/zstd/encoder.h"
+#include "genie/entropy/zstd/decoder.h"
 
 class ZSTDTestCase : public ::testing::Test {
    protected:
@@ -68,11 +69,34 @@ TEST_F(ZSTDTestCase, ZSTDEncodeDecodeTest) {  // NOLINT(cert-err58-cpp)
     encoder.encode(uncomressed_input, compressed_output);
 
     std::stringstream uncompressed_output;
-    encoder.decode(compressed_output, uncompressed_output);
+    genie::entropy::zstd::ZSTDDecoder decoder;
+    decoder.decode(compressed_output, uncompressed_output);
     
     ASSERT_EQ(NrOfInputBytes, uncompressed_output.str().size());
     for (size_t i = 0; i < NrOfInputBytes; ++i)
         EXPECT_EQ(testDataUncompressed.at(i), static_cast<uint8_t>(uncompressed_output.str().at(i)));
+}
+
+TEST_F(ZSTDTestCase, ZSTDVectorEncodeDecodeTest) {  // NOLINT(cert-err58-cpp)
+    const size_t NrOfInputBytes = 100;
+    std::vector<uint8_t> testDataUncompressed(NrOfInputBytes);
+    for (size_t i = 0; i < NrOfInputBytes; ++i) {
+        uint8_t byte = static_cast<uint8_t>(rand() % 256);
+        testDataUncompressed[i] = byte;
+    }
+
+    genie::entropy::zstd::ZSTDEncoder encoder;
+    std::vector<uint8_t> compressed_output;
+    encoder.encode(testDataUncompressed, compressed_output);
+
+    genie::entropy::zstd::ZSTDDecoder decoder;
+    std::vector<uint8_t> uncompressed_output;
+    decoder.decode(compressed_output, uncompressed_output);
+
+    ASSERT_EQ(testDataUncompressed.size(), uncompressed_output.size());
+    for (size_t i = 0; i < NrOfInputBytes; ++i) {
+        EXPECT_EQ(testDataUncompressed.at(i), uncompressed_output.at(i));
+    }
 }
 
 TEST_F(ZSTDTestCase, ZSTDparametersTest) {  // NOLINT(cert-err58-cpp)

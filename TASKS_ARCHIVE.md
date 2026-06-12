@@ -30,4 +30,9 @@
 | 2026.04.28-annotation-parser-integration | 2026-04-28 | Integrate all annotation parsers into annotation.cc | Done |
 | 2026.04.28-annot-integration-incorporate-new-annotations | 2026-04-28 | Add new annotation types to the build system | Done |
 | 2026-06-12-reorganize-docs | 2026-06-12 | Reorganize Documentation Hub (Category-level INDEX.md sub-folders) | Done |
+| 2026-06-12-entropy-jbig-decoder-interface | 2026-06-12 | Implement JBIG decoder interface and document GABAC/codec interfaces | Done |
+| 2026-06-12-harmonize-jbig-files | 2026-06-12 | Harmonize JBIG C implementation wrapper files | Done |
+| 2026-06-12-standardize-zstd-wrapper | 2026-06-12 | Standardize ZSTD wrapper class and decouple decoder | Done |
+
+
 

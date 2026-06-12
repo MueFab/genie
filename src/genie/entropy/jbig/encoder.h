@@ -15,7 +15,8 @@
 #define SYSERROR() errno
 #endif
 #include <sstream>
-#include <codecs/include/mpegg-codecs.h>
+#include <vector>
+#include <cstdint>
 #include "genie/core/parameter/annotation/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -69,9 +70,6 @@ class JBIGEncoder {
     void encode(std::stringstream& input, std::stringstream& output, uint32_t ncols, uint32_t nrows);
 
     void encode(std::vector<uint8_t>& input, std::vector<uint8_t>& output, uint32_t ncols, uint32_t nrows);
-
-    void decode(std::stringstream& input, std::stringstream& output, uint32_t& ncols, uint32_t& nrows);
-
 
  private:
     int32_t num_lines_per_stripe;

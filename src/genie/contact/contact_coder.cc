@@ -5,7 +5,8 @@
  */
 
 #include "contact_coder.h"
-#include <codecs/include/mpegg-codecs.h>
+#include <genie/entropy/jbig/encoder.h>
+#include <genie/entropy/jbig/decoder.h>
 #include <genie/core/record/contact/record.h>
 #include <genie/util/runtime_exception.h>
 #include <cstdint>
@@ -595,20 +596,17 @@ void encode_cm_tile(const BinMatDtype& bin_mat, core::AlgoID codec_ID, ContactMa
     size_t nrows = ::genie::backend::get_mat_shape(bin_mat, 0);
     size_t ncols = ::genie::backend::get_mat_shape(bin_mat, 1);
 
-    uint8_t* compressed_data = nullptr;
-    size_t compressed_data_len = 0;
-
     if (codec_ID == core::AlgoID::JBIG) {
-        mpegg_jbig_compress_default(&compressed_data, &compressed_data_len, raw_data, raw_data_len, (unsigned long)nrows, (unsigned long)ncols);
+        std::vector<uint8_t> input_vec(raw_data, raw_data + raw_data_len);
+        std::vector<uint8_t> compressed_vec;
+        ::genie::entropy::jbig::JBIGEncoder encoder;
+        encoder.encode(input_vec, compressed_vec, (uint32_t)ncols, (uint32_t)nrows);
+        tile_payload = ContactMatrixTilePayload(codec_ID, static_cast<uint32_t>(nrows), static_cast<uint32_t>(ncols), std::move(compressed_vec));
     } else {
         UTILS_DIE("Codec not supported in unified contact coder!");
     }
-
-    std::vector<uint8_t> compressed_vec(compressed_data, compressed_data + compressed_data_len);
-    tile_payload = ContactMatrixTilePayload(codec_ID, static_cast<uint32_t>(nrows), static_cast<uint32_t>(ncols), std::move(compressed_vec));
     
     if (raw_data) free(raw_data);
-    if (compressed_data) free(compressed_data);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -620,7 +618,20 @@ void decode_cm_tile(const ContactMatrixTilePayload& tile_payload, core::AlgoID c
     unsigned long ncols = tile_payload.GetTileNCols();
 
     if (codec_ID == core::AlgoID::JBIG) {
-        mpegg_jbig_decompress_default(&raw_data, &raw_data_len, tile_payload.GetPayload().data(), tile_payload.GetPayloadSize(), &nrows, &ncols);
+        std::stringstream compressed_stream;
+        for (uint8_t byte : tile_payload.GetPayload()) {
+            compressed_stream << byte;
+        }
+        std::stringstream decompressed_stream;
+        uint32_t out_ncols = 0, out_nrows = 0;
+        ::genie::entropy::jbig::JBIGDecoder decoder;
+        decoder.decode(compressed_stream, decompressed_stream, out_ncols, out_nrows);
+        nrows = out_nrows;
+        ncols = out_ncols;
+        
+        raw_data_len = decompressed_stream.str().size();
+        raw_data = (uint8_t*)malloc(raw_data_len);
+        memcpy(raw_data, decompressed_stream.str().data(), raw_data_len);
     } else {
         UTILS_DIE("Codec not supported in unified contact coder!");
     }
