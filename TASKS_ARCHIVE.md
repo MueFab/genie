@@ -33,6 +33,7 @@
 | 2026-06-12-entropy-jbig-decoder-interface | 2026-06-12 | Implement JBIG decoder interface and document GABAC/codec interfaces | Done |
 | 2026-06-12-harmonize-jbig-files | 2026-06-12 | Harmonize JBIG C implementation wrapper files | Done |
 | 2026-06-12-standardize-zstd-wrapper | 2026-06-12 | Standardize ZSTD wrapper class and decouple decoder | Done |
+| 2026-06-12-comprehensive-entropy-tests | 2026-06-12 | Create comprehensive unit tests and crash-proof JBIG decoder | Done |
 
 
 

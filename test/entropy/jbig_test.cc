@@ -222,4 +222,122 @@ TEST_F(JBIGTestCase, JBIGRoundTripRandomDimensionsTest) {  // NOLINT(cert-err58-
     }
 }
 
+TEST_F(JBIGTestCase, JBIGEmptyInputTest) { // NOLINT(cert-err58-cpp)
+    genie::entropy::jbig::JBIGEncoder encoder;
+    genie::entropy::jbig::JBIGDecoder decoder;
+
+    // 1. Zero dimensions
+    std::vector<uint8_t> testData = {0x00, 0xff};
+    std::vector<uint8_t> compressed;
+    encoder.encode(testData, compressed, 0, 10);
+    EXPECT_TRUE(compressed.empty());
+
+    encoder.encode(testData, compressed, 10, 0);
+    EXPECT_TRUE(compressed.empty());
+
+    // 2. Empty stringstream
+    std::stringstream empty_in;
+    std::stringstream empty_out;
+    encoder.encode(empty_in, empty_out, 8, 8);
+    EXPECT_EQ(empty_out.str().size(), 0);
+
+    std::stringstream decomp_out;
+    uint32_t out_ncols = 0, out_nrows = 0;
+    decoder.decode(empty_out, decomp_out, out_ncols, out_nrows);
+    EXPECT_EQ(decomp_out.str().size(), 0);
+
+    // 3. Empty vector
+    std::vector<uint8_t> empty_vec;
+    std::vector<uint8_t> comp_vec;
+    encoder.encode(empty_vec, comp_vec, 8, 8);
+    EXPECT_TRUE(comp_vec.empty());
+
+    std::vector<uint8_t> decomp_vec;
+    decoder.decode(comp_vec, decomp_vec, out_ncols, out_nrows);
+    EXPECT_TRUE(decomp_vec.empty());
+}
+
+TEST_F(JBIGTestCase, JBIGDimensionMismatchTest) { // NOLINT(cert-err58-cpp)
+    genie::entropy::jbig::JBIGEncoder encoder;
+
+    // Input buffer only has 2 bytes, but we request 100 x 100 dimensions
+    // Expected bytes per line: (100+7)/8 = 13 bytes. Total expected: 13 * 100 = 1300 bytes.
+    std::vector<uint8_t> tiny_input = {0xaa, 0xbb};
+    std::vector<uint8_t> compressed;
+    
+    // This should fail early because input is smaller than expected size
+    encoder.encode(tiny_input, compressed, 100, 100);
+    EXPECT_TRUE(compressed.empty());
+
+    std::stringstream tiny_in_stream;
+    tiny_in_stream.write(reinterpret_cast<const char*>(tiny_input.data()), tiny_input.size());
+    std::stringstream compressed_stream;
+    encoder.encode(tiny_in_stream, compressed_stream, 100, 100);
+    EXPECT_EQ(compressed_stream.str().size(), 0);
+}
+
+TEST_F(JBIGTestCase, JBIGCorruptedInputTest) { // NOLINT(cert-err58-cpp)
+    std::vector<uint8_t> garbage(100);
+    std::mt19937 rng(54321);
+    for (size_t i = 0; i < garbage.size(); ++i) {
+        garbage[i] = static_cast<uint8_t>(rng() % 256);
+    }
+
+    genie::entropy::jbig::JBIGDecoder decoder;
+    std::vector<uint8_t> decompressed;
+    uint32_t out_ncols = 0, out_nrows = 0;
+
+    // Should fail cleanly and not crash/exit the process
+    decoder.decode(garbage, decompressed, out_ncols, out_nrows);
+    EXPECT_TRUE(decompressed.empty());
+
+    std::stringstream garbage_stream;
+    garbage_stream.write(reinterpret_cast<const char*>(garbage.data()), garbage.size());
+    std::stringstream decompressed_stream;
+    decoder.decode(garbage_stream, decompressed_stream, out_ncols, out_nrows);
+    EXPECT_EQ(decompressed_stream.str().size(), 0);
+
+    // Test truncated compressed stream
+    std::vector<uint8_t> valid_input = { 0x7c, 0xe2, 0x38, 0x04, 0x92, 0x40, 0x04, 0xe2,
+                                         0x5c, 0x44, 0x92, 0x44, 0x38, 0xe2, 0x38 };
+    genie::entropy::jbig::JBIGEncoder encoder;
+    std::vector<uint8_t> valid_compressed;
+    encoder.encode(valid_input, valid_compressed, 23, 5);
+
+    if (valid_compressed.size() > 10) {
+        valid_compressed.resize(valid_compressed.size() - 10); // truncate significantly
+        std::vector<uint8_t> truncated_output;
+        decoder.decode(valid_compressed, truncated_output, out_ncols, out_nrows);
+        EXPECT_TRUE(truncated_output.empty() || truncated_output.size() != valid_input.size());
+    }
+}
+
+TEST_F(JBIGTestCase, JBIGLargePayloadTest) { // NOLINT(cert-err58-cpp)
+    const uint32_t ncols = 2048;
+    const uint32_t nrows = 1024;
+    const size_t bytes_per_line = (ncols + 7) / 8;
+    const size_t total_bytes = bytes_per_line * nrows;
+
+    std::vector<uint8_t> original_data(total_bytes);
+    std::mt19937 rng(98765);
+    for (size_t i = 0; i < total_bytes; ++i) {
+        original_data[i] = static_cast<uint8_t>(rng() % 256);
+    }
+
+    genie::entropy::jbig::JBIGEncoder encoder;
+    std::vector<uint8_t> compressed;
+    encoder.encode(original_data, compressed, ncols, nrows);
+    EXPECT_FALSE(compressed.empty());
+
+    genie::entropy::jbig::JBIGDecoder decoder;
+    std::vector<uint8_t> decompressed;
+    uint32_t out_ncols = 0, out_nrows = 0;
+    decoder.decode(compressed, decompressed, out_ncols, out_nrows);
+
+    ASSERT_EQ(original_data.size(), decompressed.size());
+    EXPECT_EQ(ncols, out_ncols);
+    EXPECT_EQ(nrows, out_nrows);
+    EXPECT_EQ(original_data, decompressed);
+}
+
 

@@ -55,7 +55,7 @@ void *checkedmalloc(
 
     if ((p = malloc(n)) == NULL) {
         fprintf(stderr, "Sorry, not enough memory available!\n");
-        exit(1);
+        return NULL;
     }
 
     return p;
@@ -163,7 +163,14 @@ int mpegg_jbig_compress(
     struct jbg85_enc_state se;
     unsigned char* src_ptr = (unsigned char*)src;
 
+    if (ncols == 0 || nrows == 0) {
+        return -1;
+    }
+
     size_t bpl = (ncols >> 3) + ((ncols & 7) != 0);     /* bytes per line */
+    if (scr_len < bpl * nrows) {
+        return -1;
+    }
 
     *dest_len = scr_len * 3 + 1024; // Expect worst case 3x source size + safety margin for headers
     *dest = (unsigned char *) calloc(*dest_len,  sizeof(unsigned  char));
@@ -174,7 +181,10 @@ int mpegg_jbig_compress(
 #endif
     if (!fout){
         fprintf(stderr, "Can't open input file");
-        exit(1);
+        free(*dest);
+        *dest = NULL;
+        *dest_len = 0;
+        return -1;
     }
 
     jbg85_enc_init(&se, ncols, nrows, data_out, fout);      /* initialize encoder */
@@ -200,18 +210,24 @@ int mpegg_jbig_compress(
     rewind(fout);
     fread(*dest,1, *dest_len, fout);
 #endif
-    if (ferror(fout) || fclose(fout)) {
-        fprintf(stderr, "Problem while writing output file");
-        perror("'");
-        exit(1);
+    bool err = ferror(fout);
+    if (fclose(fout) || err) {
+        fprintf(stderr, "Problem while writing output file\n");
+        free(*dest);
+        *dest = NULL;
+        *dest_len = 0;
+        return -1;
     }
 
-    *dest = (unsigned char*)realloc(*dest, *dest_len * sizeof(unsigned char));
-    if (dest == NULL){
-        fprintf(stderr, "Problem with resizing");
-        perror("'");
-        exit(1);
+    unsigned char *resized = (unsigned char*)realloc(*dest, *dest_len * sizeof(unsigned char));
+    if (resized == NULL && *dest_len > 0){
+        fprintf(stderr, "Problem with resizing\n");
+        free(*dest);
+        *dest = NULL;
+        *dest_len = 0;
+        return -1;
     }
+    *dest = resized;
 
     return 0;
 }
@@ -248,6 +264,9 @@ int mpegg_jbig_decompress(
     size_t               buf_len,
     size_t               xmax
 ){
+    if (src_len == 0 || src == NULL) {
+        return -1;
+    }
     FILE *fin = stdin, *fout = stdout;
     const char *fnin = NULL, *fnout = NULL;
     int result;
@@ -264,7 +283,9 @@ int mpegg_jbig_decompress(
     if (!inbuf || !outbuf)
     {
         printf("Sorry, not enough memory available!\n");
-        exit(1);
+        if (inbuf) free(inbuf);
+        if (outbuf) free(outbuf);
+        return -1;
     }
 #if defined(_WIN32) || defined(_WIN64)
     fin = fmemopen_windows(src_ptr, src_len * sizeof(unsigned  char), "rb");
@@ -274,8 +295,10 @@ int mpegg_jbig_decompress(
 
     if (!fin)
     {
-        fprintf(stderr, "Can't open input file '%s'", (fnin)?fnin:"NULL");
-        exit(1);
+        fprintf(stderr, "Can't open input file '%s'\n", (fnin)?fnin:"NULL");
+        free(inbuf);
+        free(outbuf);
+        return -1;
     }
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -288,8 +311,11 @@ int mpegg_jbig_decompress(
 
     if (!fout)
     {
-        fprintf(stderr, "Can't open input file '%s'", (fnout)?fnout:"NULL");
-        exit(1);
+        fprintf(stderr, "Can't open input file '%s'\n", (fnout)?fnout:"NULL");
+        fclose(fin);
+        free(inbuf);
+        free(outbuf);
+        return -1;
     }
 
     // send input file to decoder
@@ -315,14 +341,18 @@ int mpegg_jbig_decompress(
     }
     if (ferror(fin))
     {
-        fprintf(stderr, "Problem while reading input file '%s'", (fnin)?fnin:"NULL");
+        fprintf(stderr, "Problem while reading input file '%s'\n", (fnin)?fnin:"NULL");
         perror("'");
-        if (fout != stdout)
-        {
-            fclose(fout);
-            remove(fnout);
+        fclose(fin);
+        fclose(fout);
+        if (*dest) {
+            free(*dest);
+            *dest = NULL;
         }
-        exit(1);
+        *dest_len = 0;
+        free(inbuf);
+        free(outbuf);
+        return -1;
     }
     if (result == JBG_EAGAIN || result == JBG_EOK_INTR)
     {
@@ -344,12 +374,16 @@ int mpegg_jbig_decompress(
                 "and %lu pixel rows processed)\n",
                 (fnin)?fnin:"NULL", jbg85_strerror(result), result,
                 (unsigned long)bytes_read, (unsigned long)bytes_read, s.y);
-        if (fout != stdout)
-        {
-            fclose(fout);
-            /* remove(fnout); */
+        fclose(fin);
+        fclose(fout);
+        if (*dest) {
+            free(*dest);
+            *dest = NULL;
         }
-        exit(1);
+        *dest_len = 0;
+        free(inbuf);
+        free(outbuf);
+        return result;
     }
 
     /* do we have to update the image nrows in the PBM header? */
@@ -361,10 +395,19 @@ int mpegg_jbig_decompress(
         }
         else
         {
-            fprintf(stderr, "Problem while updating nrows in output file '%s'",
+            fprintf(stderr, "Problem while updating nrows in output file '%s'\n",
                     (fnout) ? fnout : "NULL");
             perror("'");
-            exit(1);
+            fclose(fin);
+            fclose(fout);
+            if (*dest) {
+                free(*dest);
+                *dest = NULL;
+            }
+            *dest_len = 0;
+            free(inbuf);
+            free(outbuf);
+            return -1;
         }
     }
 
@@ -375,11 +418,19 @@ int mpegg_jbig_decompress(
     fclose(fin);
 
     /* check for file errors and close fout */
-    if (ferror(fout) || fclose(fout))
+    bool err = ferror(fout);
+    if (fclose(fout) || err)
     {
-        fprintf(stderr, "Problem while writing output file '%s'", (fnout)?fnout:"NULL");
+        fprintf(stderr, "Problem while writing output file '%s'\n", (fnout)?fnout:"NULL");
         perror("'");
-        exit(1);
+        if (*dest) {
+            free(*dest);
+            *dest = NULL;
+        }
+        *dest_len = 0;
+        free(inbuf);
+        free(outbuf);
+        return -1;
     }
 
     *ncols = jbg85_dec_getwidth(&s);

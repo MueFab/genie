@@ -38,6 +38,8 @@ void JBIGDecoder::decode(
 
     if (ret != 0) {
         std::cerr << "error with decompression\n";
+        if (decompressedBuffer) free(decompressedBuffer);
+        return;
     }
     for (size_t idx_i = 0; idx_i < dest_data_len; ++idx_i) {
         output << decompressedBuffer[idx_i];
@@ -75,6 +77,8 @@ void JBIGDecoder::decode(
 
     if (ret != 0) {
         std::cerr << "error with decompression\n";
+        if (decompressedBuffer) free(decompressedBuffer);
+        return;
     }
     output.clear();
     output.reserve(dest_data_len);

@@ -54,6 +54,8 @@ void JBIGEncoder::encode(
     );
     if (ret != 0) {
         std::cerr << "error with jbig compression\n";
+        if (compressedBuffer) free(compressedBuffer);
+        return;
     }
     for (size_t idx_i = 0; idx_i < compSize; ++idx_i)
         output << compressedBuffer[idx_i];
@@ -92,6 +94,8 @@ void JBIGEncoder::encode(
     );
     if (ret != 0) {
         std::cerr << "error with compression\n";
+        if (compressedBuffer) free(compressedBuffer);
+        return;
     }
     output.clear();
     output.reserve(dest_data_len);

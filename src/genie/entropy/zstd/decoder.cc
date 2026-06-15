@@ -131,11 +131,15 @@ void ZSTDDecoder::decode(std::stringstream &input, std::stringstream &output) {
 
 void ZSTDDecoder::decode(const std::vector<uint8_t> &input, std::vector<uint8_t> &output) {
     const size_t srcLen = input.size();
-    if (srcLen == 0) return;
+    if (srcLen == 0) {
+        output.clear();
+        return;
+    }
 
     unsigned long long const uncompressedSize = ZSTD_getFrameContentSize(input.data(), srcLen);
     if (uncompressedSize == ZSTD_CONTENTSIZE_ERROR || uncompressedSize == ZSTD_CONTENTSIZE_UNKNOWN) {
         std::cerr << "error with zstd decompression size query\n";
+        output.clear();
         return;
     }
 
@@ -143,6 +147,7 @@ void ZSTDDecoder::decode(const std::vector<uint8_t> &input, std::vector<uint8_t>
     size_t decompSize = ZSTD_decompress(output.data(), uncompressedSize, input.data(), srcLen);
     if (ZSTD_isError(decompSize)) {
         std::cerr << "error with zstd decompression: " << ZSTD_getErrorName(decompSize) << "\n";
+        output.clear();
         return;
     }
 }
