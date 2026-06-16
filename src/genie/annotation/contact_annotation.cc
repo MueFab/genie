@@ -6,7 +6,7 @@
 
 #include "genie/annotation/contact_annotation.h"
 
-#include <codecs/include/mpegg-codecs.h>
+// Removed legacy codecs include
 
 #include <map>
 #include <string>

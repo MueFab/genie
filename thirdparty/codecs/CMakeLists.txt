@@ -41,26 +41,7 @@ set (MPEGG_CODECS_SHARED       "mpeggCodecs-shared")
 
 include_directories(${MPEGG_CODECS_INCLUDE_DIR})
 
-add_subdirectory ("api")
-add_subdirectory ("libbsc")
-add_subdirectory ("lzma")
-# add_subdirectory ("procrustes")
-add_subdirectory ("zstd")
-add_subdirectory ("lib")
-
-#add_subdirectory ("debug")
-######################################################################################################################
-## C-UNIT TEST CONFIGURATION
-######################################################################################################################
-include(CTest)
-#if (BUILD_TESTING)
-  add_subdirectory("test")
-#endif ()
-
-
-## Output global build information
-include(summary)
-summary()
+add_subdirectory ("procrustes")
 
 
 

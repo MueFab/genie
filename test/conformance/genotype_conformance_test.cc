@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include <codecs/include/mpegg-codecs.h>
+// Removed legacy codecs include
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"

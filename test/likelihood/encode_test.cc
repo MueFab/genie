@@ -17,7 +17,7 @@
 #include <xtensor/xview.hpp>
 #endif
 
-#include <codecs/include/mpegg-codecs.h>
+// Removed legacy codecs include
 #include "genie/core/constants.h"
 #include "genie/core/record/variant/record.h"
 #include "genie/util/bit_reader.h"

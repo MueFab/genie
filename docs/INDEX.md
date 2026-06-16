@@ -9,3 +9,4 @@ Welcome to the Documentation Hub for the GENIE MPEG-G codec project.
 - **[Task Logs & Roadmaps](../TASKS.md)**: Detailed task logs tracking current, pending, and archived development milestones.
   - Active Index: [TASKS.md](../TASKS.md) (repository root)
   - Archive Index: [TASKS_ARCHIVE.md](../TASKS_ARCHIVE.md) (repository root)
+- **[Lessons Learned & Memory](memory/lessons_learned.md)**: Implementation insights, best practices, and crash-proofing guides.

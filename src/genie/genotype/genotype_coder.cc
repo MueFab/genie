@@ -1,11 +1,12 @@
 #include "genotype_coder.h"
 #include <genie/util/runtime_exception.h>
 #include <genie/backend/backend.h>
-#include <codecs/include/mpegg-codecs.h>
 #include <genie/entropy/jbig/encoder.h>
 #include <genie/entropy/jbig/decoder.h>
 #include <genie/entropy/zstd/encoder.h>
 #include <genie/entropy/zstd/decoder.h>
+#include <genie/entropy/bsc/encoder.h>
+#include <genie/entropy/bsc/decoder.h>
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -436,7 +437,9 @@ void entropy_encode_bin_mat(
             encoder.encode(input_vec, payload);
         } break;
         case genie::core::AlgoID::BSC: {
-            mpegg_bsc_compress(&compressed_data, &compressed_data_len, raw_data, raw_data_len, 20, 8, 1, 1);
+            std::vector<uint8_t> input_vec(raw_data, raw_data + raw_data_len);
+            ::genie::entropy::bsc::BSCEncoder encoder;
+            encoder.encode(input_vec, payload);
         } break;
         default:
             UTILS_DIE("Invalid codec_ID");
@@ -485,7 +488,12 @@ void entropy_decode_bin_mat(
             memcpy(raw_data, decompressed_vec.data(), raw_data_len);
         } break;
         case genie::core::AlgoID::BSC: {
-            mpegg_bsc_decompress(&raw_data, &raw_data_len, payload.data(), payload.size());
+            std::vector<uint8_t> decompressed_vec;
+            ::genie::entropy::bsc::BSCDecoder decoder;
+            decoder.decode(payload, decompressed_vec);
+            raw_data_len = decompressed_vec.size();
+            raw_data = (uint8_t*)malloc(raw_data_len);
+            memcpy(raw_data, decompressed_vec.data(), raw_data_len);
         } break;
         default:
             UTILS_DIE("Invalid codec_ID");

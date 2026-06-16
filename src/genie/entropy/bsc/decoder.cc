@@ -9,6 +9,7 @@
 
 #include <libbsc.h>
 
+#include <iostream>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -97,6 +98,57 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
   }
   std::get<1>(desc).AddDouble("time-bsc", watch.Check());
   return desc;
+}
+
+// -----------------------------------------------------------------------------
+
+void BSCDecoder::decode(std::stringstream &input, std::stringstream &output) {
+    const std::string str = input.str();
+    const size_t srcLen = str.size();
+    if (srcLen == 0) return;
+
+    bsc_init(LIBBSC_FEATURE_FASTMODE);
+
+    int blockSize = 0, dataSize = 0;
+    int ret = bsc_block_info((const unsigned char *)str.c_str(), srcLen, &blockSize, &dataSize, LIBBSC_FEATURE_FASTMODE);
+    if (ret != LIBBSC_NO_ERROR) {
+        std::cerr << "error with bsc block info\n";
+        return;
+    }
+
+    std::vector<unsigned char> tmpBuffer(dataSize);
+    ret = bsc_decompress((const unsigned char *)str.c_str(), srcLen, tmpBuffer.data(), dataSize, LIBBSC_FEATURE_FASTMODE);
+    if (ret != LIBBSC_NO_ERROR) {
+        std::cerr << "error with decompression\n";
+        return;
+    }
+    output.write((const char *)tmpBuffer.data(), dataSize);
+}
+
+void BSCDecoder::decode(const std::vector<uint8_t> &input, std::vector<uint8_t> &output) {
+    const size_t srcLen = input.size();
+    if (srcLen == 0) {
+        output.clear();
+        return;
+    }
+
+    bsc_init(LIBBSC_FEATURE_FASTMODE);
+
+    int blockSize = 0, dataSize = 0;
+    int ret = bsc_block_info(input.data(), srcLen, &blockSize, &dataSize, LIBBSC_FEATURE_FASTMODE);
+    if (ret != LIBBSC_NO_ERROR) {
+        std::cerr << "error with bsc block info\n";
+        output.clear();
+        return;
+    }
+
+    output.resize(dataSize);
+    ret = bsc_decompress(input.data(), srcLen, output.data(), dataSize, LIBBSC_FEATURE_FASTMODE);
+    if (ret != LIBBSC_NO_ERROR) {
+        std::cerr << "error with decompression\n";
+        output.clear();
+        return;
+    }
 }
 
 // -----------------------------------------------------------------------------

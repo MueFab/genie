@@ -4,7 +4,7 @@ project(Procrustes)
 set(INC_LIBRARIES
         )
 
-include(apply_dependencies NO_POLICY_SCOPE)
+# include(apply_dependencies NO_POLICY_SCOPE)
 
 file(GLOB_RECURSE Procrustes_sources "*.c")
 

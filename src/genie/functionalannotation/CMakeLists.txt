@@ -15,7 +15,7 @@ if(MSVC)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-util)
-target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
+# target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-core)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-annotation)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-bsc)

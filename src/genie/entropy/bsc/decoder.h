@@ -18,7 +18,9 @@
 
 // -----------------------------------------------------------------------------
 
+#include <sstream>
 #include <tuple>
+#include <vector>
 
 #include "genie/core/access_unit.h"
 #include "genie/core/entropy_decoder.h"
@@ -52,6 +54,17 @@ class Decoder final : public core::EntropyDecoder {
   std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Process(
       const core::parameter::DescriptorSubSequenceCfg& param,
       core::AccessUnit::Descriptor& d, bool mm_coder_enabled) override;
+};
+
+// -----------------------------------------------------------------------------
+
+class BSCDecoder {
+ public:
+    BSCDecoder() = default;
+
+    void decode(std::stringstream &input, std::stringstream &output);
+
+    void decode(const std::vector<uint8_t> &input, std::vector<uint8_t> &output);
 };
 
 // -----------------------------------------------------------------------------

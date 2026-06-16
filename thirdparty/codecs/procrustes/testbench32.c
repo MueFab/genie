@@ -1,3 +1,4 @@
+#include <string.h>
 #include "testbench.h"
 #include "CSA.h"
 #include "utils.h"

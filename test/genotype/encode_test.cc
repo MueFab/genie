@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <codecs/include/mpegg-codecs.h>
+#include <genie/entropy/jbig/decoder.h>
 #include <gtest/gtest.h>
 #include <algorithm>
 #include <fstream>
@@ -322,41 +322,37 @@ TEST(Genotype, Serializer) {
 
 TEST(Genotype, RoundTrip_JBIG) {
     size_t ORIG_PAYLOAD_LEN = 15;
-    uint8_t ORIG_PAYLOAD[15] = {0x7c, 0xe2, 0x38, 0x04, 0x92, 0x40, 0x04, 0xe2,
-                                0x5c, 0x44, 0x92, 0x44, 0x38, 0xe2, 0x38};
+    std::vector<uint8_t> orig_payload = {0x7c, 0xe2, 0x38, 0x04, 0x92, 0x40, 0x04, 0xe2,
+                                         0x5c, 0x44, 0x92, 0x44, 0x38, 0xe2, 0x38};
     uint32_t ORIG_NCOLS = 23;
     uint32_t ORIG_NROWS = 5;
 
     size_t ORIG_COMPRESSED_PAYLOAD_LEN = 37;
-    uint8_t ORIG_COMPRESSED_PAYLOAD[37] = {
+    std::vector<uint8_t> orig_compressed_payload = {
       0, 0,  1,   0,   0,   0,   0,  23,  0,   0,   0,  5,   255, 255, 255, 255, 127, 0, 0,
       0, 25, 211, 149, 216, 214, 10, 197, 251, 121, 11, 254, 217, 140, 25,  128, 255, 2
     };
 
-    uint8_t* compressed_data;
-    size_t compressed_data_len;
-    unsigned long ncols, nrows;
+    genie::entropy::jbig::JBIGEncoder encoder;
+    std::vector<uint8_t> compressed_data;
+    encoder.encode(orig_payload, compressed_data, ORIG_NCOLS, ORIG_NROWS);
 
-    mpegg_jbig_compress_default(&compressed_data, &compressed_data_len, ORIG_PAYLOAD, ORIG_PAYLOAD_LEN, ORIG_NROWS, ORIG_NCOLS);
-
-    ASSERT_TRUE((ORIG_COMPRESSED_PAYLOAD_LEN) == (compressed_data_len));
-    for (size_t i = 0; i < compressed_data_len; ++i) {
-        EXPECT_TRUE((ORIG_COMPRESSED_PAYLOAD[i]) == (compressed_data[i]));
+    ASSERT_EQ(ORIG_COMPRESSED_PAYLOAD_LEN, compressed_data.size());
+    for (size_t i = 0; i < compressed_data.size(); ++i) {
+        EXPECT_EQ(orig_compressed_payload[i], compressed_data[i]);
     }
 
-    uint8_t* payload;
-    size_t payload_len;
-    mpegg_jbig_decompress_default(&payload, &payload_len, compressed_data, compressed_data_len, &nrows, &ncols);
+    genie::entropy::jbig::JBIGDecoder decoder;
+    std::vector<uint8_t> payload;
+    uint32_t ncols = 0, nrows = 0;
+    decoder.decode(compressed_data, payload, ncols, nrows);
 
-    ASSERT_TRUE((nrows) == (ORIG_NROWS));
-    ASSERT_TRUE((ncols) == (ORIG_NCOLS));
-    ASSERT_TRUE((ORIG_PAYLOAD_LEN) == (payload_len));
-    for (size_t i = 0; i < payload_len; i++) {
-        ASSERT_TRUE(*(payload + i) == *(ORIG_PAYLOAD + i)) << "index:" << i;
+    ASSERT_EQ(nrows, ORIG_NROWS);
+    ASSERT_EQ(ncols, ORIG_NCOLS);
+    ASSERT_EQ(ORIG_PAYLOAD_LEN, payload.size());
+    for (size_t i = 0; i < payload.size(); i++) {
+        ASSERT_EQ(payload[i], orig_payload[i]) << "index:" << i;
     }
-
-    free(compressed_data);
-    free(payload);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

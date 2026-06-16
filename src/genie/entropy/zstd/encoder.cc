@@ -29,7 +29,6 @@
 #include "genie/core/parameter/annotation/compressor_parameter_set.h"
 #include "genie/entropy/zstd/param_decoder.h"
 #include "genie/util/stop_watch.h"
-#include <codecs/include/mpegg-codecs.h>
 
 // -----------------------------------------------------------------------------
 

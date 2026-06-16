@@ -34,6 +34,10 @@
 | 2026-06-12-harmonize-jbig-files | 2026-06-12 | Harmonize JBIG C implementation wrapper files | Done |
 | 2026-06-12-standardize-zstd-wrapper | 2026-06-12 | Standardize ZSTD wrapper class and decouple decoder | Done |
 | 2026-06-12-comprehensive-entropy-tests | 2026-06-12 | Create comprehensive unit tests and crash-proof JBIG decoder | Done |
+| 2026-06-12-migrate-to-genie-entropy | 2026-06-12 | Migrate from thirdparty/codecs to native genie/entropy C++ wrappers | Done |
+| 2026-06-15-standardize-find-or-fetch-dependencies | 2026-06-15 | Standardize Find-or-Fetch dependency resolution scripts | Done |
+
+
 
 
 

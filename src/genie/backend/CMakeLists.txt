@@ -46,7 +46,7 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC .)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-util)
-target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
+# target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-jbig)
 
 # Link optional dependencies and aggressively export include paths

@@ -67,7 +67,7 @@ class BSCEncoder {
 
     void encode(std::stringstream &input, std::stringstream &output);
 
-    void decode(std::stringstream &input, std::stringstream &output);
+    void encode(const std::vector<uint8_t> &input, std::vector<uint8_t> &output);
 
     void configure(const BSCParameters bscParameters) {
         lzpHashSize = bscParameters.lzpHashSize;

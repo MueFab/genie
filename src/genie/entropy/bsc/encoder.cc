@@ -162,27 +162,26 @@ void BSCEncoder::encode(std::stringstream &input, std::stringstream &output) {
     output.write((const char *)tmpBuffer.data(), len);
 }
 
-void BSCEncoder::decode(std::stringstream &input, std::stringstream &output) {
-    const std::string str = input.str();
-    const size_t srcLen = str.size();
-    if (srcLen == 0) return;
+void BSCEncoder::encode(const std::vector<uint8_t> &input, std::vector<uint8_t> &output) {
+    const size_t srcLen = input.size();
+    if (srcLen == 0) {
+        output.clear();
+        return;
+    }
+
+    unsigned long int dstLenTot = (srcLen + 20) / 20 * 21 + (1U << 16U) + LIBBSC_HEADER_SIZE;
+    output.resize(dstLenTot);
 
     bsc_init(LIBBSC_FEATURE_FASTMODE);
 
-    int blockSize = 0, dataSize = 0;
-    int ret = bsc_block_info((const unsigned char *)str.c_str(), srcLen, &blockSize, &dataSize, LIBBSC_FEATURE_FASTMODE);
-    if (ret != LIBBSC_NO_ERROR) {
-        std::cerr << "error with bsc block info\n";
+    int len = bsc_compress(input.data(), output.data(), srcLen,
+                           lzpHashSize, lzpMinLen, blockSorter, coder, LIBBSC_FEATURE_FASTMODE);
+    if (len <= 0) {
+        std::cerr << "error with bsc compression\n";
+        output.clear();
         return;
     }
-
-    std::vector<unsigned char> tmpBuffer(dataSize);
-    ret = bsc_decompress((const unsigned char *)str.c_str(), srcLen, tmpBuffer.data(), dataSize, LIBBSC_FEATURE_FASTMODE);
-    if (ret != LIBBSC_NO_ERROR) {
-        std::cerr << "error with decompression\n";
-        return;
-    }
-    output.write((const char *)tmpBuffer.data(), dataSize);
+    output.resize(len);
 }
 
 genie::core::parameter::annotation::AlgorithmParameters BSCParameters::convertToAlgorithmParameters() const {
