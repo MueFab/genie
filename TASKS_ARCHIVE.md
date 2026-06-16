@@ -36,6 +36,7 @@
 | 2026-06-12-comprehensive-entropy-tests | 2026-06-12 | Create comprehensive unit tests and crash-proof JBIG decoder | Done |
 | 2026-06-12-migrate-to-genie-entropy | 2026-06-12 | Migrate from thirdparty/codecs to native genie/entropy C++ wrappers | Done |
 | 2026-06-15-standardize-find-or-fetch-dependencies | 2026-06-15 | Standardize Find-or-Fetch dependency resolution scripts | Done |
+| 2026-04-27-parallelize-contact-tiles | 2026-04-27 | Parallelize contact tile encoding with OpenMP | Done |
 
 
 

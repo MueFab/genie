@@ -765,6 +765,9 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
         tile_counts_data[key].push_back(::genie::backend::get_arr_element(counts, i));
     }
 
+#ifdef _OPENMP
+#pragma omp parallel for collapse(2) schedule(dynamic) shared(scm_payload, scm_param, tile_counts, tile_rows, tile_cols, tile_counts_data, row_mask, col_mask) reduction(+:total_entries_in_tiles)
+#endif
     for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++) {
         for (size_t j_tile = 0u; j_tile < ntiles_in_col; j_tile++) {
             if (i_tile > j_tile && is_intra_scm) continue;
@@ -782,9 +785,9 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
 
             UInt64VecDtype t_row_ids, t_col_ids;
             UIntVecDtype t_counts;
-            detail::assign_vec_to_arr(t_row_ids, tile_rows[key]);
-            detail::assign_vec_to_arr(t_col_ids, tile_cols[key]);
-            detail::assign_vec_to_arr(t_counts, tile_counts_data[key]);
+            detail::assign_vec_to_arr(t_row_ids, tile_rows.at(key));
+            detail::assign_vec_to_arr(t_col_ids, tile_cols.at(key));
+            detail::assign_vec_to_arr(t_counts, tile_counts_data.at(key));
 
             size_t row_count = tile_size;
             size_t col_count = tile_size;

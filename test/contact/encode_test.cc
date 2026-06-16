@@ -3840,3 +3840,93 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         }
     }
 }
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+#include <chrono>
+#include <iostream>
+
+TEST(ContactCoderBenchmark, ParallelEncodingSpeedup) {
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-50000-21_21.cont";
+    std::string filepath = gitRootDir + "/data/records/contact/" + filename;
+
+    std::vector<genie::core::record::ContactRecord> RECS;
+    {
+        std::ifstream reader(filepath, std::ios::binary);
+        ASSERT_EQ(reader.fail(), false);
+        genie::util::BitReader bitreader(reader);
+
+        while (bitreader.IsStreamGood() && reader.peek() != EOF) {
+            RECS.emplace_back(bitreader);
+        }
+    }
+    ASSERT_GT(RECS.size(), 0);
+
+    auto cm_param = genie::contact::ContactMatrixParameters();
+    cm_param.SetBinSize(RECS.front().GetBinSize());
+    cm_param.SetTileSize(150u);
+    cm_param.UpsertBinSizeMultiplier(5u);
+
+    for (auto& rec : RECS) {
+        cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(), rec.GetChr1Length());
+        cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(), rec.GetChr2Length());
+    }
+
+    auto& REC = RECS.front();
+
+#ifdef _OPENMP
+    int max_threads = omp_get_max_threads();
+    std::cout << "[INFO] OpenMP is enabled. Max threads: " << max_threads << std::endl;
+#else
+    std::cout << "[INFO] OpenMP is not enabled. Running sequentially." << std::endl;
+#endif
+
+    double t_seq = 0.0;
+    {
+#ifdef _OPENMP
+        omp_set_num_threads(1);
+#endif
+        auto scm_param = genie::contact::SubcontactMatrixParameters();
+        auto scm_payload = genie::contact::SubcontactMatrixPayload();
+        auto rec_copy = REC;
+        auto start = std::chrono::high_resolution_clock::now();
+        genie::contact::encode_scm(
+            cm_param, rec_copy, scm_param, scm_payload,
+            true, true, true, true, true, true, genie::core::AlgoID::JBIG
+        );
+        auto end = std::chrono::high_resolution_clock::now();
+        t_seq = std::chrono::duration<double>(end - start).count();
+        std::cout << "[BENCHMARK] Sequential run time: " << t_seq << " seconds." << std::endl;
+    }
+
+#ifdef _OPENMP
+    if (max_threads > 1) {
+        double t_par = 0.0;
+        omp_set_num_threads(max_threads);
+        auto scm_param = genie::contact::SubcontactMatrixParameters();
+        auto scm_payload = genie::contact::SubcontactMatrixPayload();
+        auto rec_copy = REC;
+        auto start = std::chrono::high_resolution_clock::now();
+        genie::contact::encode_scm(
+            cm_param, rec_copy, scm_param, scm_payload,
+            true, true, true, true, true, true, genie::core::AlgoID::JBIG
+        );
+        auto end = std::chrono::high_resolution_clock::now();
+        t_par = std::chrono::duration<double>(end - start).count();
+        std::cout << "[BENCHMARK] Parallel run time (" << max_threads << " threads): " << t_par << " seconds." << std::endl;
+        std::cout << "[BENCHMARK] Speedup: " << (t_seq / t_par) << "x" << std::endl;
+
+        auto obj_payload = std::stringstream();
+        std::ostream& writer = obj_payload;
+        auto bitwriter = genie::util::BitWriter(writer);
+        scm_payload.Write(bitwriter);
+        std::istream& reader_in = obj_payload;
+        auto bitreader = genie::util::BitReader(reader_in);
+        auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(bitreader, cm_param, scm_param);
+        ASSERT_TRUE(recon_scm_payload == scm_payload);
+    }
+#endif
+}
