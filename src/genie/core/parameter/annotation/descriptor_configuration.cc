@@ -5,30 +5,15 @@
  */
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include "descriptor_configuration.h"
 
-#include <cassert>
-#include <cstdint>
-#include <iostream>
-#include <sstream>
-#include <string>
+#include "genie/core/parameter/annotation/descriptor_configuration.h"
 
 #include <vector>
 
-#include "genie/core/constants.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-
-#include "genie/contact/contact_matrix_parameters.h"
-#include "genie/contact/subcontact_matrix_parameters.h"
-#include "genie/likelihood/likelihood_parameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace annotation {
+namespace genie::core::parameter::annotation {
 
 DescriptorConfiguration::DescriptorConfiguration()
     : descriptor_ID(AnnotDesc::GENOTYPE), encoding_mode_ID(AlgoID::CABAC) {}
@@ -72,45 +57,25 @@ void DescriptorConfiguration::read(util::BitReader& reader) {
         algorithm_parameters.read(reader);
     }
 }
-// DEPRECATED: Use write(util::BitWriter&) instead
-// void DescriptorConfiguration::write(core::Writer& writer) const {
-//   writer.Write(static_cast<uint8_t>(descriptor_ID), 8);
-//     if (descriptor_ID == AnnotDesc::GENOTYPE) {
-//       writer.Flush();
-//       genotype_parameters.Write(writer);
-//     } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
-//         writer.Flush();
-//         likelihood_parameters.Write(writer);
-//     } else if (descriptor_ID == AnnotDesc::CONTACT) {
-//       writer.Flush();
-//       contact_matrix_parameters.Write(writer);
-//         writer.Write(subcontract_matrix_parameters.size(), 16);
-//         for (auto& scm_params : subcontract_matrix_parameters)
-//           scm_params.Write(writer);
-//     } else {
-//       writer.Write(static_cast<uint8_t>(encoding_mode_ID), 8);
-//         algorithm_parameters.write(writer);
-//     }
-// }
 
 void DescriptorConfiguration::write(util::BitWriter& writer) const {
-  writer.WriteBits(static_cast<uint8_t>(descriptor_ID), 8);
-  if (descriptor_ID == AnnotDesc::GENOTYPE) {
-    writer.FlushBits();
-    genotype_parameters.Write(writer);
-  } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
-    writer.FlushBits();
-    likelihood_parameters.Write(writer);
-  } else if (descriptor_ID == AnnotDesc::CONTACT) {
-    writer.FlushBits();
-    contact_matrix_parameters.Write(writer);
-    writer.WriteBits(subcontract_matrix_parameters.size(), 16);
-    for (auto& scm_params : subcontract_matrix_parameters)
-      scm_params.Write(writer);
-  } else {
-    writer.WriteBits(static_cast<uint8_t>(encoding_mode_ID), 8);
-    algorithm_parameters.write(writer);
-  }
+    writer.WriteBits(static_cast<uint8_t>(descriptor_ID), 8);
+    if (descriptor_ID == AnnotDesc::GENOTYPE) {
+        writer.FlushBits();
+        genotype_parameters.Write(writer);
+    } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
+        writer.FlushBits();
+        likelihood_parameters.Write(writer);
+    } else if (descriptor_ID == AnnotDesc::CONTACT) {
+        writer.FlushBits();
+        contact_matrix_parameters.Write(writer);
+        writer.WriteBits(subcontract_matrix_parameters.size(), 16);
+        for (auto& scm_params : subcontract_matrix_parameters)
+            scm_params.Write(writer);
+    } else {
+        writer.WriteBits(static_cast<uint8_t>(encoding_mode_ID), 8);
+        algorithm_parameters.write(writer);
+    }
 }
 
 size_t DescriptorConfiguration::getSize(util::BitWriter& writesize) const {
@@ -118,18 +83,9 @@ size_t DescriptorConfiguration::getSize(util::BitWriter& writesize) const {
     return writesize.GetTotalBitsWritten();
 }
 
-// DEPRECATED: Use getSize(util::BitWriter&) instead
-// size_t DescriptorConfiguration::getSize(core::Writer& write_size) const {
-//     write(write_size);
-//     return write_size.GetBitsWritten();
-// }
-
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

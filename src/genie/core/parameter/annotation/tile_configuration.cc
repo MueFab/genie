@@ -4,28 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <cassert>
-
-#include <algorithm>
-#include <string>
-#include <utility>
-#include <vector>
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
-
 #include "genie/core/parameter/annotation/tile_configuration.h"
+
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace annotation {
+namespace genie::core::parameter::annotation {
 
 
-    TileConfiguration::TileConfiguration(uint8_t AT_coord_size, uint8_t AG_class, uint64_t defaultTileSize)
+TileConfiguration::TileConfiguration(uint8_t AT_coord_size, uint8_t AG_class, uint64_t defaultTileSize)
     : TileConfiguration(AT_coord_size, AG_class, {defaultTileSize, 0}) {
     two_dimensional = false;
     }
@@ -49,10 +37,10 @@ TileConfiguration::TileConfiguration(uint8_t AT_coord_size, uint8_t AG_class,
       n_descriptors{},
       descriptor_ID{},
       additional_tile_structure{} {
-        if (defaultTileSize.at(1) == 0)
-            two_dimensional = false;
-        else
-            two_dimensional = true;
+    if (defaultTileSize.at(1) == 0)
+        two_dimensional = false;
+    else
+        two_dimensional = true;
     if (!this->two_dimensional) {
         this->column_major_tile_order = false;
         this->symmetry_mode = 0;
@@ -184,74 +172,38 @@ void TileConfiguration::read(util::BitReader& reader) {
     }
 }
 
-// DEPRECATED: Use write(util::BitWriter&) instead
-// void TileConfiguration::write(core::Writer& writer) const {
-//   writer.Write(AG_class, 3);
-//     writer.Write(attribute_contiguity, 1);
-//     writer.Write(two_dimensional, 1);
-//     if (two_dimensional) {
-//       writer.WriteReserved(6);
-//         writer.Write(column_major_tile_order, 1);
-//         writer.Write(symmetry_mode, 3);
-//         writer.Write(symmetry_minor_diagonal, 1);
-//     } else {
-//       writer.WriteReserved(3);
-//     }
-//     writer.Write(attribute_dependent_tiles, 1);
-//     default_tile_structure.write(writer);
-//     if (attribute_dependent_tiles) {
-//       writer.Write(n_add_tile_structures, 16);
-//         for (auto idx_i = 0; idx_i < n_add_tile_structures; ++idx_i) {
-//           writer.Write(n_attributes[idx_i], 16);
-//             for (auto ID : attribute_ID[idx_i]) writer.Write(ID, 16);
-//             writer.Write(n_descriptors[idx_i], 7);
-//             for (auto ID : descriptor_ID[idx_i]) writer.Write(ID, 7);
-//             additional_tile_structure[idx_i].write(writer);
-//         }
-//     }
-// }
-
 void TileConfiguration::write(util::BitWriter& writer) const {
-      writer.WriteBits(AG_class, 3);
-      writer.WriteBits(attribute_contiguity, 1);
-      writer.WriteBits(two_dimensional, 1);
-      if (two_dimensional) {
+    writer.WriteBits(AG_class, 3);
+    writer.WriteBits(attribute_contiguity, 1);
+    writer.WriteBits(two_dimensional, 1);
+    if (two_dimensional) {
         writer.WriteBits(0, 6);
         writer.WriteBits(column_major_tile_order, 1);
         writer.WriteBits(symmetry_mode, 3);
         writer.WriteBits(symmetry_minor_diagonal, 1);
-      } else {
+    } else {
         writer.WriteBits(0, 3);
-      }
-      writer.WriteBits(attribute_dependent_tiles, 1);
-      default_tile_structure.write(writer);
-      if (attribute_dependent_tiles) {
+    }
+    writer.WriteBits(attribute_dependent_tiles, 1);
+    default_tile_structure.write(writer);
+    if (attribute_dependent_tiles) {
         writer.WriteBits(n_add_tile_structures, 16);
         for (auto idx_i = 0; idx_i < n_add_tile_structures; ++idx_i) {
-          writer.WriteBits(n_attributes[idx_i], 16);
-          for (auto ID : attribute_ID[idx_i]) writer.WriteBits(ID, 16);
-          writer.WriteBits(n_descriptors[idx_i], 7);
-          for (auto ID : descriptor_ID[idx_i]) writer.WriteBits(ID, 7);
-          additional_tile_structure[idx_i].write(writer);
+            writer.WriteBits(n_attributes[idx_i], 16);
+            for (auto ID : attribute_ID[idx_i]) writer.WriteBits(ID, 16);
+            writer.WriteBits(n_descriptors[idx_i], 7);
+            for (auto ID : descriptor_ID[idx_i]) writer.WriteBits(ID, 7);
+            additional_tile_structure[idx_i].write(writer);
         }
-      }
     }
+}
 
 size_t TileConfiguration::getSize(util::BitWriter& writesize) const {
     write(writesize);
     return writesize.GetTotalBitsWritten();
 }
 
-// DEPRECATED: Use getSize(util::BitWriter&) instead
-// size_t TileConfiguration::getSize(core::Writer& writesize) const {
-//     write(writesize);
-//     return writesize.GetBitsWritten();
-// }
-
-}  // namespace annotation
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

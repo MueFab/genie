@@ -6,26 +6,20 @@
 
 #include "genie/annotation/contact_annotation.h"
 
-#include <codecs/include/mpegg-codecs.h>
-
 #include <map>
 #include <string>
 #include <vector>
 
-#include "genie/annotation/annotation.h"
-#include "genie/core/array_type.h"
-#include "genie/util/runtime_exception.h"
+#include "genie/annotation/annotation_encoder.h"
+#include "genie/annotation/parameterset_composer.h"
+#include "genie/annotation/accessunit_composer.h"
 
 #include "genie/contact/contact_coder.h"
 #include "genie/core/record/contact/record.h"
 
-#include "genie/annotation/annotation_encoder.h"
-#include "genie/annotation/parameterset_composer.h"
-
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 
 CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
     uint8_t AG_class = 0;
@@ -96,7 +90,9 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
         const char val = '\xFF';
         descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
     }
-    accessUnitcomposer.setATtype(core::access_unit::annotation::AnnotationType::CONTACT_MATRICES, 10);
+    accessUnitcomposer.setATtype(
+        core::access_unit::annotation::AnnotationType::CONTACT_MATRICES,
+        core::access_unit::annotation::AnnotationSubtype::HIC);
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream, attributeInfo,
                                      dataunits.annotationParameterSet,
                                      annotationAccessUnit, AG_class, AT_ID, 0);
@@ -106,5 +102,4 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
     return dataunits;
 }
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation

@@ -12,18 +12,17 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include "genie/annotation/json_attribute_parser.h"
-#include "genie/core/constants.h"
 #include "genie/annotation/accessunit_composer.h"
-#include "genie/variantsite/parameterset_composer.h"
-#include "genie/functionalannotation/functionalannotation_parser.h"
 
 #include "genie/annotation/compressors.h"
-#include "genie/core/record/data_unit/record.h"
+#include "genie/core/parameter/annotation/record.h"
+#include "genie/core/access_unit/annotation/record.h"
+
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 struct FunctionalAnnotationUnits {
     core::parameter::annotation::Record annotationParameterSet;
@@ -42,7 +41,7 @@ class FunctionalAnnotation {
     void parseInfoTags(std::string& recordInputFileName);
     FunctionalAnnotationUnits parseFunctionalAnnotation(std::ifstream& inputfile);
     void setCompressors(Compressor& _compressors) { compressors = _compressors; }
-    void setAnnotationSubtype(uint8_t subtype) {
+    void setAnnotationSubtype(core::access_unit::annotation::AnnotationSubtype subtype) {
         annotationSubtype_ = subtype;
     }
 
@@ -61,16 +60,16 @@ class FunctionalAnnotation {
         core::AnnotDesc::FEATURENAME,  core::AnnotDesc::FEATUREID,
         core::AnnotDesc::ONTOLOGYNAME, core::AnnotDesc::ONTOLOGYID};
 
-    variant_site::    AccessUnitComposer accessUnitcomposer;
+    variant_site::AccessUnitComposer accessUnitcomposer;
     core::parameter::annotation::Record annotationParameterSet;
     std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
-    uint8_t annotationSubtype_{3};
+    core::access_unit::annotation::AnnotationSubtype annotationSubtype_{
+        core::access_unit::annotation::AnnotationSubtype::GFF};
 };
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation
 
 // -----------------------------------------------------------------------------
 

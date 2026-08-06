@@ -4,30 +4,20 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <algorithm>
-#include <string>
-#include <utility>
-#include <vector>
-
 #include "genie/core/access_unit/annotation/record.h"
-#include "genie/util/bit_reader.h"
 
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace access_unit {
-namespace annotation {
+namespace genie::core::access_unit::annotation {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 Record::Record()
     : AT_ID(0),
       AT_type(AnnotationType::VARIANTS),
-      AT_subtype(1),
+      AT_subtype(AnnotationSubtype::VCF),
       AG_class(0),
       annotation_access_unit_header{},
       block{},
@@ -44,7 +34,7 @@ Record::Record(util::BitReader& reader, bool attributeContiguity, bool twoDimens
     read(reader, attributeContiguity, twoDimensional, columnMajorTileOrder, ATCoordSize, numChrs);
 }
 
-Record::Record(uint8_t AT_ID, AnnotationType AT_type, uint8_t AT_subtype, uint8_t AG_class,
+Record::Record(uint8_t AT_ID, AnnotationType AT_type, AnnotationSubtype AT_subtype, uint8_t AG_class,
                AnnotationAccessUnitHeader annotation_access_unit_header, std::vector<Block> blocks,
                bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder, uint8_t ATCoordSize,
                bool variable_size_tiles, uint64_t n_blocks, uint8_t numChrs)
@@ -67,7 +57,7 @@ Record::Record(uint8_t AT_ID, AnnotationType AT_type, uint8_t AT_subtype, uint8_
 void Record::read(util::BitReader& reader) {
     AT_ID = static_cast<uint8_t>(reader.ReadBits(8));
     AT_type = static_cast<AnnotationType>(reader.ReadBits(4));
-    AT_subtype = static_cast<uint8_t>(reader.ReadBits(4));
+    AT_subtype = static_cast<AnnotationSubtype>(reader.ReadBits(4));
     AG_class = static_cast<uint8_t>(reader.ReadBits(3));
     reader.ReadBits(5);
     annotation_access_unit_header.read(reader, attribute_contiguity, two_dimensional, column_major_tile_order,
@@ -87,25 +77,14 @@ void Record::read(util::BitReader& reader, bool attributeContiguity, bool twoDim
     read(reader);
 }
 
-// DEPRECATED: Use write(util::BitWriter&) instead
-// void Record::write(core::Writer& writer) const {
-//   writer.Write(AT_ID, 8);
-//     writer.Write(static_cast<uint8_t>(AT_type), 4);
-//     writer.Write(AT_subtype, 4);
-//     writer.Write(AG_class, 3);
-//     writer.WriteReserved(5);
-//     annotation_access_unit_header.write(writer);
-//     for (auto& blocki : block) blocki.write(writer);
-// }
-
 void Record::write(util::BitWriter& writer) const {
-  writer.WriteBits(AT_ID, 8);
-  writer.WriteBits(static_cast<uint8_t>(AT_type), 4);
-  writer.WriteBits(AT_subtype, 4);
-  writer.WriteBits(AG_class, 3);
-  writer.WriteBits(0, 5);
-  annotation_access_unit_header.write(writer);
-  for (auto& blocki : block) blocki.write(writer);
+    writer.WriteBits(AT_ID, 8);
+    writer.WriteBits(static_cast<uint8_t>(AT_type), 4);
+    writer.WriteBits(static_cast<uint8_t>(AT_subtype), 4);
+    writer.WriteBits(AG_class, 3);
+    writer.WriteBits(0, 5);
+    annotation_access_unit_header.write(writer);
+    for (auto& blocki : block) blocki.write(writer);
 }
 
 size_t Record::getSize(util::BitWriter& writer) const {
@@ -117,11 +96,6 @@ size_t Record::getSize() const {
     return 0;  // Placeholder - needs BitWriter version
 }
 
-// DEPRECATED: Use getSize(util::BitWriter&) instead
-// size_t Record::getSize(core::Writer& writesize) const {
-//     write(writesize);
-//     return writesize.GetBitsWritten();
-// }
 
 Record& Record::operator=(const Record& rec) {
     AT_ID = rec.AT_ID;
@@ -140,10 +114,7 @@ Record& Record::operator=(const Record& rec) {
     return *this;
 }
 
-}  // namespace annotation
-}  // namespace access_unit
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::access_unit::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

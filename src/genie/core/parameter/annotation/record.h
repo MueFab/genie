@@ -9,27 +9,17 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
 #include <vector>
 
-#include <sstream>
-
+#include "genie/core/parameter/annotation/annotation_encoding_parameters.h"
+#include "genie/core/parameter/annotation/tile_configuration.h"
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-#include "genie/core/parameter/annotation/annotation_encoding_parameters.h"
-#include "genie/core/parameter/annotation/tile_configuration.h"
-#include "genie/core/writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace annotation {
+namespace genie::core::parameter::annotation {
 
 /**
  *  @brief
@@ -55,13 +45,10 @@ class Record {
            AnnotationEncodingParameters annotation_encoding_parameters);
 
     void read(util::BitReader& reader);
-    // DEPRECATED: Use write(util::BitWriter&) instead
-    // void write(Writer& writer) const;
     void write(util::BitWriter& writer) const;
 
     size_t getSize() const;
-    // DEPRECATED: Use getSize(util::BitWriter&) instead
-    // size_t getSize(core::Writer& writesize) const;
+    size_t getSize(util::BitWriter& writer) const;
 
     uint8_t getParameterSetID() const { return parameter_set_ID; }
     uint8_t getATID() const { return AT_ID; }
@@ -86,7 +73,7 @@ struct ParameterSettings {
     ParameterSettings()
         : parameter_set_ID(1),
           AT_ID(0),
-        AG_class(0),
+          AG_class(0),
           AT_alphabet_ID(core::AlphabetId::kAcgtn),
           ATCoordSize(3),
           AT_pos_40_bits_flag(false),
@@ -95,10 +82,7 @@ struct ParameterSettings {
 };
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

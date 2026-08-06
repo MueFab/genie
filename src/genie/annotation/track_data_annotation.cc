@@ -6,26 +6,18 @@
 
 #include "genie/annotation/track_data_annotation.h"
 
-#include <codecs/include/mpegg-codecs.h>
-
 #include <map>
-#include <set>
 #include <string>
-#include <vector>
 
-#include "genie/core/record/annotation_access_unit/TypedData.h"
-#include "genie/annotation/accessunit_composer.h"
-
-#include "genie/core/array_type.h"
-#include "genie/util/runtime_exception.h"
+#include "genie/track/track_parser.h"
+#include "genie/core/track_record/record.h"
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 
 void TrackDataAnnotation::parseInfoTags(std::string& recordInputFileName) {
     std::ifstream readForTags;
@@ -115,5 +107,4 @@ void TrackDataAnnotation::setInfoFields(std::string jsonFileName) {
     infoFields = attributeParser.getInfoFields();
 }
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation

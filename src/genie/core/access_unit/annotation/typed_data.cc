@@ -4,22 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "typed_data.h"
-#include <algorithm>
-#include <string>
-#include <utility>
-#include "genie/core/writer.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
+#include "genie/core/access_unit/annotation/typed_data.h"
+
+#include "genie/core/array_type.h"
 #include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace access_unit {
-namespace annotation {
+namespace genie::core::access_unit::annotation {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -96,31 +88,6 @@ void TypedData::convertToTypedData(std::vector<std::vector<std::vector<CustomTyp
             }
 }
 
-// DEPRECATED: Use util::BitWriter version instead
-// void TypedData::write(core::Writer& outputWriter) const {
-//   outputWriter.Write(static_cast<uint8_t>(data_type_ID), 8);
-//     outputWriter.Write(num_array_dims, 2);
-//     uint64_t n_elements = 1;
-//     for (uint64_t idx_i = 0; idx_i < num_array_dims; ++idx_i) {
-//       outputWriter.Write(array_dims[idx_i], 32);
-//         n_elements = n_elements * array_dims[idx_i];
-//     }
-//
-//     if (!compressedDataStream.str().empty()) {
-//         bool encoded = true;
-//         outputWriter.Write(encoded, 1);
-//         auto size = compressedDataStream.str().size();
-//         outputWriter.Write(size, 32);
-//         outputWriter.Write(
-//             const_cast<std::stringstream*>(&compressedDataStream));
-//     } else {
-//         bool encoded = false;
-//         outputWriter.Write(encoded, 1);
-//         outputWriter.Write(const_cast<std::stringstream*>(&dataStream));
-//     }
-//     outputWriter.Flush();
-// }
-
 void TypedData::write(util::BitWriter& writer) const {
     writer.WriteBits(static_cast<uint8_t>(data_type_ID), 8);
     writer.WriteBits(num_array_dims, 2);
@@ -164,10 +131,7 @@ void TypedData::write(util::BitWriter& writer) const {
     writer.FlushBits();
 }
 
-}  // namespace annotation
-}  // namespace access_unit
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::access_unit::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

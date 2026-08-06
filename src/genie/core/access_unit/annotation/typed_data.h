@@ -9,27 +9,16 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <fstream>
-#include <iostream>
-#include <memory>
 #include <sstream>
-#include <string>
-#include <utility>
 #include <vector>
 
-#include "genie/core/array_type.h"
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
-#include "genie/genotype/genotype_parameters.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace access_unit {
-namespace annotation {
+namespace genie::core::access_unit::annotation {
 
 using CustomType = std::vector<uint8_t>;
 
@@ -82,7 +71,9 @@ class TypedData {
     }
 
     void convertToTypedData(util::BitReader& reader);
+
     void writeElement(std::vector<CustomType> matrixRow);
+
     void convertToTypedData(CustomType value);
     void convertToTypedData(std::vector<CustomType> matrix);
     void convertToTypedData(std::vector<std::vector<CustomType>> matrix);
@@ -96,30 +87,8 @@ class TypedData {
 
     std::stringstream& getDataStream() { return dataStream; }
 
-    // DEPRECATED: Use getCompresseddata() directly
-    // std::stringstream& getdata() {
-    //   writer.Flush();
-    //     return dataStream;
-    // }
     std::stringstream& getCompresseddata() { return compressedDataStream; }
 
-    // DEPRECATED: Use util::BitWriter version instead
-    // void setCompressedData(std::stringstream& _compressed_data_block) {
-    //     compressedDataStream.str("");
-    //     compressedDataStream.clear();
-    //     genie::core::Writer compressedWriter(const_cast<std::stringstream*>(&compressedDataStream));
-    //     compressedWriter.Write(&_compressed_data_block);
-    // }
-
-    // DEPRECATED: Use util::BitWriter version instead
-    // void setCompressedData(std::vector<uint8_t>& _compressed_data_block) {
-    //     genie::core::Writer compressedWriter(&compressedDataStream);
-    //     for (auto byte : _compressed_data_block)
-    //       compressedWriter.Write(byte, 8);
-    // }
-
-    // DEPRECATED: Use util::BitWriter version instead
-    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
 
  private:
@@ -128,17 +97,13 @@ class TypedData {
     std::vector<uint32_t> array_dims;
     std::vector<CustomType> data_block;
     std::stringstream dataStream;
-    // DEPRECATED: Use util::BitWriter version instead
-    // genie::core::Writer writer{&dataStream};
+    // util::BitWriter writer{dataStream};
     std::stringstream compressedDataStream;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace access_unit
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::access_unit::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

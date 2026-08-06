@@ -5,13 +5,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
-#include <array>
-#include <fstream>
-#include <iostream>
-#include "genie/core/writer.h"
 
-#include "random_record_fill_in.h"
 #include "genie/core/parameter/annotation/annotation_encoding_parameters.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 #define GENERATE_TEST_FILES false
 

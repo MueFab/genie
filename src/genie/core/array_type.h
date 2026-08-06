@@ -4,20 +4,19 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_ARRAYTYPE_H_
-#define SRC_GENIE_CORE_ARRAYTYPE_H_
+#ifndef SRC_GENIE_CORE_ARRAY_TYPE_H_
+#define SRC_GENIE_CORE_ARRAY_TYPE_H_
 
 #include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
-#include "constants.h"
-// #include "genie/core/writer.h" // DEPRECATED: Use util::BitWriter directly
+
+#include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 class ArrayType {
  private:
@@ -26,12 +25,9 @@ class ArrayType {
  public:
     std::vector<uint8_t> toArray(DataType type, util::BitReader& reader) const;
 
-    // DEPRECATED: Use util::BitWriter version instead
-    // void toFile(core::DataType type, std::vector<uint8_t> bytearray, core::Writer& writer) const;
     void toFile(core::DataType type, std::vector<uint8_t> bytearray, util::BitWriter& writer) const;
-    // DEPRECATED: Use util::BitWriter version instead
-    // void toFile(core::DataType type, util::BitReader& reader, core::Writer& writer, uint64_t number) const;
     void toFile(core::DataType type, util::BitReader& reader, util::BitWriter& writer, uint64_t number) const;
+
     std::string toString(core::DataType type, std::vector<uint8_t> value) const;
 
     uint8_t getDefaultBitsize(core::DataType type) const;
@@ -39,6 +35,5 @@ class ArrayType {
     std::vector<uint8_t> toArray(core::DataType type, uint64_t value) const;
 };
 
-}  // namespace core
-}  // namespace genie
-#endif  // SRC_GENIE_CORE_ARRAYTYPE_H_
+}  // namespace genie::core
+#endif  // SRC_GENIE_CORE_ARRAY_TYPE_H_

@@ -30,7 +30,7 @@ namespace genie::core {
 
 namespace stats {
 class PerfStats;
-}
+}  // namespace stats
 
 // -----------------------------------------------------------------------------
 

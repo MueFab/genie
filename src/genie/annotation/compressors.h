@@ -9,22 +9,12 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cassert>
-#include <cstdint>
-#include <iostream>
-#include <memory>
+#include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
-#include "genie/core/constants.h"
-#include "genie/core/writer.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/runtime_exception.h"
-
-#include "genie/core/parameter/annotation/algorithm_parameters.h"
 #include "genie/core/parameter/annotation/compressor_parameter_set.h"
+#include "genie/core/access_unit/annotation/typed_data.h"
 
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
@@ -32,8 +22,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 
 // ---------------------------------------------------------------------------------------------------------------------
 class Compressor {
@@ -62,8 +51,7 @@ class Compressor {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

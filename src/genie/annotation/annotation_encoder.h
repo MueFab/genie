@@ -8,32 +8,32 @@
 #define SRC_GENIE_ANNOTATION_ANNOTATION_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include <cstdint>
-#include <iostream>
+
 #include <map>
-#include <sstream>
 #include <string>
 #include <vector>
 
-#include "genie/core/constants.h"
-#include "genie/core/writer.h"
-
+#include "genie/contact/contact_matrix_parameters.h"
+#include "genie/contact/subcontact_matrix_parameters.h"
+#include "genie/genotype/genotype_parameters.h"
+#include "genie/likelihood/likelihood_parameters.h"
 #include "genie/annotation/compressors.h"
+#include "genie/core/constants.h"
+#include "genie/core/parameter/annotation/algorithm_parameters.h"
 #include "genie/core/parameter/annotation/annotation_encoding_parameters.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
+#include "genie/core/parameter/annotation/attribute_parameter_set.h"
+#include "genie/core/parameter/annotation/compressor_parameter_set.h"
 #include "genie/core/parameter/annotation/descriptor_configuration.h"
-#include "genie/core/parameter/annotation/record.h"
 
-
-#include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
 #include "genie/entropy/zstd/encoder.h"
+#include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/jbig/encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 
 class AnnotationEncoder {
  public:
@@ -57,8 +57,7 @@ class AnnotationEncoder {
             case genie::core::AlgoID::JBIG: {
                 genie::entropy::jbig::JBIGparameters jbigParameters;
                 algpars = jbigParameters.convertToAlgorithmParameters();
-            }
-                break;
+            } break;
             default:
                 break;
         }
@@ -112,8 +111,7 @@ class AnnotationEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -107,7 +107,7 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
 }
 
 void Annotation::writeToFile(std::string& outputFileName) {
-  std::cerr << " start of writeToFile... " << std::endl;
+    std::cerr << " start of writeToFile... " << std::endl;
     std::ofstream testfile;
     std::string filename = outputFileName;
     testfile.open(filename + ".bin", std::ios::binary | std::ios::out);
@@ -123,7 +123,7 @@ void Annotation::writeToFile(std::string& outputFileName) {
         APS_dataUnit.Write(txtwriter, sizeSofar);
     }
     for (auto& aau : annotationAccessUnit) {
-      genie::core::record::data_unit::Record AAU_dataUnit(aau);
+        genie::core::record::data_unit::Record AAU_dataUnit(aau);
         sizeSofar = AAU_dataUnit.Write(testwriter);
         AAU_dataUnit.Write(txtwriter, sizeSofar);
     }

@@ -6,28 +6,29 @@
 
 #ifndef SRC_GENIE_ANNOTATION_GENE_EXPRESSION_ANNOTATION_H_
 #define SRC_GENIE_ANNOTATION_GENE_EXPRESSION_ANNOTATION_H_
-// #include <fstream>
+
+#include <fstream>
 #include <map>
 #include <string>
 #include <tuple>
 #include <vector>
+
+#include "genie/genotype/genotype_parameters.h"
 #include "genie/annotation/compressors.h"
-#include "genie/core/gene_expression_record/record.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
+#include "genie/core/gene_expression_record/record.h"
 #include "genie/core/parameter/annotation/record.h"
 #include "genie/core/access_unit/annotation/record.h"
-#include "genie/core/access_unit/annotation/typed_data.h"
-// #include "genie/core/data_unit_record/record.h"
-// #include "genie/annotation/json_attribute_parser.h"
-// #include "genie/gene_expression/gene_expression_parser.h"
+#include "genie/util/bit_reader.h"
+
 // -----------------------------------------------------------------------------
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 struct GeneExpressionUnits {
     core::parameter::annotation::Record annotationParameterSet;
     std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
 };
+
 class GeneExpressionAnnotation {
  public:
   using AttrType = std::vector<uint8_t>;
@@ -93,7 +94,6 @@ class GeneExpressionAnnotation {
     size_t readOneBlock(util::BitReader& reader, const uint32_t& rowTileSize,
                         RecData& recData);
 };
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation
 // -----------------------------------------------------------------------------
 #endif  // SRC_GENIE_ANNOTATION_GENE_EXPRESSION_ANNOTATION_H_

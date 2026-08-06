@@ -6,25 +6,20 @@
 
 #include "genie/annotation/feature_annotation.h"
 
-#include <codecs/include/mpegg-codecs.h>
-
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
 
-#include "genie/core/record/annotation_access_unit/TypedData.h"
-#include "genie/annotation/accessunit_composer.h"
-
-#include "genie/core/array_type.h"
-#include "genie/util/runtime_exception.h"
+#include "genie/feature/feature_parser.h"
+#include "genie/variantsite/parameterset_composer.h"
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 
 void FeatureAnnotation::parseInfoTags(std::string& recordInputFileName) {
     std::ifstream readForTags;
@@ -71,8 +66,8 @@ FeatureUnits FeatureAnnotation::parseFeature(std::ifstream& inputfile) {
     variant_site::ParameterSetComposer encodeParameters;
 
     variant_site::AccessUnitComposer accessUnit;
-    accessUnit.setATtype(core::access_unit::annotation::AnnotationType::GENIE_EXPRESSION,
-                         9);
+    accessUnit.setATtype(core::access_unit::annotation::AnnotationType::GENE_EXPRESSION,
+                         core::access_unit::annotation::AnnotationSubtype::GENE_EXPRESSION);
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;
@@ -119,5 +114,4 @@ void FeatureAnnotation::setInfoFields(std::string jsonFileName) {
     infoFields = attributeParser.getInfoFields();
 }
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation

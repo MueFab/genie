@@ -9,22 +9,14 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
 #include <vector>
-#include "genie/core/constants.h"
+
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-#include "genie/core/writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace annotation {
+namespace genie::core::parameter::annotation {
 
 class TileStructure {
  private:
@@ -51,13 +43,9 @@ class TileStructure {
 
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, uint8_t ATCoordSize, bool two_dimensional);
-    // DEPRECATED: Use write(util::BitWriter&) instead
-    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
 
     size_t getSize(util::BitWriter& writesize) const;
-    // DEPRECATED: Use getSize(util::BitWriter&) instead
-    // size_t getSize(core::Writer& writesize) const;
 
     bool isVariableSizeTiles() const { return variable_size_tiles; }
     uint64_t getNumberOfTiles() const { return n_tiles; }
@@ -68,10 +56,7 @@ class TileStructure {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

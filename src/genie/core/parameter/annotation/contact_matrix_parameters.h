@@ -15,16 +15,12 @@
 #include <utility>
 #include <vector>
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace annotation {
+namespace genie::core::parameter::annotation {
 
 class ContactMatrixParameters {
  private:
@@ -72,12 +68,8 @@ class ContactMatrixParameters {
                             std::vector<uint8_t> norm_matrix_name_len, std::vector<std::string> norm_matrix_name);
 
     void read(util::BitReader& reader);
-    // DEPRECATED: Use write(util::BitWriter&) instead
-    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
     size_t getSize(util::BitWriter& writesize) const;
-    // DEPRECATED: Use getSize(util::BitWriter&) instead
-    // size_t getSize(core::Writer& writesize) const;
 
     uint8_t getNumberOfSamples() const { return num_samples; }
     std::vector<uint8_t> getSampleIDs() const { return sample_ID; }
@@ -108,10 +100,7 @@ class ContactMatrixParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

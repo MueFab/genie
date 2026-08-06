@@ -9,23 +9,16 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
 #include <vector>
+
 #include "genie/core/array_type.h"
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace annotation {
+namespace genie::core::parameter::annotation {
 
 class AlgorithmParameters {
  private:
@@ -46,12 +39,8 @@ class AlgorithmParameters {
                         std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val);
 
     void read(util::BitReader& reader);
-    // DEPRECATED: Use write(util::BitWriter&) instead
-    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
     size_t getSize(util::BitWriter& writesize) const;
-    // DEPRECATED: Use getSize(util::BitWriter&) instead
-    // size_t getSize(core::Writer& writesize) const;
 
     uint8_t getNumberOfPars() const { return n_pars; }
     std::vector<uint8_t> getParIDs() const { return par_ID; }
@@ -72,8 +61,8 @@ std::vector<std::vector<std::vector<std::vector<uint8_t>>>> parameterToVector(st
     size_t index = 0;
     for (size_t idx_j = 0; idx_j < parameterVector.size(); ++idx_j) {
         for (size_t idx_k = 0; idx_k < parameterVector.at(idx_j).size(); ++idx_k) {
-            for (size_t l = 0; l < parameterVector.at(idx_j).at(idx_k).size(); ++l) {
-                parameterVector.at(idx_j).at(idx_k).at(l) = arrayType.toArray(type, value.at(index));
+            for (size_t idx_l = 0; idx_l < parameterVector.at(idx_j).at(idx_k).size(); ++idx_l) {
+                parameterVector.at(idx_j).at(idx_k).at(idx_l) = arrayType.toArray(type, value.at(index));
                 index++;
             }
         }
@@ -83,10 +72,7 @@ std::vector<std::vector<std::vector<std::vector<uint8_t>>>> parameterToVector(st
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

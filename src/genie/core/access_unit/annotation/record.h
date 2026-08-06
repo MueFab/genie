@@ -9,26 +9,21 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
 #include <vector>
 
-#include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
-#include "annotation_access_unit_header.h"
+#include "genie/core/access_unit/annotation/annotation_access_unit_header.h"
 #include "genie/core/access_unit/annotation/block.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace access_unit {
-namespace annotation {
+namespace genie::core::access_unit::annotation {
 
-enum class AnnotationType { VARIANTS = 1, FUNCTIONAL_ANNOTATIONS, GENIE_EXPRESSION, CONTACT_MATRICES, TRACKS };
+enum class AnnotationType { VARIANTS = 1, FUNCTIONAL_ANNOTATIONS, GENE_EXPRESSION, CONTACT_MATRICES, TRACKS };
+
+enum class AnnotationSubtype { VCF = 1, GTF = 2, GFF = 3, BED = 4, BEDGRAPH = 5, WIG = 6, BIGWIG = 7, GENBANK = 8, GENE_EXPRESSION = 9, HIC = 10 };
 
 /**
  *  @brief
@@ -37,7 +32,7 @@ class Record {
  private:
     uint8_t AT_ID;
     AnnotationType AT_type;
-    uint8_t AT_subtype;
+    AnnotationSubtype AT_subtype;
     uint8_t AG_class;
     AnnotationAccessUnitHeader annotation_access_unit_header;
     std::vector<Block> block;
@@ -59,7 +54,7 @@ class Record {
     Record(util::BitReader& reader, bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
            uint8_t ATCoordSize, uint8_t numChrs);
 
-    Record(uint8_t AT_ID, AnnotationType AT_type, uint8_t AT_subtype, uint8_t AG_class,
+    Record(uint8_t AT_ID, AnnotationType AT_type, AnnotationSubtype AT_subtype, uint8_t AG_class,
            AnnotationAccessUnitHeader annotation_access_unit_header, std::vector<Block> block, bool attributeContiguity,
            bool twoDimensional, bool columnMajorTileOrder, uint8_t ATCoordSize, bool variable_size_tiles,
            uint64_t n_blocks, uint8_t numChrs);
@@ -68,8 +63,6 @@ class Record {
     void read(util::BitReader& reader, bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
               uint8_t ATCoordSize, uint8_t numChrs);
 
-    // DEPRECATED: Use write(util::BitWriter&) instead
-    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
     size_t getSize(util::BitWriter& writer) const;
     size_t getSize() const;
@@ -79,10 +72,7 @@ class Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace access_unit
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::access_unit::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

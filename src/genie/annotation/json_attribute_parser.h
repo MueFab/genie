@@ -8,23 +8,17 @@
 #define SRC_GENIE_ANNOTATION_JSON_ATTRIBUTE_PARSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include <cstdint>
-#include <iostream>
+
 #include <map>
-#include <memory>
 #include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
-#include "genie/core/array_type.h"
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
-#include "genie/util/bit_reader.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 
 class InfoField {
  public:
@@ -76,8 +70,7 @@ class JsonAttributeParser {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

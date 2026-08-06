@@ -9,24 +9,15 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
 #include <vector>
-#include "genie/core/constants.h"
-#include "genie/core/writer.h"
+
+#include "genie/core/parameter/annotation/tile_structure.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-#include "tile_structure.h"
-
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace annotation {
+namespace genie::core::parameter::annotation {
 
 /**
  *  @brief
@@ -74,11 +65,8 @@ class TileConfiguration {
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, uint8_t ATCoordSize);
     void write(util::BitWriter& writer) const;
-    // DEPRECATED: Use write(util::BitWriter&) instead
-    // void write(core::Writer& writer) const;
+
     size_t getSize(util::BitWriter& writesize) const;
-    // DEPRECATED: Use getSize(util::BitWriter&) instead
-    // size_t getSize(core::Writer& writesize) const;
 
     uint8_t getAttributeGroupClass() const { return AG_class; }
     bool isAttributeContiguity() const { return attribute_contiguity; }
@@ -120,10 +108,7 @@ struct TileParameterSettings {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

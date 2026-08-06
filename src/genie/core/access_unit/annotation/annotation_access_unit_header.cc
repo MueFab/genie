@@ -4,21 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "annotation_access_unit_header.h"
-#include <algorithm>
-#include <string>
-#include <utility>
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
+#include "genie/core/access_unit/annotation/annotation_access_unit_header.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace access_unit {
-namespace annotation {
+namespace genie::core::access_unit::annotation {
 
 AnnotationAccessUnitHeader::AnnotationAccessUnitHeader()
     : attribute_contiguity(false),
@@ -82,65 +72,34 @@ void AnnotationAccessUnitHeader::read(util::BitReader& reader, bool attributeCon
     read(reader);
 }
 
-// DEPRECATED: Use write(util::BitWriter&) instead
-// void AnnotationAccessUnitHeader::write(core::Writer& writer) const {
-//     uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size);
-//     if (attribute_contiguity) {
-//       writer.Write(is_attribute, 1);
-//         if (is_attribute)
-//           writer.Write(attribute_ID, 16);
-//         else
-//           writer.Write(static_cast<uint8_t>(descriptor_ID), 7);
-//         if (two_dimensional && !variable_size_tiles) {
-//             if (column_major_tile_order)
-//               writer.Write(n_tiles_per_col, ATCoordBits);
-//             else
-//               writer.Write(n_tiles_per_row, ATCoordBits);
-//         }
-//         writer.Write(n_blocks, ATCoordBits);
-//     } else {
-//       writer.Write(tile_index_1, ATCoordBits);
-//         writer.Write(tile_index_2_exists, 1);
-//         if (tile_index_2_exists) writer.Write(tile_index_2, ATCoordBits);
-//         writer.Write(n_blocks, 16);
-//     }
-//     writer.Flush();
-// }
-
 void AnnotationAccessUnitHeader::write(util::BitWriter& writer) const {
-  uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size);
-  if (attribute_contiguity) {
-    writer.WriteBits(is_attribute, 1);
-    if (is_attribute)
-      writer.WriteBits(attribute_ID, 16);
-    else
-      writer.WriteBits(static_cast<uint8_t>(descriptor_ID), 7);
-    if (two_dimensional && !variable_size_tiles) {
-      if (column_major_tile_order)
-        writer.WriteBits(n_tiles_per_col, ATCoordBits);
-      else
-        writer.WriteBits(n_tiles_per_row, ATCoordBits);
+    uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size);
+    if (attribute_contiguity) {
+        writer.WriteBits(is_attribute, 1);
+        if (is_attribute)
+            writer.WriteBits(attribute_ID, 16);
+        else
+            writer.WriteBits(static_cast<uint8_t>(descriptor_ID), 7);
+        if (two_dimensional && !variable_size_tiles) {
+            if (column_major_tile_order)
+                writer.WriteBits(n_tiles_per_col, ATCoordBits);
+            else
+                writer.WriteBits(n_tiles_per_row, ATCoordBits);
+        }
+        writer.WriteBits(n_blocks, ATCoordBits);
+    } else {
+        writer.WriteBits(tile_index_1, ATCoordBits);
+        writer.WriteBits(tile_index_2_exists, 1);
+        if (tile_index_2_exists) writer.WriteBits(tile_index_2, ATCoordBits);
+        writer.WriteBits(n_blocks, 16);
     }
-    writer.WriteBits(n_blocks, ATCoordBits);
-  } else {
-    writer.WriteBits(tile_index_1, ATCoordBits);
-    writer.WriteBits(tile_index_2_exists, 1);
-    if (tile_index_2_exists) writer.WriteBits(tile_index_2, ATCoordBits);
-    writer.WriteBits(n_blocks, 16);
-  }
-  writer.FlushBits();
+    writer.FlushBits();
 }
 
 size_t AnnotationAccessUnitHeader::getSize(util::BitWriter& writesize) const {
     write(writesize);
     return writesize.GetTotalBitsWritten();
 }
-
-// DEPRECATED: Use getSize(util::BitWriter&) instead
-// size_t AnnotationAccessUnitHeader::getSize(core::Writer& writesize) const {
-//     write(writesize);
-//     return writesize.GetBitsWritten();
-// }
 
 void AnnotationAccessUnitHeader::read(util::BitReader& reader) {
     uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size);
@@ -168,10 +127,7 @@ void AnnotationAccessUnitHeader::read(util::BitReader& reader) {
     reader.FlushHeldBits();
 }
 
-}  // namespace annotation
-}  // namespace access_unit
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::access_unit::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

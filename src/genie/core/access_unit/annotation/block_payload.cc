@@ -4,24 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "block_payload.h"
-#include <algorithm>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
+#include "genie/core/access_unit/annotation/block_payload.h"
 
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace access_unit {
-namespace annotation {
+namespace genie::core::access_unit::annotation {
 
 BlockPayload::BlockPayload()
     : descriptor_ID(AnnotDesc::GENOTYPE), num_chrs(0), block_payload_size(0), generic_payload{} {}
@@ -68,32 +57,23 @@ void BlockPayload::read(util::BitReader& reader, AnnotDesc descriptorID, uint8_t
     read(reader);
 }
 
-// DEPRECATED: Use write(util::BitWriter&) instead
-// void BlockPayload::write(core::Writer& writer) const {
-//     if (generic_payload_stream.str().size() > 0)
-//       writer.Write(const_cast<std::stringstream*>(&generic_payload_stream));
-//     else
-//     for (const auto& byte : generic_payload) writer.Write(byte, 8, true);
-//     writer.Flush();
-// }
-
 void BlockPayload::write(util::BitWriter& writer) const {
-  if (generic_payload_stream.str().size() > 0) {
-    auto* ss = const_cast<std::stringstream*>(&generic_payload_stream);
-    ss->clear();
-    ss->seekg(0, std::ios::beg);
-    if (writer.IsByteAligned()) {
-      writer.WriteAlignedStream(*ss);
+    if (generic_payload_stream.str().size() > 0) {
+        auto* ss = const_cast<std::stringstream*>(&generic_payload_stream);
+        ss->clear();
+        ss->seekg(0, std::ios::beg);
+        if (writer.IsByteAligned()) {
+            writer.WriteAlignedStream(*ss);
+        } else {
+            char byte;
+            while (ss->read(&byte, 1)) {
+                writer.WriteBits(static_cast<uint8_t>(byte), 8);
+            }
+        }
     } else {
-      char byte;
-      while (ss->read(&byte, 1)) {
-        writer.WriteBits(static_cast<uint8_t>(byte), 8);
-      }
+        for (const auto& byte : generic_payload) writer.WriteBits(byte, 8);
     }
-  } else {
-    for (const auto& byte : generic_payload) writer.WriteBits(byte, 8);
-  }
-  writer.FlushBits();
+    writer.FlushBits();
 }
 
 size_t BlockPayload::getSize(util::BitWriter& writesize) const {
@@ -101,16 +81,8 @@ size_t BlockPayload::getSize(util::BitWriter& writesize) const {
     return writesize.GetTotalBitsWritten();
 }
 
-// DEPRECATED: Use getSize(util::BitWriter&) instead
-// size_t BlockPayload::getSize(core::Writer& writesize) const {
-//     write(writesize);
-//     return writesize.GetBitsWritten();
-// }
 
-}  // namespace annotation
-}  // namespace access_unit
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::access_unit::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

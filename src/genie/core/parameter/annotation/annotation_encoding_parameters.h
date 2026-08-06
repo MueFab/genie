@@ -9,25 +9,18 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
 #include <string>
-#include <utility>
 #include <vector>
-#include "genie/core/constants.h"
+
+#include "genie/core/parameter/annotation/attribute_parameter_set.h"
+#include "genie/core/parameter/annotation/compressor_parameter_set.h"
+#include "genie/core/parameter/annotation/descriptor_configuration.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-#include "attribute_parameter_set.h"
-#include "compressor_parameter_set.h"
-#include "descriptor_configuration.h"
-
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace annotation {
+namespace genie::core::parameter::annotation {
 
 struct filterData {
     std::string filter_ID;
@@ -86,12 +79,8 @@ class AnnotationEncodingParameters {
                                  std::vector<AttributeParameterSet> attribute_parameter_set);
 
     void read(util::BitReader& reader);
-    // DEPRECATED: Use write(util::BitWriter&) instead
-    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
     size_t getSize(util::BitWriter& writesize) const;
-    // DEPRECATED: Use getSize(util::BitWriter&) instead
-    // size_t getSize(core::Writer& writesize) const;
 
     uint8_t getNumberOfFilters() const { return n_filter; }
     std::vector<uint8_t> getFilterIDLengths() const { return filter_ID_len; }
@@ -119,10 +108,7 @@ class AnnotationEncodingParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

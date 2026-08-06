@@ -9,26 +9,14 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <fstream>
-#include <iostream>
-#include <memory>
 #include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
 
-#include "genie/core/constants.h"
 #include "genie/core/parameter/annotation/descriptor_configuration.h"
-#include "genie/genotype/genotype_parameters.h"
-#include "genie/core/writer.h"
-#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace access_unit {
-namespace annotation {
+namespace genie::core::access_unit::annotation {
 
 //----------------------------------------------------------------------------------//
 
@@ -54,10 +42,7 @@ class BlockPayloadStream {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace access_unit
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::access_unit::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -5,19 +5,20 @@
  */
 
 #include "genie/annotation/gene_expression_annotation.h"
+
 #include <iostream>
 #include <map>
 #include <string>
 #include <tuple>
 #include <vector>
+
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
 #include "genie/annotation/accessunit_composer.h"
 
-// "genie/util/runtime_exception.h"
 // ---------------------------------------------------------------------------------------------------------------------
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
+
 std::vector<GeneExpressionUnits> GeneExpressionAnnotation::parseGeneExpression(
     std::ifstream& inputfile) {
 
@@ -33,7 +34,7 @@ std::vector<GeneExpressionUnits> GeneExpressionAnnotation::parseGeneExpression(
     combined = blocksWPars.at(0);
     //--------------
 
-    for (auto i = 1; i < blocksWPars.size(); ++i) {
+    for (auto i = 1u; i < blocksWPars.size(); ++i) {
       combined.blocks.push_back(blocksWPars.at(i).blocks.at(0));
     }
     std::map<std::string, core::parameter::annotation::AttributeData> attributeInfo;
@@ -86,8 +87,8 @@ std::vector<GeneExpressionUnits> GeneExpressionAnnotation::parseGeneExpression(
       std::map<core::AnnotDesc, std::stringstream> descriptorStream;
 
       variant_site::AccessUnitComposer accessUnitcomposer;
-      accessUnitcomposer.setATtype(core::access_unit::annotation::AnnotationType::GENIE_EXPRESSION,
-          9);
+      accessUnitcomposer.setATtype(core::access_unit::annotation::AnnotationType::GENE_EXPRESSION,
+          core::access_unit::annotation::AnnotationSubtype::GENE_EXPRESSION);
 
       accessUnitcomposer.setCompressors(compressors);
 
@@ -207,7 +208,7 @@ void GeneExpressionAnnotation::sort_format(
   for (const auto& format : recs.at(0).GetExpressionAttributes()) {
     const auto& formatName = format.GetAttrName();
     core::parameter::annotation::AttributeData attrData(
-        formatName.size(), formatName, format.GetAttrType(), format.GetAttrArrayLen(), AttributeID);
+        static_cast<uint8_t>(formatName.size()), formatName, format.GetAttrType(), format.GetAttrArrayLen(), AttributeID);
     attrInfo[formatName] = attrData;
     AttributeID++;
   }
@@ -267,6 +268,6 @@ void GeneExpressionAnnotation::RecData::set(
   attributes = _attributes;
 }
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation
+
 // ---------------------------------------------------------------------------------------------------------------------

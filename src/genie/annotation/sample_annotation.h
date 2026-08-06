@@ -9,20 +9,19 @@
 
 #include <fstream>
 #include <map>
-#include <sstream>
 #include <string>
 #include <vector>
+
 #include "genie/annotation/json_attribute_parser.h"
-#include "genie/core/constants.h"
-#include "genie/variantsample/variantsample_parser.h"
 #include "genie/annotation/accessunit_composer.h"
-#include "genie/variantsite/parameterset_composer.h"
+#include "genie/variantsite/attributes.h"
 
 #include "genie/annotation/compressors.h"
-#include "genie/core/record/data_unit/record.h"
+#include "genie/core/parameter/annotation/record.h"
+#include "genie/core/access_unit/annotation/record.h"
+#include "genie/core/sample_record/record.h"
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 
 struct SampleUnits {
   core::parameter::annotation::Record annotationParameterSet;
@@ -35,7 +34,8 @@ class SampleAnnotation {
     defaultTileSizeWidth = _defaultTileSizeWidth;
   }
 
-  void setATtype(core::access_unit::annotation::AnnotationType annotationType, uint8_t annotationSubtype) {
+  void setATtype(core::access_unit::annotation::AnnotationType annotationType, core::access_unit::annotation::AnnotationSubtype
+          annotationSubtype) {
     annotationType_ = annotationType;
     annotationSubtype_ = annotationSubtype;
   }
@@ -53,7 +53,7 @@ class SampleAnnotation {
   std::map<std::string, InfoField> attributeInfo;
   std::vector<InfoField> infoFields;
 
-  variant_site::  AccessUnitComposer accessUnitcomposer;
+  variant_site::AccessUnitComposer accessUnitcomposer;
   core::parameter::annotation::Record annotationParameterSet;
   std::vector<core::access_unit::annotation::Record> annotationAccessUnits;
 
@@ -61,11 +61,11 @@ class SampleAnnotation {
   uint64_t colIndex = 0;
   core::access_unit::annotation::AnnotationType annotationType_ =
       core::access_unit::annotation::AnnotationType::VARIANTS;
-  uint8_t annotationSubtype_{1};
+  core::access_unit::annotation::AnnotationSubtype annotationSubtype_ =
+      core::access_unit::annotation::AnnotationSubtype::VCF;
 };
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation
 
 // -----------------------------------------------------------------------------
 

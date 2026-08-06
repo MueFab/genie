@@ -4,20 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/parameter/annotation/record.h"
-
-#include <algorithm>
-#include <cstring>
-#include <sstream>
-#include <string>
-#include <utility>
-
-#include "genie/core/array_type.h"
 #include "genie/core/feature_record/record.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
 
 // -------------------------------------------------------------------------------------------------
 
@@ -31,10 +18,9 @@ Record::Record(util::BitReader& reader) {
 
 // -------------------------------------------------------------------------------------------------
 
-// DEPRECATED: No longer needed
-// void Record::Write(core::Writer& writer) {
-//     (void)writer;
-// }
+void Record::Write(util::BitWriter& writer) {
+    (void)writer;
+}
 
 // -------------------------------------------------------------------------------------------------
 

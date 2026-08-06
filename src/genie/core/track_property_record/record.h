@@ -8,15 +8,12 @@
 #ifndef SRC_GENIE_CORE_TRACK_PROPERTY_RECORD_RECORD_H_
 #define SRC_GENIE_CORE_TRACK_PROPERTY_RECORD_RECORD_H_
 
-#include <cstdint>
 #include <string>
 #include <vector>
 
 #include "genie/core/access_unit/annotation/attribute_field.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-// DEPRECATED: core::Writer no longer used
-// #include "genie/core/writer.h"
 
 namespace genie::core::record::track_property {
 

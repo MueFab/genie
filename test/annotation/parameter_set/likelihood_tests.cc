@@ -5,11 +5,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
-#include <fstream>
-#include <iostream>
+#include <string>
 
 #include "random_record_fill_in.h"
-#include "genie/core/writer.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 #define GENERATE_TEST_FILES false
 
@@ -68,9 +67,8 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
     likelihoodParameters = randomLikelihood.randomLikelihood();
 
     std::stringstream outputfile;
-
-    genie::util::BitWriter strwriter(outputfile);
     genie::util::BitReader strreader(outputfile);
+    genie::util::BitWriter strwriter(outputfile);
     likelihoodParameters.Write(strwriter);
     strwriter.FlushBits();
     likelihoodParametersCheck.read(strreader);
@@ -92,19 +90,11 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
     std::ofstream testfile;
     testfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (testfile.is_open()) {
-        genie::core::Writer writer(&testfile);
+        genie::util::BitWriter writer(testfile);
         likelihoodParameters.write(writer);
-        writer.flush();
+        writer.FlushBits();
         testfile.close();
     }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile, true);
-        likelihoodParameters.write(txtWriter);
-        txtfile.close();
-    }
-
 #endif
 }
 

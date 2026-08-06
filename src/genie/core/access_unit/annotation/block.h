@@ -9,30 +9,18 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <fstream>
-#include <iostream>
-#include <memory>
 #include <sstream>
-#include <string>
-#include <utility>
 #include <vector>
 
-#include "genie/core/constants.h"
-#include "genie/core/parameter/annotation/descriptor_configuration.h"
-#include "genie/core/writer.h"
-// #include "genie/genotype/genotype_parameters.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
-#include "block_header.h"
-#include "block_payload.h"
+#include "genie/core/access_unit/annotation/block_header.h"
+#include "genie/core/access_unit/annotation/block_payload.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace access_unit {
-namespace annotation {
+namespace genie::core::access_unit::annotation {
 
 class BlockData {
  public:
@@ -102,22 +90,16 @@ class Block {
 
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, uint8_t numChrs);
-    // DEPRECATED: Use write(util::BitWriter&) instead
-    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
+
     void set(BlockVectorData blockData);
     void set(BlockData& blockData);
     size_t getSize(util::BitWriter& writer) const;
-    // DEPRECATED: Use getSize(util::BitWriter&) instead
-    // size_t getSize(core::Writer& writesize) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace access_unit
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::access_unit::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

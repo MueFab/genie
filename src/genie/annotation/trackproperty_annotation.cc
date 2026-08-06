@@ -6,26 +6,18 @@
 
 #include "genie/annotation/trackproperty_annotation.h"
 
-#include <codecs/include/mpegg-codecs.h>
-
 #include <map>
-#include <set>
 #include <string>
-#include <vector>
 
-#include "genie/core/record/annotation_access_unit/TypedData.h"
-#include "genie/annotation/accessunit_composer.h"
-
-#include "genie/core/array_type.h"
-#include "genie/util/runtime_exception.h"
+#include "genie/trackproperty/trackproperty_parser.h"
+#include "genie/core/track_property_record/record.h"
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 
 void TrackPropertyAnnotation::parseInfoTags(std::string& recordInputFileName) {
     std::ifstream readForTags;
@@ -77,9 +69,10 @@ TrackPropertyUnits TrackPropertyAnnotation::parseTrackProperty(std::ifstream& in
     annotationParameterSet =
         parameterset.Compose(AT_ID, AG_class, {defaultTileSizeHeight, 0}, annotationEncodingParameters);
 
-    // Convert track_type to subtype
+    // Convert track_type to AnnotationSubtype
     // track_type values: GTF=2, GFF=3, BED=4, BEDGRAPH=5, WIG=6, BIGWIG=7, GENBANK=8
-    uint8_t subtype = static_cast<uint8_t>(trackType_);
+    core::access_unit::annotation::AnnotationSubtype subtype =
+        static_cast<core::access_unit::annotation::AnnotationSubtype>(trackType_);
 
     variant_site::AccessUnitComposer accessUnit;
     // Track properties use TRACK_PROPERTY type with subtype from track_type
@@ -126,5 +119,4 @@ void TrackPropertyAnnotation::setInfoFields(std::string jsonFileName) {
     infoFields = attributeParser.getInfoFields();
 }
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation

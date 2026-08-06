@@ -8,29 +8,22 @@
 #define SRC_GENIE_VARIANTSITE_ACCESSUNIT_COMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include <iostream>
+
 #include <map>
 #include <sstream>
 #include <string>
 #include <vector>
 
-#include "genie/core/array_type.h"
-#include "genie/core/constants.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-
 #include "genie/annotation/compressors.h"
+#include "genie/core/constants.h"
 #include "genie/core/access_unit/annotation/typed_data.h"
 #include "genie/core/access_unit/annotation/record.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
-#include "genie/core/parameter/annotation/attribute_parameter_set.h"
-#include "genie/core/parameter/annotation/compressor_parameter_set.h"
-#include "genie/core/parameter/annotation/descriptor_configuration.h"
 #include "genie/core/parameter/annotation/record.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace variant_site {
+namespace genie::variant_site {
 
 class AccessUnitComposer {
  public:
@@ -40,7 +33,7 @@ class AccessUnitComposer {
     // AG_class = annotationParameterSet;
     //   }
     void setATtype(core::access_unit::annotation::AnnotationType ATtype,
-                   uint8_t ATsubtype) {
+                   core::access_unit::annotation::AnnotationSubtype ATsubtype) {
         AT_type = ATtype;
         AT_subtype = ATsubtype;
     }
@@ -69,6 +62,8 @@ class AccessUnitComposer {
     bool columnMajorTileOrder = false;
     uint8_t ATCoordSize = 3;
     bool variable_size_tiles = false;
+    core::access_unit::annotation::AnnotationSubtype AT_subtype{
+        core::access_unit::annotation::AnnotationSubtype::VCF};
     uint64_t n_tiles_per_col = 1;
     uint64_t n_tiles_per_row = 1;
     uint64_t tile_index_1 = 0;
@@ -80,7 +75,6 @@ class AccessUnitComposer {
     uint8_t AT_ID = 1;
     uint8_t AG_class = 0;
     core::access_unit::annotation::AnnotationType AT_type {core::access_unit::annotation::AnnotationType::VARIANTS};
-    uint8_t AT_subtype {1};
     uint8_t numChrs = 0;
 
     void compress(const std::vector<genie::core::parameter::annotation::DescriptorConfiguration>&
@@ -98,8 +92,7 @@ class AccessUnitComposer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace variant_site
-}  // namespace genie
+}  // namespace genie::variant_site
 
 // ---------------------------------------------------------------------------------------------------------------------
 

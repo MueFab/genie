@@ -6,26 +6,20 @@
 
 #include "genie/annotation/site_annotation.h"
 
-#include <codecs/include/mpegg-codecs.h>
-
 // #include <chrono>
 #include <map>
 #include <string>
 #include <vector>
 
-#include "genie/core/access_unit/annotation/typed_data.h"
-#include "genie/annotation/accessunit_composer.h"
-
-#include "genie/core/array_type.h"
-#include "genie/util/runtime_exception.h"
+#include "genie/annotation/vsite_parameterset_composer.h"
+#include "genie/annotation/variantsite_parser.h"
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
-#include "genie/annotation/vsite_parameterset_composer.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 
 void SiteAnnotation::parseInfoTags(std::string& recordInputFileName) {
     std::ifstream readForTags;
@@ -38,7 +32,7 @@ void SiteAnnotation::parseInfoTags(std::string& recordInputFileName) {
         for (const auto& tag : infoTag) {
             InfoField infoField(tag.name, tag.type, static_cast<uint8_t>(tag.values.size()));
             genie::core::record::variant_site::Info_tag infotag{static_cast<uint8_t>(tag.name.size()), tag.name, tag.type,
-                                                                 static_cast<uint8_t>(tag.values.size()), tag.values};
+                                                                static_cast<uint8_t>(tag.values.size()), tag.values};
             infoTags[tag.name] = infotag;
             attributeInfo[tag.name] = infoField;
         }
@@ -68,7 +62,8 @@ SiteUnits SiteAnnotation::parseSite(std::ifstream& inputfile) {
     genie::variant_site::ParameterSetComposer encodeParameters;
 
     genie::variant_site::AccessUnitComposer accessUnit;
-    accessUnit.setATtype(core::access_unit::annotation::AnnotationType::VARIANTS, 1);
+    accessUnit.setATtype(core::access_unit::annotation::AnnotationType::VARIANTS,
+                         core::access_unit::annotation::AnnotationSubtype::VCF);
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;
@@ -110,5 +105,4 @@ void SiteAnnotation::setInfoFields(std::string jsonFileName) {
     infoFields = attributeParser.getInfoFields();
 }
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation

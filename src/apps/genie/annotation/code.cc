@@ -20,7 +20,7 @@
 #include "filesystem/filesystem.hpp"
 #include "genie/core/record/data_unit/record.h"
 #include "genie/core/record/variant/record.h"
-#include "genie/core/writer.h"
+#include "genie/util/bit_writer.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/annotation/accessunit_composer.h"
@@ -170,16 +170,6 @@ void encodeVariantSite(const std::string& _inputFileName,
               << std::to_string(dataUnitWriter.GetTotalBitsWritten() / 8)
               << std::endl;
     outputFile.close();
-    if (testOutput) {
-      genie::util::BitWriter txtWriter(txtFile);
-      APS_dataUnit.Write(txtWriter);
-      for (auto& aau : annotationAccessUnit) {
-        genie::core::record::data_unit::Record AAU_dataUnit(aau);
-        AAU_dataUnit.Write(txtWriter);
-      }
-      txtWriter.FlushBits();
-      txtFile.close();
-    }
   } else {
     std::cerr << "Failed to open file : " << SYSERROR() << std::endl;
   }

@@ -5,22 +5,13 @@
  */
 
 #include "genie/core/parameter/annotation/record.h"
-#include <algorithm>
-#include <iostream>
-#include <string>
-#include <utility>
+
+#include <sstream>
 #include <vector>
-#include "genie/core/array_type.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace annotation {
+namespace genie::core::parameter::annotation {
 
 Record::Record()
     : parameter_set_ID(0),
@@ -49,7 +40,7 @@ void Record::read(util::BitReader& reader) {
     parameter_set_ID = static_cast<uint8_t>(reader.ReadBits(8));
     AT_ID = static_cast<uint8_t>(reader.ReadBits(8));
     AT_alphabet_ID = static_cast<core::AlphabetId>(reader.ReadBits(8));
-    reader.ReadBits(2);
+    reader.ReadBits(2);  // reserved
     AT_coord_size = static_cast<uint8_t>(reader.ReadBits(2));
     AT_pos_40_bits_flag = static_cast<bool>(reader.ReadBits(1));
     n_aux_attribute_groups = static_cast<uint8_t>(reader.ReadBits(3));
@@ -58,46 +49,31 @@ void Record::read(util::BitReader& reader) {
     annotation_encoding_parameters.read(reader);
 }
 
-// DEPRECATED: Use write(util::BitWriter&) instead
-// void Record::write(Writer& writer) const {
-//   writer.Write(parameter_set_ID, 8);
-//     writer.Write(AT_ID, 8);
-//     writer.Write(static_cast<uint8_t>(AT_alphabet_ID), 8);
-//     writer.WriteReserved(2);
-//     writer.Write(AT_coord_size, 2);
-//     writer.Write(AT_pos_40_bits_flag, 1);
-//     writer.Write(n_aux_attribute_groups, 3);
-//     for (auto tileConfiguration : tile_configuration) tileConfiguration.write(writer);
-//     annotation_encoding_parameters.write(writer);
-// }
-
 void Record::write(util::BitWriter& writer) const {
-  writer.WriteBits(parameter_set_ID, 8);
-  writer.WriteBits(AT_ID, 8);
-  writer.WriteBits(static_cast<uint8_t>(AT_alphabet_ID), 8);
-  writer.WriteBits(0, 2);
-  writer.WriteBits(AT_coord_size, 2);
-  writer.WriteBits(AT_pos_40_bits_flag, 1);
-  writer.WriteBits(n_aux_attribute_groups, 3);
-  for (auto tileConfiguration : tile_configuration) tileConfiguration.write(writer);
-  annotation_encoding_parameters.write(writer);
+    writer.WriteBits(parameter_set_ID, 8);
+    writer.WriteBits(AT_ID, 8);
+    writer.WriteBits(static_cast<uint8_t>(AT_alphabet_ID), 8);
+    writer.WriteBits(0, 2);
+    writer.WriteBits(AT_coord_size, 2);
+    writer.WriteBits(AT_pos_40_bits_flag, 1);
+    writer.WriteBits(n_aux_attribute_groups, 3);
+    for (auto tileConfiguration : tile_configuration) tileConfiguration.write(writer);
+    annotation_encoding_parameters.write(writer);
 }
 
 size_t Record::getSize() const {
-    return 0;  // Placeholder - getSize(core::Writer&) is deprecated
+    std::stringstream SizeOut;
+    util::BitWriter writesize(SizeOut);
+    return getSize(writesize);
 }
 
-// DEPRECATED: Use getSize(util::BitWriter&) instead
-// size_t Record::getSize(core::Writer& writesize) const {
-//     write(writesize);
-//     return writesize.GetBitsWritten();
-// }
+size_t Record::getSize(util::BitWriter& writer) const {
+    write(writer);
+    return writer.GetTotalBitsWritten();
+}
 
 
-}  // namespace annotation
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

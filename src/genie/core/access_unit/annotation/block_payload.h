@@ -9,27 +9,16 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <fstream>
-#include <iostream>
-#include <memory>
 #include <sstream>
-#include <string>
-#include <utility>
 #include <vector>
 
 #include "genie/core/constants.h"
-// #include "genie/core/parameter/annotation/descriptor_configuration.h"
-#include "genie/core/writer.h"
-// #include "genie/genotype/genotype_parameters.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace access_unit {
-namespace annotation {
+namespace genie::core::access_unit::annotation {
 
 class BlockPayload {
  private:
@@ -53,12 +42,8 @@ class BlockPayload {
 
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, AnnotDesc descriptorID, uint8_t numChrs);
-    // DEPRECATED: Use write(util::BitWriter&) instead
-    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
     size_t getSize(util::BitWriter& writer) const;
-    // DEPRECATED: Use getSize(util::BitWriter&) instead
-    // size_t getSize(core::Writer& writesize) const;
 
 
     BlockPayload& operator=(const BlockPayload& other) {
@@ -81,10 +66,7 @@ class BlockPayload {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace access_unit
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::access_unit::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

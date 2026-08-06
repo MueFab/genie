@@ -5,20 +5,10 @@
  */
 
 #include "genie/core/access_unit/annotation/block.h"
-#include <algorithm>
-#include <iostream>
-#include <string>
-#include <utility>
-#include "genie/util/bit_reader.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace access_unit {
-namespace annotation {
+namespace genie::core::access_unit::annotation {
 
 Block::Block() : block_header{}, block_payload{}, numChrs(0) {}
 
@@ -39,15 +29,9 @@ void Block::read(util::BitReader& reader, uint8_t num_Chrs) {
     read(reader);
 }
 
-// DEPRECATED: Use write(util::BitWriter&) instead
-// void Block::write(core::Writer& writer) const {
-//     block_header.write(writer);
-//     block_payload.write(writer);
-// }
-
 void Block::write(util::BitWriter& writer) const {
-  block_header.write(writer);
-  block_payload.write(writer);
+    block_header.write(writer);
+    block_payload.write(writer);
 }
 
 void Block::set(BlockVectorData blockData) {
@@ -74,21 +58,12 @@ void Block::set(BlockData& blockData) {
     block_payload = payload;
 }
 
-size_t Block::getSize(util::BitWriter& writesize) const {
-    write(writesize);
-    return writesize.GetTotalBitsWritten();
+size_t Block::getSize(util::BitWriter& writer) const {
+    write(writer);
+    return writer.GetTotalBitsWritten();
 }
 
-// DEPRECATED: Use getSize(util::BitWriter&) instead
-// size_t Block::getSize(core::Writer& writesize) const {
-//     write(writesize);
-//     return writesize.GetBitsWritten();
-// }
-
-}  // namespace annotation
-}  // namespace access_unit
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::access_unit::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

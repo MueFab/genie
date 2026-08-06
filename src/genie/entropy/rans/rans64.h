@@ -277,7 +277,7 @@ static inline void Rans64EncSymbolInit(Rans64EncSymbol* s, uint32_t start, uint3
 // Initialize a decoder symbol to start "start" and frequency "freq"
 static inline void Rans64DecSymbolInit(Rans64DecSymbol* s, uint32_t start, uint32_t freq)
 {
-    Rans64Assert(start <= (1 << 31));
+    Rans64Assert(start <= (1u << 31));
     Rans64Assert(freq <= (1 << 31) - start);
     s->start = start;
     s->freq = freq;

@@ -6,24 +6,16 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
-#include "genie/core/constants.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
+#include "genie/core/parameter/annotation/attribute_parameter_set.h"
 
-#include "attribute_parameter_set.h"
+#include <string>
+#include <vector>
+
 #include "genie/core/array_type.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace annotation {
+namespace genie::core::parameter::annotation {
 
 AttributeParameterSet::AttributeParameterSet(const AttributeParameterSet& rec) { *this = rec; }
 
@@ -165,81 +157,44 @@ void AttributeParameterSet::read(util::BitReader& reader) {
     reader.FlushHeldBits();
 }
 
-// DEPRECATED: Use write(util::BitWriter&) instead
-// void AttributeParameterSet::write(core::Writer& writer) const {
-//     ArrayType curType;
-//     writer.Write(attribute_ID, 16);
-//     writer.Write(attribute_name_len, 8);
-//     writer.Write(attribute_name);
-//     writer.Write(static_cast<uint8_t>(attribute_type), 8);
-//     writer.Write(attribute_num_array_dims, 2);
-//     for (auto attribute_dim : attribute_array_dims)
-//       writer.Write(attribute_dim, 8);
-//     curType.toFile(attribute_type, attribute_default_val, writer);
-//
-//     writer.Write(attribute_miss_val_flag, 1);
-//     if (attribute_miss_val_flag) {
-//       writer.Write(attribute_miss_default_flag, 1);
-//         if (!attribute_miss_default_flag) curType.toFile(attribute_type, attribute_miss_val, writer);
-//         writer.Write(attribute_miss_str);
-//         writer.WriteReserved(8);
-//     }
-//
-//     writer.Write(compressor_ID, 8);
-//     writer.Write(n_steps_with_dependencies, 4);
-//     for (auto idx_i = 0; idx_i < n_steps_with_dependencies; ++idx_i) {
-//       writer.Write(dependency_step_ID[idx_i], 4);
-//         writer.Write(n_dependencies[idx_i], 4);
-//         for (auto idx_j = 0; idx_j < n_dependencies[idx_i]; ++idx_j) {
-//           writer.Write(dependency_var_ID[idx_i][idx_j], 4);
-//             writer.Write(dependency_is_attribute[idx_i][idx_j], 1);
-//             if (dependency_is_attribute[idx_i][idx_j])
-//               writer.Write(dependency_ID[idx_i][idx_j], 16);
-//             else
-//               writer.Write(dependency_ID[idx_i][idx_j], 7);
-//         }
-//     }
-//     writer.Flush();
-// }
-
 void AttributeParameterSet::write(util::BitWriter& writer) const {
-  ArrayType curType;
-  writer.WriteBits(attribute_ID, 16);
-  writer.WriteBits(attribute_name_len, 8);
-  for (char c : attribute_name) {
-    writer.WriteBits(static_cast<uint8_t>(c), 8);
-  }
-  writer.WriteBits(static_cast<uint8_t>(attribute_type), 8);
-  writer.WriteBits(attribute_num_array_dims, 2);
-  for (auto attribute_dim : attribute_array_dims)
-    writer.WriteBits(attribute_dim, 8);
-  curType.toFile(attribute_type, attribute_default_val, writer);
-
-  writer.WriteBits(attribute_miss_val_flag, 1);
-  if (attribute_miss_val_flag) {
-    writer.WriteBits(attribute_miss_default_flag, 1);
-    if (!attribute_miss_default_flag) curType.toFile(attribute_type, attribute_miss_val, writer);
-    for (char c : attribute_miss_str) {
-      writer.WriteBits(static_cast<uint8_t>(c), 8);
+    ArrayType curType;
+    writer.WriteBits(attribute_ID, 16);
+    writer.WriteBits(attribute_name_len, 8);
+    for (char c : attribute_name) {
+        writer.WriteBits(static_cast<uint8_t>(c), 8);
     }
-    writer.WriteBits(0, 8);
-  }
+    writer.WriteBits(static_cast<uint8_t>(attribute_type), 8);
+    writer.WriteBits(attribute_num_array_dims, 2);
+    for (auto attribute_dim : attribute_array_dims)
+        writer.WriteBits(attribute_dim, 8);
+    curType.toFile(attribute_type, attribute_default_val, writer);
 
-  writer.WriteBits(compressor_ID, 8);
-  writer.WriteBits(n_steps_with_dependencies, 4);
-  for (auto idx_i = 0; idx_i < n_steps_with_dependencies; ++idx_i) {
-    writer.WriteBits(dependency_step_ID[idx_i], 4);
-    writer.WriteBits(n_dependencies[idx_i], 4);
-    for (auto idx_j = 0; idx_j < n_dependencies[idx_i]; ++idx_j) {
-      writer.WriteBits(dependency_var_ID[idx_i][idx_j], 4);
-      writer.WriteBits(dependency_is_attribute[idx_i][idx_j], 1);
-      if (dependency_is_attribute[idx_i][idx_j])
-        writer.WriteBits(dependency_ID[idx_i][idx_j], 16);
-      else
-        writer.WriteBits(dependency_ID[idx_i][idx_j], 7);
+    writer.WriteBits(attribute_miss_val_flag, 1);
+    if (attribute_miss_val_flag) {
+        writer.WriteBits(attribute_miss_default_flag, 1);
+        if (!attribute_miss_default_flag) curType.toFile(attribute_type, attribute_miss_val, writer);
+        for (char c : attribute_miss_str) {
+            writer.WriteBits(static_cast<uint8_t>(c), 8);
+        }
+        writer.WriteBits(0, 8);  // string-terminator
     }
-  }
-  writer.FlushBits();
+
+    writer.WriteBits(compressor_ID, 8);
+    writer.WriteBits(n_steps_with_dependencies, 4);
+    for (auto idx_i = 0; idx_i < n_steps_with_dependencies; ++idx_i) {
+        writer.WriteBits(dependency_step_ID[idx_i], 4);
+        writer.WriteBits(n_dependencies[idx_i], 4);
+        for (auto idx_j = 0; idx_j < n_dependencies[idx_i]; ++idx_j) {
+            writer.WriteBits(dependency_var_ID[idx_i][idx_j], 4);
+            writer.WriteBits(dependency_is_attribute[idx_i][idx_j], 1);
+            if (dependency_is_attribute[idx_i][idx_j])
+                writer.WriteBits(dependency_ID[idx_i][idx_j], 16);
+            else
+                writer.WriteBits(dependency_ID[idx_i][idx_j], 7);
+        }
+    }
+    writer.FlushBits();
 }
 
 size_t AttributeParameterSet::getSize(util::BitWriter& writesize) const {
@@ -247,18 +202,9 @@ size_t AttributeParameterSet::getSize(util::BitWriter& writesize) const {
     return writesize.GetTotalBitsWritten();
 }
 
-// DEPRECATED: Use getSize(util::BitWriter&) instead
-// size_t AttributeParameterSet::getSize(core::Writer& writesize) const {
-//     write(writesize);
-//     return writesize.GetBitsWritten();
-// }
-
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

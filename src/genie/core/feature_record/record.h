@@ -10,8 +10,6 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -20,7 +18,6 @@
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "genie/util/bit_writer.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -186,8 +183,7 @@ class Record {
    * @brief Writes record data to a writer
    * @param writer The writer to write to
    */
-  // DEPRECATED: No longer needed
-  // void Write(core::Writer& writer);
+  void Write(util::BitWriter& writer);
 
   /**
    * @brief Gets the feature index

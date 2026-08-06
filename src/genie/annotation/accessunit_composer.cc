@@ -3,31 +3,17 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
+
 #include "genie/annotation/accessunit_composer.h"
 
-#include <algorithm>
+#include <map>
 #include <string>
+#include <vector>
 
-#include "genie/core/access_unit/annotation/annotation_access_unit_header.h"
-#include "genie/core/access_unit/annotation/block.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
-#include "genie/annotation/variantsite_parser.h"
-
-#include "genie/core/record/variant/record.h"
-#include "genie/core/record/site/record.h"
-
-#include "genie/entropy/bsc/encoder.h"
-#include "genie/entropy/lzma/encoder.h"
-#include "genie/entropy/zstd/encoder.h"
-
-#include <filesystem>
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace variant_site {
+namespace genie::variant_site {
+
 void AccessUnitComposer::setAccessUnit(
     std::map<core::AnnotDesc, std::stringstream>& _descriptorStream,
     std::map<std::string, core::access_unit::annotation::TypedData>& _attributeTileStream,
@@ -198,8 +184,7 @@ void AccessUnitComposer::compress(genie::core::access_unit::annotation::TypedDat
     }
 }
 
-}  // namespace variant_site
-}  // namespace genie
+}  // namespace genie::variant_site
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

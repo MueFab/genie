@@ -4,8 +4,8 @@
 * https://github.com/mitogen/genie for more details.
 */
 
-#ifndef GENIE_SRC_GENIE_GENOTYPE_BIN_MAT_PAYLOAD_H_
-#define GENIE_SRC_GENIE_GENOTYPE_BIN_MAT_PAYLOAD_H_
+#ifndef SRC_GENIE_GENOTYPE_BIN_MAT_PAYLOAD_H_
+#define SRC_GENIE_GENOTYPE_BIN_MAT_PAYLOAD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -43,8 +43,7 @@ class BinMatPayload {
       core::AlgoID codec_id,
       std::vector<uint8_t>&& payload,
       uint32_t nrows,
-      uint32_t ncols
-  );
+      uint32_t ncols);
 
   // Copy constructor
   BinMatPayload(const BinMatPayload& other);
@@ -56,8 +55,7 @@ class BinMatPayload {
   BinMatPayload(
       util::BitReader& reader,
       size_t payload_size,
-      core::AlgoID codec_ID
-  );
+      core::AlgoID codec_ID);
 
   // Copy assignment operator
   BinMatPayload& operator=(const BinMatPayload& other);
@@ -86,7 +84,7 @@ class BinMatPayload {
   // Methods
   [[maybe_unused]] size_t GetPayloadSize() const;
   size_t GetSize() const;
-//  void WriteCompressed(core::Writer& writer) const;
+//  void WriteCompressed(util::BitWriter& writer) const;
 
   // Function to write to writer
   void Write(util::BitWriter& writer) const;
@@ -98,6 +96,6 @@ class BinMatPayload {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SRC_GENIE_GENOTYPE_BIN_MAT_PAYLOAD_H_
+#endif  // SRC_GENIE_GENOTYPE_BIN_MAT_PAYLOAD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------

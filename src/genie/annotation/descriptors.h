@@ -8,25 +8,18 @@
 #define SRC_GENIE_VARIANTSITE_DESCRIPTORS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include <cstdint>
-#include <iostream>
+
 #include <map>
-#include <memory>
-#include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "genie/core/constants.h"
 #include "genie/core/record/site/record.h"
-#include "genie/core/writer.h"
-#include "genie/util/bit_reader.h"
 #include "genie/annotation/tiles.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace variant_site {
+namespace genie::variant_site {
 
 class Descriptors {
  public:
@@ -62,8 +55,7 @@ class Descriptors {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace variant_site
-}  // namespace genie
+}  // namespace genie::variant_site
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -6,26 +6,19 @@
 
 #include "genie/annotation/functional_annotation.h"
 
-#include <codecs/include/mpegg-codecs.h>
-
 #include <map>
 #include <set>
 #include <string>
-#include <vector>
 
-#include "genie/core/record/annotation_access_unit/TypedData.h"
-#include "genie/annotation/accessunit_composer.h"
-
-#include "genie/core/array_type.h"
-#include "genie/util/runtime_exception.h"
+#include "genie/functionalannotation/functionalannotation_parser.h"
+#include "genie/core/functional_annotation_record/record.h"
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 
 void FunctionalAnnotation::parseInfoTags(std::string& recordInputFileName) {
     std::ifstream readForTags;
@@ -34,7 +27,7 @@ void FunctionalAnnotation::parseInfoTags(std::string& recordInputFileName) {
     core::record::functional_annotation::Record recs;
     std::set<std::string> uniqueFeatureNames;
     std::set<std::string> uniqueOntologyNames;
-    maxOntologiesPerRecord = 1; // minimum 1, so descriptor won't be empty
+    maxOntologiesPerRecord = 1;  // minimum 1, so descriptor won't be empty
 
     while (recs.Read(bitreader)) {
         const auto& attrs = recs.GetAttributes();
@@ -132,5 +125,4 @@ void FunctionalAnnotation::setInfoFields(std::string jsonFileName) {
     infoFields = attributeParser.getInfoFields();
 }
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation

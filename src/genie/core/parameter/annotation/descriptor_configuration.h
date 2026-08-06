@@ -9,28 +9,20 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
 #include <vector>
+
+#include "genie/contact/contact_matrix_parameters.h"
+#include "genie/contact/subcontact_matrix_parameters.h"
+#include "genie/genotype/genotype_parameters.h"
+#include "genie/likelihood/likelihood_parameters.h"
+#include "genie/core/parameter/annotation/algorithm_parameters.h"
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-#include "algorithm_parameters.h"
-#include "genie/contact/contact_matrix_parameters.h"
-#include "genie/contact/subcontact_matrix_parameters.h"
-#include "genie/core/writer.h"
-#include "genie/genotype/genotype_parameters.h"
-#include "genie/likelihood/likelihood_parameters.h"
-
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace annotation {
+namespace genie::core::parameter::annotation {
 
 class DescriptorConfiguration {
  private:
@@ -50,17 +42,14 @@ class DescriptorConfiguration {
 
     explicit DescriptorConfiguration(genie::likelihood::LikelihoodParameters likelihood_parameters);
 
-    DescriptorConfiguration(genie::contact::ContactMatrixParameters _contact_matrix_parameters, std::vector<genie::contact::SubcontactMatrixParameters> _subconstract_matrix_parameters);
+    DescriptorConfiguration(genie::contact::ContactMatrixParameters _contact_matrix_parameters,
+                            std::vector<genie::contact::SubcontactMatrixParameters> _subconstract_matrix_parameters);
 
     DescriptorConfiguration(AnnotDesc descriptor_ID, AlgoID encoding_mode_ID, AlgorithmParameters algorithm_parameters);
 
     void read(util::BitReader& reader);
-    // DEPRECATED: Use write(util::BitWriter&) instead
-    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
     size_t getSize(util::BitWriter& writesize) const;
-    // DEPRECATED: Use getSize(util::BitWriter&) instead
-    // size_t getSize(core::Writer& write_size) const;
     AnnotDesc getDescriptorID() const { return descriptor_ID; }
     AlgoID getEncodingModeID() const { return encoding_mode_ID; }
 
@@ -75,10 +64,7 @@ class DescriptorConfiguration {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

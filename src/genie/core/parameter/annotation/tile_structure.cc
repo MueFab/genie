@@ -6,23 +6,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
-#include "genie/core/constants.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
+#include "genie/core/parameter/annotation/tile_structure.h"
 
-#include "tile_structure.h"
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace annotation {
+namespace genie::core::parameter::annotation {
 
 uint8_t TileStructure::coordSizeInBits(uint8_t size) const {
     switch (size) {
@@ -118,41 +108,23 @@ void TileStructure::read(util::BitReader& reader) {
     }
 }
 
-// DEPRECATED: Use write(util::BitWriter&) instead
-// void TileStructure::write(core::Writer& writer) const {
-//   writer.WriteReserved(7);
-//     writer.Write(variable_size_tiles, 1);
-//     writer.Write(n_tiles, coordSizeInBits(ATCoordSize));
-//
-//     auto dimensions = two_dimensional ? 2 : 1;
-//     if (variable_size_tiles) {
-//         for (uint64_t idx_i = 0; idx_i < n_tiles; ++idx_i)
-//             for (auto idx_j = 0; idx_j < dimensions; ++idx_j) {
-//               writer.Write(start_index[idx_i][idx_j], coordSizeInBits(ATCoordSize));
-//                 writer.Write(end_index[idx_i][idx_j], coordSizeInBits(ATCoordSize));
-//             }
-//     } else {
-//         for (auto idx_j = 0; idx_j < dimensions; ++idx_j)
-//           writer.Write(tile_size[idx_j], coordSizeInBits(ATCoordSize));
-//     }
-// }
-
 void TileStructure::write(util::BitWriter& writer) const {
-  writer.WriteBits(0, 7);
-  writer.WriteBits(variable_size_tiles, 1);
-  writer.WriteBits(n_tiles, coordSizeInBits(ATCoordSize));
+    writer.WriteBits(0, 7);
+    writer.WriteBits(variable_size_tiles, 1);
+    writer.WriteBits(n_tiles, coordSizeInBits(ATCoordSize));
 
-  auto dimensions = two_dimensional ? 2 : 1;
-  if (variable_size_tiles) {
-    for (uint64_t idx_i = 0; idx_i < n_tiles; ++idx_i)
-      for (auto idx_j = 0; idx_j < dimensions; ++idx_j) {
-        writer.WriteBits(start_index[idx_i][idx_j], coordSizeInBits(ATCoordSize));
-        writer.WriteBits(end_index[idx_i][idx_j], coordSizeInBits(ATCoordSize));
-      }
-  } else {
-    for (auto idx_j = 0; idx_j < dimensions; ++idx_j)
-      writer.WriteBits(tile_size[idx_j], coordSizeInBits(ATCoordSize));
-  }
+    auto dimensions = two_dimensional ? 2 : 1;
+    if (variable_size_tiles) {
+        for (uint64_t idx_i = 0; idx_i < n_tiles; ++idx_i)
+            for (auto idx_j = 0; idx_j < dimensions; ++idx_j) {
+                writer.WriteBits(start_index[idx_i][idx_j], coordSizeInBits(ATCoordSize));
+                writer.WriteBits(end_index[idx_i][idx_j], coordSizeInBits(ATCoordSize));
+            }
+    } else {
+        for (auto idx_j = 0; idx_j < dimensions; ++idx_j) {
+            writer.WriteBits(tile_size[idx_j], coordSizeInBits(ATCoordSize));
+        }
+    }
 }
 
 
@@ -161,18 +133,9 @@ size_t TileStructure::getSize(util::BitWriter& writesize) const {
     return writesize.GetTotalBitsWritten();
 }
 
-// DEPRECATED: Use getSize(util::BitWriter&) instead
-// size_t TileStructure::getSize(core::Writer& writesize) const {
-//     write(writesize);
-//     return writesize.GetBitsWritten();
-// }
-
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

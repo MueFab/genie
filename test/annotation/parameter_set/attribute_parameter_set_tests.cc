@@ -5,12 +5,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
-#include <fstream>
-#include <iostream>
+#include <string>
+#include <vector>
 
-#include "genie/core/writer.h"
 #include "random_record_fill_in.h"
-#include "genie/core/parameter/annotation/attribute_parameter_set.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 #define GENERATE_TEST_FILES false
 
@@ -96,10 +95,11 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetValues) {  // NOLINT(cer
     EXPECT_EQ(attributeParameterSet.getCompressorID(), 4);
 
     std::stringstream InOut;
-    genie::core::Writer strwriter(&InOut);
+    genie::util::BitWriter strwriter(InOut);
     attributeParameterSet.write(strwriter);
 
-        genie::core::Writer writeSize;
+    std::stringstream SizeOut;
+    genie::util::BitWriter writeSize(SizeOut);
     auto size = attributeParameterSet.getSize(writeSize);
     if (size % 8 != 0) size += (8 - size % 8);
     EXPECT_EQ(InOut.str().size(), size / 8);
@@ -116,19 +116,20 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetRandom) {  // NOLINT(cer
     attributeParameterSet = randomattributeParameterSet.randomAttributeParameterSet();
 
     std::stringstream InOut;
-    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
+    genie::util::BitWriter strwriter(InOut);
     attributeParameterSet.write(strwriter);
-    strwriter.Flush();
+    strwriter.FlushBits();
     attributeParameterSetCheck.read(strreader);
     std::stringstream TestOut;
-    genie::core::Writer teststrwriter(&TestOut);
+    genie::util::BitWriter teststrwriter(TestOut);
     attributeParameterSetCheck.write(teststrwriter);
-    teststrwriter.Flush();
+    teststrwriter.FlushBits();
 
     EXPECT_EQ(InOut.str(), TestOut.str());
 
-        genie::core::Writer writeSize;
+    std::stringstream sizeOut;
+    genie::util::BitWriter writeSize(sizeOut);
     auto size = attributeParameterSet.getSize(writeSize);
     if (size % 8 != 0) size += (8 - size % 8);
     EXPECT_EQ(InOut.str().size(), size / 8);
@@ -148,24 +149,16 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetRandom) {  // NOLINT(cer
     EXPECT_EQ(attributeParameterSet.getAttributeNameLength(), attributeParameterSetCheck.getAttributeNameLength());
 
 #if GENERATE_TEST_FILES
-
     std::string name = "TestFiles/AttributeParameterSet_seed_";
     name += std::to_string(rand() % 10);
 
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::core::Writer writer(&outputfile);
+        genie::util::BitWriter writer(outputfile);
         attributeParameterSet.write(writer);
-        writer.flush();
+        writer.FlushBits();
         outputfile.close();
-    }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile, true);
-        attributeParameterSet.write(txtWriter);
-        txtfile.close();
     }
 #endif
 }

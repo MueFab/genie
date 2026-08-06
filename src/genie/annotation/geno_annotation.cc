@@ -6,8 +6,6 @@
 
 #include "genie/annotation/geno_annotation.h"
 
-#include <codecs/include/mpegg-codecs.h>
-
 #include <algorithm>
 #include <iostream>
 #include <map>
@@ -18,21 +16,12 @@
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
-#include "genie/core/array_type.h"
-#include "genie/core/constants.h"
-#include "genie/core/access_unit/annotation/typed_data.h"
-#include "genie/entropy/bsc/encoder.h"
-#include "genie/entropy/jbig/encoder.h"
-#include "genie/entropy/lzma/encoder.h"
-#include "genie/entropy/zstd/encoder.h"
-#include "genie/genotype/genotype_coder.h"
-#include "genie/genotype/genotype_payload.h"
-#include "genie/util/runtime_exception.h"
 #include "genie/annotation/accessunit_composer.h"
+#include "genie/likelihood/likelihood_payload.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 
 std::vector<GenoUnits> GenoAnnotation::parseGenotype(
     std::ifstream& inputfile,
@@ -51,7 +40,7 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(
   combined = std::move(blocksWPars.at(0));
   //--------------
 
-  for (auto idx_i = 1; idx_i < blocksWPars.size(); ++idx_i) {
+  for (auto idx_i = 1u; idx_i < blocksWPars.size(); ++idx_i) {
     combined.blocks.push_back(std::move(blocksWPars.at(idx_i).blocks.at(0)));
   }
   std::map<std::string, core::parameter::annotation::AttributeData>
@@ -117,8 +106,8 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(
       combined.blocks.at(blockIndex).payload.Write(writer);
     }
     variant_site::AccessUnitComposer accessUnitcomposer;
-    accessUnitcomposer.setATtype(
-        core::access_unit::annotation::AnnotationType::VARIANTS, 1);
+    accessUnitcomposer.setATtype(core::access_unit::annotation::AnnotationType::VARIANTS,
+                                 core::access_unit::annotation::AnnotationSubtype::VCF);
 
     accessUnitcomposer.setCompressors(compressors);
 
@@ -178,7 +167,7 @@ size_t GenoAnnotation::readBlocks(std::ifstream& inputfile,
   return TotalnumberOfRows;
 }
 
-size_t genie::annotation::GenoAnnotation::readOneBlock(
+size_t GenoAnnotation::readOneBlock(
     genie::util::BitReader& reader, const uint32_t& rowTileSize,
     genie::genotype::GenotypeParameters& genotypeParameters,
     genie::likelihood::LikelihoodParameters& likelihoodParameters,
@@ -273,7 +262,7 @@ void GenoAnnotation::sort_format(
   for (const auto& format : recs.at(0).GetFormat()) {
     const auto& formatName = format.GetFormat();
     core::parameter::annotation::AttributeData attrData(
-        formatName.size(), formatName, format.GetType(),
+        static_cast<uint8_t>(formatName.size()), formatName, format.GetType(),
         format.GetArrayLength(), AttributeID);
     attrInfo[formatName] = attrData;
     AttributeID++;
@@ -363,5 +352,4 @@ void GenoAnnotation::RecData::set(
   attributes = _attributes;
 }
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation

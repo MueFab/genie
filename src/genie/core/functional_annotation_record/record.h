@@ -9,21 +9,12 @@
 #define SRC_GENIE_CORE_FUNCTIONAL_ANNOTATION_RECORD_RECORD_H_
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <ostream>
 #include <string>
-#include <utility>
 #include <vector>
 
-#include "genie/core/array_type.h"
 #include "genie/core/access_unit/annotation/attribute_field.h"
-#include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "genie/util/bit_writer.impl.h"
-// DEPRECATED: core::Writer no longer used
-// #include "genie/core/writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

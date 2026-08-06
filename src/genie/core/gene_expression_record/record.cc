@@ -45,7 +45,7 @@ bool Record::Read(genie::util::BitReader& reader) {
     auto& expr_attr = expression_attributes[j];
     auto expr_attr_values = expr_attr.GetAttrValues();
     expr_attr_values.resize(sample_count);
-    for (auto i = 0; i < sample_count; ++i) {
+    for (auto i = 0u; i < sample_count; ++i) {
       expr_attr_values[i].resize(expr_attr.GetAttrArrayLen());
       for (auto k = 0; k < expr_attr.GetAttrArrayLen(); ++k) {
         std::vector<uint8_t> value = arrayType.toArray(expr_attr.GetAttrType(), reader);

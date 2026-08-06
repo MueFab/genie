@@ -5,12 +5,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
-#include <fstream>
-#include <iostream>
-#include "genie/core/writer.h"
+#include <string>
+#include <vector>
 
 #include "random_record_fill_in.h"
-#include "genie/core/parameter/annotation/compressor_parameter_set.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 #define GENERATE_TEST_FILES false
 
@@ -134,12 +133,12 @@ TEST_F(CompressorParameterSetTests, CompressorParameterSetRandom) {  // NOLINT(c
     compressorParameterSet = RandomContactMatrixParameters.randomCompressorParameterSet();
 
     std::stringstream InOut;
-    //(std::stringstream::in | std::stringstream::out | std::stringstream::binary);
-    genie::core::Writer strwriter(&InOut);
+    // (std::stringstream::in | std::stringstream::out | std::stringstream::binary);
     genie::util::BitReader strreader(InOut);
+    genie::util::BitWriter strwriter(InOut);
     compressorParameterSet.write(strwriter);
     compressorParameterSet.write(strwriter);
-    strwriter.Flush();
+    strwriter.FlushBits();
     compressorParameterSetCheck.read(strreader);
     compressorParameterSetCheck2.read(strreader);
 
@@ -160,17 +159,10 @@ TEST_F(CompressorParameterSetTests, CompressorParameterSetRandom) {  // NOLINT(c
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::core::Writer writer(&outputfile);
+        genie::util::BitWriter writer(outputfile);
         compressorParameterSet.write(writer);
-        writer.flush();
+        writer.FlushBits();
         outputfile.close();
-    }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile, true);
-        compressorParameterSet.write(txtWriter);
-        txtfile.close();
     }
 #endif
 }

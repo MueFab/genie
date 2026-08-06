@@ -2,25 +2,25 @@ project("genie-annotation")
 
 set(source_files
         annotation.cc
-		geno_annotation.cc
-		site_annotation.cc
-		contact_annotation.cc
+	geno_annotation.cc
+	site_annotation.cc
+	contact_annotation.cc
         compressors.cc
-		parameterset_composer.cc
-		annotation_encoder.cc
-		json_attribute_parser.cc
-		variantsite_parser.cc
-		vsite_parameterset_composer.cc
-		accessunit_composer.cc
-		vsite_attributes.cc
-		vsite_descriptors.cc
-		vsite_tiles.cc
-		gene_expression_annotation.cc
-		functional_annotation.cc
-		sample_annotation.cc
-		track_data_annotation.cc
-		trackproperty_annotation.cc
-		feature_annotation.cc
+	parameterset_composer.cc
+	annotation_encoder.cc
+	json_attribute_parser.cc
+	variantsite_parser.cc
+	vsite_parameterset_composer.cc
+	accessunit_composer.cc
+	vsite_attributes.cc
+	vsite_descriptors.cc
+	vsite_tiles.cc
+	gene_expression_annotation.cc
+	functional_annotation.cc
+	sample_annotation.cc
+	track_data_annotation.cc
+	trackproperty_annotation.cc
+	feature_annotation.cc
 )
 
 add_library(${PROJECT_NAME} ${source_files})

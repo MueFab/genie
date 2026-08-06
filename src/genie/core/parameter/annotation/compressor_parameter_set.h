@@ -9,23 +9,16 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
 #include <vector>
+
+#include "genie/core/parameter/annotation/algorithm_parameters.h"
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-#include "algorithm_parameters.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace annotation {
+namespace genie::core::parameter::annotation {
 
 struct compressorStep {
     uint8_t stepID{0};
@@ -58,13 +51,9 @@ class CompressorParameterSet {
     void addCompressorStep(compressorStep stepParameters);
 
     void read(util::BitReader& reader);
-    // DEPRECATED: Use write(util::BitWriter&) instead
-    // void write(core::Writer& writer) const;
     void write(util::BitWriter& writer) const;
 
     size_t getSize(util::BitWriter& writesize) const;
-    // DEPRECATED: Use getSize(util::BitWriter&) instead
-    // size_t getSize(core::Writer& writesize) const;
 
     uint8_t getCompressorID() const { return compressor_ID; }
     uint8_t getNumberOfCompressorSteps() const { return static_cast<uint8_t>(compressorSteps.size()); }
@@ -98,10 +87,7 @@ class CompressorParameterSet {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

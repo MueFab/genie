@@ -6,25 +6,18 @@
 
 #include "genie/annotation/sample_annotation.h"
 
-#include <codecs/include/mpegg-codecs.h>
-
 #include <algorithm>
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
 
-#include "genie/core/record/annotation_access_unit/TypedData.h"
-#include "genie/annotation/accessunit_composer.h"
-
-#include "genie/core/array_type.h"
-#include "genie/util/runtime_exception.h"
+#include "genie/variantsample/variantsample_parser.h"
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 
 void SampleAnnotation::parseInfoTags(std::string& recordInputFileName) {
   std::ifstream readForTags;
@@ -98,5 +91,4 @@ SampleUnits SampleAnnotation::parseSample(std::ifstream& inputfile) {
   return SampleUnits{annotationParameterSet, annotationAccessUnits};
 }
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation

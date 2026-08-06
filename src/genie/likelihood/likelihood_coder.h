@@ -45,6 +45,6 @@ void extract_likelihoods(
 void transform_likelihood_mat(const EncodingOptions& opt, LikelihoodEncodingBlock& block);
 void inverse_transform_likelihood_mat(const EncodingOptions& opt, LikelihoodEncodingBlock& block);
 
-} // namespace genie::likelihood
+}  // namespace genie::likelihood
 
-#endif // GENIE_LIKELIHOOD_LIKELIHOOD_CODER_H
+#endif  // GENIE_LIKELIHOOD_LIKELIHOOD_CODER_H

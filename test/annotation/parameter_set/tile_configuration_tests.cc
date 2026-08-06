@@ -5,11 +5,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
-#include <fstream>
-#include <iostream>
+#include <string>
 
 #include "random_record_fill_in.h"
-#include "genie/core/parameter/annotation/tile_configuration.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 #define GENERATE_TEST_FILES false
 
@@ -81,17 +80,18 @@ TEST_F(TileConfigurationTests, TileConfigurationRandom) {  // NOLINT(cert-err58-
 
     tileConfiguration = randomTileConfiguration.randomTileConfiguration(AT_coord_size);
     std::stringstream InOut;
-    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
+    genie::util::BitWriter strwriter(InOut);
     tileConfiguration.write(strwriter);
-    strwriter.Flush();
+    strwriter.FlushBits();
     tileConfigurationCheck.read(strreader);
     std::stringstream CheckOut;
-    genie::core::Writer checkWriter(&CheckOut);
+    genie::util::BitWriter checkWriter(CheckOut);
     tileConfigurationCheck.write(checkWriter);
-    checkWriter.Flush();
+    checkWriter.FlushBits();
 
-        genie::core::Writer writeSize;
+    std::stringstream SizeOut;
+    genie::util::BitWriter writeSize(SizeOut);
     auto size = tileConfiguration.getSize(writeSize);
     if (size % 8 != 0) size += (8 - size % 8);
     EXPECT_EQ(InOut.str().size(), size / 8);
@@ -120,17 +120,10 @@ TEST_F(TileConfigurationTests, TileConfigurationRandom) {  // NOLINT(cert-err58-
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::core::Writer writer(&outputfile);
+        genie::util::BitWriter writer(outputfile);
         tileConfiguration.write(writer);
-        writer.flush();
+        writer.FlushBits();
         outputfile.close();
-    }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile, true);
-        tileConfiguration.write(txtWriter);
-        txtfile.close();
     }
 #endif
 }
@@ -180,13 +173,14 @@ TEST_F(TileConfigurationTests, TileConfigurationRandomSimpleStructure) {  // NOL
     genie::core::parameter::annotation::TileConfiguration tileConfigurationCheck;
 
     std::stringstream InOut;
-    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
+    genie::util::BitWriter strwriter(InOut);
     tileConfiguration.write(strwriter);
-    strwriter.Flush();
+    strwriter.FlushBits();
     tileConfigurationCheck.read(strreader);
 
-        genie::core::Writer writeSize;
+    std::stringstream SizeOut;
+    genie::util::BitWriter writeSize(SizeOut);
     auto size = tileConfiguration.getSize(writeSize);
     if (size % 8 != 0) size += (8 - size % 8);
     EXPECT_EQ(InOut.str().size(), size / 8);
@@ -203,18 +197,10 @@ TEST_F(TileConfigurationTests, TileConfigurationRandomSimpleStructure) {  // NOL
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::core::Writer writer(&outputfile);
+        genie::util::BitWriter writer(outputfile);
         tileConfiguration.write(writer);
-        writer.flush();
+        writer.FlushBits();
         outputfile.close();
-    }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile, true);
-        txtfile << std::to_string(ATCoordSize) << ",";
-        tileConfiguration.write(txtWriter);
-        txtfile.close();
     }
 #endif
 }
