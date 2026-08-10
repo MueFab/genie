@@ -173,14 +173,14 @@ size_t GenoAnnotation::readOneBlock(
     genie::likelihood::LikelihoodParameters& likelihoodParameters,
     RecData& recData) {
   // read rowTileSize of rows
-  std::vector<genie::core::record::VariantGenotype> varGenoType;
+  std::vector<genie::core::record::genotype::Record> varGenoType;
   while (reader.IsStreamGood() && varGenoType.size() < rowTileSize) {
     varGenoType.emplace_back(reader);
     if (!reader.IsStreamGood()) varGenoType.pop_back();
   }
   if (varGenoType.empty()) return 0;
   // extract format fields
-  std::map<std::string, genie::core::record::FormatField> formatList;
+  std::map<std::string, genie::core::record::genotype::FormatField> formatList;
   for (auto& rec : varGenoType)
     for (const auto& field : rec.GetFormat()) {
       formatList[field.GetFormat()] = field;
@@ -252,7 +252,7 @@ size_t GenoAnnotation::readOneBlock(
 }
 
 void GenoAnnotation::sort_format(
-    std::vector<genie::core::record::VariantGenotype>& recs) {
+    std::vector<genie::core::record::genotype::Record>& recs) {
   // starting number
   uint8_t AttributeID = 25;
 

@@ -8,24 +8,16 @@
 #define SRC_GENIE_FUNCTIONALANNOTATION_TILES_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include <cstdint>
-#include <iostream>
-#include <map>
-#include <memory>
+
 #include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
-#include "genie/core/constants.h"
-#include "genie/core/functional_annotation_record/record.h"
-#include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace functional_annotation {
+namespace genie::functional_annotation {
 
 class Tiles {
  public:
@@ -82,8 +74,7 @@ class TiledStream {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace functional_annotation
-}  // namespace genie
+}  // namespace genie::functional_annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -6,21 +6,11 @@
 
 #include "genie/track/descriptors.h"
 
-#include <algorithm>
-#include <string>
-#include <utility>
-#include <vector>
-
-#include "genie/core/array_type.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/runtime_exception.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace track {
+namespace genie::track {
 
-void Descriptors::write(genie::core::record::track::Record trackRecord) {
+void Descriptors::write(genie::core::record::track_data::Record trackRecord) {
     // Write descriptors: SEQUENCEID, STARTPOS, ENDPOS, STRAND
     tiles[genie::core::AnnotDesc::SEQUENCEID].write(trackRecord.GetSeqId(), 16);
     tiles[genie::core::AnnotDesc::STARTPOS].write(trackRecord.GetStartPos(), 64);
@@ -55,8 +45,7 @@ void Descriptors::init() {
     tiles[genie::core::AnnotDesc::LINKID].setRowsPerTile(rowsPerTile);      // 8
 }
 
-}  // namespace track
-}  // namespace genie
+}  // namespace genie::track
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

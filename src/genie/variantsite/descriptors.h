@@ -8,27 +8,18 @@
 #define SRC_GENIE_VARIANTSITE_DESCRIPTORS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include <cstdint>
-#include <iostream>
+
 #include <map>
-#include <memory>
-#include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "genie/core/constants.h"
 #include "genie/core/record/site/record.h"
-#include "genie/core/record/variant/record.h"
-#include "genie/core/feature_record/record.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
 #include "genie/variantsite/tiles.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace variant_site {
+namespace genie::variant_site {
 
 class Descriptors {
  public:
@@ -40,7 +31,7 @@ class Descriptors {
         init();
     }
 
-    void write(genie::core::record::variant_site::Record variantSite);
+    void write(genie::core::record::site::Record variantSite);
 
     std::map<genie::core::AnnotDesc, TiledStream>& getTiles() { return tiles; }
 
@@ -64,8 +55,7 @@ class Descriptors {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace variant_site
-}  // namespace genie
+}  // namespace genie::variant_site
 
 // ---------------------------------------------------------------------------------------------------------------------
 

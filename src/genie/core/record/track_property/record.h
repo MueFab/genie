@@ -5,8 +5,8 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_TRACK_PROPERTY_RECORD_RECORD_H_
-#define SRC_GENIE_CORE_TRACK_PROPERTY_RECORD_RECORD_H_
+#ifndef SRC_GENIE_CORE_RECORD_TRACK_PROPERTY_RECORD_H_
+#define SRC_GENIE_CORE_RECORD_TRACK_PROPERTY_RECORD_H_
 
 #include <string>
 #include <vector>
@@ -76,4 +76,4 @@ class Record {
 
 }  // namespace genie::core::record::track_property
 
-#endif  // SRC_GENIE_CORE_TRACK_PROPERTY_RECORD_RECORD_H_
+#endif  // SRC_GENIE_CORE_RECORD_TRACK_PROPERTY_RECORD_H_

@@ -11,7 +11,7 @@
 #include <string>
 
 #include "genie/functionalannotation/functionalannotation_parser.h"
-#include "genie/core/functional_annotation_record/record.h"
+#include "genie/core/record/functional_annotation/record.h"
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"

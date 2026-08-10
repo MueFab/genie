@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_GENOTYPE_PAYLOAD_H
-#define GENIE_GENOTYPE_PAYLOAD_H
+#ifndef SRC_GENIE_GENOTYPE_GENOTYPE_PAYLOAD_H_
+#define SRC_GENIE_GENOTYPE_GENOTYPE_PAYLOAD_H_
 
 #include <cstdint>
 #include <iostream>
@@ -44,7 +44,7 @@ class GenotypePayload {
   bool no_reference_flag_;
   bool not_available_flag_;
   bool phases_value_;
-  uint8_t num_bit_planes_; //? Only for bit plane binarization
+  uint8_t num_bit_planes_;  //? Only for bit plane binarization
 
   std::vector<SortedBinMatPayload> variants_payloads_;
   std::optional<AmaxPayload> variants_amax_payload_;
@@ -80,8 +80,7 @@ class GenotypePayload {
   // Constructor from BitReader
   explicit GenotypePayload(
       util::BitReader& reader,
-      GenotypeParameters& parameters
-  );
+      GenotypeParameters& parameters);
 
   // Equality operator
   bool operator==(const GenotypePayload& other) const;
@@ -124,6 +123,6 @@ class GenotypePayload {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_GENOTYPE_PAYLOAD_H
+#endif  // SRC_GENIE_GENOTYPE_GENOTYPE_PAYLOAD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -8,30 +8,8 @@
 
 #include <sstream>
 #include <string>
-#include <vector>
-
-#include <codecs/include/mpegg-codecs.h>
-#include "genie/core/constants.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/runtime_exception.h"
-
-#include "genie/core/parameter/annotation/algorithm_parameters.h"
-#include "genie/core/parameter/annotation/descriptor_configuration.h"
-#include "genie/annotation/parameterset_composer.h"
-#include "genie/genotype/genotype_parameters.h"
-#include "genie/genotype/genotype_payload.h"
-
-#include "genie/core/access_unit/annotation/typed_data.h"
-#include "genie/core/access_unit/annotation/record.h"
-#include "genie/core/parameter/annotation/record.h"
-#include "genie/core/record/data_unit/record.h"
-#include "genie/core/record/variant/record.h"
-#include "genie/annotation/accessunit_composer.h"
 
 #include "genie/annotation/annotation.h"
-#include "genie/annotation/parameterset_composer.h"
-#include "genie/annotation/variantsite_parser.h"
 #include "helpers.h"
 
 class SiteConformanceTest : public ::testing::TestWithParam<std::string> {
@@ -71,6 +49,6 @@ TEST_P(SiteConformanceTest, SiteConformancetests) {  // NOLINT(cert-err58-cpp)
 }
 
 INSTANTIATE_TEST_SUITE_P(testallsiteConformance, SiteConformanceTest,
-                        ::testing::Values("/data/records/conformance/1.3.5.bgz.CASE01.site",
-                                          "/data/records/conformance/1.3.11.bgz.CASE03.site",
-                                          "/data/records/conformance/1.3.11.bgz.CASE04.site"));
+    ::testing::Values("/data/records/conformance/1.3.5.bgz.CASE01.site",
+                      "/data/records/conformance/1.3.11.bgz.CASE03.site",
+                      "/data/records/conformance/1.3.11.bgz.CASE04.site"));

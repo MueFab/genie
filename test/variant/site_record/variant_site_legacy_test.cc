@@ -17,7 +17,7 @@
 TEST(VariantSiteRecord, test) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::stringstream inputfile;
-    genie::core::record::variant_site::Record variantSite;
+    genie::core::record::site::Record variantSite;
 
 }
 

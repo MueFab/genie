@@ -10,7 +10,6 @@
 
 #include <vector>
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::core::parameter::annotation {
@@ -78,9 +77,9 @@ void DescriptorConfiguration::write(util::BitWriter& writer) const {
     }
 }
 
-size_t DescriptorConfiguration::getSize(util::BitWriter& writesize) const {
-    write(writesize);
-    return writesize.GetTotalBitsWritten();
+size_t DescriptorConfiguration::getSize(util::BitWriter& writer) const {
+    write(writer);
+    return writer.GetTotalBitsWritten();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

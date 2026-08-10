@@ -10,17 +10,14 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <map>
-#include <string>
-#include <vector>
 
+#include "genie/core/record/track_property/record.h"
 #include "genie/core/constants.h"
-#include "genie/core/track_property_record/record.h"
 #include "genie/variantsite/tiles.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace track_property {
+namespace genie::track_property {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -46,8 +43,7 @@ class Descriptors {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace track_property
-}  // namespace genie
+}  // namespace genie::track_property
 
 // ---------------------------------------------------------------------------------------------------------------------
 

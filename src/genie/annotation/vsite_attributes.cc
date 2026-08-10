@@ -4,18 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/annotation/attributes.h"
 #include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "genie/annotation/attributes.h"
 #include "genie/core/array_type.h"
 #include "genie/util/runtime_exception.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace variant_site {
+namespace genie::variant_site {
 
 void Attributes::add(std::vector<genie::core::access_unit::annotation::AttributeField> fields) {
     for (const auto& field : fields) {
@@ -123,7 +122,7 @@ void AttributeTile::setCompressedData(uint64_t tilenr, std::stringstream& compre
     (void)compressedData;
 }
 
-void Attributes::add(std::map<std::string, genie::core::record::variant_site::Info_tag> tags, std::map<std::string, std::vector<std::vector<uint8_t>>> infoValues) {
+void Attributes::add(std::map<std::string, genie::core::record::site::Info_tag> tags, std::map<std::string, std::vector<std::vector<uint8_t>>> infoValues) {
     for (const auto& tag : tags) {
         attributeTiles[tag.first].write(infoValues[tag.first]);
         attrWritten[tag.first] = true;
@@ -158,8 +157,7 @@ void Attributes::initAttributeTiles() {
     }
 }
 
-}  // namespace variant_site
-}  // namespace genie
+}  // namespace genie::variant_site
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

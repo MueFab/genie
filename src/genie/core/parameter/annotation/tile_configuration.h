@@ -63,7 +63,7 @@ class TileConfiguration {
                       std::vector<TileStructure> additional_tile_structure);
 
     void read(util::BitReader& reader);
-    void read(util::BitReader& reader, uint8_t ATCoordSize);
+    void read(util::BitReader& reader, uint8_t AT_coord_size);
     void write(util::BitWriter& writer) const;
 
     size_t getSize(util::BitWriter& writesize) const;

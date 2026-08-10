@@ -96,27 +96,27 @@ void CompressorParameterSet::write(util::BitWriter& writer) const {
         writer.WriteBits(step.completed_out_var_ID.size(), 4);
         for (auto outvar : step.completed_out_var_ID) writer.WriteBits(outvar, 4);
     }
-  /*
-  writer.WriteBits(n_compressor_steps, 4);
-  uint8_t algorithm_index = 0;
-  for (auto idx_i = 0; idx_i < n_compressor_steps; ++idx_i) {
-      writer.WriteBits(compressor_step_ID[idx_i], 4);
-      writer.WriteBits(static_cast<uint8_t>(algorithm_ID[idx_i]), 5);
-      writer.WriteBits(use_default_pars[idx_i], 1);
-      if (!use_default_pars[idx_i]) {
-          (algorithm_parameters[algorithm_index].write(writer));
-          algorithm_index++;
-      }
-      writer.WriteBits(n_in_vars[idx_i], 4);
-      for (auto idx_j = 0; idx_j < n_in_vars[idx_i]; ++idx_j) {
-          writer.WriteBits(in_var_ID[idx_i][idx_j], 4);
-          writer.WriteBits(prev_step_ID[idx_i][idx_j], 4);
-          writer.WriteBits(prev_out_var_ID[idx_i][idx_j], 4);
-      }
-      writer.WriteBits(n_completed_out_vars[idx_i], 4);
-      for (auto idx_j = 0; idx_j < n_completed_out_vars[idx_i]; ++idx_j) writer.WriteBits(completed_out_var_ID[idx_i][idx_j], 4);
-  }
-  */
+    /*
+    writer.WriteBits(n_compressor_steps, 4);
+    uint8_t algorithm_index = 0;
+    for (auto idx_i = 0; idx_i < n_compressor_steps; ++idx_i) {
+        writer.WriteBits(compressor_step_ID[idx_i], 4);
+        writer.WriteBits(static_cast<uint8_t>(algorithm_ID[idx_i]), 5);
+        writer.WriteBits(use_default_pars[idx_i], 1);
+        if (!use_default_pars[idx_i]) {
+            (algorithm_parameters[algorithm_index].write(writer));
+            algorithm_index++;
+        }
+        writer.WriteBits(n_in_vars[idx_i], 4);
+        for (auto idx_j = 0; idx_j < n_in_vars[idx_i]; ++idx_j) {
+            writer.WriteBits(in_var_ID[idx_i][idx_j], 4);
+            writer.WriteBits(prev_step_ID[idx_i][idx_j], 4);
+            writer.WriteBits(prev_out_var_ID[idx_i][idx_j], 4);
+        }
+        writer.WriteBits(n_completed_out_vars[idx_i], 4);
+        for (auto idx_j = 0; idx_j < n_completed_out_vars[idx_i]; ++idx_j) writer.WriteBits(completed_out_var_ID[idx_i][idx_j], 4);
+    }
+    */
     writer.FlushBits();
 }
 

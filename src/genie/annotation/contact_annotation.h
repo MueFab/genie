@@ -8,21 +8,17 @@
 #define SRC_GENIE_ANNOTATION_CONTACT_ANNOTATION_H_
 
 #include <fstream>
-#include <map>
-#include <sstream>
 #include <vector>
-#include "genie/core/constants.h"
 
-#include "genie/contact/contact_coder.h"
-#include "genie/core/record/variant/record.h"
+#include "genie/contact/contact_matrix_parameters.h"
+#include "genie/annotation/compressors.h"
+#include "genie/core/constants.h"
 #include "genie/core/parameter/annotation/record.h"
 #include "genie/core/access_unit/annotation/record.h"
 
-#include "genie/annotation/compressors.h"
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 
 struct CMUnits {
     core::parameter::annotation::Record annotationParameterSet;
@@ -61,8 +57,7 @@ class CMAnnotation {
     genie::annotation::Compressor compressors;
 };
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation
 
 // -----------------------------------------------------------------------------
 

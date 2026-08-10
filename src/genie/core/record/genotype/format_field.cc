@@ -5,11 +5,14 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "format_field.h"
+#include "genie/core/record/genotype/format_field.h"
+
+#include <string>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie::core::record {
+namespace genie::core::record::genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -49,6 +52,6 @@ const std::vector<std::vector<DynamicDataType>>& FormatField::GetFormatValue() c
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genie::core::record
+}  // namespace genie::core::record::genotype
 
 // ---------------------------------------------------------------------------------------------------------------------

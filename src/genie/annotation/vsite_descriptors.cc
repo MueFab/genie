@@ -16,10 +16,9 @@
 #include "genie/util/runtime_exception.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace variant_site {
+namespace genie::variant_site {
 
-void Descriptors::write(genie::core::record::variant_site::Record variantSite) {
+void Descriptors::write(genie::core::record::site::Record variantSite) {
     tiles[genie::core::AnnotDesc::SEQUENCEID].write(variantSite.GetSeqId(), 16);
     tiles[genie::core::AnnotDesc::STARTPOS].write(variantSite.GetPos(), 64);
     tiles[genie::core::AnnotDesc::STRAND].write(variantSite.GetStrand(), 2);
@@ -129,8 +128,7 @@ std::vector<uint8_t> Descriptors::FilterTranslate(const std::string& filter) {
   return filters;
 }
 
-}  // namespace variant_site
-}  // namespace genie
+}  // namespace genie::variant_site
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

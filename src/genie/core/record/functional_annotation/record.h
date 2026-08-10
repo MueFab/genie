@@ -5,8 +5,8 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_FUNCTIONAL_ANNOTATION_RECORD_RECORD_H_
-#define SRC_GENIE_CORE_FUNCTIONAL_ANNOTATION_RECORD_RECORD_H_
+#ifndef SRC_GENIE_CORE_RECORD_FUNCTIONAL_ANNOTATION_RECORD_H_
+#define SRC_GENIE_CORE_RECORD_FUNCTIONAL_ANNOTATION_RECORD_H_
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <string>
@@ -292,7 +292,7 @@ class Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_FUNCTIONAL_ANNOTATION_RECORD_RECORD_H_
+#endif  // SRC_GENIE_CORE_RECORD_FUNCTIONAL_ANNOTATION_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

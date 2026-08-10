@@ -5,22 +5,17 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef GENIE_CORE_RECORD_FORMAT_FIELD_FORMAT_FIELD_H
-#define GENIE_CORE_RECORD_FORMAT_FIELD_FORMAT_FIELD_H
+#ifndef SRC_GENIE_CORE_RECORD_GENOTYPE_FORMAT_FIELD_H_
+#define SRC_GENIE_CORE_RECORD_GENOTYPE_FORMAT_FIELD_H_
 
-#include <cstdint>
-#include <memory>
 #include <string>
-#include <utility>
-#include <variant>
 #include <vector>
+
 #include "genie/core/constants.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie::core::record {
+namespace genie::core::record::genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -76,10 +71,10 @@ class FormatField {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genie::core::record
+}  // namespace genie::core::record::genotype
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CORE_RECORD_FORMAT_FIELD_FORMAT_FIELD_H
+#endif  // SRC_GENIE_CORE_RECORD_GENOTYPE_FORMAT_FIELD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------

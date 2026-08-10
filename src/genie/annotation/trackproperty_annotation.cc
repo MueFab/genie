@@ -10,7 +10,7 @@
 #include <string>
 
 #include "genie/trackproperty/trackproperty_parser.h"
-#include "genie/core/track_property_record/record.h"
+#include "genie/core/record/track_property/record.h"
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"

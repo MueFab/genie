@@ -8,31 +8,23 @@
 #define SRC_GENIE_FUNCTIONALANNOTATION_FUNCTIONALANNOTATION_PARSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include <cstdint>
-#include <iostream>
+
 #include <map>
-#include <memory>
-#include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
-#include "genie/core/constants.h"
 #include "genie/variantsite/attributes.h"
 #include "genie/functionalannotation/descriptors.h"
 
 #include "genie/annotation/json_attribute_parser.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
-#include "genie/core/parameter/annotation/attribute_parameter_set.h"
-#include "genie/core/parameter/annotation/descriptor_configuration.h"
-#include "genie/core/functional_annotation_record/record.h"
+#include "genie/core/record/functional_annotation/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace functional_annotation {
+namespace genie::functional_annotation {
 
 //-------------------------------------------------------------------------------//
 
@@ -77,8 +69,7 @@ class FunctionalAnnotationParser {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace functional_annotation
-}  // namespace genie
+}  // namespace genie::functional_annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

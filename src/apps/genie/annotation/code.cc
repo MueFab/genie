@@ -18,20 +18,20 @@
 #include <vector>
 
 #include "filesystem/filesystem.hpp"
-#include "genie/core/record/data_unit/record.h"
-#include "genie/core/record/variant/record.h"
-#include "genie/util/bit_writer.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
-#include "genie/annotation/accessunit_composer.h"
+#include "genie/annotation/parameterset_composer.h"
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_parameters.h"
 #include "genie/likelihood/likelihood_payload.h"
+#include "genie/annotation/accessunit_composer.h"
+#include "genie/variantsite/parameterset_composer.h"
+#include "genie/annotation/variantsite_parser.h"
+#include "genie/core/record/data_unit/record.h"
+#include "genie/core/record/genotype/record.h"
 #include "genie/util/runtime_exception.h"
 #include "genie/util/string_helpers.h"
-#include "genie/annotation/parameterset_composer.h"
-#include "genie/annotation/vsite_parameterset_composer.h"
-#include "genie/annotation/variantsite_parser.h"
+#include "genie/util/bit_writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 #ifdef _WIN32
 #include <windows.h>
@@ -179,7 +179,7 @@ void encodeVariantGenotype(const std::string& _input_fpath,
                            const std::string& _output_fpath) {
   std::ifstream reader(_input_fpath, std::ios::binary);
   genie::util::BitReader bitreader(reader);
-  std::vector<genie::core::record::VariantGenotype> recs;
+  std::vector<genie::core::record::genotype::Record> recs;
 
   while (bitreader.IsStreamGood()) {
     recs.emplace_back(bitreader);

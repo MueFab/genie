@@ -4,25 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <algorithm>
-#include <cstring>
-#include <sstream>
-#include <string>
-#include <utility>
-
-#include "genie/core/array_type.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
+
+#include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace annotation {
+namespace genie::core::parameter::annotation {
 
 AttributeData::AttributeData()
     : attributeID(0),
@@ -63,10 +51,7 @@ AttributeData::AttributeData(const AttributeData& other) {
     attributeID = other.attributeID;
 }
 
-}  // namespace annotation
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -1,4 +1,5 @@
-#include "genotype_coder.h"
+#include "genie/genotype/genotype_coder.h"
+
 #include <genie/util/runtime_exception.h>
 #include <genie/backend/backend.h>
 #include <codecs/include/mpegg-codecs.h>
@@ -11,7 +12,7 @@
 namespace genie::genotype {
 
 void decompose(
-    std::vector<core::record::VariantGenotype>& recs,
+    std::vector<core::record::genotype::Record>& recs,
     uint8_t& max_ploidy,
     Int8MatDtype& allele_mat,
     BinMatDtype& phasing_mat,
@@ -536,7 +537,7 @@ void decode_and_inverse_sort_bin_mat(
 }
 
 void encode_genotype(
-    std::vector<core::record::VariantGenotype>& recs,
+    std::vector<core::record::genotype::Record>& recs,
     GenotypeParameters& params,
     GenotypePayload& payload,
     size_t block_size,

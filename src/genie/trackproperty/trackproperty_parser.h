@@ -14,17 +14,16 @@
 #include <string>
 #include <vector>
 
-#include "genie/annotation/json_attribute_parser.h"
-#include "genie/core/track_property_record/record.h"
-#include "genie/trackproperty/descriptors.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/runtime_exception.h"
 #include "genie/variantsite/attributes.h"
+#include "genie/trackproperty/descriptors.h"
+#include "genie/annotation/json_attribute_parser.h"
+#include "genie/core/parameter/annotation/attribute_data.h"
+#include "genie/core/record/track_property/record.h"
+#include "genie/util/bit_reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace track_property {
+namespace genie::track_property {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -59,8 +58,7 @@ class TrackPropertyParser {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace track_property
-}  // namespace genie
+}  // namespace genie::track_property
 
 // ---------------------------------------------------------------------------------------------------------------------
 

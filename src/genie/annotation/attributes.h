@@ -8,32 +8,25 @@
 #define SRC_GENIE_VARIANTSITE_ATTRIBUTES_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include <cstdint>
-#include <iostream>
+
 #include <map>
-#include <memory>
 #include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
-#include "genie/core/constants.h"
+#include "genie/core/access_unit/annotation/typed_data.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
-#include "genie/util/bit_reader.h"
+#include "genie/core/record/site/record.h"
+#include "genie/core/record/feature/record.h"
+#include "genie/core/record/sample/record.h"
+#include "genie/core/record/functional_annotation/record.h"
+#include "genie/core/record/track_data/record.h"
+#include "genie/core/record/track_property/record.h"
 #include "genie/util/bit_writer.h"
 
-#include "genie/core/access_unit/annotation/attribute_field.h"
-#include "genie/core/record/site/record.h"
-
-#include "genie/core/access_unit/annotation/typed_data.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace variant_site {
-
-
-
-
+namespace genie::variant_site {
 
 class AttributeTile {
  public:
@@ -59,7 +52,7 @@ class AttributeTile {
 
     std::stringstream& getTile(uint64_t tilenr) {
         if (tilenr == tiles.size() - 1) {
-          writers.back().FlushBits();
+            writers.back().FlushBits();
         }
         return tiles.at(tilenr);
     }
@@ -94,7 +87,7 @@ class Attributes {
 
     void add(std::vector<genie::core::access_unit::annotation::AttributeField> fields);
 
-    void add(std::map<std::string, genie::core::record::variant_site::Info_tag> tags,
+    void add(std::map<std::string, genie::core::record::site::Info_tag> tags,
              std::map<std::string, std::vector<std::vector<uint8_t>>> infoValues);
 
     std::map<std::string, AttributeTile>& getTiles() { return attributeTiles; }
@@ -117,8 +110,7 @@ inline void forceLinkAnnotationAddSymbols() {
     // No-op - symbols are now explicit overloads
 }
 
-}  // namespace variant_site
-}  // namespace genie
+}  // namespace genie::variant_site
 
 // ---------------------------------------------------------------------------------------------------------------------
 

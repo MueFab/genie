@@ -12,18 +12,19 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include "genie/annotation/json_attribute_parser.h"
-#include "genie/core/constants.h"
 #include "genie/annotation/accessunit_composer.h"
-#include "genie/annotation/parameterset_composer.h"
-#include "genie/annotation/variantsite_parser.h"
 
 #include "genie/annotation/compressors.h"
-#include "genie/core/record/data_unit/record.h"
+#include "genie/core/constants.h"
+#include "genie/core/parameter/annotation/record.h"
+#include "genie/core/access_unit/annotation/record.h"
+#include "genie/core/record/site/record.h"
+
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 struct SiteUnits {
     core::parameter::annotation::Record annotationParameterSet;
@@ -42,9 +43,9 @@ class SiteAnnotation {
     void setCompressors(genie::annotation::Compressor& _compressors) { compressors = _compressors; }
 
  private:
-     std::ifstream recordInput;
+    std::ifstream recordInput;
     genie::annotation::Compressor compressors;
-    std::map<std::string, genie::core::record::variant_site::Info_tag> infoTags;
+    std::map<std::string, genie::core::record::site::Info_tag> infoTags;
     std::map<std::string, InfoField> attributeInfo;
     std::vector<InfoField> infoFields;
     const std::vector<genie::core::AnnotDesc> descrList{
@@ -62,8 +63,7 @@ class SiteAnnotation {
     uint32_t defaultTileSizeHeight;
 };
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation
 
 // -----------------------------------------------------------------------------
 

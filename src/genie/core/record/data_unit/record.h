@@ -9,7 +9,6 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-
 #include "genie/core/access_unit/annotation/record.h"
 #include "genie/core/parameter/annotation/record.h"
 #include "genie/util/bit_writer.h"

@@ -8,25 +8,16 @@
 #define SRC_GENIE_TRACK_DESCRIPTORS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include <cstdint>
-#include <iostream>
-#include <map>
-#include <memory>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
 
-#include "genie/core/constants.h"
-#include "genie/core/track_record/record.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
+#include <map>
+
 #include "genie/track/tiles.h"
+#include "genie/core/constants.h"
+#include "genie/core/record/track_data/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace track {
+namespace genie::track {
 
 class Descriptors {
  public:
@@ -38,7 +29,7 @@ class Descriptors {
         init();
     }
 
-    void write(genie::core::record::track::Record trackRecord);
+    void write(genie::core::record::track_data::Record trackRecord);
 
     std::map<genie::core::AnnotDesc, TiledStream>& getTiles() { return tiles; }
 
@@ -55,8 +46,7 @@ class Descriptors {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace track
-}  // namespace genie
+}  // namespace genie::track
 
 // ---------------------------------------------------------------------------------------------------------------------
 

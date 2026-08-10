@@ -4,19 +4,19 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_GENOTYPE_GENOTYPE_CODER_H
-#define GENIE_GENOTYPE_GENOTYPE_CODER_H
+#ifndef SRC_GENIE_GENOTYPE_GENOTYPE_CODER_H_
+#define SRC_GENIE_GENOTYPE_GENOTYPE_CODER_H_
 
 #include <cstdint>
 #include <vector>
 #include <tuple>
 
 #include "genie/core/constants.h"
-#include "genie/core/record/variant/record.h"
+#include "genie/core/record/genotype/record.h"
 #include "genie/backend/backend.h"
-#include "genotype_parameters.h"
-#include "genotype_payload.h"
-#include "genotype_types.h"
+#include "genie/genotype/genotype_parameters.h"
+#include "genie/genotype/genotype_payload.h"
+#include "genie/genotype/genotype_types.h"
 
 namespace genie::genotype {
 
@@ -35,7 +35,7 @@ struct EncodingOptions {
 // Unified Coder Interface
 
 void decompose(
-    std::vector<core::record::VariantGenotype>& recs,
+    std::vector<core::record::genotype::Record>& recs,
     uint8_t& max_ploidy,
     Int8MatDtype& allele_mat,
     BinMatDtype& phasing_mat,
@@ -156,16 +156,16 @@ void decode_and_inverse_sort_bin_mat(
 );
 
 void encode_genotype(
-    std::vector<core::record::VariantGenotype>& recs,
+    std::vector<core::record::genotype::Record>& recs,
     GenotypeParameters& params,
     GenotypePayload& payload,
-    size_t block_size=512,
-    BinarizationID binarization_ID=BinarizationID::ROW_BIN,
-    ConcatAxis concat_axis=ConcatAxis::DO_NOT_CONCAT,
-    bool transpose_mat=false,
-    SortingAlgoID sort_row_method=SortingAlgoID::NO_SORTING,
-    SortingAlgoID sort_col_method=SortingAlgoID::NO_SORTING,
-    genie::core::AlgoID codec_ID=genie::core::AlgoID::JBIG
+    size_t block_size = 512,
+    BinarizationID binarization_ID = BinarizationID::ROW_BIN,
+    ConcatAxis concat_axis = ConcatAxis::DO_NOT_CONCAT,
+    bool transpose_mat = false,
+    SortingAlgoID sort_row_method = SortingAlgoID::NO_SORTING,
+    SortingAlgoID sort_col_method = SortingAlgoID::NO_SORTING,
+    genie::core::AlgoID codec_ID = genie::core::AlgoID::JBIG
 );
 
 void decode_genotype(
@@ -177,4 +177,4 @@ void decode_genotype(
 
 
 } // namespace genie::genotype
-#endif // GENIE_GENOTYPE_GENOTYPE_CODER_H
+#endif  // SRC_GENIE_GENOTYPE_GENOTYPE_CODER_H_

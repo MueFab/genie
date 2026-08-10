@@ -19,7 +19,7 @@
 
 #include <codecs/include/mpegg-codecs.h>
 #include "genie/core/constants.h"
-#include "genie/core/record/variant/record.h"
+#include "genie/core/record/genotype/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/runtime_exception.h"
@@ -32,8 +32,8 @@
 namespace genie::likelihood {
 
 // Helper to generate synthetic records
-std::vector<core::record::VariantGenotype> create_synthetic_records(size_t num_records, size_t num_samples, size_t num_likelihoods) {
-    std::vector<core::record::VariantGenotype> recs;
+std::vector<core::record::genotype::Record> create_synthetic_records(size_t num_records, size_t num_samples, size_t num_likelihoods) {
+    std::vector<core::record::genotype::Record> recs;
     recs.reserve(num_records);
     for (size_t i = 0; i < num_records; ++i) {
         recs.emplace_back();
@@ -64,7 +64,7 @@ TEST(Likelihood, SyntheticRoundTrip) {
     encode_likelihood(recs, params, payload, 256, true);
 
     // Decode
-    std::vector<core::record::VariantGenotype> decoded_recs(num_records);
+    std::vector<core::record::genotype::Record> decoded_recs(num_records);
     for(auto& r : decoded_recs) {
         r.SetSampleCount((uint32_t)num_samples);
         r.SetNumberOfLikelihoods((uint8_t)num_likelihoods);
@@ -85,13 +85,13 @@ TEST(Likelihood, SyntheticRoundTrip) {
 TEST(Likelihood, ParseLikelihood) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/variant/1.3.5.header100.gl_only.vcf.geno";
-    std::vector<core::record::VariantGenotype> recs;
+    std::vector<genie::core::record::genotype::Record> recs;
 
     uint32_t BLOCK_SIZE = 100;
 
     std::ifstream reader(filepath, std::ios::binary | std::ios::in);
     ASSERT_EQ(reader.fail(), false);
-    util::BitReader bitreader(reader);
+    genie::util::BitReader bitreader(reader);
     while (bitreader.IsStreamGood()) {
         recs.emplace_back(bitreader);
     }
@@ -120,14 +120,14 @@ TEST(Likelihood, ParseLikelihood) {
 TEST(Likelihood, RoundTripNoTransform) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/variant/1.3.5.header100.gl_only.vcf.geno";
-    std::vector<core::record::VariantGenotype> recs;
+    std::vector<genie::core::record::genotype::Record> recs;
 
     uint32_t BLOCK_SIZE = 100;
     bool TRANSFORM_MODE = false;
 
     std::ifstream reader(filepath, std::ios::binary | std::ios::in);
     ASSERT_EQ(reader.fail(), false);
-    util::BitReader bitreader(reader);
+    genie::util::BitReader bitreader(reader);
     while (bitreader.IsStreamGood()) {
         recs.emplace_back(bitreader);
     }
@@ -154,14 +154,14 @@ TEST(Likelihood, RoundTripNoTransform) {
 TEST(Likelihood, RoundTripTransform) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/variant/1.3.5.header100.gl_only.vcf.geno";
-    std::vector<core::record::VariantGenotype> recs;
+    std::vector<genie::core::record::genotype::Record> recs;
 
     uint32_t BLOCK_SIZE = 100;
     bool TRANSFORM_MODE = true;
 
     std::ifstream reader(filepath, std::ios::binary | std::ios::in);
     ASSERT_EQ(reader.fail(), false);
-    util::BitReader bitreader(reader);
+    genie::util::BitReader bitreader(reader);
     while (bitreader.IsStreamGood()) {
         recs.emplace_back(bitreader);
     }

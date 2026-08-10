@@ -8,31 +8,24 @@
 #define SRC_GENIE_VARIANTSITE_VARIANTSITE_PARSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include <cstdint>
-#include <iostream>
+
 #include <map>
-#include <memory>
 #include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
-#include "genie/core/constants.h"
 #include "genie/annotation/attributes.h"
 #include "genie/annotation/descriptors.h"
-
 #include "genie/annotation/json_attribute_parser.h"
+#include "genie/core/constants.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
-#include "genie/core/parameter/annotation/attribute_parameter_set.h"
-#include "genie/core/parameter/annotation/descriptor_configuration.h"
 #include "genie/core/record/site/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace variant_site {
+namespace genie::variant_site {
 
 //-------------------------------------------------------------------------------//
 
@@ -43,7 +36,7 @@ class VariantSiteParser {
 
     VariantSiteParser(std::istream& _site_MGrecs, std::stringstream& _jsonInfoFields, uint64_t rowsPerTile);
     VariantSiteParser(std::istream& _site_MGrecs, std::vector<genie::annotation::InfoField>& _fields, uint64_t _rowsPerTile);
-    VariantSiteParser(std::istream& _site_MGrecs, std::map<std::string, genie::core::record::variant_site::Info_tag>& _fields, uint64_t _rowsPerTile);
+    VariantSiteParser(std::istream& _site_MGrecs, std::map<std::string, genie::core::record::site::Info_tag>& _fields, uint64_t _rowsPerTile);
 
     size_t getNumberOfRows() const { return numberOfRows; }
 
@@ -53,17 +46,16 @@ class VariantSiteParser {
     uint64_t getNrOfTiles() { return descriptors.getTiles()[genie::core::AnnotDesc::STARTPOS].getTiles().size(); }
 
  private:
-    genie::core::record::variant_site::Record variantSite;
+    genie::core::record::site::Record variantSite;
     std::istream& siteMGrecs;
     uint64_t rowsPerTile;
     size_t numberOfRows;
-    std::map<std::string, genie::core::record::variant_site::Info_tag> tags;
+    std::map<std::string, genie::core::record::site::Info_tag> tags;
     std::vector<InfoField> infoFields;
     std::vector<std::string> testAltern;
     std::map<std::string, uint8_t> infoFieldType;
 
     std::vector<genie::util::BitWriter> fieldWriter;
-
     std::map<std::string, genie::util::BitWriter> attrWriter;
 
     std::map<std::string, AttributeData> attributeData;
@@ -82,8 +74,7 @@ class VariantSiteParser {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace variant_site
-}  // namespace genie
+}  // namespace genie::variant_site
 
 // ---------------------------------------------------------------------------------------------------------------------
 

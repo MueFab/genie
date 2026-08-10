@@ -127,7 +127,6 @@ void TileStructure::write(util::BitWriter& writer) const {
     }
 }
 
-
 size_t TileStructure::getSize(util::BitWriter& writesize) const {
     write(writesize);
     return writesize.GetTotalBitsWritten();

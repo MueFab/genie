@@ -20,7 +20,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie::core::record::variant_site {
+namespace genie::core::record::site {
 
 /**
  * @brief Class for handling information fields in variant site records
@@ -421,7 +421,7 @@ class Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genie::core::record::variant_site
+}  // namespace genie::core::record::site
 
 // ---------------------------------------------------------------------------------------------------------------------
 

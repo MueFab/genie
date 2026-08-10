@@ -14,12 +14,11 @@
 
 #include "genie/annotation/json_attribute_parser.h"
 #include "genie/annotation/accessunit_composer.h"
-#include "genie/variantsite/attributes.h"
-
 #include "genie/annotation/compressors.h"
+#include "genie/variantsite/attributes.h"
 #include "genie/core/parameter/annotation/record.h"
 #include "genie/core/access_unit/annotation/record.h"
-#include "genie/core/sample_record/record.h"
+#include "genie/core/record/sample/record.h"
 
 namespace genie::annotation {
 

@@ -4,17 +4,16 @@
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
-#ifndef SRC_GENIE_CORE_GENE_EXPRESSION_RECORD_RECORD_H_
-#define SRC_GENIE_CORE_GENE_EXPRESSION_RECORD_RECORD_H_
+#ifndef SRC_GENIE_CORE_RECORD_GENE_EXPRESSION_RECORD_H_
+#define SRC_GENIE_CORE_RECORD_GENE_EXPRESSION_RECORD_H_
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
 #include <string>
 #include <vector>
+
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "genie/util/bit_writer.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -195,7 +194,7 @@ class Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_GENE_EXPRESSION_RECORD_RECORD_H_
+#endif  // SRC_GENIE_CORE_RECORD_GENE_EXPRESSION_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

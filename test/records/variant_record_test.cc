@@ -11,7 +11,7 @@
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-namespace genie::core::record::variant_site {
+namespace genie::core::record::site {
 
 TEST(VariantSiteRecord, RoundTrip) {
     uint64_t variant_index = 1;

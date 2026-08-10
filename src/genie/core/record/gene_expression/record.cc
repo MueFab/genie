@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/gene_expression_record/record.h"
+#include "genie/core/record/gene_expression/record.h"
+
 #include <string>
 #include <vector>
+
 #include "genie/core/array_type.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
 
 // -------------------------------------------------------------------------------------------------
 

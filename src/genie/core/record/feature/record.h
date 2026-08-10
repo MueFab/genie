@@ -5,8 +5,8 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_SAMPLE_RECORD_RECORD_H_
-#define SRC_GENIE_CORE_SAMPLE_RECORD_RECORD_H_
+#ifndef SRC_GENIE_CORE_RECORD_FEATURE_RECORD_H_
+#define SRC_GENIE_CORE_RECORD_FEATURE_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,12 +21,12 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie::core::record::sample {
+namespace genie::core::record::feature {
 
 /**
- * @brief Class for handling information fields in sample records
+ * @brief Class for handling information fields in feature records
  */
-class SampleFields {
+class FeatureFields {
  public:
   /**
    * @brief Custom type definition for field values
@@ -90,7 +90,7 @@ class SampleFields {
     fields_.shrink_to_fit();
   }
   /**
-   * @brief Gets the fields as AttributeField vector
+   * @brief Gets the vector of information fields
    * @return Vector of AttributeField entries
    */
   std::vector<genie::core::access_unit::annotation::AttributeField> GetFields() {
@@ -131,12 +131,12 @@ struct Info_tag {
 };
 
 /**
- * @brief Class representing a sample record
+ * @brief Class representing a feature record
  */
 class Record {
  private:
-  uint64_t sample_index_;   //!< @brief Index of the sample
-  SampleFields sample_attributes_;  //!< @brief Sample attributes
+  uint64_t feature_index_;   //!< @brief Index of the feature
+  FeatureFields feature_attributes_;  //!< @brief Feature attributes
 
   uint8_t linked_record_;     //!< @brief Flag indicating if record is linked
   uint8_t link_name_len_;     //!< @brief Length of the link name
@@ -153,8 +153,8 @@ class Record {
    * @brief Default constructor for Record
    */
   Record()
-      : sample_index_(0),
-        sample_attributes_(),
+      : feature_index_(0),
+        feature_attributes_(),
         linked_record_(0),
         link_name_len_(0),
         link_name_(""),
@@ -165,6 +165,12 @@ class Record {
    * @param reader The bit reader to read from
    */
   explicit Record(util::BitReader& reader);
+  /**
+   * @brief
+   */
+  //  Record(util::BitReader& reader, std::vector<Info_tag> infoTag) :
+  //  info_tag(infoTag) { read(reader); }
+  //   Record(util::BitReader& reader) { read(reader); }
 
   /**
    * @brief Reads record data from a bit reader
@@ -181,18 +187,18 @@ class Record {
 
   /**
    * @brief Gets the feature index
-   * @return The sample index
+   * @return The feature index
    */
-  [[nodiscard]] uint64_t GetSampleIndex() const {
-    return sample_index_;
+  [[nodiscard]] uint64_t GetFeatureIndex() const {
+    return feature_index_;
   }
 
   /**
-   * @brief Gets the sample attributes
-   * @return Reference to the sample attributes
+   * @brief Gets the feature attributes
+   * @return Reference to the feature attributes
    */
-  SampleFields& GetSampleAttributes() {
-    return sample_attributes_;
+  FeatureFields& GetFeatureAttributes() {
+    return feature_attributes_;
   }
 
   /**
@@ -222,11 +228,11 @@ class Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genie::core::record::sample
+}  // namespace genie::core::record::feature
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_SAMPLE_RECORD_RECORD_H_
+#endif  // SRC_GENIE_CORE_RECORD_FEATURE_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

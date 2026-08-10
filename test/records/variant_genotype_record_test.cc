@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <vector>
-#include "genie/core/record/variant/record.h"
+#include "genie/core/record/genotype/record.h"
 
 namespace genie::core::record {
 
@@ -15,15 +15,15 @@ TEST(VariantGenotypeRecord, BasicProperties) {
     uint32_t sample_index_from = 0;
     uint32_t sample_count = 2;
 
-    std::vector<FormatField> format;
+    std::vector<genotype::FormatField> format;
 
     std::vector<std::vector<int8_t>> alleles = {{0, 1}, {2, 3}};
     std::vector<std::vector<uint8_t>> phasing = {{4}, {5}}; // p-1 = 1
     std::vector<std::vector<uint32_t>> likelihoods = {{8, 9}, {10, 11}};
 
-    std::optional<LinkRecord> link_record;
+    std::optional<linked::Record> link_record;
 
-    VariantGenotype rec(
+    genotype::Record rec(
         variant_index, sample_index_from, sample_count, std::move(format),
         std::move(alleles), std::move(phasing), std::move(likelihoods), link_record);
 
@@ -43,13 +43,13 @@ TEST(VariantGenotypeRecord, RecordWithZeroValues) {
     uint64_t variant_index = 0;
     uint32_t sample_index_from = 0;
     uint32_t sample_count = 0;
-    std::vector<FormatField> format;
+    std::vector<genotype::FormatField> format;
     std::vector<std::vector<int8_t>> alleles;
     std::vector<std::vector<uint8_t>> phasings;
     std::vector<std::vector<uint32_t>> likelihoods;
-    std::optional<LinkRecord> link_record;
+    std::optional<linked::Record> link_record;
 
-    VariantGenotype rec(
+    genotype::Record rec(
         variant_index, sample_index_from, sample_count,
         std::move(format),
         std::move(alleles),
@@ -71,13 +71,13 @@ TEST(VariantGenotypeRecord, RecordFilledWithOtherValues) {
     uint64_t variant_index = 1;
     uint32_t sample_index_from = 0;
     uint32_t sample_count = 2;
-    std::vector<genie::core::record::FormatField> format;
+    std::vector<genie::core::record::genotype::FormatField> format;
     std::vector<std::vector<int8_t>> alleles = {{0, 1}, {2, 3}};
     std::vector<std::vector<uint8_t>> phasings = {{4, 5}, {6, 7}};
     std::vector<std::vector<uint32_t>> likelihoods = {{8, 9}, {10, 11}};
-    std::optional<genie::core::record::LinkRecord> link_record;
+    std::optional<genie::core::record::linked::Record> link_record;
 
-    genie::core::record::VariantGenotype rec(
+    genie::core::record::genotype::Record rec(
         variant_index, sample_index_from, sample_count,
         std::move(format),
         std::move(alleles),

@@ -8,25 +8,17 @@
 #define SRC_GENIE_FUNCTIONALANNOTATION_DESCRIPTORS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include <cstdint>
-#include <iostream>
-#include <map>
-#include <memory>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
 
-#include "genie/core/constants.h"
-#include "genie/core/functional_annotation_record/record.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
+#include <map>
+#include <string>
+
 #include "genie/functionalannotation/tiles.h"
+#include "genie/core/constants.h"
+#include "genie/core/record/functional_annotation/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace functional_annotation {
+namespace genie::functional_annotation {
 
 class Descriptors {
  public:
@@ -70,8 +62,7 @@ class Descriptors {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace functional_annotation
-}  // namespace genie
+}  // namespace genie::functional_annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 

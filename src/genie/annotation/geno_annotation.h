@@ -8,52 +8,50 @@
 #define SRC_GENIE_ANNOTATION_GENO_ANNOTATION_H_
 
 #include <fstream>
-#include <list>
 #include <map>
-#include <sstream>
 #include <string>
 #include <tuple>
-#include <utility>
 #include <vector>
 
-#include "genie/contact/contact_coder.h"
-#include "genie/core/constants.h"
-#include "genie/core/record/variant/record.h"
-// #include "genie/genotype/ParameterSetComposer.h"
 #include "genie/annotation/compressors.h"
 #include "genie/genotype/genotype_coder.h"
+#include "genie/genotype/genotype_parameters.h"
+#include "genie/genotype/genotype_payload.h"
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_payload.h"
+#include "genie/core/constants.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
 #include "genie/core/parameter/annotation/record.h"
 #include "genie/core/access_unit/annotation/record.h"
+#include "genie/core/record/genotype/record.h"
+#include "genie/util/bit_reader.h"
+
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
 struct GenoUnits {
-  core::parameter::annotation::Record annotationParameterSet;
-  std::vector<core::access_unit::annotation::Record>
-      annotationAccessUnit;
+    core::parameter::annotation::Record annotationParameterSet;
+    std::vector<core::access_unit::annotation::Record>
+        annotationAccessUnit;
 };
 
 class GenoAnnotation {
  public:
-  void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) {
-    likelihood_opt = opt;
-  }
-  void setGenotypeOptions(genie::genotype::EncodingOptions opt) {
-    genotype_opt = opt;
-  }
-  void setTileSize(uint32_t _defaultTileSizeHeight,
-                   uint32_t _defaultTileSizeWidth) {
-    defaultTileSizeHeight = _defaultTileSizeHeight;
-    defaultTileSizeWidth = _defaultTileSizeWidth;
-  }
+    void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) {
+        likelihood_opt = opt;
+    }
+    void setGenotypeOptions(genie::genotype::EncodingOptions opt) {
+        genotype_opt = opt;
+    }
+    void setTileSize(uint32_t _defaultTileSizeHeight,
+                     uint32_t _defaultTileSizeWidth) {
+        defaultTileSizeHeight = _defaultTileSizeHeight;
+        defaultTileSizeWidth = _defaultTileSizeWidth;
+    }
 
-  using AttrType = std::vector<uint8_t>;
+    using AttrType = std::vector<uint8_t>;
 
   class RecData {
    public:
@@ -116,7 +114,7 @@ class GenoAnnotation {
   }
 
  private:
-  typedef std::vector<genie::core::record::VariantGenotype>
+  typedef std::vector<genie::core::record::genotype::Record>
       Tile;  // one tile contains a number of records
 
   uint32_t defaultTileSizeHeight;
@@ -139,7 +137,7 @@ class GenoAnnotation {
       attrValues;
 
   void sort_format(
-      std::vector<genie::core::record::VariantGenotype>& varGenoType);
+      std::vector<genie::core::record::genotype::Record>& varGenoType);
 
   struct ParsBlocks {
     genie::genotype::GenotypeParameters genotypePars;
@@ -164,8 +162,7 @@ class GenoAnnotation {
       RecData& recData);
 };
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation
 
 // -----------------------------------------------------------------------------
 

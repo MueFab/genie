@@ -32,7 +32,7 @@ namespace genie::likelihood {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void extract_likelihoods(const EncodingOptions& opt, LikelihoodEncodingBlock& block,
-                         std::vector<core::record::VariantGenotype>& recs) {
+                         std::vector<core::record::genotype::Record>& recs) {
     UTILS_DIE_IF(recs.empty(), "No records found for the process!");
 
     auto block_size = opt.block_size < recs.size() ? opt.block_size : recs.size();
@@ -199,7 +199,7 @@ void deserialize_block(const std::vector<uint8_t>& mat_payload, const std::vecto
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void encode_likelihood(std::vector<core::record::VariantGenotype>& recs, LikelihoodParameters& params,
+void encode_likelihood(std::vector<core::record::genotype::Record>& recs, LikelihoodParameters& params,
                        LikelihoodPayload& payload, size_t block_size, bool transform_flag) {
     EncodingOptions opt{static_cast<uint32_t>(block_size), transform_flag};
     LikelihoodEncodingBlock block;
@@ -233,7 +233,7 @@ void encode_likelihood(std::vector<core::record::VariantGenotype>& recs, Likelih
 // ---------------------------------------------------------------------------------------------------------------------
 
 void decode_likelihood(const LikelihoodParameters& params, LikelihoodPayload& payload,
-                       std::vector<core::record::VariantGenotype>& recs) {
+                       std::vector<core::record::genotype::Record>& recs) {
     LikelihoodEncodingBlock block;
     block.nrows = payload.getNRows();
     block.ncols = payload.getNCols();

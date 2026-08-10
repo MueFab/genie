@@ -31,7 +31,7 @@ class Descriptors {
         init();
     }
 
-    void write(genie::core::record::variant_site::Record variantSite);
+    void write(genie::core::record::site::Record variantSite);
 
     std::map<genie::core::AnnotDesc, TiledStream>& getTiles() { return tiles; }
 

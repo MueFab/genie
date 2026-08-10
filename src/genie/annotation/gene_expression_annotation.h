@@ -15,10 +15,10 @@
 
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/annotation/compressors.h"
-#include "genie/core/parameter/annotation/attribute_data.h"
-#include "genie/core/gene_expression_record/record.h"
-#include "genie/core/parameter/annotation/record.h"
 #include "genie/core/access_unit/annotation/record.h"
+#include "genie/core/parameter/annotation/attribute_data.h"
+#include "genie/core/parameter/annotation/record.h"
+#include "genie/core/record/gene_expression/record.h"
 #include "genie/util/bit_reader.h"
 
 // -----------------------------------------------------------------------------

@@ -5,26 +5,21 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_TRACK_RECORD_RECORD_H_
-#define SRC_GENIE_CORE_TRACK_RECORD_RECORD_H_
+#ifndef SRC_GENIE_CORE_RECORD_TRACK_DATA_RECORD_H_
+#define SRC_GENIE_CORE_RECORD_TRACK_DATA_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <memory>
 #include <string>
 #include <vector>
 
-#include "genie/core/array_type.h"
 #include "genie/core/access_unit/annotation/attribute_field.h"
-#include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "genie/util/bit_writer.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie::core::record::track {
+namespace genie::core::record::track_data {
 
 /**
  * @brief Structure representing an attribute entry
@@ -196,11 +191,11 @@ class Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genie::core::record::track
+}  // namespace genie::core::record::track_data
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_TRACK_RECORD_RECORD_H_
+#endif  // SRC_GENIE_CORE_RECORD_TRACK_DATA_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

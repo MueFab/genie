@@ -5,20 +5,9 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/core/track_property_record/record.h"
-
-#include <algorithm>
-#include <cstring>
-#include <sstream>
-#include <string>
-#include <utility>
+#include "genie/core/record/track_property/record.h"
 
 #include "genie/core/array_type.h"
-#include "genie/core/parameter/annotation/record.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
 
 // -------------------------------------------------------------------------------------------------
 

@@ -26,13 +26,13 @@ void SiteAnnotation::parseInfoTags(std::string& recordInputFileName) {
     readForTags.open(recordInputFileName, std::ios::in | std::ios::binary);
     genie::util::BitReader bitreader(readForTags);
     std::vector<genie::core::access_unit::annotation::AttributeField> infoTag;
-    genie::core::record::variant_site::Record recs;
+    genie::core::record::site::Record recs;
     while (recs.Read(bitreader)) {
         infoTag = recs.GetInfoTag();
         for (const auto& tag : infoTag) {
             InfoField infoField(tag.name, tag.type, static_cast<uint8_t>(tag.values.size()));
-            genie::core::record::variant_site::Info_tag infotag{static_cast<uint8_t>(tag.name.size()), tag.name, tag.type,
-                                                                static_cast<uint8_t>(tag.values.size()), tag.values};
+            genie::core::record::site::Info_tag infotag{static_cast<uint8_t>(tag.name.size()), tag.name, tag.type,
+                                                        static_cast<uint8_t>(tag.values.size()), tag.values};
             infoTags[tag.name] = infotag;
             attributeInfo[tag.name] = infoField;
         }

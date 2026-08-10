@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/feature_record/record.h"
+#include "genie/core/record/feature/record.h"
 
 // -------------------------------------------------------------------------------------------------
 

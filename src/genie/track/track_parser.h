@@ -8,31 +8,23 @@
 #define SRC_GENIE_TRACK_TRACK_PARSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include <cstdint>
-#include <iostream>
+
 #include <map>
-#include <memory>
-#include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "genie/core/constants.h"
 #include "genie/variantsite/attributes.h"
 #include "genie/track/descriptors.h"
-
 #include "genie/annotation/json_attribute_parser.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
-#include "genie/core/parameter/annotation/attribute_parameter_set.h"
-#include "genie/core/parameter/annotation/descriptor_configuration.h"
-#include "genie/core/track_record/record.h"
+#include "genie/core/record/track_data/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace track {
+namespace genie::track {
 
 //-------------------------------------------------------------------------------//
 
@@ -51,7 +43,7 @@ class TrackParser {
     uint64_t getNrOfTiles() { return descriptors.getTiles()[genie::core::AnnotDesc::STARTPOS].getTiles().size(); }
 
  private:
-    genie::core::record::track::Record trackRecord;
+    genie::core::record::track_data::Record trackRecord;
     std::istream& trackMGrecs;
     uint64_t rowsPerTile;
     size_t numberOfRows;
@@ -73,8 +65,7 @@ class TrackParser {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace track
-}  // namespace genie
+}  // namespace genie::track
 
 // ---------------------------------------------------------------------------------------------------------------------
 

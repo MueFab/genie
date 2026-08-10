@@ -10,7 +10,7 @@
 #include <string>
 
 #include "genie/track/track_parser.h"
-#include "genie/core/track_record/record.h"
+#include "genie/core/record/track_data/record.h"
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"
@@ -23,7 +23,7 @@ void TrackDataAnnotation::parseInfoTags(std::string& recordInputFileName) {
     std::ifstream readForTags;
     readForTags.open(recordInputFileName, std::ios::in | std::ios::binary);
     util::BitReader bitreader(readForTags);
-    core::record::track::Record recs;
+    core::record::track_data::Record recs;
     numberOfRecords = 0;
 
     while (recs.Read(bitreader)) {
