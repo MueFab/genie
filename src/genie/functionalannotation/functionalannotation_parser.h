@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/variantsite/attributes.h"
+#include "genie/annotation/attributes.h"
 #include "genie/functionalannotation/descriptors.h"
 
 #include "genie/annotation/json_attribute_parser.h"
