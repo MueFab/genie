@@ -18,8 +18,8 @@
 #include "genie/util/make_unique.h"
 #include "genie/util/runtime_exception.h"
 
-#include "genie/core/record/variant/record.h"
-#include "genie/core/record/variant/record.h"
+#include "genie/core/record/genotype/record.h"
+#include "genie/core/record/genotype/record.h"
 
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"

@@ -12,7 +12,7 @@
 #include <tuple>
 
 #include "genie/core/constants.h"
-#include "genie/core/record/variant/record.h"
+#include "genie/core/record/genotype/record.h"
 #include "genie/backend/backend.h"
 #include "genotype_parameters.h"
 #include "genotype_payload.h"
@@ -35,7 +35,7 @@ struct EncodingOptions {
 // Unified Coder Interface
 
 void decompose(
-    std::vector<core::record::VariantGenotype>& recs,
+    std::vector<core::record::GenotypeRecord>& recs,
     uint8_t& max_ploidy,
     Int8MatDtype& allele_mat,
     BinMatDtype& phasing_mat,
@@ -156,7 +156,7 @@ void decode_and_inverse_sort_bin_mat(
 );
 
 void encode_genotype(
-    std::vector<core::record::VariantGenotype>& recs,
+    std::vector<core::record::GenotypeRecord>& recs,
     GenotypeParameters& params,
     GenotypePayload& payload,
     size_t block_size=512,

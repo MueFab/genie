@@ -18,7 +18,7 @@
 
 #include "genie/contact/contact_coder.h"
 #include "genie/core/constants.h"
-#include "genie/core/record/variant/record.h"
+#include "genie/core/record/genotype/record.h"
 // #include "genie/genotype/ParameterSetComposer.h"
 #include "genie/annotation/compressors.h"
 #include "genie/genotype/genotype_coder.h"
@@ -116,7 +116,7 @@ class GenoAnnotation {
   }
 
  private:
-  typedef std::vector<genie::core::record::VariantGenotype>
+  typedef std::vector<genie::core::record::GenotypeRecord>
       Tile;  // one tile contains a number of records
 
   uint32_t defaultTileSizeHeight;
@@ -139,7 +139,7 @@ class GenoAnnotation {
       attrValues;
 
   void sort_format(
-      std::vector<genie::core::record::VariantGenotype>& varGenoType);
+      std::vector<genie::core::record::GenotypeRecord>& varGenoType);
 
   struct ParsBlocks {
     genie::genotype::GenotypeParameters genotypePars;

@@ -28,8 +28,8 @@ set(source_files
         record/alignment_box.cc
         record/alignment.cc
 
-        record/variant/record.cc
-        record/variant/format_field.cc
+        record/genotype/record.cc
+        record/genotype/format_field.cc
         linked_record/linked_record.cc
         record/site/record.cc
         record/data_unit/record.cc

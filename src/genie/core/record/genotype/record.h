@@ -5,8 +5,8 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_VARIANT_GENOTYPE_RECORD_H_
-#define SRC_GENIE_CORE_RECORD_VARIANT_GENOTYPE_RECORD_H_
+#ifndef SRC_GENIE_CORE_RECORD_GENOTYPE_RECORD_H_
+#define SRC_GENIE_CORE_RECORD_GENOTYPE_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -154,7 +154,7 @@ bool operator==(const FormatField& lhs, const FormatField& rhs);
  * Contains information about samples, alleles, phasings, likelihoods and format fields
  * associated with a specific variant.
  */
-class VariantGenotype {
+class GenotypeRecord {
  private:
   uint64_t variant_index_;      //!< @brief Variant index
   uint32_t sample_index_from_;  //!< @brief Starting sample index
@@ -172,12 +172,12 @@ class VariantGenotype {
  /**
    * @brief Default constructor
    */
- VariantGenotype();
+ GenotypeRecord();
 
  /**
    * @brief Parametrized constructor
    */
- VariantGenotype(
+ GenotypeRecord(
      uint64_t variant_index,
      uint32_t sample_index_from,
      uint32_t sample_count,
@@ -190,40 +190,40 @@ class VariantGenotype {
 
  /**
    * @brief Copy constructor
-   * @param other VariantGenotype
+   * @param other GenotypeRecord
    */
- VariantGenotype(const VariantGenotype& other);
+ GenotypeRecord(const GenotypeRecord& other);
 
  /**
    * @brief Move constructor
-   * @param other VariantGenotype
+   * @param other GenotypeRecord
    */
- VariantGenotype(VariantGenotype&& other) noexcept;
+ GenotypeRecord(GenotypeRecord&& other) noexcept;
 
  /**
    * @brief Copy assignment operator
-   * @param other VariantGenotype
+   * @param other GenotypeRecord
    */
- VariantGenotype& operator=(const VariantGenotype& other);
+ GenotypeRecord& operator=(const GenotypeRecord& other);
 
  /**
    * @brief Move assignment operator
-   * @param other VariantGenotype
+   * @param other GenotypeRecord
    */
- VariantGenotype& operator=(VariantGenotype&& other) noexcept;
+ GenotypeRecord& operator=(GenotypeRecord&& other) noexcept;
 
   /**
    * @brief Constructs a variant genotype by reading using BitReader
    * @param bitreader The bit reader to read from
    */
-  explicit VariantGenotype(util::BitReader& bitreader);
+  explicit GenotypeRecord(util::BitReader& bitreader);
 
   /**
    * @brief Constructs a variant genotype with specified parameters
    * @param variant_index The index of the variant
    * @param sample_index_from The starting sample index
    */
-  VariantGenotype(uint64_t variant_index, uint32_t sample_index_from);
+  GenotypeRecord(uint64_t variant_index, uint32_t sample_index_from);
 
  // Getters
 
@@ -391,8 +391,8 @@ class VariantGenotype {
   void SetNumberOfSamples(uint32_t sampleSize);
 
  /**
- * @brief Get size of the VariantGenotype
- * @return size_t of VariantGenotype size
+ * @brief Get size of the GenotypeRecord
+ * @return size_t of GenotypeRecord size
  */
   size_t GetSize() const;
 };
@@ -405,13 +405,13 @@ class VariantGenotype {
  * @return true
  * @return false
  */
-bool operator==(const VariantGenotype& lhs, const VariantGenotype& rhs);
+bool operator==(const GenotypeRecord& lhs, const GenotypeRecord& rhs);
 
 }  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_VARIANT_GENOTYPE_RECORD_H_
+#endif  // SRC_GENIE_CORE_RECORD_GENOTYPE_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

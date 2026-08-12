@@ -19,7 +19,7 @@
 
 #include "filesystem/filesystem.hpp"
 #include "genie/core/record/data_unit/record.h"
-#include "genie/core/record/variant/record.h"
+#include "genie/core/record/genotype/record.h"
 #include "genie/core/writer.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
@@ -189,7 +189,7 @@ void encodeVariantGenotype(const std::string& _input_fpath,
                            const std::string& _output_fpath) {
   std::ifstream reader(_input_fpath, std::ios::binary);
   genie::util::BitReader bitreader(reader);
-  std::vector<genie::core::record::VariantGenotype> recs;
+  std::vector<genie::core::record::GenotypeRecord> recs;
 
   while (bitreader.IsStreamGood()) {
     recs.emplace_back(bitreader);
