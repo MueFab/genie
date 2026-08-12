@@ -19,7 +19,7 @@
 #include "genie/trackproperty/descriptors.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/runtime_exception.h"
-#include "genie/variantsite/attributes.h"
+#include "genie/annotation/attributes.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

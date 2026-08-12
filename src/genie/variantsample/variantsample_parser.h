@@ -18,8 +18,8 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/variantsite/attributes.h"
-#include "genie/variantsite/descriptors.h"
+#include "genie/annotation/attributes.h"
+#include "genie/annotation/descriptors.h"
 
 #include "genie/annotation/json_attribute_parser.h"
 #include "genie/core/sample_record/record.h"

@@ -14,7 +14,7 @@
 #include <string>
 
 #include "genie/core/constants.h"
-#include "genie/variantsite/tiles.h"
+#include "genie/annotation/tiles.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

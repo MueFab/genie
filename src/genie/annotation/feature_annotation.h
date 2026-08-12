@@ -16,7 +16,7 @@
 #include "genie/core/constants.h"
 #include "genie/feature/feature_parser.h"
 #include "genie/annotation/accessunit_composer.h"
-#include "genie/variantsite/parameterset_composer.h"
+#include "genie/annotation/vsite_parameterset_composer.h"
 
 #include "genie/annotation/compressors.h"
 #include "genie/core/record/data_unit/record.h"
