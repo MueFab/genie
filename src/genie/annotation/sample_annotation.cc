@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include "genie/core/record/annotation_access_unit/TypedData.h"
+#include "genie/core/access_unit/annotation/typed_data.h"
 #include "genie/annotation/accessunit_composer.h"
 
 #include "genie/core/array_type.h"
