@@ -16,7 +16,7 @@
 #include <memory>
 #include "genie/entropy/base/encoder.h"
 #include "genie/core/parameter/annotation/algorithm_parameters.h"
-#include "genie/core/record/annotation_access_unit/TypedData.h"
+#include "genie/core/access_unit/annotation/typed_data.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
