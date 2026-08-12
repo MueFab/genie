@@ -60,7 +60,7 @@ class TypedData {
         return *this;
     }
 
-    TypedData(TypedData& other) {
+    TypedData(const TypedData& other) {
         data_type_ID = other.data_type_ID;
         num_array_dims = other.num_array_dims;
         array_dims = other.array_dims;
