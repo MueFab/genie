@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <vector>
-#include "genie/core/record/variant/record.h"
+#include "genie/core/record/genotype/record.h"
 
 namespace genie::core::record {
 
@@ -23,7 +23,7 @@ TEST(VariantGenotypeRecord, BasicProperties) {
 
     std::optional<LinkRecord> link_record;
 
-    VariantGenotype rec(
+    GenotypeRecord rec(
         variant_index, sample_index_from, sample_count, std::move(format),
         std::move(alleles), std::move(phasing), std::move(likelihoods), link_record);
 
@@ -49,7 +49,7 @@ TEST(VariantGenotypeRecord, RecordWithZeroValues) {
     std::vector<std::vector<uint32_t>> likelihoods;
     std::optional<LinkRecord> link_record;
 
-    VariantGenotype rec(
+    GenotypeRecord rec(
         variant_index, sample_index_from, sample_count,
         std::move(format),
         std::move(alleles),
@@ -77,7 +77,7 @@ TEST(VariantGenotypeRecord, RecordFilledWithOtherValues) {
     std::vector<std::vector<uint32_t>> likelihoods = {{8, 9}, {10, 11}};
     std::optional<genie::core::record::LinkRecord> link_record;
 
-    genie::core::record::VariantGenotype rec(
+    genie::core::record::GenotypeRecord rec(
         variant_index, sample_index_from, sample_count,
         std::move(format),
         std::move(alleles),

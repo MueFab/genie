@@ -15,7 +15,7 @@
 #include "genie/util/runtime_exception.h"
 
 #include "genie/core/array_type.h"
-#include "genie/core/record/variant/record.h"
+#include "genie/core/record/genotype/record.h"
 
 // -----------------------------------------------------------------------------
 
@@ -23,12 +23,12 @@ namespace genie::core::record {
 
 // -----------------------------------------------------------------------------
 
-VariantGenotype::VariantGenotype() = default;
+GenotypeRecord::GenotypeRecord() = default;
 
 // -----------------------------------------------------------------------------
 
 // Parameterized constructor
-VariantGenotype::VariantGenotype(
+GenotypeRecord::GenotypeRecord(
     uint64_t variant_index,
     uint32_t sample_index_from,
     uint32_t sample_count,
@@ -49,7 +49,7 @@ VariantGenotype::VariantGenotype(
 
 // -----------------------------------------------------------------------------
 
-//VariantGenotype::VariantGenotype(uint64_t _variant_index, uint32_t _sample_index_from)
+//GenotypeRecord::GenotypeRecord(uint64_t _variant_index, uint32_t _sample_index_from)
 //
 //    : variant_index(_variant_index),
 //      sample_index_from(_sample_index_from),
@@ -61,7 +61,7 @@ VariantGenotype::VariantGenotype(
 // -----------------------------------------------------------------------------
 
 // Copy constructor
-VariantGenotype::VariantGenotype(const VariantGenotype& other) {
+GenotypeRecord::GenotypeRecord(const GenotypeRecord& other) {
   variant_index_ = other.variant_index_;
   sample_index_from_ = other.sample_index_from_;
   sample_count_ = other.sample_count_;
@@ -75,7 +75,7 @@ VariantGenotype::VariantGenotype(const VariantGenotype& other) {
 // -----------------------------------------------------------------------------
 
 // Move constructor
-VariantGenotype::VariantGenotype(VariantGenotype&& other) noexcept {
+GenotypeRecord::GenotypeRecord(GenotypeRecord&& other) noexcept {
   variant_index_ = other.variant_index_;
   sample_index_from_ = other.sample_index_from_;
   sample_count_ = other.sample_count_;
@@ -89,7 +89,7 @@ VariantGenotype::VariantGenotype(VariantGenotype&& other) noexcept {
 // -----------------------------------------------------------------------------
 
 // Copy assignment operator
-VariantGenotype& VariantGenotype::operator=(const VariantGenotype& other) {
+GenotypeRecord& GenotypeRecord::operator=(const GenotypeRecord& other) {
   if (this != &other) {
     variant_index_ = other.variant_index_;
     sample_index_from_ = other.sample_index_from_;
@@ -106,7 +106,7 @@ VariantGenotype& VariantGenotype::operator=(const VariantGenotype& other) {
 // -----------------------------------------------------------------------------
 
 // Move assignment operator
-VariantGenotype& VariantGenotype::operator=(VariantGenotype&& other) noexcept {
+GenotypeRecord& GenotypeRecord::operator=(GenotypeRecord&& other) noexcept {
   if (this != &other) {
     variant_index_ = other.variant_index_;
     sample_index_from_ = other.sample_index_from_;
@@ -122,7 +122,7 @@ VariantGenotype& VariantGenotype::operator=(VariantGenotype&& other) noexcept {
 
 // -----------------------------------------------------------------------------
 
-VariantGenotype::VariantGenotype(util::BitReader& reader)
+GenotypeRecord::GenotypeRecord(util::BitReader& reader)
     : variant_index_(reader.ReadAlignedInt<uint64_t>()),
       sample_index_from_(reader.ReadAlignedInt<uint32_t>()),
       sample_count_(reader.ReadAlignedInt<uint32_t>()),
@@ -187,80 +187,80 @@ VariantGenotype::VariantGenotype(util::BitReader& reader)
     }
 }
 
-uint64_t VariantGenotype::GetVariantIndex() const { return variant_index_; }
+uint64_t GenotypeRecord::GetVariantIndex() const { return variant_index_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t VariantGenotype::GetSampleIndexFrom() const { return sample_index_from_; }
+uint32_t GenotypeRecord::GetSampleIndexFrom() const { return sample_index_from_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t VariantGenotype::GetSampleCount() const { return sample_count_; }
+uint32_t GenotypeRecord::GetSampleCount() const { return sample_count_; }
 
 // -----------------------------------------------------------------------------
 
-const std::vector<FormatField>& VariantGenotype::GetFormat() const { return format_; }
+const std::vector<FormatField>& GenotypeRecord::GetFormat() const { return format_; }
 
 // -----------------------------------------------------------------------------
 
-const std::vector<std::vector<int8_t>>& VariantGenotype::GetAlleles() const { return alleles_; }
+const std::vector<std::vector<int8_t>>& GenotypeRecord::GetAlleles() const { return alleles_; }
 
 // -----------------------------------------------------------------------------
 
-const std::vector<std::vector<uint8_t>>& VariantGenotype::GetPhasing() const { return phasings_; }
+const std::vector<std::vector<uint8_t>>& GenotypeRecord::GetPhasing() const { return phasings_; }
 
 // -----------------------------------------------------------------------------
 
-const std::vector<std::vector<uint32_t>>& VariantGenotype::GetLikelihoods() const { return likelihoods_; }
+const std::vector<std::vector<uint32_t>>& GenotypeRecord::GetLikelihoods() const { return likelihoods_; }
 
 // -----------------------------------------------------------------------------
 
-const std::optional<LinkRecord>& VariantGenotype::GetLinkRecord() const { return link_record_; }
+const std::optional<LinkRecord>& GenotypeRecord::GetLinkRecord() const { return link_record_; }
 
 // -----------------------------------------------------------------------------
 
-void VariantGenotype::SetVariantIndex(uint64_t value) { variant_index_ = value; }
+void GenotypeRecord::SetVariantIndex(uint64_t value) { variant_index_ = value; }
 
 // -----------------------------------------------------------------------------
 
-void VariantGenotype::SetSampleIndexFrom(uint32_t value) { sample_index_from_ = value; }
+void GenotypeRecord::SetSampleIndexFrom(uint32_t value) { sample_index_from_ = value; }
 
 // -----------------------------------------------------------------------------
 
-void VariantGenotype::SetSampleCount(uint32_t value) { sample_count_ = value; }
+void GenotypeRecord::SetSampleCount(uint32_t value) { sample_count_ = value; }
 
 // -----------------------------------------------------------------------------
 
-void VariantGenotype::SetFormat(std::vector<FormatField> value) { format_ = std::move(value); }
+void GenotypeRecord::SetFormat(std::vector<FormatField> value) { format_ = std::move(value); }
 
 // -----------------------------------------------------------------------------
 
-void VariantGenotype::SetFormat(std::vector<FormatField>&& value) { format_ = std::move(value); }
+void GenotypeRecord::SetFormat(std::vector<FormatField>&& value) { format_ = std::move(value); }
 
 // -----------------------------------------------------------------------------
 
-void VariantGenotype::SetAlleles(std::vector<std::vector<int8_t>> value) { alleles_ = std::move(value); }
+void GenotypeRecord::SetAlleles(std::vector<std::vector<int8_t>> value) { alleles_ = std::move(value); }
 
 // -----------------------------------------------------------------------------
 
-void VariantGenotype::SetAlleles(std::vector<std::vector<int8_t>>&& value) { alleles_ = std::move(value); }
+void GenotypeRecord::SetAlleles(std::vector<std::vector<int8_t>>&& value) { alleles_ = std::move(value); }
 
 // -----------------------------------------------------------------------------
 
-void VariantGenotype::SetPhasings(std::vector<std::vector<uint8_t>> value) { phasings_ = std::move(value); }
+void GenotypeRecord::SetPhasings(std::vector<std::vector<uint8_t>> value) { phasings_ = std::move(value); }
 
 // -----------------------------------------------------------------------------
 
-void VariantGenotype::SetPhasings(std::vector<std::vector<uint8_t>>&& value) { phasings_ = std::move(value); }
+void GenotypeRecord::SetPhasings(std::vector<std::vector<uint8_t>>&& value) { phasings_ = std::move(value); }
 
 
 // -----------------------------------------------------------------------------
 
-void VariantGenotype::SetLikelihoods(std::vector<std::vector<uint32_t>> value) { likelihoods_ = std::move(value); }
+void GenotypeRecord::SetLikelihoods(std::vector<std::vector<uint32_t>> value) { likelihoods_ = std::move(value); }
 
 // -----------------------------------------------------------------------------
 
-void VariantGenotype::SetNumberOfLikelihoods(uint8_t value) {
+void GenotypeRecord::SetNumberOfLikelihoods(uint8_t value) {
     if (likelihoods_.size() != sample_count_) {
         likelihoods_.resize(sample_count_);
     }
@@ -272,19 +272,19 @@ void VariantGenotype::SetNumberOfLikelihoods(uint8_t value) {
 
 // -----------------------------------------------------------------------------
 
-void VariantGenotype::SetLinkRecord(const std::optional<LinkRecord>& value) { link_record_ = value; }
+void GenotypeRecord::SetLinkRecord(const std::optional<LinkRecord>& value) { link_record_ = value; }
 
 // -----------------------------------------------------------------------------
 
-uint8_t VariantGenotype::GetFormatCount() const { return static_cast<uint8_t>(format_.size()); }
+uint8_t GenotypeRecord::GetFormatCount() const { return static_cast<uint8_t>(format_.size()); }
 
 // -----------------------------------------------------------------------------
 
-bool VariantGenotype::IsGenotypePresent() const { return !alleles_.empty(); }
+bool GenotypeRecord::IsGenotypePresent() const { return !alleles_.empty(); }
 
 // -----------------------------------------------------------------------------
 
-uint8_t VariantGenotype::GetNumberOfAllelesPerSample() const {
+uint8_t GenotypeRecord::GetNumberOfAllelesPerSample() const {
   if (IsGenotypePresent()) {
     return static_cast<uint8_t>(alleles_.front().size());
   } else {
@@ -295,11 +295,11 @@ uint8_t VariantGenotype::GetNumberOfAllelesPerSample() const {
 
 // -----------------------------------------------------------------------------
 
-bool VariantGenotype::IsLikelihoodPresent() const { return !likelihoods_.empty(); }
+bool GenotypeRecord::IsLikelihoodPresent() const { return !likelihoods_.empty(); }
 
 // -----------------------------------------------------------------------------
 
-uint8_t VariantGenotype::GetNumberOfLikelihoods() const {
+uint8_t GenotypeRecord::GetNumberOfLikelihoods() const {
     if (!IsLikelihoodPresent()) {
         return 0;
     } else {
@@ -309,12 +309,12 @@ uint8_t VariantGenotype::GetNumberOfLikelihoods() const {
 
 // -----------------------------------------------------------------------------
 
-bool VariantGenotype::GetLinkedRecord() const { return link_record_.has_value(); }
+bool GenotypeRecord::GetLinkedRecord() const { return link_record_.has_value(); }
 
 // -----------------------------------------------------------------------------
 
 // Size calculation
-size_t VariantGenotype::GetSize() const {
+size_t GenotypeRecord::GetSize() const {
 //  size_t size = 0;
 //  size += sizeof(variant_index_);
 //  size += sizeof(sample_index_from_);
@@ -370,7 +370,7 @@ bool operator==(const FormatField& lhs, const FormatField& rhs) {
            lhs.GetArrayLength() == rhs.GetArrayLength();
 }
 
-bool operator==(const VariantGenotype& lhs, const VariantGenotype& rhs) {
+bool operator==(const GenotypeRecord& lhs, const GenotypeRecord& rhs) {
     return lhs.GetVariantIndex() == rhs.GetVariantIndex() &&
            lhs.GetSampleIndexFrom() == rhs.GetSampleIndexFrom() &&
            lhs.GetSampleCount() == rhs.GetSampleCount() &&

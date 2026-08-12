@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/record/variant/record.h"
+#include "genie/core/record/genotype/record.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genotype_test_helpers.h"
@@ -412,7 +412,7 @@ TEST(Genotype, RoundTrip_CASE12) {
   std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
   std::string filepath = gitRootDir + "/data/records/variant/1.3.5.header100.gt_only.vcf.geno";
 
-  std::vector<genie::core::record::VariantGenotype> RECS;
+  std::vector<genie::core::record::GenotypeRecord> RECS;
   {
     std::ifstream reader(filepath, std::ios::binary);
     ASSERT_TRUE((reader.fail()) == (false));
@@ -491,7 +491,7 @@ TEST(Genotype, RoundTrip_File_Integration) {
         std::ifstream reader(gitRootDir + file, std::ios::binary);
         if (reader.fail()) continue;
 
-        std::vector<genie::core::record::VariantGenotype> recs;
+        std::vector<genie::core::record::GenotypeRecord> recs;
         genie::util::BitReader bitreader(reader);
         while (bitreader.IsStreamGood()) recs.emplace_back(bitreader);
         recs.pop_back();
@@ -522,7 +522,7 @@ TEST(Genotype, DISABLED_GenerateGoldenMaster) {
     std::ifstream reader(gitRootDir + inputFile, std::ios::binary);
     ASSERT_FALSE(reader.fail()) << "Could not open input file: " << inputFile;
 
-    std::vector<genie::core::record::VariantGenotype> recs;
+    std::vector<genie::core::record::GenotypeRecord> recs;
     genie::util::BitReader bitreader(reader);
     while (bitreader.IsStreamGood()) {
         recs.emplace_back(bitreader);
@@ -571,7 +571,7 @@ TEST(Genotype, CrossBackend_GoldenMaster) {
     std::ifstream reader(gitRootDir + inputFile, std::ios::binary);
     ASSERT_FALSE(reader.fail()) << "Could not open input file: " << inputFile;
 
-    std::vector<genie::core::record::VariantGenotype> recs;
+    std::vector<genie::core::record::GenotypeRecord> recs;
     genie::util::BitReader bitreader(reader);
     while (bitreader.IsStreamGood()) {
         recs.emplace_back(bitreader);

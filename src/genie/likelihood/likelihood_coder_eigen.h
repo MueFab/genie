@@ -10,7 +10,7 @@
 #include <vector>
 #include <sstream>
 #include "likelihood_types.h"
-#include "genie/core/record/variant/record.h"
+#include "genie/core/record/genotype/record.h"
 #include "likelihood_parameters.h"
 
 namespace genie::likelihood {
@@ -42,7 +42,7 @@ namespace genie::likelihood::detail::eigen {
 void extract_likelihoods(
     const EncodingOptions& opt,
     LikelihoodEncodingBlock& block,
-    std::vector<core::record::VariantGenotype>& recs);
+    std::vector<core::record::GenotypeRecord>& recs);
 
 void transform_likelihood_mat(const EncodingOptions& opt, LikelihoodEncodingBlock& block);
 
@@ -59,13 +59,13 @@ void serialize_mat(UInt32MatDtype mat, core::DataType dtype_id, uint32_t& nrows,
 void serialize_arr(UInt32ArrDtype arr, uint32_t nelems, std::stringstream& payload);
 
 void encode_likelihood(
-    std::vector<core::record::VariantGenotype>& recs,
+    std::vector<core::record::GenotypeRecord>& recs,
     LikelihoodParameters& params, LikelihoodPayload& payload,
     size_t block_size, bool transform_flag);
 
 void decode_likelihood(
     const LikelihoodParameters& params, LikelihoodPayload& payload,
-    std::vector<core::record::VariantGenotype>& recs);
+    std::vector<core::record::GenotypeRecord>& recs);
 
 } // namespace genie::likelihood::detail::eigen
 

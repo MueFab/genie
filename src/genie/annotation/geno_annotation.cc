@@ -184,7 +184,7 @@ size_t genie::annotation::GenoAnnotation::readOneBlock(
     genie::likelihood::LikelihoodParameters& likelihoodParameters,
     RecData& recData) {
   // read rowTileSize of rows
-  std::vector<genie::core::record::VariantGenotype> varGenoType;
+  std::vector<genie::core::record::GenotypeRecord> varGenoType;
   while (reader.IsStreamGood() && varGenoType.size() < rowTileSize) {
     varGenoType.emplace_back(reader);
     if (!reader.IsStreamGood()) varGenoType.pop_back();
@@ -263,7 +263,7 @@ size_t genie::annotation::GenoAnnotation::readOneBlock(
 }
 
 void GenoAnnotation::sort_format(
-    std::vector<genie::core::record::VariantGenotype>& recs) {
+    std::vector<genie::core::record::GenotypeRecord>& recs) {
   // starting number
   uint8_t AttributeID = 25;
 

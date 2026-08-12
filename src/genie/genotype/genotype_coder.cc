@@ -16,7 +16,7 @@
 namespace genie::genotype {
 
 void decompose(
-    std::vector<core::record::VariantGenotype>& recs,
+    std::vector<core::record::GenotypeRecord>& recs,
     uint8_t& max_ploidy,
     Int8MatDtype& allele_mat,
     BinMatDtype& phasing_mat,
@@ -562,7 +562,7 @@ void decode_and_inverse_sort_bin_mat(
 }
 
 void encode_genotype(
-    std::vector<core::record::VariantGenotype>& recs,
+    std::vector<core::record::GenotypeRecord>& recs,
     GenotypeParameters& params,
     GenotypePayload& payload,
     size_t block_size,
