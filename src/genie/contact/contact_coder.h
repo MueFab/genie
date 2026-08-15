@@ -4,21 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CONTACT_CONTACT_CODER_H
-#define GENIE_CONTACT_CONTACT_CODER_H
+#ifndef SRC_GENIE_CONTACT_CONTACT_CODER_H_
+#define SRC_GENIE_CONTACT_CONTACT_CODER_H_
 
 #include <cstdint>
 #include <list>
 #include <optional>
 #include <tuple>
-#include "consts.h"
-#include "contact_matrix_parameters.h"
+#include "genie/contact/consts.h"
+#include "genie/contact/contact_matrix_parameters.h"
+#include "genie/contact/subcontact_matrix_parameters.h"
+#include "genie/contact/subcontact_matrix_payload.h"
+#include "genie/contact/contact_types.h"
+#include "genie/backend/backend.h"
 #include "genie/core/constants.h"
 #include "genie/core/record/contact/record.h"
-#include "subcontact_matrix_parameters.h"
-#include "subcontact_matrix_payload.h"
-#include "contact_types.h"
-#include <genie/backend/backend.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -288,7 +288,7 @@ void conv_noop_on_sparse_mat(
     UInt64VecDtype& tile_col_ids,
     UIntVecDtype& tile_counts,
     uint32_t bin_size_mult,
-    bool sort_output=false
+    bool sort_output = false
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -311,7 +311,7 @@ void decode_scm(
     SubcontactMatrixParameters& scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
     core::record::ContactRecord& rec,
-    uint32_t bin_size_mult=1
+    uint32_t bin_size_mult = 1
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -321,17 +321,17 @@ void encode_scm(
     core::record::ContactRecord& rec,
     SubcontactMatrixParameters& scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
-    bool remove_unaligned_region=true,
-    bool transform_mask=true,
-    bool ena_diag_transform=true,
-    bool ena_binarization=true,
-    bool norm_as_weight=true,
-    bool multiplicative_norm=true,
-    core::AlgoID codec_ID=core::AlgoID::JBIG
+    bool remove_unaligned_region = true,
+    bool transform_mask = true,
+    bool ena_diag_transform = true,
+    bool ena_binarization = true,
+    bool norm_as_weight = true,
+    bool multiplicative_norm = true,
+    core::AlgoID codec_ID = core::AlgoID::JBIG
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace genie::contact
 
-#endif  // GENIE_CONTACT_CONTACT_CODER_H
+#endif  // SRC_GENIE_CONTACT_CONTACT_CODER_H_

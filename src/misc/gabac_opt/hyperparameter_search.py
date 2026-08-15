@@ -268,8 +268,8 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Hyperparameter Search')
 
-    parser.add_argument('-idx_j', '--num_processes', required=False, default=None, type=int, help='Number of processes')
-    parser.add_argument('-idx_i', '--data_dirpath', required=True, type=str, help='Path to data directory')
+    parser.add_argument('-j', '--num_processes', required=False, default=None, type=int, help='Number of processes')
+    parser.add_argument('-i', '--data_dirpath', required=True, type=str, help='Path to data directory')
     parser.add_argument('-o', '--result_dirpath', required=True, type=str, help='Path to result directory')
     parser.add_argument('-a', '--algorithm', required=True, type=str, choices=['ga', 'sa'],
                         help='Algorithm used for searching the best config')

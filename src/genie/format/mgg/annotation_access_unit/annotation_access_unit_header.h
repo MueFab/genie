@@ -4,8 +4,8 @@
 * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MGG_ANNOTATION_ACCESS_UNIT_ANNOTATION_ACCESS_UNIT_HEADER_H
-#define SRC_GENIE_FORMAT_MGG_ANNOTATION_ACCESS_UNIT_ANNOTATION_ACCESS_UNIT_HEADER_H
+#ifndef SRC_GENIE_FORMAT_MGG_ANNOTATION_ACCESS_UNIT_ANNOTATION_ACCESS_UNIT_HEADER_H_
+#define SRC_GENIE_FORMAT_MGG_ANNOTATION_ACCESS_UNIT_ANNOTATION_ACCESS_UNIT_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -45,8 +45,7 @@ class AnnotationAccessUnitHeader : public GenInfo {
         uint64_t _n_blocks,
         uint64_t _tile_index_1,
         bool _tile_index_2_exists,
-        uint64_t _tile_index_2
-    );
+        uint64_t _tile_index_2);
 
  private:
     bool is_transport_mode;
@@ -61,17 +60,16 @@ class AnnotationAccessUnitHeader : public GenInfo {
     bool is_attribute;
     uint16_t attribute_ID;
     genie::core::AnnotDesc descriptor_ID;
-    bool two_dimensional; // From other structure
-    bool variable_size_tiles; // From other structure
+    bool two_dimensional;  // From other structure
+    bool variable_size_tiles;  // From other structure
     bool column_major_tile_order;  // From other structure
     uint64_t n_tiles_per_col;
     uint64_t n_tiles_per_row;
-    uint64_t n_blocks; // n_AAU_blocks
+    uint64_t n_blocks;  // n_AAU_blocks
 
     uint64_t tile_index_1;
     bool tile_index_2_exists;
     uint64_t tile_index_2;
-
 };
 
 
@@ -84,4 +82,4 @@ class AnnotationAccessUnitHeader : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MGG_ANNOTATION_ACCESS_UNIT_ANNOTATION_ACCESS_UNIT_HEADER_H
+#endif  // SRC_GENIE_FORMAT_MGG_ANNOTATION_ACCESS_UNIT_ANNOTATION_ACCESS_UNIT_HEADER_H_

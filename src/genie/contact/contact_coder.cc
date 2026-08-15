@@ -4,26 +4,27 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "contact_coder.h"
-#include <codecs/include/mpegg-codecs.h>
-#include <genie/core/record/contact/record.h>
-#include <genie/util/runtime_exception.h>
-#include <cstdint>
-#include <cstring>
-#include <vector>
-#include <numeric>
+#include "genie/contact/contact_coder.h"
 #include <algorithm>
 #include <cmath>
-#include <map>
-#include <set>
+#include <cstdint>
+#include <cstring>
 #include <iostream>
-#include "contact_matrix_parameters.h"
-#include "contact_matrix_tile_payload.h"
-#include "subcontact_matrix_parameters.h"
-#include "subcontact_matrix_payload.h"
-#include "subcontact_matrix_mask_payload.h"
-#include "genie/backend/backend.h"
+#include <map>
+#include <numeric>
+#include <set>
 #include <unordered_map>
+#include <utility>
+#include <vector>
+#include "genie/contact/contact_matrix_parameters.h"
+#include "genie/contact/contact_matrix_tile_payload.h"
+#include "genie/contact/subcontact_matrix_parameters.h"
+#include "genie/contact/subcontact_matrix_payload.h"
+#include "genie/contact/subcontact_matrix_mask_payload.h"
+#include "genie/backend/backend.h"
+#include "genie/core/record/contact/record.h"
+#include "genie/util/runtime_exception.h"
+#include "codecs/include/mpegg-codecs.h"
 
 namespace genie::contact {
 
@@ -50,7 +51,7 @@ inline void assign_vec_to_arr(UIntVecDtype& dest, const std::vector<uint32_t>& s
     std::memcpy(dest.data(), src.data(), src.size() * sizeof(uint32_t));
 }
 
-}
+}  // namespace detail
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -116,7 +117,7 @@ void compute_masks(
         UTILS_DIE_IF(nrows != ncols, "For intra-SCM, nrows and ncols must be equal!");
         ::genie::backend::resize_arr(row_mask, nrows);
         ::genie::backend::assign_arr(row_mask, nrows, false);
-        
+
         size_t n = ::genie::backend::get_arr_size(row_ids);
         for (size_t i = 0; i < n; ++i) {
             uint64_t r = ::genie::backend::get_arr_element(row_ids, i);
@@ -171,20 +172,20 @@ void decode_scm_mask_payload(
     if (transform_ID == TransformID::ID_0) {
         auto mask_array = mask_payload.GetMaskArray();
         ::genie::backend::resize_arr(mask, mask_array.size());
-        for(size_t i=0; i<mask_array.size(); ++i) ::genie::backend::set_arr_element(mask, i, mask_array[i]);
+        for (size_t i = 0; i < mask_array.size(); ++i) ::genie::backend::set_arr_element(mask, i, mask_array[i]);
         return;
     }
 
     ::genie::backend::resize_arr(mask, num_entries);
     ::genie::backend::assign_arr(mask, num_entries, false);
-    
+
     bool current_val = mask_payload.GetFirstVal();
     const auto& rl_entries = mask_payload.GetRlEntries();
 
     size_t start_idx = 0;
     for (uint32_t rl_entry : rl_entries) {
         size_t end_idx = start_idx + rl_entry;
-        for(size_t i = start_idx; i < std::min(end_idx, num_entries); ++i) {
+        for (size_t i = start_idx; i < std::min(end_idx, num_entries); ++i) {
             ::genie::backend::set_arr_element(mask, i, current_val);
         }
         start_idx = end_idx;
@@ -232,18 +233,18 @@ void remove_unaligned(
 
     std::vector<uint64_t> tmp_rows, tmp_cols;
     std::vector<uint32_t> tmp_counts;
-    
+
     for (size_t i = 0; i < n; ++i) {
         uint64_t r_tile = ::genie::backend::get_arr_element(row_ids, i);
         uint64_t c_tile = ::genie::backend::get_arr_element(col_ids, i);
-        
+
         if (r_tile < row_size && c_tile < col_size) {
             size_t global_r = row_offset + (size_t)r_tile;
             size_t global_c = col_offset + (size_t)c_tile;
-            
+
             bool r_aligned = (global_r < nrows_mask) && ::genie::backend::get_arr_element(row_mask, global_r);
             bool c_aligned = (global_c < ncols_mask) && ::genie::backend::get_arr_element(col_mask, global_c);
-            
+
             if (r_aligned && c_aligned) {
                 tmp_rows.push_back(row_map[(size_t)r_tile]);
                 tmp_cols.push_back(col_map[(size_t)c_tile]);
@@ -251,7 +252,7 @@ void remove_unaligned(
             }
         }
     }
-    
+
     ::genie::backend::resize_arr(row_ids, tmp_rows.size());
     ::genie::backend::resize_arr(col_ids, tmp_cols.size());
     ::genie::backend::resize_arr(counts, tmp_counts.size());
@@ -298,7 +299,7 @@ void insert_unaligned(
     for (size_t i = 0; i < n; ++i) {
         uint64_t r_compact = ::genie::backend::get_arr_element(row_ids, i);
         uint64_t c_compact = ::genie::backend::get_arr_element(col_ids, i);
-        
+
         if (r_compact < row_inv_map.size()) {
             ::genie::backend::set_arr_element(row_ids, i, row_inv_map[(size_t)r_compact]);
         }
@@ -319,7 +320,7 @@ void sparse_to_dense(
     UIntMatDtype& mat
 ) {
     ::genie::backend::resize_mat(mat, std::vector<size_t>{nrows, ncols});
-    for(size_t i=0; i<nrows; ++i) for(size_t j=0; j<ncols; ++j) ::genie::backend::set_mat_element(mat, i, j, 0u);
+    for (size_t i = 0; i < nrows; ++i) for (size_t j = 0; j < ncols; ++j) ::genie::backend::set_mat_element(mat, i, j, 0u);
 
     size_t n = ::genie::backend::get_arr_size(row_ids);
     for (size_t i = 0; i < n; ++i) {
@@ -343,10 +344,10 @@ void dense_to_sparse(
 ) {
     size_t nrows = ::genie::backend::get_mat_shape(mat, 0);
     size_t ncols = ::genie::backend::get_mat_shape(mat, 1);
-    
+
     std::vector<uint64_t> tmp_rows, tmp_cols;
     std::vector<uint32_t> tmp_counts;
-    
+
     for (size_t i = 0; i < nrows; ++i) {
         for (size_t j = 0; j < ncols; ++j) {
             uint32_t v = ::genie::backend::get_mat_element(mat, i, j);
@@ -357,11 +358,11 @@ void dense_to_sparse(
             }
         }
     }
-    
+
     ::genie::backend::resize_arr(row_ids, tmp_rows.size());
     ::genie::backend::resize_arr(col_ids, tmp_cols.size());
     ::genie::backend::resize_arr(counts, tmp_counts.size());
-    
+
     for (size_t i = 0; i < tmp_rows.size(); ++i) {
         ::genie::backend::set_arr_element(row_ids, i, tmp_rows[i]);
         ::genie::backend::set_arr_element(col_ids, i, tmp_cols[i]);
@@ -401,7 +402,7 @@ void diag_transform(UIntMatDtype& mat, DiagonalTransformMode mode) {
         UTILS_DIE_IF(nrows != ncols, "Matrix must be square for MODE_0!");
         size_t new_nrows = nrows / 2 + 1;
         ::genie::backend::resize_mat(trans_mat, std::vector<size_t>{new_nrows, ncols});
-        for(size_t i=0; i<new_nrows; ++i) for(size_t j=0; j<ncols; ++j) ::genie::backend::set_mat_element(trans_mat, i, j, 0u);
+        for (size_t i = 0; i < new_nrows; ++i) for (size_t j = 0; j < ncols; ++j) ::genie::backend::set_mat_element(trans_mat, i, j, 0u);
 
         size_t o = 0;
         for (size_t k_diag = 0; k_diag < nrows; ++k_diag) {
@@ -419,20 +420,20 @@ void diag_transform(UIntMatDtype& mat, DiagonalTransformMode mode) {
         mat = std::move(trans_mat);
     } else {
         ::genie::backend::resize_mat(trans_mat, std::vector<size_t>{nrows, ncols});
-        for(size_t i=0; i<nrows; ++i) for(size_t j=0; j<ncols; ++j) ::genie::backend::set_mat_element(trans_mat, i, j, 0u);
-        
+        for (size_t i = 0; i < nrows; ++i) for (size_t j = 0; j < ncols; ++j) ::genie::backend::set_mat_element(trans_mat, i, j, 0u);
+
         auto diag_ids = get_diag_ids(nrows, ncols, mode);
         size_t o = 0;
         for (auto diag_id : diag_ids) {
             int64_t i_offset = (diag_id >= 0) ? 0 : -diag_id;
             int64_t j_offset = (diag_id >= 0) ? diag_id : 0;
             int64_t nelems = std::max((int64_t)nrows, (int64_t)ncols) - std::abs(diag_id);
-            
+
             for (int64_t k = 0; k < nelems; ++k) {
                 int64_t i = k + i_offset;
                 int64_t j = k + j_offset;
                 if (i >= (int64_t)nrows || j >= (int64_t)ncols) break;
-                
+
                 uint32_t v = ::genie::backend::get_mat_element(mat, (size_t)i, (size_t)j);
                 size_t target_i = o / ncols;
                 size_t target_j = o % ncols;
@@ -458,7 +459,7 @@ void inverse_diag_transform(UIntMatDtype& mat, DiagonalTransformMode mode) {
     if (mode == DiagonalTransformMode::MODE_0) {
         size_t n = ncols;
         ::genie::backend::resize_mat(orig_mat, std::vector<size_t>{n, n});
-        for(size_t i=0; i<n; ++i) for(size_t j=0; j<n; ++j) ::genie::backend::set_mat_element(orig_mat, i, j, 0u);
+        for (size_t i = 0; i < n; ++i) for (size_t j = 0; j < n; ++j) ::genie::backend::set_mat_element(orig_mat, i, j, 0u);
 
         size_t o = 0;
         for (size_t k_diag = 0; k_diag < n; ++k_diag) {
@@ -478,19 +479,19 @@ void inverse_diag_transform(UIntMatDtype& mat, DiagonalTransformMode mode) {
         // MODE_1, 2, 3 logic
         auto diag_ids = get_diag_ids(nrows, ncols, mode);
         ::genie::backend::resize_mat(orig_mat, std::vector<size_t>{nrows, ncols});
-        for(size_t i=0; i<nrows; ++i) for(size_t j=0; j<ncols; ++j) ::genie::backend::set_mat_element(orig_mat, i, j, 0u);
+        for (size_t i = 0; i < nrows; ++i) for (size_t j = 0; j < ncols; ++j) ::genie::backend::set_mat_element(orig_mat, i, j, 0u);
 
         size_t o = 0;
         for (auto diag_id : diag_ids) {
             int64_t i_offset = (diag_id >= 0) ? 0 : -diag_id;
             int64_t j_offset = (diag_id >= 0) ? diag_id : 0;
             int64_t nelems = std::max((int64_t)nrows, (int64_t)ncols) - std::abs(diag_id);
-            
+
             for (int64_t k = 0; k < nelems; ++k) {
                 int64_t i = k + i_offset;
                 int64_t j = k + j_offset;
                 if (i >= (int64_t)nrows || j >= (int64_t)ncols) break;
-                
+
                 size_t src_i = o / ncols;
                 size_t src_j = o % ncols;
                 if (src_i < nrows && src_j < ncols) {
@@ -524,7 +525,7 @@ void transform_row_bin(const UIntMatDtype& mat, BinMatDtype& bin_mat) {
     }
 
     ::genie::backend::resize_mat(bin_mat, std::vector<size_t>{static_cast<size_t>(total_bin_rows), ncols + 1});
-    for(size_t i=0; i<total_bin_rows; ++i) for(size_t j=0; j<ncols+1; ++j) ::genie::backend::set_mat_element(bin_mat, i, j, false);
+    for (size_t i = 0; i < total_bin_rows; ++i) for (size_t j = 0; j < ncols+1; ++j) ::genie::backend::set_mat_element(bin_mat, i, j, false);
 
     size_t current_row = 0;
     for (size_t i = 0; i < nrows; ++i) {
@@ -548,7 +549,7 @@ void inverse_transform_row_bin(const BinMatDtype& bin_mat, UIntMatDtype& mat) {
     if (bin_nrows == 0) return;
 
     size_t ncols = bin_ncols - 1;
-    
+
     // Count how many rows we have (by counting column 0 == true)
     size_t nrows = 0;
     for (size_t i = 0; i < bin_nrows; ++i) {
@@ -556,7 +557,7 @@ void inverse_transform_row_bin(const BinMatDtype& bin_mat, UIntMatDtype& mat) {
     }
 
     ::genie::backend::resize_mat(mat, std::vector<size_t>{nrows, ncols});
-    for(size_t i=0; i<nrows; ++i) for(size_t j=0; j<ncols; ++j) ::genie::backend::set_mat_element(mat, i, j, 0u);
+    for (size_t i = 0; i < nrows; ++i) for (size_t j = 0; j < ncols; ++j) ::genie::backend::set_mat_element(mat, i, j, 0u);
 
     size_t current_row = 0;
     size_t current_bit = 0;
@@ -606,7 +607,7 @@ void encode_cm_tile(const BinMatDtype& bin_mat, core::AlgoID codec_ID, ContactMa
 
     std::vector<uint8_t> compressed_vec(compressed_data, compressed_data + compressed_data_len);
     tile_payload = ContactMatrixTilePayload(codec_ID, static_cast<uint32_t>(nrows), static_cast<uint32_t>(ncols), std::move(compressed_vec));
-    
+
     if (raw_data) free(raw_data);
     if (compressed_data) free(compressed_data);
 }
@@ -667,16 +668,16 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
 
     UInt64VecDtype row_ids, col_ids;
     UIntVecDtype counts;
-    
+
     auto rec_row_ids = rec.GetStartPos1();
     auto rec_col_ids = rec.GetStartPos2();
     auto rec_counts = rec.GetCounts();
-    
+
     ::genie::backend::resize_arr(row_ids, rec_row_ids.size());
     ::genie::backend::resize_arr(col_ids, rec_col_ids.size());
     ::genie::backend::resize_arr(counts, rec_counts.size());
-    
-    for(size_t k=0; k<rec_row_ids.size(); ++k) {
+
+    for (size_t k = 0; k < rec_row_ids.size(); ++k) {
         uint64_t r = rec_row_ids[k] / interval;
         uint64_t c = rec_col_ids[k] / interval;
         if (is_intra_scm && r > c) std::swap(r, c);
@@ -717,7 +718,7 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
 
     std::unordered_map<std::pair<size_t, size_t>, size_t, detail::PairHash> tile_counts;
 
-    for(size_t i=0; i<n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         uint64_t r = ::genie::backend::get_arr_element(row_ids, i);
         uint64_t c = ::genie::backend::get_arr_element(col_ids, i);
 
@@ -739,7 +740,7 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
         tile_counts_data[key].reserve(count);
     }
 
-    for(size_t i=0; i<n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         uint64_t r = ::genie::backend::get_arr_element(row_ids, i);
         uint64_t c = ::genie::backend::get_arr_element(col_ids, i);
 
@@ -805,7 +806,6 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
             scm_param.SetTileParameter(i_tile, j_tile, {mode, BinarizationMode::ROW_BINARIZATION});
         }
     }
-
 }
 
 void decode_scm(ContactMatrixParameters& cm_param, SubcontactMatrixParameters& scm_param, SubcontactMatrixPayload& scm_payload, core::record::ContactRecord& rec, uint32_t bin_size_mult) {
@@ -851,10 +851,10 @@ void decode_scm(ContactMatrixParameters& cm_param, SubcontactMatrixParameters& s
                 uint64_t r = (::genie::backend::get_arr_element(t_row_ids, k) + i * tile_size);
                 uint64_t c = (::genie::backend::get_arr_element(t_col_ids, k) + j * tile_size);
                 uint32_t v = ::genie::backend::get_arr_element(t_counts, k);
-                
+
                 uint64_t lr_r = (r / bin_size_mult) * target_bin_size;
                 uint64_t lr_c = (c / bin_size_mult) * target_bin_size;
-                
+
                 merged_entries[{lr_r, lr_c}] += v;
             }
         }
@@ -885,4 +885,4 @@ void decode_scm(ContactMatrixParameters& cm_param, SubcontactMatrixParameters& s
     rec.SetCMValues(std::move(all_row_ids), std::move(all_end1), std::move(all_col_ids), std::move(all_end2), std::move(all_counts));
 }
 
-} // namespace genie::contact
+}  // namespace genie::contact

@@ -7,6 +7,7 @@
 #include "genie/core/record/contact/record.h"
 
 #include <cstring>
+#include <string>
 #include <utility>
 #include <vector>
 

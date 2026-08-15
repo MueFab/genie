@@ -6,8 +6,10 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
-#include <random>
 #include <numeric>
+#include <random>
+#include <utility>
+#include <vector>
 
 namespace genie::genotype {
 
@@ -28,7 +30,7 @@ void decompose(
     }
 
     ::genie::backend::resize_mat(allele_mat, std::vector<size_t>{block_size, static_cast<size_t>(num_samples * max_ploidy)});
-    ::genie::backend::replace_value(allele_mat, static_cast<int8_t>(0), static_cast<int8_t>(-2)); // Placeholder initialization
+    ::genie::backend::replace_value(allele_mat, static_cast<int8_t>(0), static_cast<int8_t>(-2));  // Placeholder initialization
 
     ::genie::backend::resize_mat(phasing_mat, std::vector<size_t>{block_size, static_cast<size_t>(num_samples * (max_ploidy > 0 ? max_ploidy - 1 : 0))});
 
@@ -182,7 +184,7 @@ void debinarize_bit_plane(
     nrows = ::genie::backend::get_mat_shape(bin_mats[0], 0);
     ncols = ::genie::backend::get_mat_shape(bin_mats[0], 1);
     ::genie::backend::resize_mat(allele_mat, std::vector<size_t>{nrows, ncols});
-    for(size_t idx_i=0; idx_i<nrows; ++idx_i) for(size_t idx_j=0; idx_j<ncols; ++idx_j) ::genie::backend::set_mat_element(allele_mat, idx_i, idx_j, (int8_t)0);
+    for (size_t idx_i = 0; idx_i < nrows; ++idx_i) for (size_t idx_j = 0; idx_j < ncols; ++idx_j) ::genie::backend::set_mat_element(allele_mat, idx_i, idx_j, (int8_t)0);
 
     for (size_t idx_k = 0; idx_k < bin_mats.size(); ++idx_k) {
         for (size_t idx_i = 0; idx_i < nrows; ++idx_i) {
@@ -248,7 +250,7 @@ void debinarize_row_bin(
 
     ::genie::backend::resize_mat(allele_mat, std::vector<size_t>{nrows, ncols});
     // Manual zero init as resize_mat might not zero out
-    for(size_t idx_i=0; idx_i<nrows; ++idx_i) for(size_t idx_j=0; idx_j<ncols; ++idx_j) ::genie::backend::set_mat_element(allele_mat, idx_i, idx_j, (int8_t)0);
+    for (size_t idx_i = 0; idx_i < nrows; ++idx_i) for (size_t idx_j = 0; idx_j < ncols; ++idx_j) ::genie::backend::set_mat_element(allele_mat, idx_i, idx_j, (int8_t)0);
 
     size_t current_row = 0;
     for (size_t idx_i = 0; idx_i < nrows; ++idx_i) {
@@ -333,7 +335,7 @@ void random_sort_bin_mat(
 
     UIntVecDtype p_vec;
     ::genie::backend::resize_arr(p_vec, n);
-    for(size_t idx_i=0; idx_i<n; ++idx_i) ::genie::backend::set_arr_element(p_vec, idx_i, p[idx_i]);
+    for (size_t idx_i = 0; idx_i < n; ++idx_i) ::genie::backend::set_arr_element(p_vec, idx_i, p[idx_i]);
 
     sort_matrix(bin_mat, p_vec, axis);
 
@@ -425,8 +427,7 @@ void entropy_encode_bin_mat(
                 &compressed_data, &compressed_data_len,
                 raw_data, raw_data_len,
                 static_cast<unsigned long>(nrows),
-                static_cast<unsigned long>(ncols)
-            );
+                static_cast<unsigned long>(ncols));
         } break;
         case genie::core::AlgoID::ZSTD: {
             mpegg_zstd_compress(&compressed_data, &compressed_data_len, raw_data, raw_data_len, 3);
@@ -461,8 +462,7 @@ void entropy_decode_bin_mat(
                 &raw_data, &raw_data_len,
                 payload.data(), payload.size(),
                 reinterpret_cast<unsigned long*>(&nrows),
-                reinterpret_cast<unsigned long*>(&ncols)
-            );
+                reinterpret_cast<unsigned long*>(&ncols));
         } break;
         case genie::core::AlgoID::ZSTD: {
             mpegg_zstd_decompress(&raw_data, &raw_data_len, payload.data(), payload.size());
@@ -493,12 +493,12 @@ void encode_and_sort_bin_mat(
 
     if (sort_rows_flag) {
         std::vector<uint32_t> p(::genie::backend::get_arr_size(row_ids));
-        for(size_t idx_i=0; idx_i<p.size(); ++idx_i) p[idx_i] = ::genie::backend::get_arr_element(row_ids, idx_i);
+        for (size_t idx_i = 0; idx_i < p.size(); ++idx_i) p[idx_i] = ::genie::backend::get_arr_element(row_ids, idx_i);
         sorted_bin_mat_payload.SetRowIdsPayload(RowColIdsPayload(std::move(p)));
     }
     if (sort_cols_flag) {
         std::vector<uint32_t> p(::genie::backend::get_arr_size(col_ids));
-        for(size_t idx_i=0; idx_i<p.size(); ++idx_i) p[idx_i] = ::genie::backend::get_arr_element(col_ids, idx_i);
+        for (size_t idx_i = 0; idx_i < p.size(); ++idx_i) p[idx_i] = ::genie::backend::get_arr_element(col_ids, idx_i);
         sorted_bin_mat_payload.SetColIdsPayload(RowColIdsPayload(std::move(p)));
     }
 
@@ -524,14 +524,14 @@ void decode_and_inverse_sort_bin_mat(
         auto p = sorted_bin_mat_payload.GetRowIdsPayload()->GetRowColIdsElements();
         UIntVecDtype row_ids;
         ::genie::backend::resize_arr(row_ids, p.size());
-        for(size_t idx_i=0; idx_i<p.size(); ++idx_i) ::genie::backend::set_arr_element(row_ids, idx_i, p[idx_i]);
+        for (size_t idx_i = 0; idx_i < p.size(); ++idx_i) ::genie::backend::set_arr_element(row_ids, idx_i, p[idx_i]);
         sort_matrix(bin_mat, row_ids, 0);
     }
     if (sort_cols_flag) {
         auto p = sorted_bin_mat_payload.GetColIdsPayload()->GetRowColIdsElements();
         UIntVecDtype col_ids;
         ::genie::backend::resize_arr(col_ids, p.size());
-        for(size_t idx_i=0; idx_i<p.size(); ++idx_i) ::genie::backend::set_arr_element(col_ids, idx_i, p[idx_i]);
+        for (size_t idx_i = 0; idx_i < p.size(); ++idx_i) ::genie::backend::set_arr_element(col_ids, idx_i, p[idx_i]);
         sort_matrix(bin_mat, col_ids, 1);
     }
 }
@@ -555,8 +555,7 @@ void encode_genotype(
         transpose_mat, codec_ID, true,
         sort_row_method != SortingAlgoID::NO_SORTING,
         sort_col_method != SortingAlgoID::NO_SORTING,
-        transpose_mat, codec_ID
-    );
+        transpose_mat, codec_ID);
 
     uint8_t max_ploidy;
     Int8MatDtype allele_mat;
@@ -579,7 +578,7 @@ void encode_genotype(
     if (binarization_ID == BinarizationID::ROW_BIN) {
         size_t n = ::genie::backend::get_arr_size(amax_vec);
         std::vector<uint64_t> amax_u64(n);
-        for(size_t idx_i=0; idx_i<n; ++idx_i) amax_u64[idx_i] = ::genie::backend::get_arr_element(amax_vec, idx_i);
+        for (size_t idx_i = 0; idx_i < n; ++idx_i) amax_u64[idx_i] = ::genie::backend::get_arr_element(amax_vec, idx_i);
         payload.SetVariantsAmaxPayload(AmaxPayload(std::move(amax_u64)));
     }
 
@@ -615,7 +614,7 @@ void decode_genotype(
         auto amax_u64 = payload.GetVariantsAmaxPayload()->GetAmaxElements();
         UIntVecDtype amax_vec;
         ::genie::backend::resize_arr(amax_vec, amax_u64.size());
-        for(size_t idx_i=0; idx_i<amax_u64.size(); ++idx_i) ::genie::backend::set_arr_element(amax_vec, idx_i, static_cast<uint32_t>(amax_u64[idx_i]));
+        for (size_t idx_i = 0; idx_i < amax_u64.size(); ++idx_i) ::genie::backend::set_arr_element(amax_vec, idx_i, static_cast<uint32_t>(amax_u64[idx_i]));
         debinarize_row_bin(bin_mats, amax_vec, allele_mat);
     } else {
         debinarize_bit_plane(bin_mats, payload.GetNumBitPlanes(), params.GetConcatAxis(), allele_mat);
@@ -629,4 +628,4 @@ void decode_genotype(
     inverse_transform_max_val(allele_mat, payload.GetNoReferenceFlag(), payload.GetNotAvailableFlag());
 }
 
-} // namespace genie::genotype
+}  // namespace genie::genotype

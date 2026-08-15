@@ -1,7 +1,8 @@
-#include "cli_handler.h"
-#include "cli11/CLI11_RESTORED.hpp"
-#include <iostream>
+#include "apps/genie/cli_handler.h"
 #include <algorithm>
+#include <iostream>
+#include <string>
+#include "cli11/CLI11_RESTORED.hpp"
 
 namespace genieapp::cli {
 
@@ -25,4 +26,4 @@ CliOptions parse_args(int argc, char* argv[]) {
     return options;
 }
 
-} // namespace genieapp::cli
+}  // namespace genieapp::cli

@@ -18,8 +18,8 @@
 
 #include "genie/core/global_cfg.h"
 #include "genie/core/parameter/quality_values.h"
-//#include "genie/entropy/bsc/param_decoder.h"
-//#include "genie/entropy/lzma/param_decoder.h"
+// #include "genie/entropy/bsc/param_decoder.h"
+// #include "genie/entropy/lzma/param_decoder.h"
 #include "genie/entropy/paramcabac/decoder.h"
 #include "genie/entropy/zstd/param_decoder.h"
 #include "genie/quality/paramqv1/qv_coding_config_1.h"

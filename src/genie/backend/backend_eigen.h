@@ -1,7 +1,8 @@
-#ifndef GENIE_BACKEND_BACKEND_EIGEN_H
-#define GENIE_BACKEND_BACKEND_EIGEN_H
+#ifndef SRC_GENIE_BACKEND_BACKEND_EIGEN_H_
+#define SRC_GENIE_BACKEND_BACKEND_EIGEN_H_
 
-#include "backend.h"
+#include "genie/backend/backend.h"
+#include <vector>
 
 #ifdef GENIE_HAS_EIGEN_BACKEND
 #include <Eigen/Dense>
@@ -43,6 +44,6 @@ void serialize_arr(const UIntVecDtype& arr, uint32_t nelems, std::ostream& paylo
 void deserialize_mat(const std::vector<uint8_t>& payload_bytes, uint32_t dtype_id, uint32_t nrows, uint32_t ncols, UIntMatDtype& mat);
 void deserialize_arr(const std::vector<uint8_t>& payload_bytes, uint32_t nelems, UIntVecDtype& arr);
 
-} // namespace genie::backend::genie_eigen_impl
+}  // namespace genie::backend::genie_eigen_impl
 
-#endif // GENIE_BACKEND_BACKEND_EIGEN_H
+#endif  // SRC_GENIE_BACKEND_BACKEND_EIGEN_H_

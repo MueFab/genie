@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_GENOTYPE_TYPES_H
-#define GENIE_GENOTYPE_TYPES_H
+#ifndef SRC_GENIE_GENOTYPE_GENOTYPE_TYPES_H_
+#define SRC_GENIE_GENOTYPE_GENOTYPE_TYPES_H_
 
 #include <cstdint>
 #include <vector>
@@ -41,6 +41,6 @@ using UIntVecDtype = ::genie::backend::genie_std_impl::UIntVecDtype;
 using MatShapeDtype = ::genie::backend::genie_std_impl::MatShapeDtype;
 #endif
 
-} // namespace genie::genotype
+}  // namespace genie::genotype
 
-#endif // GENIE_GENOTYPE_TYPES_H
+#endif  // SRC_GENIE_GENOTYPE_GENOTYPE_TYPES_H_

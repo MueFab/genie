@@ -8,6 +8,9 @@
 #include <algorithm>
 #include <cmath>
 #include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 #ifdef GENIE_BACKEND_XTENSOR
 #include <xtensor/xadapt.hpp>
@@ -41,7 +44,7 @@ void extract_likelihoods(const EncodingOptions& opt, LikelihoodEncodingBlock& bl
     uint32_t ncols = num_samples * num_likelihoods;
 
     ::genie::backend::resize_mat(block.likelihood_mat, std::vector<size_t>{static_cast<size_t>(block_size), static_cast<size_t>(ncols)});
-    for(size_t i=0; i<block_size; ++i) for(size_t j=0; j<ncols; ++j) ::genie::backend::set_mat_element(block.likelihood_mat, i, j, 0u);
+    for (size_t i = 0; i < block_size; ++i) for (size_t j = 0; j < ncols; ++j) ::genie::backend::set_mat_element(block.likelihood_mat, i, j, 0u);
 
     for (uint32_t i_rec = 0; i_rec < block_size; i_rec++) {
         auto& rec = recs[i_rec];
@@ -280,4 +283,4 @@ void decode_likelihood(const LikelihoodParameters& params, LikelihoodPayload& pa
     }
 }
 
-} // namespace genie::likelihood
+}  // namespace genie::likelihood

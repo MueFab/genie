@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_LIKELIHOOD_PARAMETERS_H
-#define GENIE_LIKELIHOOD_PARAMETERS_H
+#ifndef SRC_GENIE_LIKELIHOOD_LIKELIHOOD_PARAMETERS_H_
+#define SRC_GENIE_LIKELIHOOD_LIKELIHOOD_PARAMETERS_H_
 
 #include <cstdint>
 #include <memory>
@@ -48,6 +48,6 @@ class LikelihoodParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_LIKELIHOOD_PARAMETERS_H
+#endif  // SRC_GENIE_LIKELIHOOD_LIKELIHOOD_PARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------

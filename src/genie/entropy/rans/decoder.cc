@@ -1,10 +1,11 @@
-#include "decoder.h"
+#include "genie/entropy/rans/decoder.h"
 #include <genie/util/runtime_exception.h>
 #include <cstdint>
+#include <vector>
 
 namespace genie::entropy::rans {
 
-RANSDecoder::RANSDecoder(){};
+RANSDecoder::RANSDecoder() {}
 
 void RANSDecoder::decode(std::istream& input, std::ostream& output, uint32_t num_interleavings) {
     if (num_interleavings != 1 && num_interleavings != 2) throw std::runtime_error("num_interleavings must be 1 or 2.");
@@ -62,4 +63,4 @@ void RANSDecoder::decode(std::istream& input, std::ostream& output, uint32_t num
     output.write(reinterpret_cast<char*>(dec_bytes.data()), dec_bytes.size());
 }
 
-} // namespace genie::entropy::rans
+}  // namespace genie::entropy::rans

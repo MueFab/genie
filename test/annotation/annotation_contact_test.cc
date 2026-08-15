@@ -19,7 +19,7 @@ struct ContactTestDetails {
                      bool REMOVE_UNALIGNED_REGION, bool TRANSFORM_MASK,
                      bool ENA_DIAG_TRANSFORM, bool ENA_BINARIZATION,
                      bool NORM_AS_WEIGHT, bool MULTIPLICATIVE_NORM,
-                     uint32_t TILE_SIZE, uint32_t MULT = 1u){//, std::vector<uint32_t> BINSIZEMULT ={}) {
+                     uint32_t TILE_SIZE, uint32_t MULT = 1u) {
     filename = contactin;
     cm_pars.REMOVE_UNALIGNED_REGION = REMOVE_UNALIGNED_REGION;
     cm_pars.TRANSFORM_MASK = TRANSFORM_MASK;
@@ -30,13 +30,11 @@ struct ContactTestDetails {
     cm_pars.CODEC_ID = genie::core::AlgoID::JBIG, cm_pars.TILE_SIZE = TILE_SIZE;
     cm_pars.MULT = MULT;
     outputfile = casename;
-    //binSizemultipliers = BINSIZEMULT;
   }
 
   std::string filename;
   std::string outputfile;
   genie::annotation::ContactMatrixParameters cm_pars;
- // std::vector<uint32_t> binSizemultipliers;
 };
 
 class AnnotationContactTests
@@ -85,7 +83,7 @@ TEST_P(AnnotationContactTests, contactparameterset) {
   annotationGenerator.setTileSize(100, 3000);
   annotationGenerator.setContactOptions(cmParameters);
   annotationGenerator.setCompressorConfig(config);
-  annotationGenerator.startStream(genie::annotation::RecType::CM_FILE,
+  annotationGenerator.startStream(genie::annotation::RecType::CONTACT_MATRIX_FILE,
                                   inputFilename, outputFilename);
   EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"))
       << outputFilename + ".bin";

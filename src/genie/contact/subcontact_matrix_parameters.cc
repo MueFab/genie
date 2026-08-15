@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "subcontact_matrix_parameters.h"
+#include "genie/contact/subcontact_matrix_parameters.h"
+#include <utility>
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
@@ -52,12 +53,10 @@ SubcontactMatrixParameters::SubcontactMatrixParameters(
       codec_ID_(other.codec_ID_),
       tile_parameters_(other.tile_parameters_),
       row_mask_exists_flag_(other.row_mask_exists_flag_),
-      col_mask_exists_flag_(other.col_mask_exists_flag_)
-{
+      col_mask_exists_flag_(other.col_mask_exists_flag_) {
   SetNumTiles(
       other.GetNTilesInRow(),
-      other.GetNTilesInCol()
-  );
+      other.GetNTilesInCol());
 
   // Deep copy for TileParameters if needed
   for (size_t idx_i = 0; idx_i < other.GetNTilesInRow(); ++idx_i) {
@@ -117,10 +116,9 @@ SubcontactMatrixParameters& SubcontactMatrixParameters::operator=(
 SubcontactMatrixParameters::SubcontactMatrixParameters(
     util::BitReader& reader,
     ContactMatrixParameters& cm_params
-): parameter_set_ID_(reader.ReadAlignedInt<uint8_t>()),
+) : parameter_set_ID_(reader.ReadAlignedInt<uint8_t>()),
    chr1_ID_(reader.ReadAlignedInt<uint8_t>()),
    chr2_ID_(reader.ReadAlignedInt<uint8_t>()) {
-
     auto flags = reader.ReadAlignedInt<uint8_t>();
     codec_ID_ = static_cast<core::AlgoID>(flags & 0x1F);
 

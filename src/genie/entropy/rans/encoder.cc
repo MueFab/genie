@@ -1,6 +1,7 @@
-#include "encoder.h"
-#include <genie/util/runtime_exception.h>
+#include "genie/entropy/rans/encoder.h"
 #include <cstdint>
+#include <vector>
+#include "genie/util/runtime_exception.h"
 
 namespace genie::entropy::rans {
 
@@ -47,4 +48,4 @@ void RANSEncoder::encode(std::istream& input, std::ostream& output, bool is_tabl
     output.write(reinterpret_cast<const char*>(ptr), param.compressed_size * sizeof(uint32_t));
 }
 
-} // namespace genie::entropy::rans
+}  // namespace genie::entropy::rans

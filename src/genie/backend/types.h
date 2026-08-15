@@ -1,5 +1,5 @@
-#ifndef GENIE_BACKEND_TYPES_H
-#define GENIE_BACKEND_TYPES_H
+#ifndef SRC_GENIE_BACKEND_TYPES_H_
+#define SRC_GENIE_BACKEND_TYPES_H_
 
 #include <cstdint>
 #include <vector>
@@ -59,7 +59,7 @@ namespace genie_std_impl {
     void deserialize_mat(const std::vector<uint8_t>& payload_bytes, uint32_t dtype_id, uint32_t nrows, uint32_t ncols, UIntMatDtype& mat);
     void deserialize_arr(const std::vector<uint8_t>& payload_bytes, uint32_t nelems, UIntVecDtype& arr);
     void compute_mask(const UInt64VecDtype& ids, size_t nelems, BinVecDtype& mask);
-}
+}  // namespace genie_std_impl
 
 #ifdef GENIE_HAS_XTENSOR_BACKEND
 namespace genie_xt_impl {
@@ -81,7 +81,7 @@ namespace genie_xt_impl {
     void deserialize_mat(const std::vector<uint8_t>& payload_bytes, uint32_t dtype_id, uint32_t nrows, uint32_t ncols, UIntMatDtype& mat);
     void deserialize_arr(const std::vector<uint8_t>& payload_bytes, uint32_t nelems, UIntVecDtype& arr);
     void compute_mask(const UInt64VecDtype& ids, size_t nelems, BinVecDtype& mask);
-}
+}  // namespace genie_xt_impl
 #endif
 
 #ifdef GENIE_HAS_EIGEN_BACKEND
@@ -104,7 +104,7 @@ namespace genie_eigen_impl {
     void deserialize_mat(const std::vector<uint8_t>& payload_bytes, uint32_t dtype_id, uint32_t nrows, uint32_t ncols, UIntMatDtype& mat);
     void deserialize_arr(const std::vector<uint8_t>& payload_bytes, uint32_t nelems, UIntVecDtype& arr);
     void compute_mask(const UInt64VecDtype& ids, size_t nelems, BinVecDtype& mask);
-}
+}  // namespace genie_eigen_impl
 #endif
 
 // Default global aliases based on GENIE_BACKEND setting
@@ -139,6 +139,6 @@ namespace genie_eigen_impl {
 
 using MatShapeDtype = std::vector<size_t>;
 
-} // namespace genie::backend
+}  // namespace genie::backend
 
-#endif // GENIE_BACKEND_TYPES_H
+#endif  // SRC_GENIE_BACKEND_TYPES_H_

@@ -33,7 +33,7 @@
 namespace genie::annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum class RecType { SITE_FILE = 0, GENO_FILE, SAMPLE_FILE, FEATURE_FILE, GENE_EXPRESSION_FILE, CM_FILE, FUNCTIONAL_ANNOTATIONS_FILE, TRACK_FILE, TRACK_PROPERTY_FILE };
+enum class RecType { VARIANT_SITE_FILE = 0, VARIANT_GENO_FILE, SAMPLE_FILE, FUNCTIONAL_ANNOTATION_FILE, TRACK_PROPERTY_FILE, TRACK_DATA_FILE, EXPRESSION_FILE, FEATURE_FILE, CONTACT_MATRIX_FILE };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -46,14 +46,20 @@ class Annotation {
                      uint32_t _defaultTileSizeWidth) {
         defaultTileSizeHeight = _defaultTileSizeHeight;
         defaultTileSizeWidth = _defaultTileSizeWidth;
-        genoAnnotation.setTileSize(_defaultTileSizeHeight, defaultTileSizeWidth);
         siteAnnotation.setTileSize(_defaultTileSizeHeight);
+        genoAnnotation.setTileSize(_defaultTileSizeHeight, defaultTileSizeWidth);
         sampleAnnotation.setTileSize(_defaultTileSizeWidth);
-        featureAnnotation.setTileSize(_defaultTileSizeHeight);
-        geneExpressionAnnotation.setTileSize(_defaultTileSizeHeight, _defaultTileSizeWidth);
         functionalAnnotation.setTileSize(_defaultTileSizeHeight);
+        trackPropertyAnnotation.setTileSize(_defaultTileSizeHeight);
         trackDataAnnotation.setTileSize(_defaultTileSizeHeight);
-        trackpropertyAnnotation.setTileSize(_defaultTileSizeHeight);
+        geneExpressionAnnotation.setTileSize(_defaultTileSizeHeight, _defaultTileSizeWidth);
+        featureAnnotation.setTileSize(_defaultTileSizeHeight);
+    }
+
+    void setATType(core::access_unit::annotation::AnnotationType ATtype,
+                   core::access_unit::annotation::AnnotationSubtype ATsubtype) {
+        annotationType_ = ATtype;
+        annotationSubtype_ = ATsubtype;
     }
 
     void startStream(RecType recType, std::string recordInputFileName,
@@ -82,18 +88,22 @@ class Annotation {
     std::vector<genie::core::access_unit::annotation::Record>
         annotationAccessUnit;
 
-    GenoAnnotation genoAnnotation;
     SiteAnnotation siteAnnotation;
+    GenoAnnotation genoAnnotation;
     SampleAnnotation sampleAnnotation;
+    FunctionalAnnotation functionalAnnotation;
+    TrackPropertyAnnotation trackPropertyAnnotation;
+    TrackDataAnnotation trackDataAnnotation;
     GeneExpressionAnnotation geneExpressionAnnotation;
     FeatureAnnotation featureAnnotation;
-    FunctionalAnnotation functionalAnnotation;
-    TrackDataAnnotation trackDataAnnotation;
-    TrackPropertyAnnotation trackpropertyAnnotation;
     CMAnnotation cmAnnotation;
 
     uint32_t defaultTileSizeHeight{0};
     uint32_t defaultTileSizeWidth{0};
+    core::access_unit::annotation::AnnotationType annotationType_{
+        core::access_unit::annotation::AnnotationType::VARIANTS};
+    core::access_unit::annotation::AnnotationSubtype annotationSubtype_{
+        core::access_unit::annotation::AnnotationSubtype::VCF};
 };
 
 }  // namespace genie::annotation

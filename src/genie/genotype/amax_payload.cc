@@ -6,7 +6,10 @@
 
 // -----------------------------------------------------------------------------
 
-#include "amax_payload.h"
+#include "genie/genotype/amax_payload.h"
+#include <algorithm>
+#include <utility>
+#include <vector>
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
@@ -161,7 +164,7 @@ uint8_t AmaxPayload::ComputeNbitsPerElement(const std::vector<uint64_t>& amax_el
     UTILS_DIE_IF(max_val == 0, "Maximum value of amax_elements cannot be 0!");
     UTILS_DIE_IF(min_val == 0, "Minimum value of amax_elements cannot be 0!");
 
-    if (max_val == 1){
+    if (max_val == 1) {
         return 0;
     }
     uint64_t adjusted_max = max_val - 1;
@@ -173,6 +176,6 @@ uint8_t AmaxPayload::ComputeNbitsPerElement(const std::vector<uint64_t>& amax_el
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genotype::genie
+}  // namespace genie::genotype
 
 // -----------------------------------------------------------------------------

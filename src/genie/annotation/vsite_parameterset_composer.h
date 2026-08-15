@@ -3,16 +3,16 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
- 
+
 #ifndef SRC_GENIE_ANNOTATION_VSITE_PARAMETERSET_COMPOSER_H_
 #define SRC_GENIE_ANNOTATION_VSITE_PARAMETERSET_COMPOSER_H_
- 
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <map>
 #include <string>
 #include <vector>
- 
+
 #include "genie/core/constants.h"
 #include "genie/core/parameter/annotation/record.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
@@ -52,5 +52,5 @@ class ParameterSetComposer {
 }  // namespace genie::variant_site
 
 // ---------------------------------------------------------------------------------------------------------------------
- 
+
 #endif  // SRC_GENIE_ANNOTATION_VSITE_PARAMETERSET_COMPOSER_H_

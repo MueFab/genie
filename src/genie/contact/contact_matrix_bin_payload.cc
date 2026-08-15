@@ -4,19 +4,13 @@
 * https://github.com/mitogen/genie for more details.
 */
 
-//#include "contact_matrix_bin_payload.h"
-
-/**
-* @file
-* @copyright This file is part of GENIE. See LICENSE and/or
-* https://github.com/mitogen/genie for more details.
- */
-
 #include "genie/contact/contact_matrix_bin_payload.h"
 #include <fstream>
+#include <string>
+#include <utility>
 #include <vector>
-#include <genie/util/bit_reader.h>
-#include <genie/util/bit_writer.h>
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
@@ -27,7 +21,7 @@ ContactMatrixBinPayload::ContactMatrixBinPayload()
     : sample_ID_(0),
       chr_ID_(0),
       bin_size_multiplier_(0),
-      weight_value_(){}
+      weight_value_() {}
 
 // -----------------------------------------------------------------------------
 
@@ -74,7 +68,6 @@ ContactMatrixBinPayload::ContactMatrixBinPayload(
     uint8_t num_norm_methods,
     uint32_t num_bin_entries
 ) {
-
   sample_ID_ = bit_reader.Read<uint16_t>();
   chr_ID_ = bit_reader.Read<uint8_t>();
   bin_size_multiplier_ = bit_reader.Read<uint32_t>();
@@ -209,8 +202,8 @@ void ContactMatrixBinPayload::Write(util::BitWriter& writer) const {
   writer.WriteAlignedInt(GetChrID());
   writer.WriteAlignedInt(GetBinSizeMultiplier());
 
-  for (const auto &norm_weights: GetWeightValue()){
-    for (const auto &weight_value: norm_weights){
+  for (const auto &norm_weights : GetWeightValue()) {
+    for (const auto &weight_value : norm_weights) {
       const uint64_t bits = *reinterpret_cast<const uint64_t*>(&weight_value);
       writer.WriteAlignedInt(bits);
     }

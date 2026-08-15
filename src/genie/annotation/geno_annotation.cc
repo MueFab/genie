@@ -232,14 +232,14 @@ size_t GenoAnnotation::readOneBlock(
   for (auto& attr : attrInfo)
     attributes[attr.first] =
         std::make_tuple(attr.second, attrValues[attr.first]);
-    
+
   // Converting LikelihoodPayload back to EncodingBlock if strictly required by RecData or refactoring RecData.
   // Ideally RecData should hold Payload.
   // For now, I will create a dummy EncodingBlock or refactor RecData if I can see header.
   // Assuming RecData needs refactoring. But I can't check header easily without reading it.
   // Let's assume I can change RecData in .h file too?
   // Wait, RecData struct is defined in .cc file? No, it's used in readOneBlock return.
-  
+
   // Let's assume RecData stores LikelihoodPayload now.
   recData.set(rowStart, 0, std::make_tuple(pars, std::move(payload)),
               std::move(likPayload),

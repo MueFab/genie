@@ -1,7 +1,8 @@
-#ifndef GENIE_BACKEND_BACKEND_XTENSOR_H
-#define GENIE_BACKEND_BACKEND_XTENSOR_H
+#ifndef SRC_GENIE_BACKEND_BACKEND_XTENSOR_H_
+#define SRC_GENIE_BACKEND_BACKEND_XTENSOR_H_
 
-#include "backend.h"
+#include "genie/backend/backend.h"
+#include <vector>
 
 #ifdef GENIE_HAS_XTENSOR_BACKEND
 #include <xtensor/xtensor.hpp>
@@ -43,6 +44,6 @@ void serialize_arr(const UIntVecDtype& arr, uint32_t nelems, std::ostream& paylo
 void deserialize_mat(const std::vector<uint8_t>& payload_bytes, uint32_t dtype_id, uint32_t nrows, uint32_t ncols, UIntMatDtype& mat);
 void deserialize_arr(const std::vector<uint8_t>& payload_bytes, uint32_t nelems, UIntVecDtype& arr);
 
-} // namespace genie::backend::genie_xt_impl
+}  // namespace genie::backend::genie_xt_impl
 
-#endif // GENIE_BACKEND_BACKEND_XTENSOR_H
+#endif  // SRC_GENIE_BACKEND_BACKEND_XTENSOR_H_

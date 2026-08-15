@@ -6,19 +6,9 @@
 
 #include "genie/functionalannotation/descriptors.h"
 
-#include <algorithm>
-#include <string>
-#include <utility>
-#include <vector>
-
-#include "genie/core/array_type.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/runtime_exception.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace functional_annotation {
+namespace genie::functional_annotation {
 
 void Descriptors::write(genie::core::record::functional_annotation::Record functionalAnnotation) {
     // Write basic descriptors
@@ -106,8 +96,7 @@ void Descriptors::init() {
     tiles[genie::core::AnnotDesc::ONTOLOGYID].setRowsPerTile(rowsPerTile);      // 21
 }
 
-}  // namespace functional_annotation
-}  // namespace genie
+}  // namespace genie::functional_annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

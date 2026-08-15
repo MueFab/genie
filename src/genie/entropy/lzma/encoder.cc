@@ -16,6 +16,7 @@
 #include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "genie/core/parameter/descriptor_present/descriptor_present.h"
 #include "genie/core/parameter/annotation/algorithm_parameters.h"

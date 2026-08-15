@@ -3,18 +3,18 @@
 * @copyright This file is part of GENIE. See LICENSE and/or
 * https://github.com/mitogen/genie for more details.
 */
-#ifndef GENIE_CONTACT_SUBCONTACT_MATRIX_PARAMETERS_H
-#define GENIE_CONTACT_SUBCONTACT_MATRIX_PARAMETERS_H
+#ifndef SRC_GENIE_CONTACT_SUBCONTACT_MATRIX_PARAMETERS_H_
+#define SRC_GENIE_CONTACT_SUBCONTACT_MATRIX_PARAMETERS_H_
 
-#include <genie/core/constants.h>
-#include <genie/util/bit_reader.h>
-#include <genie/util/bit_writer.h>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include "contact_matrix_parameters.h"
+#include "genie/contact/contact_matrix_parameters.h"
+#include "genie/core/constants.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,8 +22,8 @@ namespace genie::contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//#define ENA_TRANSFqORM_BLEN 1
-//#define CODEC_ID_BLEN 5
+// #define ENA_TRANSFqORM_BLEN 1
+// #define CODEC_ID_BLEN 5
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -81,13 +81,11 @@ class SubcontactMatrixParameters {
 
     // Constructor by reference
     SubcontactMatrixParameters(
-        const SubcontactMatrixParameters& other
-    ) noexcept;
+        const SubcontactMatrixParameters& other) noexcept;
 
     // Constructor from move
     SubcontactMatrixParameters(
-        SubcontactMatrixParameters&& other
-    ) noexcept;
+        SubcontactMatrixParameters&& other) noexcept;
 
     // Assignment operators
     SubcontactMatrixParameters& operator=(const SubcontactMatrixParameters& other);
@@ -234,8 +232,7 @@ class SubcontactMatrixParameters {
     */
     TileParameter& GetTileParameter(
         size_t i_tile,
-        size_t j_tile
-    );
+        size_t j_tile);
 
     /**
      * This method sets the tile parameter for the tile in the position idx_i and idx_j.
@@ -247,8 +244,7 @@ class SubcontactMatrixParameters {
     void SetTileParameter(
         size_t i_tile,
         size_t j_tile,
-        TileParameter tile_parameter
-    );
+        TileParameter tile_parameter);
 
     /**
      * @brief Get the number of tiles in a row.
@@ -305,4 +301,4 @@ class SubcontactMatrixParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CONTACT_SUBCONTACT_MATRIX_PARAMETERS_H
+#endif  // SRC_GENIE_CONTACT_SUBCONTACT_MATRIX_PARAMETERS_H_

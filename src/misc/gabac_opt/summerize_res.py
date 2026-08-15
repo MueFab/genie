@@ -35,12 +35,12 @@ subplot_const = (5, 6)
 
 bash_cmd = "cut -d , -f 4".split(' ')
 
-# for idx_i, ngen_npop_pair in enumerate(zip(npops, ngens)):
-#     for idx_j, nparam in enumerate(nparams):
+# for i, ngen_npop_pair in enumerate(zip(npops, ngens)):
+#     for j, nparam in enumerate(nparams):
 
 #         start_time_param = time.time()
 
-#         for idx_k, transform in enumerate(avail_transform):
+#         for k, transform in enumerate(avail_transform):
 #             start_time = time.time()
 
 #             for l, fname in enumerate(data_fnames):
@@ -59,24 +59,24 @@ bash_cmd = "cut -d , -f 4".split(' ')
 #                 )
 
 #                 # df = pd.read_csv(csv_fpath)
-#                 # datapoints[idx_i, idx_j, idx_k, l, :ngen] = df['best_encoded_ratio']
+#                 # datapoints[i, j, k, l, :ngen] = df['best_encoded_ratio']
 
 
 #                 p = subprocess.Popen([*bash_cmd, csv_fpath], stdout=subprocess.PIPE)
 #                 output = p.communicate()[0]
 #                 # numbers = [float(num) for num in output.decode().split('\n')[1:-1]]
 
-#                 datapoints[idx_i, idx_j, idx_k, l, :ngen] = np.array(output.decode().split('\n')[1:-1]).astype(float)
+#                 datapoints[i, j, k, l, :ngen] = np.array(output.decode().split('\n')[1:-1]).astype(float)
 
 #             print('Time per transform {}'.format(time.time() - start_time))
 
 #         print('Time per param {}'.format(time.time() - start_time_param))
 
-for idx_i, ngen_npop_pair in enumerate(zip(ngens, npops)):
+for i, ngen_npop_pair in enumerate(zip(ngens, npops)):
 
     ngen, npop = ngen_npop_pair
 
-    for idx_j, nparam in enumerate(nparams):
+    for j, nparam in enumerate(nparams):
 
         start_time_param = time.time()
 
@@ -93,7 +93,7 @@ for idx_i, ngen_npop_pair in enumerate(zip(ngens, npops)):
 
         print(hyperparam_comb)
 
-        for idx_k, transform in enumerate(avail_transform):
+        for k, transform in enumerate(avail_transform):
             start_time = time.time()
 
             for l, fname in enumerate(data_fnames):

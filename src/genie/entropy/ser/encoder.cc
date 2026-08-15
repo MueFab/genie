@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace ser {
+namespace genie::entropy::ser {
 
 SEREncoder::SEREncoder()
     : order(false) {
@@ -301,8 +299,6 @@ genie::core::parameter::annotation::AlgorithmParameters SERParameters::convertTo
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace ser
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::ser
 
 // ---------------------------------------------------------------------------------------------------------------------

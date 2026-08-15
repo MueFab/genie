@@ -4,15 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_GENOTYPE_TEST_HELPERS_H
-#define GENIE_GENOTYPE_TEST_HELPERS_H
+#ifndef SRC_GENIE_GENOTYPE_GENOTYPE_TEST_HELPERS_H_
+#define SRC_GENIE_GENOTYPE_GENOTYPE_TEST_HELPERS_H_
 
-#include "genotype_coder.h"
+#include "genie/genotype/genotype_coder.h"
 #include <algorithm>
 #include <vector>
 #include <random>
 #include <cmath>
 #include <numeric>
+#include <utility>
 
 namespace genie::genotype {
 
@@ -91,7 +92,7 @@ auto sum(const std::vector<std::vector<T>>& mat) {
 
 template <typename T>
 auto amax(const std::vector<std::vector<T>>& mat) {
-    if (mat.empty() || mat[0].empty()) return static_cast<T>(0); // Should handle empty case safely
+    if (mat.empty() || mat[0].empty()) return static_cast<T>(0);  // Should handle empty case safely
     T m = mat[0][0];
     for (const auto& row : mat) {
         for (const auto& val : row) if (val > m) m = val;
@@ -101,7 +102,7 @@ auto amax(const std::vector<std::vector<T>>& mat) {
 
 template <typename T>
 auto amin(const std::vector<std::vector<T>>& mat) {
-    if (mat.empty() || mat[0].empty()) return static_cast<T>(0); // Should handle empty case safely
+    if (mat.empty() || mat[0].empty()) return static_cast<T>(0);  // Should handle empty case safely
     T m = mat[0][0];
     for (const auto& row : mat) {
         for (const auto& val : row) if (val < m) m = val;
@@ -160,7 +161,7 @@ auto random_permutation(T n) {
     return result;
 }
 
-} // namespace genie::genotype
+}  // namespace genie::genotype
 
 namespace std {
 template <typename T>
@@ -173,6 +174,6 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& v) {
     os << "]";
     return os;
 }
-}
+}  // namespace std
 
-#endif // GENIE_GENOTYPE_TEST_HELPERS_H
+#endif  // SRC_GENIE_GENOTYPE_GENOTYPE_TEST_HELPERS_H_

@@ -1,11 +1,11 @@
-#include "commons.h"
+#include "genie/entropy/rans/commons.h"
+#include <cstdio>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::entropy::rans {
 
-void panic(const char *fmt, ...)
-{
+void panic(const char *fmt, ...) {
     va_list arg;
 
     va_start(arg, fmt);
@@ -19,8 +19,7 @@ void panic(const char *fmt, ...)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t* read_file(char const* filename, size_t* out_size)
-{
+uint8_t* read_file(char const* filename, size_t* out_size) {
     FILE* f = fopen(filename, "rb");
     if (!f)
         panic("file not found: %s\n", filename);
@@ -43,8 +42,7 @@ uint8_t* read_file(char const* filename, size_t* out_size)
 // ---------------------------------------------------------------------------------------------------------------------
 // ---- Stats
 
-void SymbolStats::count_freqs(uint8_t const* in, size_t nbytes)
-{
+void SymbolStats::count_freqs(uint8_t const* in, size_t nbytes) {
     for (int idx_i=0; idx_i < 256; idx_i++)
         freqs[idx_i] = 0;
 
@@ -52,8 +50,7 @@ void SymbolStats::count_freqs(uint8_t const* in, size_t nbytes)
         freqs[in[idx_i]]++;
 }
 
-void SymbolStats::calc_cum_freqs()
-{
+void SymbolStats::calc_cum_freqs() {
     cum_freqs[0] = 0;
     for (int idx_i=0; idx_i < 256; idx_i++)
         cum_freqs[idx_i+1] = cum_freqs[idx_i] + freqs[idx_i];
@@ -61,8 +58,7 @@ void SymbolStats::calc_cum_freqs()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SymbolStats::normalize_freqs(uint32_t target_total)
-{
+void SymbolStats::normalize_freqs(uint32_t target_total) {
     assert(target_total >= 256);
 
     calc_cum_freqs();
@@ -117,4 +113,4 @@ void SymbolStats::normalize_freqs(uint32_t target_total)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}
+}  // namespace genie::entropy::rans

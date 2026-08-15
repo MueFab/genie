@@ -4,20 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <algorithm>
-#include <string>
-#include <utility>
-
-#include "genie/core/array_type.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
 #include "genie/track/tiles.h"
+
+#include <string>
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace track {
+namespace genie::track {
 
 void TiledStream::write(std::string value) {
     setTile();
@@ -39,8 +32,7 @@ void TiledStream::setTile() {
     }
 }
 
-}  // namespace track
-}  // namespace genie
+}  // namespace genie::track
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -28,7 +28,7 @@ namespace genie {
 namespace variant_site {
 
 class Tiles {
-  public:
+ public:
     Tiles() {
         tileData.emplace_back("");
         tileWriter.emplace_back(tileData.back());

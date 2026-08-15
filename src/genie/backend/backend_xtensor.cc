@@ -1,14 +1,17 @@
+#include "genie/backend/backend_xtensor.h"
+#include <numeric>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 #include <xtensor/xindex_view.hpp>
 #include <xtensor/xsort.hpp>
 #include <xtensor/xview.hpp>
 #include <xtensor/xadapt.hpp>
-#include <genie/util/runtime_exception.h>
-#include <genie/util/bit_writer.h>
-#include <genie/util/bit_reader.h>
-#include <numeric>
-#include <sstream>
-#include "backend.h"
-#include "backend_xtensor.h"
+#include "genie/backend/backend.h"
+#include "genie/util/runtime_exception.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/bit_reader.h"
 
 namespace genie::backend::genie_xt_impl {
 
@@ -31,8 +34,7 @@ void sort_sparse_mat_inplace(
                 return row_ids(i1) < row_ids(i2);
             }
             return col_ids(i1) < col_ids(i2);
-        }
-    );
+        });
 
     UInt64VecDtype sorted_row_ids = xt::empty_like(row_ids);
     UInt64VecDtype sorted_col_ids = xt::empty_like(col_ids);
@@ -180,4 +182,4 @@ void deserialize_arr(
         arr(idx_i) = reader.ReadAlignedInt<uint32_t>();
 }
 
-} // namespace genie::backend::genie_xt_impl
+}  // namespace genie::backend::genie_xt_impl

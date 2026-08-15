@@ -1,20 +1,22 @@
-#ifndef GENIE_NDARRAY_H
-#define GENIE_NDARRAY_H
- 
+#ifndef SRC_GENIE_CORE_NDARRAY_H_
+#define SRC_GENIE_CORE_NDARRAY_H_
+
 // -----------------------------------------------------------------------------
- 
-#include <vector>
-#include <stdexcept>
-#include <cstddef>
-#include <numeric>
+
 #include <algorithm>
- 
+#include <cstddef>
+#include <functional>
+#include <numeric>
+#include <stdexcept>
+#include <utility>
+#include <vector>
+
 // -----------------------------------------------------------------------------
- 
+
 namespace genie::core {
- 
+
 // -----------------------------------------------------------------------------
- 
+
 /**
  * @brief Multi-dimensional array class.
  *
@@ -27,7 +29,7 @@ class NDArray {
     std::vector<size_t> dimensions;  ///< Dimensions of the array.
     std::vector<size_t> strides;     ///< Strides for each dimension.
     std::vector<T> data;           ///< Data storage for the array elements.
- 
+
     void computeStrides() {
         strides.resize(dimensions.size());
         size_t stride = 1;
@@ -36,23 +38,23 @@ class NDArray {
             stride *= dimensions[idx_i];
         }
     }
- 
+
  public:
     /**
      * @brief Default constructor.
      */
     NDArray() : dimensions(), strides(), data() {}
- 
+
     /**
      * @brief Constructor from dimensions.
      */
-    NDArray(const std::vector<size_t>& dims) : dimensions(dims) {
+    explicit NDArray(const std::vector<size_t>& dims) : dimensions(dims) {
         size_t total = std::accumulate(
             dimensions.begin(), dimensions.end(), 1, std::multiplies<size_t>());
         data.resize(total);
         computeStrides();
     }
- 
+
     /**
      * @brief Constructor from dimensions and buffer.
      */
@@ -60,7 +62,7 @@ class NDArray {
         : dimensions(dims), data(std::move(buffer)) {
         computeStrides();
     }
- 
+
     /**
      * @brief Constructor from dimensions and a buffer by reference.
      */
@@ -68,7 +70,7 @@ class NDArray {
         : dimensions(dims), data(buffer) {
         computeStrides();
     }
- 
+
     /**
      * @brief Move constructor.
      */
@@ -76,7 +78,7 @@ class NDArray {
         : dimensions(std::move(other.dimensions)),
           strides(std::move(other.strides)),
           data(std::move(other.data)) {}
- 
+
     /**
      * @brief Copy constructor.
      */
@@ -85,7 +87,7 @@ class NDArray {
           data(other.data) {
         computeStrides();
     }
- 
+
     /**
      * @brief Move assignment operator.
      */
@@ -97,7 +99,7 @@ class NDArray {
         }
         return *this;
     }
- 
+
     /**
      * @brief Copy assignment operator.
      */
@@ -109,7 +111,7 @@ class NDArray {
         }
         return *this;
     }
- 
+
     /**
      * @brief Resize the array.
      */
@@ -120,7 +122,7 @@ class NDArray {
             dimensions.begin(), dimensions.end(), 1, std::multiplies<size_t>());
         data.resize(newSize, defaultValue);
     }
- 
+
     /**
      * @brief Access element using vector of indices.
      */
@@ -137,7 +139,7 @@ class NDArray {
         }
         return data[index];
     }
- 
+
     /**
      * @brief Variadic template version for convenient access.
      */
@@ -146,14 +148,14 @@ class NDArray {
         std::vector<size_t> indices{static_cast<size_t>(args)...};
         return (*this)(indices);
     }
- 
+
     /**
      * @brief Const version of access element using vector of indices.
      */
     const T& operator()(const std::vector<size_t>& indices) const {
         return const_cast<NDArray*>(this)->operator()(indices);
     }
- 
+
     /**
      * @brief Const variadic template version for convenient access.
      */
@@ -161,37 +163,37 @@ class NDArray {
     const T& operator()(Args... args) const {
         return const_cast<NDArray*>(this)->operator()(args...);
     }
- 
+
     /**
      * @brief Get the shape of the array.
      */
     const std::vector<size_t>& shape() const { return dimensions; }
- 
+
     /**
      * @brief Get the total number of elements in the array.
      */
     size_t size() const { return data.size(); }
- 
+
     /**
      * @brief Fill the array with a specific value.
      */
     void fill(const T& value) { std::fill(data.begin(), data.end(), value); }
- 
+
     /**
      * @brief Flatten the array.
      */
     NDArray<T> flatten() const {
         return NDArray<T>({data.size()}, std::vector<T>(data));
     }
- 
+
     template<typename U> friend NDArray<U> operator+(const NDArray<U>& lhs, const NDArray<U>& rhs);
     template<typename U> friend NDArray<U> operator-(const NDArray<U>& lhs, const NDArray<U>& rhs);
     template<typename U> friend NDArray<U> operator*(const NDArray<U>& lhs, const NDArray<U>& rhs);
     template<typename U> friend NDArray<U> operator/(const NDArray<U>& lhs, const NDArray<U>& rhs);
 };
- 
+
 // -----------------------------------------------------------------------------
- 
+
 template<typename T>
 NDArray<T> operator+(const NDArray<T>& lhs, const NDArray<T>& rhs) {
     if (lhs.shape() != rhs.shape()) throw std::invalid_argument("Shapes do not match");
@@ -199,7 +201,7 @@ NDArray<T> operator+(const NDArray<T>& lhs, const NDArray<T>& rhs) {
     std::transform(lhs.data.begin(), lhs.data.end(), rhs.data.begin(), result.data.begin(), std::plus<T>());
     return result;
 }
- 
+
 template<typename T>
 NDArray<T> operator-(const NDArray<T>& lhs, const NDArray<T>& rhs) {
     if (lhs.shape() != rhs.shape()) throw std::invalid_argument("Shapes do not match");
@@ -207,7 +209,7 @@ NDArray<T> operator-(const NDArray<T>& lhs, const NDArray<T>& rhs) {
     std::transform(lhs.data.begin(), lhs.data.end(), rhs.data.begin(), result.data.begin(), std::minus<T>());
     return result;
 }
- 
+
 template<typename T>
 NDArray<T> operator*(const NDArray<T>& lhs, const NDArray<T>& rhs) {
     if (lhs.shape() != rhs.shape()) throw std::invalid_argument("Shapes do not match");
@@ -215,7 +217,7 @@ NDArray<T> operator*(const NDArray<T>& lhs, const NDArray<T>& rhs) {
     std::transform(lhs.data.begin(), lhs.data.end(), rhs.data.begin(), result.data.begin(), std::multiplies<T>());
     return result;
 }
- 
+
 template<typename T>
 NDArray<T> operator/(const NDArray<T>& lhs, const NDArray<T>& rhs) {
     if (lhs.shape() != rhs.shape()) throw std::invalid_argument("Shapes do not match");
@@ -223,9 +225,9 @@ NDArray<T> operator/(const NDArray<T>& lhs, const NDArray<T>& rhs) {
     std::transform(lhs.data.begin(), lhs.data.end(), rhs.data.begin(), result.data.begin(), std::divides<T>());
     return result;
 }
- 
+
 // -----------------------------------------------------------------------------
- 
+
 template<typename T>
 class NDArrayFactory {
  public:
@@ -233,13 +235,13 @@ class NDArrayFactory {
         size_t total = std::accumulate(dimensions.begin(), dimensions.end(), 1, std::multiplies<size_t>());
         return NDArray<T>(dimensions, std::vector<T>(total));
     }
- 
+
     static NDArray<T> create(const std::vector<size_t>& dimensions, const T& initValue) {
         size_t total = std::accumulate(dimensions.begin(), dimensions.end(), 1, std::multiplies<size_t>());
         return NDArray<T>(dimensions, std::vector<T>(total, initValue));
     }
 };
- 
-} // namespace genie::core
- 
-#endif  // GENIE_NDARRAY_H
+
+}  // namespace genie::core
+
+#endif  // SRC_GENIE_CORE_NDARRAY_H_

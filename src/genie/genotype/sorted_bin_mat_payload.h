@@ -4,28 +4,27 @@
 * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SRC_GENIE_GENOTYPE_SORTED_BIN_MAT_PAYLOAD_H_
-#define GENIE_SRC_GENIE_GENOTYPE_SORTED_BIN_MAT_PAYLOAD_H_
+#ifndef SRC_GENIE_GENOTYPE_SORTED_BIN_MAT_PAYLOAD_H_
+#define SRC_GENIE_GENOTYPE_SORTED_BIN_MAT_PAYLOAD_H_
 
 // -----------------------------------------------------------------------------
 
 #include <cstdint>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
-#include <optional>
 
-#include <optional>
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
 #include "genie/genotype/bin_mat_payload.h"
 #include "genie/genotype/row_col_ids_payload.h"
-//#include "genie/util/data_block.h"
+// #include "genie/util/data_block.h"
 
 // -----------------------------------------------------------------------------
 
@@ -47,8 +46,7 @@ class [[maybe_unused]] SortedBinMatPayload {
   [[maybe_unused]] SortedBinMatPayload(
       BinMatPayload&& bin_mat_payload,
       std::optional<RowColIdsPayload>&& row_ids_payload,
-      std::optional<RowColIdsPayload>&& col_ids_payload
-  );
+      std::optional<RowColIdsPayload>&& col_ids_payload);
 
   // Copy constructor
   SortedBinMatPayload(const SortedBinMatPayload& other);
@@ -67,8 +65,7 @@ class [[maybe_unused]] SortedBinMatPayload {
     util::BitReader& reader,
     core::AlgoID codec_ID,
     bool rows_sorted,
-    bool cols_sorted
-  );
+    bool cols_sorted);
 
   // Comparison operator
   bool operator==(const SortedBinMatPayload& other) const;
@@ -99,6 +96,6 @@ class [[maybe_unused]] SortedBinMatPayload {
 
 // -----------------------------------------------------------------------------
 
-#endif  // GENIE_SRC_GENIE_GENOTYPE_SORTED_BIN_MAT_PAYLOAD_H_
+#endif  // SRC_GENIE_GENOTYPE_SORTED_BIN_MAT_PAYLOAD_H_
 
 // -----------------------------------------------------------------------------

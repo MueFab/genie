@@ -5,6 +5,7 @@
  */
 
 #include <algorithm>
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>
@@ -96,7 +97,7 @@ genie::core::parameter::annotation::Record ParameterSetComposer::Build(
         descriptor_ID, genie::core::AlgoID::BSC, BSCalgorithmParameters));
 
     uint8_t ndescriptors = static_cast<uint8_t>(descriptor_configuration.size());
-    
+
     uint8_t n_compressors = static_cast<uint8_t>(compressor_parameter_set.size());
 
     std::vector<genie::core::parameter::annotation::AttributeParameterSet> attribute_parameter_set;

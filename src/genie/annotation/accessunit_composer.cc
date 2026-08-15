@@ -71,7 +71,7 @@ void AccessUnitComposer::setAccessUnit(
         if (compressorId != 0) {
             auto& AttributeStream = _attributeTileStream[attribute.getAttributeName()];
             auto& compressorSet = compressorParameterSets.at(compressorId - 1);
-           
+
 
             compress(AttributeStream, compressorSet);
          }

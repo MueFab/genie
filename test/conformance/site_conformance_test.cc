@@ -6,7 +6,6 @@
 
 #include <gtest/gtest.h>
 
-#include <sstream>
 #include <string>
 
 #include "genie/annotation/annotation.h"
@@ -45,7 +44,7 @@ TEST_P(SiteConformanceTest, SiteConformancetests) {  // NOLINT(cert-err58-cpp)
     annotationGenerator.setCompressorConfig(config);
     annotationGenerator.setTileSize(1000, 3000);
 
-    annotationGenerator.startStream(genie::annotation::RecType::SITE_FILE, filepath, filepath + "_output");
+    annotationGenerator.startStream(genie::annotation::RecType::VARIANT_SITE_FILE, filepath, filepath + "_output");
 }
 
 INSTANTIATE_TEST_SUITE_P(testallsiteConformance, SiteConformanceTest,

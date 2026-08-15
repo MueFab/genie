@@ -5,21 +5,14 @@
  */
 
 #include "genie/feature/feature_parser.h"
-#include <algorithm>
+
 #include <map>
 #include <string>
-#include <utility>
 #include <vector>
 
-#include "genie/core/array_type.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace feature {
+namespace genie::feature {
 
 FeatureParser::FeatureParser(std::istream& _feature_MGrecs, std::vector<annotation::InfoField>& _fields,
                                      uint64_t _rowsPerTile)
@@ -74,5 +67,4 @@ bool FeatureParser::fillRecord(util::BitReader reader) {
     return true;
 }
 
-}  // namespace feature
-}  // namespace genie
+}  // namespace genie::feature

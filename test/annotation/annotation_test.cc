@@ -152,7 +152,7 @@ TEST_P(AnnotationTests, annotationSite) {
     if (std::filesystem::file_size(inputFilename) > 100 * 1024) return;
 
   std::string outputFilename = composeSiteOutputFileName(filePath, testParams);
-                                 
+
   std::filesystem::remove(outputFilename + ".bin");
 
   genie::annotation::Annotation annotationGenerator;
@@ -166,7 +166,7 @@ TEST_P(AnnotationTests, annotationSite) {
   annotationGenerator.setCompressorConfig(config);
   annotationGenerator.setTileSize(testParams.defaultTileHeight,
                                   testParams.defaultTileWidth);
-  annotationGenerator.startStream(genie::annotation::RecType::SITE_FILE,
+  annotationGenerator.startStream(genie::annotation::RecType::VARIANT_SITE_FILE,
                                   inputFilename, outputFilename);
 
   EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
@@ -178,7 +178,7 @@ TEST_P(AnnotationTests, annotationGeno) {
   auto testParams = GetParam();
 
   std::string inputFilename =
-      filePath + testParams.genofile_in;  //"ALL.chrX.10000.geno";
+      filePath + testParams.genofile_in;  // "ALL.chrX.10000.geno";
 
 
   ASSERT_TRUE(std::filesystem::exists(inputFilename));
@@ -208,7 +208,7 @@ TEST_P(AnnotationTests, annotationGeno) {
 
   genie::genotype::EncodingOptions genotype_opt = {
       BLOCK_SIZE,                                  // block_size;
-      genie::genotype::BinarizationID::ROW_BIN,    // BIT_PLANE,  //
+      genie::genotype::BinarizationID::ROW_BIN,    // BIT_PLANE,
                                                    // binarization_ID;
       genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
       false,                                       // transpose_mat;
@@ -226,7 +226,7 @@ TEST_P(AnnotationTests, annotationGeno) {
   annotationGenerator.setTileSize(testParams.defaultTileHeight,
                                   testParams.defaultTileWidth);
   std::cerr << "starting stream..." << std::endl;
-  annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE,
+  annotationGenerator.startStream(genie::annotation::RecType::VARIANT_GENO_FILE,
                                   inputFilename, outputFilename);
   std::cerr << "returning stream..." << std::endl;
 

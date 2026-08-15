@@ -4,14 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "likelihood_payload.h"
+#include "genie/likelihood/likelihood_payload.h"
 
+#include <string>
 #include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace likelihood {
+namespace genie::likelihood {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -43,8 +44,7 @@ LikelihoodPayload::LikelihoodPayload(detail::LikelihoodEncodingBlock& block) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 LikelihoodPayload::LikelihoodPayload(LikelihoodParameters parameters, detail::LikelihoodEncodingBlock& data)
-    : LikelihoodPayload(data)
-{
+    : LikelihoodPayload(data) {
     transform_flag = parameters.GetTransformFlag();
     if (transform_flag) {
         additionalPayloadStream << data.serialized_arr.rdbuf();
@@ -172,5 +172,4 @@ void LikelihoodPayload::read(util::BitReader& reader) {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace likelihood
-}  // namespace genie
+}  // namespace genie::likelihood

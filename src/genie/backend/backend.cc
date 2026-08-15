@@ -1,12 +1,13 @@
-#include "backend.h"
-#include "backend_std.h"
+#include "genie/backend/backend.h"
+#include <vector>
+#include "genie/backend/backend_std.h"
 
 #ifdef GENIE_HAS_XTENSOR_BACKEND
-#include "backend_xtensor.h"
+#include "genie/backend/backend_xtensor.h"
 #endif
 
 #ifdef GENIE_HAS_EIGEN_BACKEND
-#include "backend_eigen.h"
+#include "genie/backend/backend_eigen.h"
 #endif
 
 namespace genie::backend {
@@ -39,7 +40,7 @@ namespace std_lib {
     void compute_mask(const ::genie::backend::genie_std_impl::UInt64VecDtype& ids, size_t nelems, ::genie::backend::genie_std_impl::BinVecDtype& mask) {
         ::genie::backend::genie_std_impl::compute_mask(ids, nelems, mask);
     }
-}
+}  // namespace std_lib
 
 #ifdef GENIE_HAS_XTENSOR_BACKEND
 namespace xtensor {
@@ -67,7 +68,7 @@ namespace xtensor {
     void compute_mask(const ::genie::backend::genie_xt_impl::UInt64VecDtype& ids, size_t nelems, ::genie::backend::genie_xt_impl::BinVecDtype& mask) {
         ::genie::backend::genie_xt_impl::compute_mask(ids, nelems, mask);
     }
-}
+}  // namespace xtensor
 #endif
 
 #ifdef GENIE_HAS_EIGEN_BACKEND
@@ -96,7 +97,7 @@ namespace eigen {
     void compute_mask(const ::genie::backend::genie_eigen_impl::UInt64VecDtype& ids, size_t nelems, ::genie::backend::genie_eigen_impl::BinVecDtype& mask) {
         ::genie::backend::genie_eigen_impl::compute_mask(ids, nelems, mask);
     }
-}
+}  // namespace eigen
 #endif
 
-} // namespace genie::backend
+}  // namespace genie::backend

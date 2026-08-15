@@ -57,10 +57,10 @@ void Record::Write(genie::util::BitWriter& writer) {
         for (auto idx_j = 0u; idx_j < info_tag[idx_i].values.size(); ++idx_j) {
             writeType.toFile(info_tag[idx_i].type, info_tag.at(idx_i).values.at(idx_j), writer);
             if (info_tag[idx_i].type == DataType::STRING)
-                writer.WriteBits(0, 8);
+                writer.WriteBits(0, 8);  // reserved(8)
         }
     }
-    writer.WriteBits(0, 7);
+    writer.WriteBits(0, 7);  // reserved(7)
     writer.WriteBits(linked_record_, 1);
     if (linked_record_) {
         writer.WriteBits(link_name_len_, 8);

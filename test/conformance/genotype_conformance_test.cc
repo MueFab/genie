@@ -6,32 +6,12 @@
 
 #include <gtest/gtest.h>
 
-#include <sstream>
 #include <string>
-#include <vector>
 
-#include <codecs/include/mpegg-codecs.h>
-#include "genie/core/constants.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/runtime_exception.h"
-
-#include "genie/core/parameter/annotation/algorithm_parameters.h"
-#include "genie/core/parameter/annotation/descriptor_configuration.h"
-#include "genie/annotation/parameterset_composer.h"
-#include "genie/genotype/genotype_parameters.h"
-#include "genie/genotype/genotype_payload.h"
-
-#include "genie/core/access_unit/annotation/typed_data.h"
-#include "genie/core/access_unit/annotation/record.h"
-#include "genie/core/parameter/annotation/record.h"
-#include "genie/core/record/data_unit/record.h"
-#include "genie/annotation/accessunit_composer.h"
+#include "genie/genotype/genotype_coder.h"
+#include "genie/likelihood/likelihood_coder.h"
 
 #include "genie/annotation/annotation.h"
-#include "genie/likelihood/likelihood_coder.h"
-#include "genie/likelihood/likelihood_payload.h"
-
 #include "helpers.h"
 
 struct genoTestValues {
@@ -45,7 +25,7 @@ struct genoTestValues {
     genoTestValues(uint16_t id, genie::genotype::SortingAlgoID _SortingID, genie::genotype::BinarizationID _binID,
                    genie::genotype::ConcatAxis _concatAxis, bool _transposeMat, genie::core::AlgoID _algID,
                    std::string _filepath)
-        : ID(id),sortingID(_SortingID),
+        : ID(id), sortingID(_SortingID),
           binID(_binID),
           concatAxis(_concatAxis),
           transposeMat(_transposeMat),
@@ -119,7 +99,7 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
 
     annotationGenerator.setGenotypeOptions(genotype_opt);
     annotationGenerator.setLikelihoodOptions(likelihood_opt);
-    annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE, gitRootDir + testparams.filepath + ".geno",
+    annotationGenerator.startStream(genie::annotation::RecType::VARIANT_GENO_FILE, gitRootDir + testparams.filepath + ".geno",
                                     name);
 }
 
@@ -139,7 +119,7 @@ INSTANTIATE_TEST_SUITE_P(
                        genie::genotype::ConcatAxis::DO_NOT_CONCAT, false, genie::core::AlgoID::ZSTD,
                        "/data/records/conformance/1.3.11.bgz.CASE04"},
         genoTestValues{9, genie::genotype::SortingAlgoID::RANDOM_SORT, genie::genotype::BinarizationID::ROW_BIN,
-                       genie::genotype::ConcatAxis::CONCAT_COL_DIR, false, genie::core::AlgoID::ZSTD,
+                       genie::genotype::ConcatAxis::CONCAT_COL_DIR, false, genie::core::AlgoID::JBIG,
                        "/data/records/conformance/1.3.11.bgz.CASE03"},
         genoTestValues{10, genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::ROW_BIN,
                        genie::genotype::ConcatAxis::DO_NOT_CONCAT, false, genie::core::AlgoID::JBIG,
@@ -152,4 +132,4 @@ INSTANTIATE_TEST_SUITE_P(
                        "/data/records/conformance/1.3.11.bgz.CASE03"},
         genoTestValues{13, genie::genotype::SortingAlgoID::RANDOM_SORT, genie::genotype::BinarizationID::ROW_BIN,
                        genie::genotype::ConcatAxis::CONCAT_COL_DIR, false, genie::core::AlgoID::JBIG,
-                       "/data/records/conformance/1.3.11.bgz.CASE03"} ));
+                       "/data/records/conformance/1.3.11.bgz.CASE03"}));

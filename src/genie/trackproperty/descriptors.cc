@@ -6,19 +6,9 @@
 
 #include "genie/trackproperty/descriptors.h"
 
-#include <algorithm>
-#include <string>
-#include <utility>
-#include <vector>
-
-#include "genie/core/array_type.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/runtime_exception.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace track_property {
+namespace genie::track_property {
 
 void Descriptors::write(genie::core::record::track_property::Record trackPropertyRecord) {
     // Track properties only store LINKNAME and LINKID as descriptors
@@ -43,8 +33,7 @@ void Descriptors::init() {
     tiles[genie::core::AnnotDesc::LINKID].setRowsPerTile(rowsPerTile);      // 8
 }
 
-}  // namespace track_property
-}  // namespace genie
+}  // namespace genie::track_property
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

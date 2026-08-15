@@ -216,15 +216,13 @@ void encodeVariantGenotype(const std::string& _input_fpath,
       genotype_opt.transpose_mat,
       genotype_opt.sort_row_method,
       genotype_opt.sort_col_method,
-      genotype_opt.codec_ID
-  );
+      genotype_opt.codec_ID);
 
   genie::likelihood::LikelihoodParameters likelihoodParameters;
   genie::likelihood::LikelihoodPayload likelihoodPayload(likelihoodParameters, 0, 0, {}, {});
   genie::likelihood::encode_likelihood(
       recs, likelihoodParameters, likelihoodPayload,
-      likelihood_opt.block_size, likelihood_opt.transform_flag
-  );
+      likelihood_opt.block_size, likelihood_opt.transform_flag);
 
   //--------------------------------------------------
   uint8_t AT_ID = 1;

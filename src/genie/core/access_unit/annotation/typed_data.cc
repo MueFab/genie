@@ -90,6 +90,7 @@ void TypedData::convertToTypedData(std::vector<std::vector<std::vector<CustomTyp
 
 void TypedData::write(util::BitWriter& writer) const {
     writer.WriteBits(static_cast<uint8_t>(data_type_ID), 8);
+    writer.WriteBits(0, 5);  // reserved(5)
     writer.WriteBits(num_array_dims, 2);
     uint64_t n_elements = 1;
     for (uint64_t idx_i = 0; idx_i < num_array_dims; ++idx_i) {

@@ -5,12 +5,10 @@
  */
 
 #include "genie/core/array_type.h"
-
 #include <cstring>
 #include <iostream>
 #include <string>
 #include <vector>
-
 #include "genie/util/bit_reader.h"
 
 namespace genie::core {
@@ -242,7 +240,7 @@ void ArrayType::toFile(core::DataType type, util::BitReader& reader, util::BitWr
             for (char c : temp) {
                 writer.WriteBits(static_cast<uint8_t>(c), 8);
             }
-            writer.WriteBits(0, static_cast<uint8_t>(8));
+            writer.WriteBits(0, static_cast<uint8_t>(8));  // string-terminator
         }
     } else {
         if (number > 0) {

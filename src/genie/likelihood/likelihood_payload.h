@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_LIKELIHOOD_LIKELIHOOD_PAYLOAD_H
-#define GENIE_LIKELIHOOD_LIKELIHOOD_PAYLOAD_H
+#ifndef SRC_GENIE_LIKELIHOOD_LIKELIHOOD_PAYLOAD_H_
+#define SRC_GENIE_LIKELIHOOD_LIKELIHOOD_PAYLOAD_H_
 
 #include <cstdint>
 #include <iostream>
@@ -44,10 +44,9 @@ class LikelihoodPayload {
          uint32_t _nrows,
          uint32_t _ncols,
          std::vector<uint8_t> _payload,
-         std::vector<uint8_t> _additionalPayload
-     );
+         std::vector<uint8_t> _additionalPayload);
 
-    LikelihoodPayload(detail::LikelihoodEncodingBlock& block);
+    explicit LikelihoodPayload(detail::LikelihoodEncodingBlock& block);
     LikelihoodPayload(LikelihoodParameters parameters, detail::LikelihoodEncodingBlock& data);
 
     LikelihoodPayload(LikelihoodPayload&& other) noexcept;
@@ -78,8 +77,8 @@ class LikelihoodPayload {
 
 // -----------------------------------------------------------------------------
 
-}
+}  // namespace genie::likelihood
 
 // -----------------------------------------------------------------------------
 
-#endif  // GENIE_LIKELIHOOD_LIKELIHOOD_PAYLOAD_H
+#endif  // SRC_GENIE_LIKELIHOOD_LIKELIHOOD_PAYLOAD_H_

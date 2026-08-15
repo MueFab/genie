@@ -5,22 +5,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <algorithm>
-#include <map>
-#include <string>
-#include <utility>
-#include <vector>
 #include "genie/variantsample/variantsample_parser.h"
 
-#include "genie/util/json.h"
-#include "genie/core/array_type.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
+#include <vector>
 
-namespace genie {
-namespace variant_sample {
+namespace genie::variant_sample {
 
     VariantSampleParser::VariantSampleParser(std::istream& _samples, std::vector<annotation::InfoField>& _fields,
         uint32_t _rowsPerTile)
@@ -60,6 +49,5 @@ bool VariantSampleParser::fillRecord(util::BitReader reader) {
       return true;
     }
 
-}  // namespace variant_sample
-}  // namespace genie
+}  // namespace genie::variant_sample
 

@@ -4,7 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "contact_matrix_tile_payload.h"
+#include "genie/contact/contact_matrix_tile_payload.h"
+#include <utility>
+#include <vector>
 #include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -28,7 +30,7 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
       ncols_(other.ncols_),
       payload_(other.payload_) {
 
-    if (codec_ID_ == core::AlgoID::JBIG){
+    if (codec_ID_ == core::AlgoID::JBIG) {
       nrows_ = 0;
       ncols_ = 0;
     }
@@ -42,10 +44,8 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
     : codec_ID_(other.codec_ID_),
       nrows_(other.nrows_),
       ncols_(other.ncols_),
-      payload_(std::move(other.payload_))
-{
-
-    if (codec_ID_ == core::AlgoID::JBIG){
+      payload_(std::move(other.payload_)) {
+    if (codec_ID_ == core::AlgoID::JBIG) {
       nrows_ = 0;
       ncols_ = 0;
     }
@@ -55,8 +55,7 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
 
 ContactMatrixTilePayload& ContactMatrixTilePayload::operator=(
     ContactMatrixTilePayload&& other
-) noexcept
-{
+) noexcept {
     if (this != &other) {
       codec_ID_ = other.codec_ID_;
       nrows_ = other.nrows_;
@@ -71,7 +70,7 @@ ContactMatrixTilePayload& ContactMatrixTilePayload::operator=(
 ContactMatrixTilePayload::ContactMatrixTilePayload(
     util::BitReader &reader,
     size_t payload_size
-){
+) {
     UTILS_DIE_IF(!reader.IsByteAligned(), "Must be byte-aligned");
 
     codec_ID_ = reader.ReadAlignedInt<core::AlgoID>();
@@ -79,7 +78,7 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
 
     switch (codec_ID_) {
       case genie::core::AlgoID::JBIG: {
-        //TODO: First 4 bytes are width, 2nd 4 bytes are heights
+        // TODO(Yeremia): First 4 bytes are width, 2nd 4 bytes are heights
         nrows_ = 0;
         ncols_ = 0;
         payload_.resize(payload_size);
@@ -139,9 +138,8 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
 ): codec_ID_(_codec_ID),
       nrows_(_tile_nrows),
       ncols_(_tile_ncols),
-      payload_(std::move(_payload))
-{
-    if (codec_ID_ == core::AlgoID::JBIG){
+      payload_(std::move(_payload)) {
+    if (codec_ID_ == core::AlgoID::JBIG) {
       nrows_ = 0;
       ncols_ = 0;
     }
@@ -157,8 +155,7 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
     size_t payload_len
 ): codec_ID_(codec_ID),
       nrows_(tile_nrows),
-      ncols_(tile_ncols)
-{
+      ncols_(tile_ncols) {
     if (payload == nullptr || *payload == nullptr) {
         // payload is nullptr, do nothing
     } else {
@@ -166,7 +163,7 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
         free(*payload);
     }
 
-    if (codec_ID == core::AlgoID::JBIG){
+    if (codec_ID == core::AlgoID::JBIG) {
       nrows_ = 0;
       ncols_ = 0;
     }
@@ -194,12 +191,12 @@ const std::vector<uint8_t>& ContactMatrixTilePayload::GetPayload() const { retur
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//[[maybe_unused]] void ContactMatrixTilePayload::SetTileNRows(uint32_t rows) {
+// [[maybe_unused]] void ContactMatrixTilePayload::SetTileNRows(uint32_t rows) {
 //  nrows_ = rows; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//[[maybe_unused]] void ContactMatrixTilePayload::SetTileNCols(uint32_t cols) {
+// [[maybe_unused]] void ContactMatrixTilePayload::SetTileNCols(uint32_t cols) {
 //  ncols_ = cols; }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -209,7 +206,7 @@ const std::vector<uint8_t>& ContactMatrixTilePayload::GetPayload() const { retur
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//void ContactMatrixTilePayload::setJBIGPayload(
+// void ContactMatrixTilePayload::setJBIGPayload(
 //    uint8_t** _payload,
 //    size_t _payload_len
 //) {
@@ -224,7 +221,7 @@ const std::vector<uint8_t>& ContactMatrixTilePayload::GetPayload() const { retur
 //    }
 //}
 
-//std::pair<uint32_t, uint32_t> ContactMatrixTilePayload::GetTileDimensions() const {
+// std::pair<uint32_t, uint32_t> ContactMatrixTilePayload::GetTileDimensions() const {
 //  if (codec_ID_ != core::AlgoID::JBIG) {
 //    return {nrows_, ncols_};
 //  }
@@ -334,12 +331,12 @@ uint32_t ContactMatrixTilePayload::GetNumCols() {
 
 size_t ContactMatrixTilePayload::GetSize() const {
     size_t size = 0;
-    size += sizeof(uint8_t); // codec_ID_
+    size += sizeof(uint8_t);  // codec_ID_
 
-    if (codec_ID_ != core::AlgoID::JBIG){
+    if (codec_ID_ != core::AlgoID::JBIG) {
         // Adds nrows_, ncols_, and payload_size
-        size += sizeof(uint32_t); // nrows_
-        size += sizeof(uint32_t); // ncols_
+        size += sizeof(uint32_t);  // nrows_
+        size += sizeof(uint32_t);  // ncols_
     }
 
     size += GetPayloadSize();
@@ -349,18 +346,19 @@ size_t ContactMatrixTilePayload::GetSize() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ContactMatrixTilePayload::Write(util::BitWriter &writer) const {
-
     writer.WriteAlignedInt(static_cast<uint8_t>(codec_ID_));
 
-    if (codec_ID_ != core::AlgoID::JBIG){
+    if (codec_ID_ != core::AlgoID::JBIG) {
         writer.WriteAlignedInt(nrows_);
         writer.WriteAlignedInt(ncols_);
     }
 
-    //writer.WriteBypassBE(static_cast<uint32_t>(GetPayloadSize()));
-    for (auto v: payload_) writer.WriteAlignedInt<uint8_t>(v);
+    // writer.WriteBypassBE(static_cast<uint32_t>(GetPayloadSize()));
+    for (auto v : payload_) writer.WriteAlignedInt<uint8_t>(v);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace genie::contact
+
+// ---------------------------------------------------------------------------------------------------------------------

@@ -26,12 +26,12 @@ total_tests_per_exp = 200
 npops = [4, 5, 10, 20, 25, 50]
 ngens = [total_tests_per_exp // npop for npop in npops]
 nparams = list(range(1, 6))
-color = ['r', 'g', 'b', 'idx_k', 'y']
+color = ['r', 'g', 'b', 'k', 'y']
 
 datapoints = np.ones((len(ngens), len(nparams), len(avail_transform), max(ngens), 955)) * np.inf
 
-for idx_i, ngen_npop_pair in enumerate(zip(ngens, npops)):
-    for idx_j, nparam in enumerate(nparams):
+for i, ngen_npop_pair in enumerate(zip(ngens, npops)):
+    for j, nparam in enumerate(nparams):
         ngen, npop = ngen_npop_pair
 
         hyperparam_comb = "ngen_{ngen}_npop_{npop}_nparam_{nparam}".format(
@@ -40,7 +40,7 @@ for idx_i, ngen_npop_pair in enumerate(zip(ngens, npops)):
             nparam=nparam
         )
 
-        for idx_k, transform in enumerate(avail_transform):
+        for k, transform in enumerate(avail_transform):
             csv_path = os.path.join(
                 hs_ga_path,
                 hyperparam_comb,
@@ -50,7 +50,7 @@ for idx_i, ngen_npop_pair in enumerate(zip(ngens, npops)):
             print(hyperparam_comb + " " + transform)
             df = pd.read_csv(csv_path)
 
-            datapoints[idx_i, idx_j, idx_k, :ngen, :] = df.values
+            datapoints[i, j, k, :ngen, :] = df.values
 
 for file_idx in range(955):
     datapoints[:, :, :, :, file_idx] = datapoints[:, :, :, :, file_idx] / np.amin(datapoints[:, :, :, :, file_idx])
@@ -58,12 +58,12 @@ for file_idx in range(955):
     # not_nan = ~ np.isnan(datapoints[:, :, :, :, file_idx])
     # datapoints[not_nan] = datapoints[not_nan] / np.amin(datapoints[not_nan])
 
-fig = plt.figure(num=None, figsize=(16, 9), dpi=120, facecolor='w', edgecolor='idx_k')
-for idx_i, ngen_npop_pair in enumerate(zip(ngens, npops)):
-    for idx_j, nparam in enumerate(nparams):
+fig = plt.figure(num=None, figsize=(16, 9), dpi=120, facecolor='w', edgecolor='k')
+for i, ngen_npop_pair in enumerate(zip(ngens, npops)):
+    for j, nparam in enumerate(nparams):
         ngen, npop = ngen_npop_pair
 
-        ax = plt.subplot(len(ngens), len(nparams), idx_i + idx_j * len(ngens) + 1)
+        ax = plt.subplot(len(ngens), len(nparams), i + j * len(ngens) + 1)
         hyperparam_comb = "ngen_{ngen}_npop_{npop}_nparam_{nparam}".format(
             ngen=ngen,
             npop=npop,
@@ -72,13 +72,13 @@ for idx_i, ngen_npop_pair in enumerate(zip(ngens, npops)):
 
         mean_vals = np.zeros((ngen, len(avail_transform)))
 
-        for idx_k, transform in enumerate(avail_transform):
-            mean_vals[:, idx_k] = np.mean(datapoints[idx_i, idx_j, idx_k, :ngen, idx_k])
+        for k, transform in enumerate(avail_transform):
+            mean_vals[:, k] = np.mean(datapoints[i, j, k, :ngen, k])
 
         ax.plot(
             np.arange(1, ngen + 1) / ngen,
             np.mean(mean_vals, axis=1),
-            color[idx_k],
+            color[k],
             label=hyperparam_comb
         )
 

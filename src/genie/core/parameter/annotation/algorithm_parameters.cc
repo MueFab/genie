@@ -44,6 +44,10 @@ void AlgorithmParameters::read(util::BitReader& reader) {
     for (auto idx_i = 0; idx_i < n_pars; ++idx_i) {
         par_ID[idx_i] = (static_cast<uint8_t>(reader.ReadBits(4)));
         par_type[idx_i] = (static_cast<core::DataType>(reader.ReadBits(8)));
+        DataType paramType = par_type[idx_i];
+        if (paramType == DataType::BOOL) {
+          paramType = DataType::UINT8;
+        }
         par_num_array_dims[idx_i] = (static_cast<uint8_t>(reader.ReadBits(2)));
         for (auto idx_j = 0; idx_j < par_num_array_dims[idx_i]; ++idx_j) {
             par_array_dims[idx_i].push_back(static_cast<uint8_t>(reader.ReadBits(8)));
@@ -51,7 +55,7 @@ void AlgorithmParameters::read(util::BitReader& reader) {
         par_val.emplace_back(resizeVector(par_num_array_dims[idx_i], par_array_dims[idx_i]));
         for (auto& d1 : par_val[idx_i])
             for (auto& d2 : d1)
-                for (auto& d3 : d2) d3 = types.toArray(par_type[idx_i], reader);
+                for (auto& d3 : d2) d3 = types.toArray(paramType, reader);
     }
 }
 
@@ -61,13 +65,17 @@ void AlgorithmParameters::write(util::BitWriter& writer) const {
     for (auto idx_i = 0; idx_i < n_pars; ++idx_i) {
         writer.WriteBits(par_ID[idx_i], 4);
         writer.WriteBits(static_cast<uint8_t>(par_type[idx_i]), 8);
+        DataType paramType = par_type[idx_i];
+        if (paramType == DataType::BOOL) {
+            paramType = DataType::UINT8;
+        }
         writer.WriteBits(par_num_array_dims[idx_i], 2);
         for (auto idx_j = 0; idx_j < par_num_array_dims[idx_i]; ++idx_j) {
             writer.WriteBits(par_array_dims[idx_i][idx_j], 8);
         }
         for (auto idx_j : par_val[idx_i])
             for (auto idx_k : idx_j)
-                for (auto l : idx_k) types.toFile(par_type[idx_i], l, writer);
+                for (auto idx_l : idx_k) types.toFile(paramType, idx_l, writer);
     }
 }
 

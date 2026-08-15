@@ -1,5 +1,5 @@
-#ifndef GENIE_APPS_GENIE_CLI_HANDLER_H
-#define GENIE_APPS_GENIE_CLI_HANDLER_H
+#ifndef SRC_APPS_GENIE_CLI_HANDLER_H_
+#define SRC_APPS_GENIE_CLI_HANDLER_H_
 
 #include <string>
 #include <vector>
@@ -14,6 +14,6 @@ struct CliOptions {
 
 CliOptions parse_args(int argc, char* argv[]);
 
-} // namespace genieapp::cli
+}  // namespace genieapp::cli
 
-#endif
+#endif  // SRC_APPS_GENIE_CLI_HANDLER_H_

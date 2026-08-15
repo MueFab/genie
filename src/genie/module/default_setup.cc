@@ -17,13 +17,13 @@
 
 #include "genie/module/default_setup.h"
 
-#include "genie/name/write_out/decoder.h"
-#include "genie/name/write_out/encoder.h"
-
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "genie/name/write_out/decoder.h"
+#include "genie/name/write_out/encoder.h"
 
 #include "genie/core/classifier_bypass.h"
 #include "genie/core/classifier_regroup.h"

@@ -19,9 +19,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace base {
+namespace genie::entropy::base {
 
 /**
  * @brief Base class for annotation-specific entropy encoders
@@ -69,9 +67,7 @@ class Encoder {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace base
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::base
 
 // -----------------------------------------------------------------------------
 

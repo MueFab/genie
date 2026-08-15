@@ -5,22 +5,12 @@
  */
 
 #include "genie/track/track_parser.h"
-#include <algorithm>
-#include <map>
-#include <string>
-#include <utility>
-#include <vector>
 
-#include "genie/core/array_type.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace track {
+namespace genie::track {
 
 TrackParser::TrackParser(std::istream& _track_MGrecs, std::vector<genie::annotation::InfoField>& _fields,
                                      uint64_t _rowsPerTile)
@@ -64,8 +54,7 @@ bool TrackParser::fillRecord(util::BitReader reader) {
     return true;
 }
 
-}  // namespace track
-}  // namespace genie
+}  // namespace genie::track
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

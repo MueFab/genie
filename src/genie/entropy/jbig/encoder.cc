@@ -4,15 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encoder.h"
-#include <iostream>
+#include "genie/entropy/jbig/encoder.h"
 #include <cstring>
+#include <iostream>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace jbig {
+namespace genie::entropy::jbig {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +20,8 @@ JBIGEncoder::JBIGEncoder()
       deterministic_pred(false),
       typical_pred(false),
       diff_layer_typical_pred(false),
-      two_line_template(false) {}
+      two_line_template(false) {
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,8 +29,7 @@ void JBIGEncoder::encode(
     std::stringstream& input,
     std::stringstream& output,
     uint32_t ncols,
-    uint32_t nrows
-) {
+    uint32_t nrows) {
     const size_t srcLen = input.str().size();
     unsigned char* compressedBuffer;
     size_t compSize;
@@ -41,18 +40,16 @@ void JBIGEncoder::encode(
     int ret = mpegg_jbig_compress_default(
         &compressedBuffer,
         &compSize,
-        (const unsigned char* )input.str().c_str(),
+        (const unsigned char*)input.str().c_str(),
         srcLen,
         buf_nrows,
-        buf_ncols
-    );
+        buf_ncols);
     if (ret != 0) {
         std::cerr << "error with jbig compression\n";
     }
     for (size_t idx_i = 0; idx_i < compSize; ++idx_i)
         output << compressedBuffer[idx_i];
- 
-
+    free(compressedBuffer);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -61,32 +58,34 @@ void JBIGEncoder::encode(
     std::vector<uint8_t>& input,
     std::vector<uint8_t>& output,
     uint32_t ncols,
-    uint32_t nrows
-) {
+    uint32_t nrows) {
     const size_t srcLen = input.size();
     unsigned char* inputBuffer = NULL;
     inputBuffer = (unsigned char*)malloc(sizeof(*inputBuffer) * srcLen);
     memcpy(inputBuffer, &input[0], srcLen);
 
-    unsigned char* decompressedBuffer = NULL;
+    unsigned char* compressedBuffer = NULL;
     size_t dest_data_len;
 
     auto buf_nrows = (unsigned long) ncols;
     auto buf_ncols = (unsigned long) nrows;
 
     int ret = mpegg_jbig_compress_default(
-        &decompressedBuffer,
+        &compressedBuffer,
         &dest_data_len,
         inputBuffer,
         srcLen,
         buf_nrows,
-        buf_ncols
-    );
+        buf_ncols);
     if (ret != 0) {
-        std::cerr << "error with decompression\n";
+        std::cerr << "error with compression\n";
+        free(inputBuffer);
+        return;
     }
     for (size_t idx_i = 0; idx_i < dest_data_len; ++idx_i)
-        output.push_back(decompressedBuffer[idx_i]);
+        output.push_back(compressedBuffer[idx_i]);
+    free(inputBuffer);
+    free(compressedBuffer);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -95,11 +94,9 @@ void JBIGEncoder::decode(
     std::stringstream& input,
     std::stringstream& output,
     uint32_t& ncols,
-    uint32_t& nrows
-) {
-
+    uint32_t& nrows) {
     const size_t srcLen = input.str().size();
-     unsigned char* decompressedBuffer;
+    unsigned char* decompressedBuffer;
     size_t dest_data_len;
 
     unsigned long buf_nrows, buf_ncols;
@@ -107,14 +104,13 @@ void JBIGEncoder::decode(
     int ret = mpegg_jbig_decompress_default(
         &decompressedBuffer,
         &dest_data_len,
-        (const unsigned char* )input.str().c_str(),
+        (const unsigned char*)input.str().c_str(),
         srcLen,
         &buf_nrows,
-        &buf_ncols
-    );
+        &buf_ncols);
 
-    nrows = (uint32_t) buf_nrows;
-    ncols = (uint32_t) buf_ncols;
+    nrows = static_cast<uint32_t>(buf_nrows);
+    ncols = static_cast<uint32_t>(buf_ncols);
 
     if (ret != 0) {
         std::cerr << "error with decompression\n";
@@ -176,8 +172,6 @@ genie::core::parameter::annotation::CompressorParameterSet JBIGparameters::compr
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace jbig
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::jbig
 
 // ---------------------------------------------------------------------------------------------------------------------

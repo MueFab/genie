@@ -75,7 +75,7 @@ class InfoFields {
         fields_.clear();
         fields_.shrink_to_fit();
     }
-	
+
     /**
      * @brief Gets the fields as AttributeField vector
      * @return Vector of AttributeField entries

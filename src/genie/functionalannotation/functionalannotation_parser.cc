@@ -5,22 +5,14 @@
  */
 
 #include "genie/functionalannotation/functionalannotation_parser.h"
-#include <algorithm>
+
 #include <map>
 #include <string>
-#include <utility>
 #include <vector>
-
-#include "genie/core/array_type.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace functional_annotation {
+namespace genie::functional_annotation {
 
 FunctionalAnnotationParser::FunctionalAnnotationParser(std::istream& _annotation_MGrecs, std::vector<genie::annotation::InfoField>& _fields,
                                      const std::vector<std::string>& _featureNames,
@@ -83,8 +75,7 @@ bool FunctionalAnnotationParser::fillRecord(util::BitReader reader) {
     return true;
 }
 
-}  // namespace functional_annotation
-}  // namespace genie
+}  // namespace genie::functional_annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

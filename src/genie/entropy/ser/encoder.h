@@ -19,9 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace ser {
+namespace genie::entropy::ser {
 
 class SERParameters {
  public:
@@ -54,8 +52,6 @@ class SEREncoder : public base::Encoder {
         order = serParameters.order;
     }
 
- protected:
-
  private:
     bool order;
 
@@ -77,9 +73,7 @@ class SEREncoder : public base::Encoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace ser
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::ser
 
 // ---------------------------------------------------------------------------------------------------------------------
 

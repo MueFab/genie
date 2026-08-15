@@ -65,9 +65,9 @@ void BlockPayload::Write(util::BitWriter& writer) const {
         for (char c : generic_payload_stream.str()) {
             writer.WriteBits(static_cast<uint8_t>(c), 8);
         }
-    }
-    else
+    } else {
         for (const auto& byte : generic_payload) writer.WriteBits(byte, 8);
+    }
     writer.FlushBits();
 }
 

@@ -1,7 +1,8 @@
-#ifndef GENIE_BACKEND_BACKEND_STD_H
-#define GENIE_BACKEND_BACKEND_STD_H
+#ifndef SRC_GENIE_BACKEND_BACKEND_STD_H_
+#define SRC_GENIE_BACKEND_BACKEND_STD_H_
 
-#include "backend.h"
+#include "genie/backend/backend.h"
+#include <vector>
 
 namespace genie::backend::genie_std_impl {
 
@@ -39,6 +40,6 @@ void serialize_arr(const UIntVecDtype& arr, uint32_t nelems, std::ostream& paylo
 void deserialize_mat(const std::vector<uint8_t>& payload_bytes, uint32_t dtype_id, uint32_t nrows, uint32_t ncols, UIntMatDtype& mat);
 void deserialize_arr(const std::vector<uint8_t>& payload_bytes, uint32_t nelems, UIntVecDtype& arr);
 
-} // namespace genie::backend::genie_std_impl
+}  // namespace genie::backend::genie_std_impl
 
-#endif // GENIE_BACKEND_BACKEND_STD_H
+#endif  // SRC_GENIE_BACKEND_BACKEND_STD_H_

@@ -10,13 +10,14 @@
 #include <libbsc.h>
 
 #include <atomic>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <utility>
-#include <cstdlib>
-#include <cstring>
-#include <iostream>
+#include <vector>
 
 #include "genie/core/parameter/descriptor_present/descriptor_present.h"
 #include "genie/core/parameter/annotation/algorithm_parameters.h"

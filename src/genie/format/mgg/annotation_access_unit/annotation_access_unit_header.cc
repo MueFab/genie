@@ -32,8 +32,7 @@ AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(
     uint64_t _n_blocks,
     uint64_t _tile_index_1,
     bool _tile_index_2_exists,
-    uint64_t _tile_index_2
-    ):
+    uint64_t _tile_index_2) :
     is_transport_mode(_is_tranport_mode),
     dataset_group_ID(_dataset_group_ID),
     dataset_ID(_dataset_ID),

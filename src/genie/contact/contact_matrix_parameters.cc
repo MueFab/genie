@@ -4,7 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "contact_matrix_parameters.h"
+#include "genie/contact/contact_matrix_parameters.h"
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 #include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -20,10 +24,9 @@ ContactMatrixParameters::ContactMatrixParameters()
       tile_size_(0),
       bin_size_multipliers_(),
       norm_method_infos_(),
-      norm_mat_infos_()
-{
-    // TODO (Yeremia): Check if interval multipliers are valid
-    // TODO (Yeremia): Set default value so that bin_size_multipliers_ is valid
+      norm_mat_infos_() {
+    // TODO(Yeremia): Check if interval multipliers are valid
+    // TODO(Yeremia): Set default value so that bin_size_multipliers_ is valid
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -43,9 +46,8 @@ ContactMatrixParameters::ContactMatrixParameters(
       bin_size_multipliers_(std::move(_interval_multipliers)),
       norm_method_infos_(std::move(_norm_method_infos)),
       norm_mat_infos_(std::move(_norm_mat_infos)) {
-
-    // TODO (Yeremia): check if interval multipliers are valid
-    for (uint32_t mult: _interval_multipliers){
+    // TODO(Yeremia): check if interval multipliers are valid
+    for (uint32_t mult : _interval_multipliers) {
         UTILS_DIE_IF(tile_size_ % mult != 0, "Invalid multiplier!");
     }
 
@@ -58,9 +60,9 @@ ContactMatrixParameters::ContactMatrixParameters(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
+ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader) {
     auto num_samples = reader.ReadAlignedInt<uint16_t>();
-    for (uint16_t idx_i = 0; idx_i<num_samples; idx_i++){
+    for (uint16_t idx_i = 0; idx_i < num_samples; idx_i++) {
         auto ID = reader.ReadAlignedInt<uint16_t>();
 
         std::string name;
@@ -76,7 +78,7 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     }
 
     auto num_chrs = reader.ReadAlignedInt<uint8_t>();
-    for (uint8_t idx_i = 0; idx_i<num_chrs; idx_i++){
+    for (uint8_t idx_i = 0; idx_i < num_chrs; idx_i++) {
         auto ID = reader.ReadAlignedInt<uint8_t>();
         std::string name;
         name.resize(reader.ReadAlignedInt<uint8_t>());
@@ -95,12 +97,12 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     bin_size_ = reader.ReadAlignedInt<uint32_t>();
     tile_size_ = reader.ReadAlignedInt<uint32_t>();
     auto num_interval_mults = reader.ReadAlignedInt<uint8_t>();
-    for (uint8_t idx_i = 0; idx_i<num_interval_mults; idx_i++){
+    for (uint8_t idx_i = 0; idx_i < num_interval_mults; idx_i++) {
       bin_size_multipliers_.push_back(reader.ReadAlignedInt<uint32_t>());
     }
 
     auto num_norm_methods = reader.ReadAlignedInt<uint8_t>();
-    for (uint8_t idx_i = 0; idx_i<num_norm_methods; idx_i++){
+    for (uint8_t idx_i = 0; idx_i < num_norm_methods; idx_i++) {
         auto ID = reader.ReadAlignedInt<uint8_t>();
         std::string name;
         name.resize(reader.ReadAlignedInt<uint8_t>());
@@ -117,7 +119,7 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     }
 
     auto num_norm_matrices = reader.ReadAlignedInt<uint8_t>();
-    for (uint8_t idx_i = 0; idx_i<num_norm_matrices; idx_i++){
+    for (uint8_t idx_i = 0; idx_i < num_norm_matrices; idx_i++) {
         auto ID = reader.ReadAlignedInt<uint8_t>();
         std::string name;
         name.resize(reader.ReadAlignedInt<uint8_t>());
@@ -132,7 +134,7 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     }
 
 //    auto num_scm = reader.ReadAlignedInt<uint16_t>();
-//    for (uint16_t idx_i = 0; idx_i<num_scm; idx_i++){
+//    for (uint16_t idx_i = 0; idx_i < num_scm; idx_i++) {
 //        auto chr1_ID_ = reader.ReadAlignedInt<uint8_t>();
 //        auto chr2_ID_ = reader.ReadAlignedInt<uint8_t>();
 
@@ -169,21 +171,21 @@ void ContactMatrixParameters::AddSample(uint16_t ID, std::string&& name, bool ex
     if (it == sample_infos_.end()) {
         SampleInformation sample_info = {ID, std::move(name)};
         sample_infos_.emplace(ID, std::move(sample_info));
-    } else if (exist_ok){
+    } else if (exist_ok) {
         UTILS_DIE_IF(it->second.name != name,
                      "name differs for the same sample_ID_");
-    } else{
+    } else {
         UTILS_DIE("sample_ID_ already exists!");
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] const std::unordered_map<uint16_t, SampleInformation>& ContactMatrixParameters::GetSamples() const{ return sample_infos_; }
+[[maybe_unused]] const std::unordered_map<uint16_t, SampleInformation>& ContactMatrixParameters::GetSamples() const { return sample_infos_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::string& ContactMatrixParameters::GetSampleName(uint16_t sample_ID) const{
+const std::string& ContactMatrixParameters::GetSampleName(uint16_t sample_ID) const {
     auto sample_obj = sample_infos_.find(sample_ID);
     UTILS_DIE_IF(sample_obj == sample_infos_.end(), "sample_ID_ does not exist!");
 
@@ -196,8 +198,7 @@ void ContactMatrixParameters::UpsertSample(
     uint16_t ID,
     const std::string& name,
     bool exist_ok
-){
-
+) {
     auto _name = std::string(name);
 
     UpsertSample(ID, std::move(_name), exist_ok);
@@ -209,16 +210,14 @@ void ContactMatrixParameters::UpsertSample(
     uint16_t ID,
     std::string&& name,
     bool exist_ok
-){
-
+) {
     auto it = sample_infos_.find(ID);
-    if (it == sample_infos_.end()){
+    if (it == sample_infos_.end()) {
         SampleInformation sample_info = {ID, std::move(name)};
         sample_infos_.emplace(ID, std::move(sample_info));
-    } else if (exist_ok){
+    } else if (exist_ok) {
         it->second.name = std::move(name);
-
-    } else{
+    } else {
         UTILS_DIE("chr_ID_ already exists!");
     }
 }
@@ -239,7 +238,7 @@ void ContactMatrixParameters::UpsertChromosome(
     const std::string& name,
     uint64_t length,
     bool exist_ok
-){
+) {
     auto _name = std::string(name);
 
     UpsertChromosome(ID, std::move(_name), length, exist_ok);
@@ -252,27 +251,26 @@ void ContactMatrixParameters::UpsertChromosome(
     std::string&& name,
     uint64_t length,
     bool exist_ok
-){
-
+) {
     auto it = chr_infos_.find(ID);
-    if (it == chr_infos_.end()){
+    if (it == chr_infos_.end()) {
         ChromosomeInformation chr_info = {ID, std::move(name), length};
         chr_infos_.emplace(ID, std::move(chr_info));
-    } else if (exist_ok){
+    } else if (exist_ok) {
         UTILS_DIE_IF(it->second.name != name,
                      "name differs for the same chr_ID_");
 
         it->second.name = std::move(name);
         it->second.length = length;
 
-    } else{
+    } else {
         UTILS_DIE("chr_ID_ already exists!");
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::unordered_map<uint8_t, ChromosomeInformation>& ContactMatrixParameters::GetChromosomes() const{ return chr_infos_; }
+const std::unordered_map<uint8_t, ChromosomeInformation>& ContactMatrixParameters::GetChromosomes() const { return chr_infos_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -301,7 +299,7 @@ uint32_t ContactMatrixParameters::GetTileSize() const { return tile_size_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactMatrixParameters::SetTileSize(uint32_t tile_size) {tile_size_ = tile_size;}
+void ContactMatrixParameters::SetTileSize(uint32_t tile_size) { tile_size_ = tile_size; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -313,12 +311,12 @@ void ContactMatrixParameters::SetTileSize(uint32_t tile_size) {tile_size_ = tile
 
 void ContactMatrixParameters::UpsertBinSizeMultiplier(
     size_t bin_size_multiplier
-){
-    if (bin_size_multiplier != 1){
+) {
+    if (bin_size_multiplier != 1) {
         UTILS_DIE_IF(bin_size_ % bin_size_multiplier != 0, "Invalid bin_size_multiplier_!");
         auto iter = std::find(bin_size_multipliers_.begin(),
                               bin_size_multipliers_.end(), bin_size_multiplier);
-        if (iter == bin_size_multipliers_.end()){
+        if (iter == bin_size_multipliers_.end()) {
           bin_size_multipliers_.push_back(static_cast<uint32_t>(bin_size_multiplier));
         }
     }
@@ -329,25 +327,23 @@ void ContactMatrixParameters::UpsertBinSizeMultiplier(
 
 bool ContactMatrixParameters::IsBinSizeMultiplierValid(
     size_t target_interv_mult
-) const{
-
+) const {
     // By default 1 is always valid
-    if (target_interv_mult == 1){
+    if (target_interv_mult == 1) {
         return true;
     }
 
-    for (const auto& interv_mult: bin_size_multipliers_){
-        if (interv_mult == target_interv_mult){
+    for (const auto& interv_mult : bin_size_multipliers_) {
+        if (interv_mult == target_interv_mult) {
             return true;
         }
     }
 
     auto iter = std::find(bin_size_multipliers_.begin(),
                           bin_size_multipliers_.end(),
-        target_interv_mult
-    );
+        target_interv_mult);
 
-    if (iter != bin_size_multipliers_.end()){
+    if (iter != bin_size_multipliers_.end()) {
         return true;
     } else {
         return false;
@@ -360,13 +356,13 @@ uint8_t ContactMatrixParameters::GetNumNormMethods() const { return static_cast<
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] void ContactMatrixParameters::AddNormMethod(uint8_t ID, NormalizationMethodInformation&& norm_method_info){
+[[maybe_unused]] void ContactMatrixParameters::AddNormMethod(uint8_t ID, NormalizationMethodInformation&& norm_method_info) {
   norm_method_infos_.emplace(ID, std::move(norm_method_info));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] const std::unordered_map<uint8_t, NormalizationMethodInformation>& ContactMatrixParameters::GetNormMethods() const{
+[[maybe_unused]] const std::unordered_map<uint8_t, NormalizationMethodInformation>& ContactMatrixParameters::GetNormMethods() const {
     return norm_method_infos_;
 }
 
@@ -376,21 +372,21 @@ uint8_t ContactMatrixParameters::GetNumNormMats() const { return static_cast<uin
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] void ContactMatrixParameters::AddNormMat(uint8_t ID, NormalizedMatrixInformations&& norm_mat_info){
+[[maybe_unused]] void ContactMatrixParameters::AddNormMat(uint8_t ID, NormalizedMatrixInformations&& norm_mat_info) {
   norm_mat_infos_.emplace(ID, norm_mat_info);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] const std::unordered_map<uint8_t, NormalizedMatrixInformations>& ContactMatrixParameters::GetNormMats() const {return norm_mat_infos_;}
+[[maybe_unused]] const std::unordered_map<uint8_t, NormalizedMatrixInformations>& ContactMatrixParameters::GetNormMats() const { return norm_mat_infos_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//uint16_t ContactMatrixParameters::getNumSCMParams() const {return static_cast<uint16_t>(scm_params.size());}
+// uint16_t ContactMatrixParameters::getNumSCMParams() const {return static_cast<uint16_t>(scm_params.size());}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//void ContactMatrixParameters::addSCMParam(SubcontactMatrixParameters&& scm_param){
+// void ContactMatrixParameters::addSCMParam(SubcontactMatrixParameters&& scm_param){
 //    auto chr_pair = scm_param.getChrPair();
 //    UTILS_DIE_IF(scm_params.find(chr_pair) != scm_params.end(), "SCM parameter already exists!");
 //    scm_params.emplace(chr_pair, std::move(scm_param));
@@ -398,14 +394,14 @@ uint8_t ContactMatrixParameters::GetNumNormMats() const { return static_cast<uin
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//const SCMParamsDtype& ContactMatrixParameters::getSCMParams() const {return scm_params;}
+// const SCMParamsDtype& ContactMatrixParameters::getSCMParams() const {return scm_params;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t ContactMatrixParameters::GetNumBinEntries(
     uint8_t chr_ID,
     uint32_t interv_mult
-){
+) {
     UTILS_DIE_IF(bin_size_ == 0, "Please set the bin size!");
     UTILS_DIE_IF(chr_infos_.find(chr_ID) == chr_infos_.end(), "chr_ID_ does not exist!");
 
@@ -422,7 +418,7 @@ uint64_t ContactMatrixParameters::GetNumBinEntries(
 uint32_t ContactMatrixParameters::GetNumTiles(
     uint8_t chr_ID,
     uint32_t interv_mult
-){
+) {
     UTILS_DIE_IF(tile_size_ == 0, "Please set the tile size!");
 
     uint64_t num_bins = GetNumBinEntries(chr_ID, interv_mult);
@@ -438,30 +434,30 @@ size_t ContactMatrixParameters::GetSize() const {
 
     size += sizeof(uint16_t);
     for (const auto& sample_info : sample_infos_) {
-        size += sizeof(uint16_t); // ID
-        size += sample_info.second.name.size() + 1; // +1 for the null terminator
+        size += sizeof(uint16_t);  // ID
+        size += sample_info.second.name.size() + 1;  // +1 for the null terminator
     }
 
     size += sizeof(uint8_t);
     for (const auto& chr_info : chr_infos_) {
-        size += sizeof(uint8_t); // ID
+        size += sizeof(uint8_t);  // ID
         size += chr_info.second.name.size() + 1;
-        size += sizeof(uint64_t); // length
+        size += sizeof(uint64_t);  // length
     }
 
-    size += sizeof(uint32_t); // bin_size
-    size += sizeof(uint32_t); // tile_size_
-    size += sizeof(uint8_t);  // number of bin_size_multipliers_
+    size += sizeof(uint32_t);  // bin_size
+    size += sizeof(uint32_t);  // tile_size_
+    size += sizeof(uint8_t);   // number of bin_size_multipliers_
     size += bin_size_multipliers_.size() * sizeof(uint32_t);
 
-    size += sizeof(uint8_t); // number of normalization methods
+    size += sizeof(uint8_t);  // number of normalization methods
     for (const auto& norm_method_info : norm_method_infos_) {
         size += sizeof(uint8_t);
         size += norm_method_info.second.name.size() + 1;
-        size += sizeof(uint8_t); // mult_flag
+        size += sizeof(uint8_t);  // mult_flag
     }
 
-    size += sizeof(uint8_t); // number of normalized matrices
+    size += sizeof(uint8_t);  // number of normalized matrices
     for (const auto& norm_mat_info : norm_mat_infos_) {
         size += sizeof(uint8_t);
         size += norm_mat_info.second.name.size() + 1;
@@ -473,44 +469,44 @@ size_t ContactMatrixParameters::GetSize() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ContactMatrixParameters::Write(util::BitWriter& writer) const {
-  writer.WriteBits(static_cast<uint16_t>(sample_infos_.size()), 16);
-  for(const auto& sample_info : sample_infos_) {
-    writer.WriteBits(sample_info.second.ID, 16);
-    writer.WriteBits(static_cast<uint16_t>(sample_info.second.name.size()), 8);
-    writer.WriteAlignedBytes(sample_info.second.name.data(), sample_info.second.name.size());
-  }
+    writer.WriteBits(static_cast<uint16_t>(sample_infos_.size()), 16);
+    for (const auto& sample_info : sample_infos_) {
+        writer.WriteBits(sample_info.second.ID, 16);
+        writer.WriteBits(static_cast<uint16_t>(sample_info.second.name.size()), 8);
+        writer.WriteAlignedBytes(sample_info.second.name.data(), sample_info.second.name.size());
+    }
 
-  writer.WriteBits(static_cast<uint8_t>(chr_infos_.size()), 8);
-  for(const auto& chr_info : chr_infos_) {
-    writer.WriteBits(chr_info.second.ID, 8);
-    writer.WriteBits(static_cast<uint16_t>(chr_info.second.name.size()), 8);
-    writer.WriteAlignedBytes(chr_info.second.name.data(), chr_info.second.name.size());
-    writer.WriteBits(chr_info.second.length, 64);
-  }
+    writer.WriteBits(static_cast<uint8_t>(chr_infos_.size()), 8);
+    for (const auto& chr_info : chr_infos_) {
+        writer.WriteBits(chr_info.second.ID, 8);
+        writer.WriteBits(static_cast<uint16_t>(chr_info.second.name.size()), 8);
+        writer.WriteAlignedBytes(chr_info.second.name.data(), chr_info.second.name.size());
+        writer.WriteBits(chr_info.second.length, 64);
+    }
 
-  writer.WriteBits(bin_size_, 32);
-  writer.WriteBits(tile_size_, 32);
+    writer.WriteBits(bin_size_, 32);
+    writer.WriteBits(tile_size_, 32);
 
-  writer.WriteBits(static_cast<uint8_t>(bin_size_multipliers_.size()), 8);
-  for(const auto& bin_size_multiplier : bin_size_multipliers_) {
-    writer.WriteBits(bin_size_multiplier, 32);
-  }
+    writer.WriteBits(static_cast<uint8_t>(bin_size_multipliers_.size()), 8);
+    for (const auto& bin_size_multiplier : bin_size_multipliers_) {
+        writer.WriteBits(bin_size_multiplier, 32);
+    }
 
-  writer.WriteBits(static_cast<uint8_t>(norm_method_infos_.size()), 8);
-  for(const auto& method_info : norm_method_infos_) {
-    writer.WriteBits(method_info.second.ID, 8);
-    writer.WriteBits(static_cast<uint16_t>(method_info.second.name.size()), 8);
-    writer.WriteAlignedBytes(method_info.second.name.data(), method_info.second.name.size());
-    writer.WriteBits(0, 7);
-    writer.WriteBits(method_info.second.mult_flag, 1);
-  }
+    writer.WriteBits(static_cast<uint8_t>(norm_method_infos_.size()), 8);
+    for (const auto& method_info : norm_method_infos_) {
+        writer.WriteBits(method_info.second.ID, 8);
+        writer.WriteBits(static_cast<uint16_t>(method_info.second.name.size()), 8);
+        writer.WriteAlignedBytes(method_info.second.name.data(), method_info.second.name.size());
+        writer.WriteBits(0, 7);
+        writer.WriteBits(method_info.second.mult_flag, 1);
+    }
 
-  writer.WriteBits(static_cast<uint8_t>(norm_mat_infos_.size()), 8);
-  for(const auto& mat_info : norm_mat_infos_) {
-    writer.WriteBits(mat_info.second.ID, 8);
-    writer.WriteBits(static_cast<uint16_t>(mat_info.second.name.size()), 8);
-    writer.WriteAlignedBytes(mat_info.second.name.data(), mat_info.second.name.size());
-  }
+    writer.WriteBits(static_cast<uint8_t>(norm_mat_infos_.size()), 8);
+    for (const auto& mat_info : norm_mat_infos_) {
+        writer.WriteBits(mat_info.second.ID, 8);
+        writer.WriteBits(static_cast<uint16_t>(mat_info.second.name.size()), 8);
+        writer.WriteAlignedBytes(mat_info.second.name.data(), mat_info.second.name.size());
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -520,14 +516,14 @@ bool mapsEqual(const std::unordered_map<KeyType, T>& current, const std::unorder
     if (current.size() != other.size()) {
         return false;
     }
-    //TODO(yeremia): Improve this
+    // TODO(yeremia): Improve this
     for (const auto& pair : current) {
         auto iter = other.find(pair.first);
         if (iter == other.end()) {
             return false;
         }
-        //TODO(yeremia): operator != does not work
-        if (!(pair.second == iter->second)){
+        // TODO(yeremia): operator != does not work
+        if (!(pair.second == iter->second)) {
             return false;
         }
     }
@@ -537,38 +533,38 @@ bool mapsEqual(const std::unordered_map<KeyType, T>& current, const std::unorder
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool ContactMatrixParameters::operator==(const ContactMatrixParameters& other) {
-    if (this->GetNumSamples() != other.GetNumSamples()){
+    if (this->GetNumSamples() != other.GetNumSamples()) {
         return false;
     }
-    if (!mapsEqual(this->sample_infos_, other.sample_infos_)){
-        return false;
-    }
-
-    if (this->GetNumChromosomes() != other.GetNumChromosomes()){
-        return false;
-    }
-    if (!mapsEqual(this->GetChromosomes(), other.GetChromosomes())){
+    if (!mapsEqual(this->sample_infos_, other.sample_infos_)) {
         return false;
     }
 
-    if (this->GetBinSize() != other.GetBinSize()){
+    if (this->GetNumChromosomes() != other.GetNumChromosomes()) {
         return false;
     }
-    if (this->GetTileSize() != other.GetTileSize()){
-        return false;
-    }
-
-    if (this->GetNumNormMethods() != other.GetNumNormMethods()){
-        return false;
-    }
-    if (!mapsEqual(this->norm_method_infos_, other.norm_method_infos_)){
+    if (!mapsEqual(this->GetChromosomes(), other.GetChromosomes())) {
         return false;
     }
 
-    if (this->GetNumNormMats() != other.GetNumNormMats()){
+    if (this->GetBinSize() != other.GetBinSize()) {
         return false;
     }
-    if (!mapsEqual(this->norm_mat_infos_, other.norm_mat_infos_)){
+    if (this->GetTileSize() != other.GetTileSize()) {
+        return false;
+    }
+
+    if (this->GetNumNormMethods() != other.GetNumNormMethods()) {
+        return false;
+    }
+    if (!mapsEqual(this->norm_method_infos_, other.norm_method_infos_)) {
+        return false;
+    }
+
+    if (this->GetNumNormMats() != other.GetNumNormMats()) {
+        return false;
+    }
+    if (!mapsEqual(this->norm_mat_infos_, other.norm_mat_infos_)) {
         return false;
     }
 

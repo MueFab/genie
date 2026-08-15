@@ -15,9 +15,8 @@
 #include <vector>
 #include <map>
 
-#include "genie/util/runtime_exception.h"
-
 #include "genie/core/record/class_type.h"
+#include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
@@ -474,6 +473,8 @@ uint8_t Range2Bytes(const std::pair<int64_t, int64_t>& range) {
   return Bits2Bytes(bits);
 }
 
+// -----------------------------------------------------------------------------
+
 std::string AnnotDescToString(AnnotDesc desc) {
     switch (desc) {
         case genie::core::AnnotDesc::SEQUENCEID:
@@ -527,8 +528,7 @@ std::string AnnotDescToString(AnnotDesc desc) {
     }
 }
 
-AlgoID stringToAlgoID(std::string& algostring)
-{
+AlgoID stringToAlgoID(const std::string& algostring) {
     std::map<std::string, AlgoID> stringtoalgo;
     stringtoalgo["CABAC"] = AlgoID::CABAC;
     stringtoalgo["LZMA"] = AlgoID::LZMA;

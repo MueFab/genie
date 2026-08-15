@@ -4,8 +4,8 @@
 * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MGG_ANNOTATION_TABLE_ANNOTATION_TABLE_HEADER_H
-#define SRC_GENIE_FORMAT_MGG_ANNOTATION_TABLE_ANNOTATION_TABLE_HEADER_H
+#ifndef SRC_GENIE_FORMAT_MGG_ANNOTATION_TABLE_ANNOTATION_TABLE_HEADER_H_
+#define SRC_GENIE_FORMAT_MGG_ANNOTATION_TABLE_ANNOTATION_TABLE_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,8 +24,6 @@ namespace mgg {
 namespace annotation_table {
 
 class AnnotationTableHeader : public GenInfo {
- public:
-
  private:
     // IF is_transport_mode == 1
     uint8_t dataset_group_ID;
@@ -53,9 +51,9 @@ class AnnotationTableHeader : public GenInfo {
     std::vector<std::vector<uint16_t>> field_ID;
 };
 
-} // namespace annotation_table
-} // namespace mgg
-} // namespace format
-} // namespace genie
+}  // namespace annotation_table
+}  // namespace mgg
+}  // namespace format
+}  // namespace genie
 
-#endif  // SRC_GENIE_FORMAT_MGG_ANNOTATION_TABLE_ANNOTATION_TABLE_HEADER_H
+#endif  // SRC_GENIE_FORMAT_MGG_ANNOTATION_TABLE_ANNOTATION_TABLE_HEADER_H_

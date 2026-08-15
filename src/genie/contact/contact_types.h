@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CONTACT_TYPES_H
-#define GENIE_CONTACT_TYPES_H
+#ifndef SRC_GENIE_CONTACT_CONTACT_TYPES_H_
+#define SRC_GENIE_CONTACT_CONTACT_TYPES_H_
 
 #include <cstddef>
 #include <cstdint>
@@ -68,6 +68,6 @@ struct RunLengthEncodingData {
   TransformID transformID;
 };
 
-} // namespace genie::contact
+}  // namespace genie::contact
 
-#endif // GENIE_CONTACT_TYPES_H
+#endif  // SRC_GENIE_CONTACT_CONTACT_TYPES_H_

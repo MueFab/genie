@@ -4,15 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_LIKELIHOOD_LIKELIHOOD_CODER_XTENSOR_H
-#define GENIE_LIKELIHOOD_LIKELIHOOD_CODER_XTENSOR_H
+#ifndef SRC_GENIE_LIKELIHOOD_LIKELIHOOD_CODER_XTENSOR_H_
+#define SRC_GENIE_LIKELIHOOD_LIKELIHOOD_CODER_XTENSOR_H_
 
-#include <vector>
 #include <sstream>
+#include <vector>
 #include <xtensor/xtensor.hpp>
-#include "likelihood_types.h"
+#include "genie/likelihood/likelihood_types.h"
+#include "genie/likelihood/likelihood_parameters.h"
 #include "genie/core/record/variant/record.h"
-#include "likelihood_parameters.h"
 
 namespace genie::likelihood {
     struct EncodingOptions;
@@ -26,12 +26,12 @@ struct LikelihoodEncodingBlock {
     uint32_t ncols;
     std::stringstream serialized_mat;
     std::stringstream serialized_arr;
-    
+
     // XTensor specific members
     xt::xtensor<uint32_t, 2> likelihood_mat;
     xt::xtensor<uint32_t, 1> lut;
     xt::xtensor<uint32_t, 2> idx_mat;
-    
+
     uint32_t nelems;
     core::DataType dtype_id = core::DataType::UINT32;
 
@@ -68,7 +68,7 @@ void decode_likelihood(
     const LikelihoodParameters& params, LikelihoodPayload& payload,
     std::vector<core::record::VariantGenotype>& recs);
 
-} // namespace xtensor
-} // namespace genie::likelihood::detail
+}  // namespace xtensor
+}  // namespace genie::likelihood::detail
 
-#endif // GENIE_LIKELIHOOD_LIKELIHOOD_CODER_XTENSOR_H
+#endif  // SRC_GENIE_LIKELIHOOD_LIKELIHOOD_CODER_XTENSOR_H_

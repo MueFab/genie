@@ -41,11 +41,13 @@ class TypedData {
           compressedDataStream{} {}
 
     TypedData& operator=(const TypedData& other) {
-        data_type_ID = other.data_type_ID;
-        num_array_dims = other.num_array_dims;
-        array_dims = other.array_dims;
-        dataStream << other.dataStream.rdbuf();
-        compressedDataStream << other.compressedDataStream.rdbuf();
+        if (this != &other) {
+            data_type_ID = other.data_type_ID;
+            num_array_dims = other.num_array_dims;
+            array_dims = other.array_dims;
+            dataStream << other.dataStream.rdbuf();
+            compressedDataStream << other.compressedDataStream.rdbuf();
+        }
         return *this;
     }
 

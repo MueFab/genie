@@ -6,18 +6,14 @@
 
 #include "genie/trackproperty/trackproperty_parser.h"
 
-#include <algorithm>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "genie/util/runtime_exception.h"
-
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace track_property {
+namespace genie::track_property {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +68,7 @@ bool TrackPropertyParser::fillRecord(util::BitReader reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace track_property
-}  // namespace genie
+}  // namespace genie::track_property
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

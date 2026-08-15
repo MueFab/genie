@@ -2,13 +2,12 @@
 // Created by Irvan on 19.11.2024.
 //
 
-#ifndef COMMONS_H
-#define COMMONS_H
+#ifndef SRC_GENIE_ENTROPY_RANS_COMMONS_H_
+#define SRC_GENIE_ENTROPY_RANS_COMMONS_H_
 
 #include <cstdio>
 #include <cstdint>
 #include <cstddef>
-#include <cstdint>
 #include <cstdarg>
 #include <cstdlib>
 #include <cassert>
@@ -48,6 +47,6 @@ struct RANSParams {
     uint32_t compressed_size;
 };
 
-} // namespace genie::entropy::rans
+}  // namespace genie::entropy::rans
 
-#endif //COMMONS_H
+#endif  // SRC_GENIE_ENTROPY_RANS_COMMONS_H_

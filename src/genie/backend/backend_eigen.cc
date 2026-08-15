@@ -1,10 +1,13 @@
-#include "backend_eigen.h"
-#include <genie/util/runtime_exception.h>
-#include <genie/util/bit_writer.h>
-#include <genie/util/bit_reader.h>
-#include <numeric>
+#include "genie/backend/backend_eigen.h"
 #include <algorithm>
+#include <numeric>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/util/runtime_exception.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/bit_reader.h"
 
 namespace genie::backend::genie_eigen_impl {
 
@@ -27,8 +30,7 @@ void sort_sparse_mat_inplace(
                 return row_ids(i1) < row_ids(i2);
             }
             return col_ids(i1) < col_ids(i2);
-        }
-    );
+        });
 
     UInt64VecDtype sorted_row_ids(num_entries);
     UInt64VecDtype sorted_col_ids(num_entries);
@@ -176,4 +178,4 @@ void deserialize_arr(
         arr[idx_i] = reader.ReadAlignedInt<uint32_t>();
 }
 
-} // namespace genie::backend::genie_eigen_impl
+}  // namespace genie::backend::genie_eigen_impl

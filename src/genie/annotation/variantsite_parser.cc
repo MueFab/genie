@@ -6,8 +6,10 @@
 
 #include "genie/annotation/variantsite_parser.h"
 #include <algorithm>
+#include <map>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "genie/core/array_type.h"
 #include "genie/util/bit_reader.h"

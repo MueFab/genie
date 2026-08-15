@@ -6,6 +6,7 @@
 
 #include "genie/annotation/attributes.h"
 #include <algorithm>
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>
@@ -15,19 +16,6 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::variant_site {
-
-void Attributes::add(std::vector<genie::core::access_unit::annotation::AttributeField> fields) {
-    for (const auto& field : fields) {
-        attributeTiles[field.name].write(field.values);
-        attrWritten[field.name] = true;
-    }
-    for (const auto& isWritten : attrWritten) {
-        if (!isWritten.second) {
-            attributeTiles[isWritten.first].writeMissing();
-        }
-        attrWritten[isWritten.first] = false;
-    }
-}
 
 void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
     AddFirst();
@@ -120,6 +108,19 @@ AttributeTile::AttributeTile(const AttributeTile& other) {
 void AttributeTile::setCompressedData(uint64_t tilenr, std::stringstream& compressedData) {
     (void)tilenr;
     (void)compressedData;
+}
+
+void Attributes::add(std::vector<genie::core::access_unit::annotation::AttributeField> fields) {
+    for (const auto& field : fields) {
+        attributeTiles[field.name].write(field.values);
+        attrWritten[field.name] = true;
+    }
+    for (const auto& isWritten : attrWritten) {
+        if (!isWritten.second) {
+            attributeTiles[isWritten.first].writeMissing();
+        }
+        attrWritten[isWritten.first] = false;
+    }
 }
 
 void Attributes::add(std::map<std::string, genie::core::record::site::Info_tag> tags, std::map<std::string, std::vector<std::vector<uint8_t>>> infoValues) {

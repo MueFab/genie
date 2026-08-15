@@ -15,21 +15,22 @@
 #include <zstd.h>
 
 #include <atomic>
+#include <cstdlib>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <utility>
-#include <cstdlib>
-#include <cstring>
+#include <vector>
 
 #include "genie/core/parameter/descriptor_present/descriptor_present.h"
 #include "genie/core/parameter/annotation/algorithm_parameters.h"
 #include "genie/core/parameter/annotation/compressor_parameter_set.h"
 #include "genie/entropy/zstd/param_decoder.h"
 #include "genie/util/stop_watch.h"
-#include <codecs/include/mpegg-codecs.h>
+#include "codecs/include/mpegg-codecs.h"
 
 // -----------------------------------------------------------------------------
 
@@ -159,7 +160,6 @@ void ZSTDEncoder::encode(std::stringstream &input, std::stringstream &output) {
 
 void ZSTDEncoder::decode(std::stringstream &input, std::stringstream &output) {
     const size_t srcLen = input.str().size();
-    char *dest = new char[srcLen];
     unsigned char *destination = nullptr;
     size_t destLen = srcLen;
     int ret = mpegg_zstd_decompress(&destination, &destLen, (const unsigned char *)input.str().c_str(), srcLen);
@@ -168,7 +168,6 @@ void ZSTDEncoder::decode(std::stringstream &input, std::stringstream &output) {
     }
     output.write((const char *)destination, destLen);
     if (destination) free(destination);
-    delete[] dest;
 }
 
 genie::core::parameter::annotation::AlgorithmParameters ZSTDParameters::convertToAlgorithmParameters()

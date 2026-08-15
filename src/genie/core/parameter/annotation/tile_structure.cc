@@ -109,7 +109,7 @@ void TileStructure::read(util::BitReader& reader) {
 }
 
 void TileStructure::write(util::BitWriter& writer) const {
-    writer.WriteBits(0, 7);
+    writer.WriteBits(0, 7);  // reserved(7)
     writer.WriteBits(variable_size_tiles, 1);
     writer.WriteBits(n_tiles, coordSizeInBits(ATCoordSize));
 

@@ -13,6 +13,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -99,7 +100,6 @@ void Compressor::compress(std::stringstream& input, std::stringstream& output, u
     output << intermediateOut.rdbuf();
 }
 
-#include <type_traits>
 class Parameter {
  public:
     bool read(std::string parameterIn, uint8_t& parameterOut) {

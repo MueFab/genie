@@ -20,11 +20,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace annotation {
+namespace genie::annotation {
 
-void genie::annotation::Annotation::startStream(RecType recType, std::string recordInputFileName,
-                                                std::string outputFileName) {
+void Annotation::startStream(RecType recType, std::string recordInputFileName,
+                             std::string outputFileName) {
     std::ifstream inputfile;
     inputfile.open(recordInputFileName, std::ios::in | std::ios::binary);
 
@@ -33,7 +32,13 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
 
     // read file - determine type
 
-    if (recType == RecType::GENO_FILE) {
+    if (recType == RecType::VARIANT_SITE_FILE) {
+        siteAnnotation.setCompressors(compressors);
+        siteAnnotation.parseInfoTags(recordInputFileName);
+        auto dataunits = siteAnnotation.parseSite(inputfile);
+        annotationParameterSet.push_back(dataunits.annotationParameterSet);
+        annotationAccessUnit = dataunits.annotationAccessUnit;
+    } else if (recType == RecType::VARIANT_GENO_FILE) {
         std::vector<std::pair<uint64_t, uint8_t>> numBitPlanes;
         genoAnnotation.setCompressors(compressors);
         genoAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
@@ -44,53 +49,56 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
             annotationAccessUnit.insert(annotationAccessUnit.end(), dataunit.annotationAccessUnit.begin(),
                                         dataunit.annotationAccessUnit.end());
         }
-    } else if (recType == RecType::SITE_FILE) {
-        siteAnnotation.setCompressors(compressors);
-        siteAnnotation.parseInfoTags(recordInputFileName);
-        auto dataunits = siteAnnotation.parseSite(inputfile);
-        annotationParameterSet.push_back(dataunits.annotationParameterSet);
-        annotationAccessUnit = dataunits.annotationAccessUnit;
     } else if (recType == RecType::SAMPLE_FILE) {
         sampleAnnotation.setCompressors(compressors);
+        sampleAnnotation.setTileSize(defaultTileSizeWidth);
         sampleAnnotation.parseInfoTags(recordInputFileName);
+        sampleAnnotation.setTileSize(defaultTileSizeWidth);
+        sampleAnnotation.setATtype(annotationType_, annotationSubtype_);
         auto dataunits = sampleAnnotation.parseSample(inputfile);
         annotationParameterSet.push_back(dataunits.annotationParameterSet);
         annotationAccessUnit.insert(annotationAccessUnit.end(), dataunits.annotationAccessUnit.begin(),
                                   dataunits.annotationAccessUnit.end());
-    } else if (recType == RecType::FEATURE_FILE) {
-        featureAnnotation.setCompressors(compressors);
-        featureAnnotation.parseInfoTags(recordInputFileName);
-        auto dataunits = featureAnnotation.parseFeature(inputfile);
-        annotationParameterSet.push_back(dataunits.annotationParameterSet);
-        annotationAccessUnit.insert(annotationAccessUnit.end(), dataunits.annotationAccessUnit.begin(),
-                                  dataunits.annotationAccessUnit.end());
-    } else if (recType == RecType::GENE_EXPRESSION_FILE) {
-        geneExpressionAnnotation.setCompressors(compressors);
-        geneExpressionAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
-        auto dataunits = geneExpressionAnnotation.parseGeneExpression(inputfile);
-        for (auto& dataunit : dataunits) {
-            annotationParameterSet.push_back(dataunit.annotationParameterSet);
-            annotationAccessUnit.insert(annotationAccessUnit.end(), dataunit.annotationAccessUnit.begin(),
-                                      dataunit.annotationAccessUnit.end());
-        }
-    } else if (recType == RecType::FUNCTIONAL_ANNOTATIONS_FILE) {
+    } else if (recType == RecType::FUNCTIONAL_ANNOTATION_FILE) {
         functionalAnnotation.setCompressors(compressors);
+        functionalAnnotation.setTileSize(defaultTileSizeHeight);
+        functionalAnnotation.setAnnotationSubtype(annotationSubtype_);
         functionalAnnotation.parseInfoTags(recordInputFileName);
         auto dataunits = functionalAnnotation.parseFunctionalAnnotation(inputfile);
         annotationParameterSet.push_back(dataunits.annotationParameterSet);
         annotationAccessUnit.insert(annotationAccessUnit.end(), dataunits.annotationAccessUnit.begin(),
                                   dataunits.annotationAccessUnit.end());
-    } else if (recType == RecType::TRACK_FILE) {
+    } else if (recType == RecType::TRACK_PROPERTY_FILE) {
+        trackPropertyAnnotation.setCompressors(compressors);
+        trackPropertyAnnotation.setTileSize(defaultTileSizeHeight);
+        trackPropertyAnnotation.parseInfoTags(recordInputFileName);
+        auto dataunits = trackPropertyAnnotation.parseTrackProperty(inputfile);
+        annotationParameterSet.push_back(dataunits.annotationParameterSet);
+        annotationAccessUnit.insert(annotationAccessUnit.end(), dataunits.annotationAccessUnit.begin(),
+                                  dataunits.annotationAccessUnit.end());
+    } else if (recType == RecType::TRACK_DATA_FILE) {
         trackDataAnnotation.setCompressors(compressors);
+        trackDataAnnotation.setTileSize(defaultTileSizeHeight);
+        trackDataAnnotation.setAnnotationSubtype(annotationSubtype_);
         trackDataAnnotation.parseInfoTags(recordInputFileName);
         auto dataunits = trackDataAnnotation.parseTrack(inputfile);
         annotationParameterSet.push_back(dataunits.annotationParameterSet);
         annotationAccessUnit.insert(annotationAccessUnit.end(), dataunits.annotationAccessUnit.begin(),
                                   dataunits.annotationAccessUnit.end());
-    } else if (recType == RecType::TRACK_PROPERTY_FILE) {
-        trackpropertyAnnotation.setCompressors(compressors);
-        trackpropertyAnnotation.parseInfoTags(recordInputFileName);
-        auto dataunits = trackpropertyAnnotation.parseTrackProperty(inputfile);
+    } else if (recType == RecType::EXPRESSION_FILE) {
+        geneExpressionAnnotation.setCompressors(compressors);
+        geneExpressionAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
+        auto dataunits = geneExpressionAnnotation.parseGeneExpression(inputfile);
+        for (auto& dataunit : dataunits) {
+            annotationParameterSet.push_back(dataunit.annotationParameterSet);
+            annotationAccessUnit.insert(annotationAccessUnit.end(),
+                                        dataunit.annotationAccessUnit.begin(),
+                                        dataunit.annotationAccessUnit.end());
+        }
+    } else if (recType == RecType::FEATURE_FILE) {
+        featureAnnotation.setCompressors(compressors);
+        featureAnnotation.parseInfoTags(recordInputFileName);
+        auto dataunits = featureAnnotation.parseFeature(inputfile);
         annotationParameterSet.push_back(dataunits.annotationParameterSet);
         annotationAccessUnit.insert(annotationAccessUnit.end(), dataunits.annotationAccessUnit.begin(),
                                   dataunits.annotationAccessUnit.end());
@@ -112,24 +120,16 @@ void Annotation::writeToFile(std::string& outputFileName) {
     std::string filename = outputFileName;
     testfile.open(filename + ".bin", std::ios::binary | std::ios::out);
     genie::util::BitWriter testwriter(testfile);
-    std::ofstream txtfile;
-    txtfile.open(filename + ".txt", std::ios::out);
-    genie::util::BitWriter txtwriter(txtfile);
-    uint64_t sizeSofar = 0;
 
     for (auto& pars : annotationParameterSet) {
         genie::core::record::data_unit::Record APS_dataUnit(pars);
-        sizeSofar = APS_dataUnit.Write(testwriter);
-        APS_dataUnit.Write(txtwriter, sizeSofar);
+        APS_dataUnit.Write(testwriter);
     }
     for (auto& aau : annotationAccessUnit) {
         genie::core::record::data_unit::Record AAU_dataUnit(aau);
-        sizeSofar = AAU_dataUnit.Write(testwriter);
-        AAU_dataUnit.Write(txtwriter, sizeSofar);
+        AAU_dataUnit.Write(testwriter);
     }
     testfile.close();
-    txtfile.close();
 }
 
-}  // namespace annotation
-}  // namespace genie
+}  // namespace genie::annotation

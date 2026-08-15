@@ -1,10 +1,13 @@
-#include "backend_std.h"
-#include <genie/util/runtime_exception.h>
-#include <genie/util/bit_writer.h>
-#include <genie/util/bit_reader.h>
-#include <sstream>
+#include "genie/backend/backend_std.h"
 #include <algorithm>
 #include <numeric>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/util/runtime_exception.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/bit_reader.h"
 
 namespace genie::backend::genie_std_impl {
 
@@ -27,8 +30,7 @@ void sort_sparse_mat_inplace(
                 return tile_row_ids[i1] < tile_row_ids[i2];
             }
             return tile_col_ids[i1] < tile_col_ids[i2];
-        }
-    );
+        });
 
     std::vector<uint64_t> sorted_row_ids(num_entries);
     std::vector<uint64_t> sorted_col_ids(num_entries);
@@ -179,4 +181,4 @@ void deserialize_arr(
         arr[idx_i] = reader.ReadAlignedInt<uint32_t>();
 }
 
-} // namespace genie::backend::genie_std_impl
+}  // namespace genie::backend::genie_std_impl

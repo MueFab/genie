@@ -4,13 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/core/access_unit/annotation/block_payload_stream.h"
 #include <algorithm>
 #include <sstream>
 #include <string>
 #include <utility>
-#include "block_payload.h"
-
-#include "genie/core/access_unit/annotation/block_payload_stream.h"
+#include "genie/core/access_unit/annotation/block_payload.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"
@@ -18,10 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace access_unit {
-namespace annotation {
+namespace genie::core::access_unit::annotation {
 
 BlockPayloadStream::BlockPayloadStream()
     : descriptor_ID(genie::core::AnnotDesc::GENOTYPE),
@@ -68,10 +64,7 @@ BlockPayloadStream& BlockPayloadStream::operator=(const BlockPayloadStream& bp) 
     return *this;
 }
 
-}  // namespace annotation
-}  // namespace access_unit
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::access_unit::annotation
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

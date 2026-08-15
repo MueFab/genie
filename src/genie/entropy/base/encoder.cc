@@ -8,9 +8,7 @@
 
 /// ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace base {
+namespace genie::entropy::base {
 
 void Encoder::setInput(uint8_t inVarID, const core::access_unit::annotation::TypedData& data) {
     if (inVarID >= inputs.size()) {
@@ -26,6 +24,4 @@ const core::access_unit::annotation::TypedData& Encoder::getOutput(uint8_t outVa
     return outputs[outVarID];
 }
 
-}  // namespace base
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::base

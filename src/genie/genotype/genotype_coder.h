@@ -176,5 +176,5 @@ void decode_genotype(
 );
 
 
-} // namespace genie::genotype
+}  // namespace genie::genotype
 #endif  // SRC_GENIE_GENOTYPE_GENOTYPE_CODER_H_

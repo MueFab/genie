@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ENTROPY_JBIG_ENCODER_H
-#define GENIE_ENTROPY_JBIG_ENCODER_H
+#ifndef SRC_GENIE_ENTROPY_JBIG_ENCODER_H_
+#define SRC_GENIE_ENTROPY_JBIG_ENCODER_H_
 
 #ifdef _WIN32
 #include <windows.h>
@@ -15,14 +15,13 @@
 #define SYSERROR() errno
 #endif
 #include <sstream>
-#include <codecs/include/mpegg-codecs.h>
+#include <vector>
+#include "codecs/include/mpegg-codecs.h"
 #include "genie/core/parameter/annotation/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace jbig {
+namespace genie::entropy::jbig {
 // ---------------------------------------------------------------------------------------------------------------------
 class JBIGparameters {
  public:
@@ -83,12 +82,10 @@ class JBIGEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace jbig
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::jbig
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ENTROPY_JBIG_ENCODER_H
+#endif  // SRC_GENIE_ENTROPY_JBIG_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------

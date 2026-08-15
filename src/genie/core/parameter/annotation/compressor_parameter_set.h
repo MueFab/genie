@@ -62,6 +62,12 @@ class CompressorParameterSet {
         for (auto step : compressorSteps) allStepIDs.push_back(step.stepID);
         return allStepIDs;
     }
+    const compressorStep& getCompressorStep(uint8_t stepId) const {
+      auto it =
+          std::find_if(compressorSteps.begin(), compressorSteps.end(),
+                       [stepId](const compressorStep& step) { return step.stepID == stepId; });
+      return *it;
+    }
     std::vector<genie::core::AlgoID> getAlgorithmIDs() const {
         std::vector<genie::core::AlgoID> allAlgIDs;
         for (auto step : compressorSteps) allAlgIDs.push_back(step.algorithmID);

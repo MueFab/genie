@@ -1,12 +1,12 @@
-#ifndef GENIE_BACKEND_BACKEND_H
-#define GENIE_BACKEND_BACKEND_H
+#ifndef SRC_GENIE_BACKEND_BACKEND_H_
+#define SRC_GENIE_BACKEND_BACKEND_H_
 
-#include <iostream>
 #include <cstddef>
-#include <vector>
+#include <iostream>
 #include <type_traits>
-#include "types.h"
-#include <genie/util/bit_writer.h>
+#include <vector>
+#include "genie/backend/types.h"
+#include "genie/util/bit_writer.h"
 
 namespace genie::backend {
 
@@ -31,7 +31,7 @@ namespace genie_std_impl {
             }
         }
     }
-}
+}  // namespace genie_std_impl
 
 #ifdef GENIE_HAS_XTENSOR_BACKEND
 namespace genie_xt_impl {
@@ -45,7 +45,7 @@ namespace genie_xt_impl {
         }
         return mat;
     }
-}
+}  // namespace genie_xt_impl
 #endif
 
 #ifdef GENIE_HAS_EIGEN_BACKEND
@@ -60,7 +60,7 @@ namespace genie_eigen_impl {
         }
         return mat;
     }
-}
+}  // namespace genie_eigen_impl
 #endif
 
 // --- Helper Utilities ---
@@ -113,7 +113,7 @@ namespace detail {
             return min_val;
         }
     }
-}
+}  // namespace detail
 
 template<typename T>
 size_t get_mat_shape(const T& mat, size_t axis) {
@@ -187,11 +187,11 @@ void clear_mat(T& mat) {
 
 template<typename T>
 T clone_mat(const T& mat) {
-    return mat; // Default copy is fine for our backend types
+    return mat;  // Default copy is fine for our backend types
 }
 
 template<typename T>
-size_t get_mat_dimension(const T& mat) { return 2; } // Likelihood mats are always 2D natively modeled as 2D
+size_t get_mat_dimension(const T& mat) { return 2; }  // Likelihood mats are always 2D natively modeled as 2D
 
 template<typename T>
 bool mats_equal(const T& m1, const T& m2) {
@@ -285,7 +285,7 @@ void append_arr_element(T& arr, const V& val) {
         auto current_size = arr.size();
         auto old_arr = arr;
         arr.resize({current_size + 1});
-        for(size_t i=0; i<current_size; ++i) arr(i) = old_arr(i);
+        for (size_t i = 0; i < current_size; ++i) arr(i) = old_arr(i);
         arr(current_size) = val;
 #endif
     } else if constexpr (detail::has_rows<T>::value) {
@@ -369,7 +369,7 @@ auto max_coeff(const T& mat) {
 #endif
     } else {
         using ValType = typename T::value_type::value_type;
-        ValType current_max = -128; // Fallback for signed char
+        ValType current_max = -128;  // Fallback for signed char
         if constexpr (detail::is_2d_vector<T>::value) {
             bool first = true;
             for (const auto& row : mat) {
@@ -395,9 +395,9 @@ void replace_value(T& mat, V cond_val, V target_val) {
 #endif
     } else if constexpr (detail::has_rows<T>::value) {
 #ifdef GENIE_HAS_EIGEN_BACKEND
-        for(int idx_i=0; idx_i<mat.rows(); ++idx_i)
-            for(int idx_j=0; idx_j<mat.cols(); ++idx_j)
-                if (mat(idx_i,idx_j) == cond_val) mat(idx_i,idx_j) = target_val;
+        for (int idx_i = 0; idx_i < mat.rows(); ++idx_i)
+            for (int idx_j = 0; idx_j < mat.cols(); ++idx_j)
+                if (mat(idx_i, idx_j) == cond_val) mat(idx_i, idx_j) = target_val;
 #endif
     } else {
         if constexpr (detail::is_2d_vector<T>::value) {
@@ -549,6 +549,6 @@ void compute_mask(const Type1& ids, size_t nelems, Type2& mask) {
     }
 }
 
-} // namespace genie::backend
+}  // namespace genie::backend
 
-#endif // GENIE_BACKEND_BACKEND_H
+#endif  // SRC_GENIE_BACKEND_BACKEND_H_

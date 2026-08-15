@@ -4,17 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CONTACT_TEST_HELPERS_H
-#define GENIE_CONTACT_TEST_HELPERS_H
+#ifndef SRC_GENIE_CONTACT_CONTACT_TEST_HELPERS_H_
+#define SRC_GENIE_CONTACT_CONTACT_TEST_HELPERS_H_
 
-#include "contact_types.h"
 #include <algorithm>
-#include <vector>
-#include <random>
 #include <initializer_list>
 #include <iostream>
 #include <numeric>
+#include <random>
 #include <type_traits>
+#include <vector>
+
+#include "genie/contact/contact_types.h"
 
 #ifdef GENIE_CONTACT_BACKEND_XTENSOR
 #include <xtensor/xsort.hpp>
@@ -34,7 +35,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::vector<T>& v) {
     os << "]";
     return os;
 }
-}
+}  // namespace std
 
 // Generalized arithmetic operators for std::vector
 template <typename T, typename S>
@@ -553,6 +554,6 @@ inline auto linspace(T min_val, T max_val, size_t n) {
 #define ASSERT_CM_EQUAL(a, b) ASSERT_TRUE(genie::contact::equal(a, b))
 #define EXPECT_CM_EQUAL(a, b) EXPECT_TRUE(genie::contact::equal(a, b))
 
-} // namespace genie::contact
+}  // namespace genie::contact
 
-#endif // GENIE_CONTACT_TEST_HELPERS_H
+#endif  // SRC_GENIE_CONTACT_CONTACT_TEST_HELPERS_H_

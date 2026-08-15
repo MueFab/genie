@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CONTACT_CONSTS_H
-#define GENIE_CONTACT_CONSTS_H
+#ifndef SRC_GENIE_CONTACT_CONSTS_H_
+#define SRC_GENIE_CONTACT_CONSTS_H_
 
 #include <cstdint>
 #include <list>
 #include <tuple>
-#include "contact_types.h"
+#include "genie/contact/contact_types.h"
 #include "genie/core/constants.h"
 #include "genie/core/record/contact/record.h"
 
@@ -18,6 +18,6 @@ namespace genie::contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-} // namespace genie::contact
+}  // namespace genie::contact
 
-#endif  // GENIE_CONTACT_CONSTS_H
+#endif  // SRC_GENIE_CONTACT_CONSTS_H_

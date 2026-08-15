@@ -82,7 +82,7 @@ void Record::write(util::BitWriter& writer) const {
     writer.WriteBits(static_cast<uint8_t>(AT_type), 4);
     writer.WriteBits(static_cast<uint8_t>(AT_subtype), 4);
     writer.WriteBits(AG_class, 3);
-    writer.WriteBits(0, 5);
+    writer.WriteBits(0, 5);  // reserved(5)
     annotation_access_unit_header.write(writer);
     for (auto& blocki : block) blocki.write(writer);
 }
@@ -93,7 +93,9 @@ size_t Record::getSize(util::BitWriter& writer) const {
 }
 
 size_t Record::getSize() const {
-    return 0;  // Placeholder - needs BitWriter version
+    std::stringstream SizeOut;
+    util::BitWriter writer(SizeOut);
+    return getSize(writer);
 }
 
 

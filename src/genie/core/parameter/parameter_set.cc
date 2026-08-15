@@ -123,7 +123,7 @@ EncodingSet::EncodingSet()
 
 void ParameterSet::Write(util::BitWriter& writer) const {
   DataUnit::Write(writer);
-  writer.WriteBits(0, 10);  // reserved
+  writer.WriteBits(0, 10);  // reserved(10)
 
   // Calculate Size and write structure to tmp buffer
   std::stringstream ss;
@@ -194,7 +194,7 @@ void EncodingSet::Write(util::BitWriter& writer) const {
   writer.WriteBits(static_cast<uint8_t>(alphabet_id_), 8);
   writer.WriteBits(read_length_, 24);
   writer.WriteBits(number_of_template_segments_minus1_, 2);
-  writer.WriteBits(0, 6);  // reserved_2
+  writer.WriteBits(0, 6);  // reserved_2(6)
   writer.WriteBits(max_au_data_unit_size_, 29);
   writer.WriteBits(pos_40_bits_flag_, 1);
   writer.WriteBits(qv_depth_, 3);

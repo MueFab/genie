@@ -5,10 +5,8 @@
  */
 
 #include "genie/genotype/genotype_payload.h"
-
 #include <utility>
 #include <vector>
-
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/jbig/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
@@ -163,7 +161,7 @@ GenotypePayload::GenotypePayload(
     num_variants_payloads = num_bit_planes_;
   }
 
-  for (auto idx_i=0; idx_i< num_variants_payloads; idx_i++) {
+  for (auto idx_i=0; idx_i < num_variants_payloads; idx_i++) {
     variants_payloads_.emplace_back(
       reader,
       parameters.GetVariantsCodecID(),

@@ -9,8 +9,8 @@
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
-#ifndef GENIE_ENTROPY_RANS_SUBSEQUENCE_H_
-#define GENIE_ENTROPY_RANS_SUBSEQUENCE_H_
+#ifndef SRC_GENIE_ENTROPY_RANS_SUBSEQUENCE_H_
+#define SRC_GENIE_ENTROPY_RANS_SUBSEQUENCE_H_
 
 #include "genie/util/bit_writer.h"
 
@@ -22,10 +22,10 @@ namespace genie::entropy::rans {
  * @brief Configuration for rANS entropy coder for one subsequence
  */
 class Subsequence {
-private:
+ private:
   uint8_t output_symbol_size_;  //!< Number of bits per output symbol
 
-public:
+ public:
   /**
    * @brief Constructor
    * @param output_symbol_size Desired number of bits per output symbol
@@ -56,4 +56,4 @@ public:
 }  // namespace genie::entropy::rans
 // -----------------------------------------------------------------------------
 
-#endif  // GENIE_ENTROPY_RANS_SUBSEQUENCE_H_
+#endif  // SRC_GENIE_ENTROPY_RANS_SUBSEQUENCE_H_
