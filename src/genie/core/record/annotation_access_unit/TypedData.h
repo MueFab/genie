@@ -44,15 +44,15 @@ class TypedData {
           compressedDataStream{} {}
 
     TypedData& operator=(const TypedData& other) {
-      if (this != &other) {
-        data_type_ID = other.data_type_ID;
-        num_array_dims = other.num_array_dims;
-        array_dims = other.array_dims;
-        dataStream.str(other.dataStream.str());
-        dataStream.clear();
-        compressedDataStream.str(other.compressedDataStream.str());
-        compressedDataStream.clear();
-      }
+        if (this != &other) {
+            data_type_ID = other.data_type_ID;
+            num_array_dims = other.num_array_dims;
+            array_dims = other.array_dims;
+            dataStream.str(other.dataStream.str());
+            dataStream.clear();
+            compressedDataStream.str(other.compressedDataStream.str());
+            compressedDataStream.clear();
+        }
         return *this;
     }
 

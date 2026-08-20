@@ -1,9 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <fstream>
-#include <iostream>
 #include "genie/core/access_unit/annotation/block_payload_stream.h"
-#include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
 class payloadStreamTests : public ::testing::Test {
@@ -65,7 +62,7 @@ TEST_F(payloadStreamTests, testcopy) {  // NOLINT(cert-err58-cpp)
 //    uint32_t block_payload_size = static_cast<uint32_t>(generic_payload.str().size());
 
     genie::core::access_unit::annotation::BlockPayloadStream payload(descriptorID, 199,
-                                                                            generic_payload);
+                                                                     generic_payload);
 
 //    uint32_t block_payload_size2 = static_cast<uint32_t>(payload.getPayload().str().size());
 

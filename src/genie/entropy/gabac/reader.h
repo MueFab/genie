@@ -33,7 +33,7 @@
 
 namespace genie::util {
 class DataBlock;
-}
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 

@@ -1,3 +1,10 @@
+/**
+ * Copyright 2018-2024 The Genie Authors.
+ * @file
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
+ */
+
 #ifndef SRC_APPS_GENIE_CLI_HANDLER_H_
 #define SRC_APPS_GENIE_CLI_HANDLER_H_
 

@@ -12,7 +12,7 @@
 
 #include <tuple>
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/access_unit.h"
 #include "genie/core/entropy_encoder.h"
 #include "genie/core/module.h"
 #include "genie/core/name_encoder.h"

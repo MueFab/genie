@@ -13,7 +13,7 @@
 #include <memory>
 #include <vector>
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/access_unit.h"
 #include "genie/core/format_exporter.h"
 #include "genie/core/format_exporter_compressed.h"
 #include "genie/core/stats/perf_stats.h"

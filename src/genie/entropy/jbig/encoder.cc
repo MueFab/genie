@@ -34,8 +34,8 @@ void JBIGEncoder::encode(
     unsigned char* compressedBuffer;
     size_t compSize;
 
-    auto buf_nrows = (unsigned long) nrows;
-    auto buf_ncols = (unsigned long) ncols;
+    auto buf_nrows = (unsigned long) nrows;  // NOLINT(runtime/int)
+    auto buf_ncols = (unsigned long) ncols;  // NOLINT(runtime/int)
 
     int ret = mpegg_jbig_compress_default(
         &compressedBuffer,
@@ -67,8 +67,8 @@ void JBIGEncoder::encode(
     unsigned char* compressedBuffer = NULL;
     size_t dest_data_len;
 
-    auto buf_nrows = (unsigned long) ncols;
-    auto buf_ncols = (unsigned long) nrows;
+    auto buf_nrows = (unsigned long) ncols;  // NOLINT(runtime/int)
+    auto buf_ncols = (unsigned long) nrows;  // NOLINT(runtime/int)
 
     int ret = mpegg_jbig_compress_default(
         &compressedBuffer,
@@ -99,7 +99,7 @@ void JBIGEncoder::decode(
     unsigned char* decompressedBuffer;
     size_t dest_data_len;
 
-    unsigned long buf_nrows, buf_ncols;
+    unsigned long buf_nrows, buf_ncols;  // NOLINT(runtime/int)
 
     int ret = mpegg_jbig_decompress_default(
         &decompressedBuffer,

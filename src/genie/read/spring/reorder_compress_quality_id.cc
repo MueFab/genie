@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/access_unit.h"
 #include "genie/core/read_encoder.h"
 #include "genie/core/record/chunk.h"
 #include "genie/core/record/segment.h"

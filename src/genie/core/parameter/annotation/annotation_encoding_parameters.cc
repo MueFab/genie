@@ -39,19 +39,19 @@ AnnotationEncodingParameters::AnnotationEncodingParameters(
     std::vector<CompressorParameterSet> compressorParameterSets,
     std::vector<AttributeParameterSet> attributeParameterSets) {
     n_filter = (uint8_t)filterData.size();
-    for (auto& filter : filterData) {
+    for (const auto& filter : filterData) {
         filter_ID.push_back(filter.filter_ID);
         filter_ID_len.push_back((uint8_t)filter.filter_ID.size());
         description.push_back(filter.description);
         desc_len.push_back((uint8_t)filter.description.size());
     }
     n_features_names = (uint8_t)features.size();
-    for (auto& feature : features) {
+    for (const auto& feature : features) {
         feature_name_len.push_back((uint8_t)feature.size());
         feature_name.push_back(feature);
     }
     n_ontology_terms = (uint8_t)ontologyTerms.size();
-    for (auto& term : ontologyTerms) {
+    for (const auto& term : ontologyTerms) {
         ontology_term_name_len.push_back((uint8_t)term.size());
         ontology_term_name.push_back(term);
     }

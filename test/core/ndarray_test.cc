@@ -1,4 +1,6 @@
 #include <gtest/gtest.h>
+#include <utility>
+#include <vector>
 #include "genie/core/ndarray.h"
 
 TEST(NDArrayTest, DefaultConstructor) {
@@ -139,43 +141,43 @@ TEST(NDArrayTest, NDArrayFactoryCreateWithValue) {
     EXPECT_EQ(arr({1, 2}), 5);
 }
 
-//TEST(NDArrayTest, ElementWiseAddition) {
+// TEST(NDArrayTest, ElementWiseAddition) {
 //    genie::core::NDArray<int> arr1({2, 3}, {1, 2, 3, 4, 5, 6});
 //    genie::core::NDArray<int> arr2({2, 3}, {6, 5, 4, 3, 2, 1});
 //    genie::core::NDArray<int> result = arr1 + arr2;
 //    EXPECT_EQ(result.shape(), std::vector<size_t>({2, 3}));
 //    EXPECT_EQ(result({0, 0}), 7);
 //    EXPECT_EQ(result({1, 2}), 7);
-//}
+// }
 //
-//TEST(NDArrayTest, ElementWiseSubtraction) {
+// TEST(NDArrayTest, ElementWiseSubtraction) {
 //    genie::core::NDArray<int> arr1({2, 3}, {1, 2, 3, 4, 5, 6});
 //    genie::core::NDArray<int> arr2({2, 3}, {6, 5, 4, 3, 2, 1});
 //    genie::core::NDArray<int> result = arr1 - arr2;
 //    EXPECT_EQ(result.shape(), std::vector<size_t>({2, 3}));
 //    EXPECT_EQ(result({0, 0}), -5);
 //    EXPECT_EQ(result({1, 2}), 5);
-//}
+// }
 //
-//TEST(NDArrayTest, ElementWiseMultiplication) {
+// TEST(NDArrayTest, ElementWiseMultiplication) {
 //    genie::core::NDArray<int> arr1({2, 3}, {1, 2, 3, 4, 5, 6});
 //    genie::core::NDArray<int> arr2({2, 3}, {6, 5, 4, 3, 2, 1});
 //    genie::core::NDArray<int> result = arr1 * arr2;
 //    EXPECT_EQ(result.shape(), std::vector<size_t>({2, 3}));
 //    EXPECT_EQ(result({0, 0}), 6);
 //    EXPECT_EQ(result({1, 2}), 6);
-//}
+// }
 //
-//TEST(NDArrayTest, ElementWiseDivision) {
+// TEST(NDArrayTest, ElementWiseDivision) {
 //    genie::core::NDArray<int> arr1({2, 3}, {10, 20, 30, 40, 50, 60});
 //    genie::core::NDArray<int> arr2({2, 3}, {2, 4, 5, 5, 10, 12});
 //    genie::core::NDArray<int> result = arr1 / arr2;
 //    EXPECT_EQ(result.shape(), std::vector<size_t>({2, 3}));
 //    EXPECT_EQ(result({0, 0}), 5);
 //    EXPECT_EQ(result({1, 2}), 5);
-//}
+// }
 
-//int main(int argc, char **argv) {
+// int main(int argc, char **argv) {
 //    ::testing::InitGoogleTest(&argc, argv);
 //    return RUN_ALL_TESTS();
-//}
+// }

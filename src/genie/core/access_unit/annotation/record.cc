@@ -84,7 +84,7 @@ void Record::write(util::BitWriter& writer) const {
     writer.WriteBits(AG_class, 3);
     writer.WriteBits(0, 5);  // reserved(5)
     annotation_access_unit_header.write(writer);
-    for (auto& blocki : block) blocki.write(writer);
+    for (const auto& blocki : block) blocki.write(writer);
 }
 
 size_t Record::getSize(util::BitWriter& writer) const {

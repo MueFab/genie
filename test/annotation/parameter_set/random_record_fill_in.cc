@@ -6,7 +6,10 @@
  */
 
 #include "random_record_fill_in.h"
-#include "genie/core/constants.h"
+
+#include <string>
+#include <vector>
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 genie::likelihood::LikelihoodParameters
@@ -95,11 +98,11 @@ RandomAnnotationEncodingParameters::randomAlgorithmParameters(uint8_t nuMOfpars,
         par_ID[i] = randomU4();
         par_type[i] = randomType();
         if (par_type[i] == genie::core::DataType::STRING) par_type[i] = genie::core::DataType::UINT8;
-        //par_array_dims[i].resize(par_num_array_dims[i]+1);
+        // par_array_dims[i].resize(par_num_array_dims[i]+1);
         for (auto j = 0; j < par_num_array_dims[i]; ++j) par_array_dims[i][j] = randomU4();  // randomU8();
-        std::vector<std::vector<std::vector<std::vector<uint8_t>>>> tempvec=
+        std::vector<std::vector<std::vector<std::vector<uint8_t>>>> tempvec =
             genie::core::parameter::annotation::AlgorithmParameters::resizeVector(par_num_array_dims[i],
-                                                                                             par_array_dims[i]);
+                                                                                  par_array_dims[i]);
         par_val.emplace_back(tempvec);
         for (auto& j : par_val[i])
             for (auto& k : j)
@@ -127,15 +130,16 @@ genie::core::parameter::annotation::TileStructure RandomAnnotationEncodingParame
     end_index.resize(n_tiles, std::vector<uint64_t>(dimensions, 0));
     tile_size.resize(dimensions, 0);
 
-    if (variable_size_tiles)
+    if (variable_size_tiles) {
         for (uint64_t i = 0; i < n_tiles; ++i) {
             for (auto j = 0; j < dimensions; ++j) {
                 start_index[i][j] = 0;
                 end_index[i][j] = 1;
             }
         }
-    else
+    } else {
         for (auto j = 0; j < dimensions; ++j) tile_size[j] = 2;
+    }
 
     return genie::core::parameter::annotation::TileStructure(
         ATCoordSize, two_dimensional, variable_size_tiles, n_tiles, start_index, end_index, tile_size);
@@ -370,6 +374,6 @@ RandomAnnotationEncodingParameters::randomAnnotationParameterSet() {
     genie::core::parameter::annotation::AnnotationEncodingParameters annotation_encoding_parameters;
 
     return genie::core::parameter::annotation::Record(parameter_set_ID, AT_ID, AT_alphabet_ID, AT_coord_size,
-                                                                 AT_pos_40_bits_flag, n_aux_attribute_groups,
-                                                                 tile_configuration, annotation_encoding_parameters);
+                                                      AT_pos_40_bits_flag, n_aux_attribute_groups,
+                                                      tile_configuration, annotation_encoding_parameters);
 }

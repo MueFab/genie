@@ -19,9 +19,7 @@
 #include "genie/core/record/annotation_access_unit/TypedData.h"
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace factory {
+namespace genie::entropy::factory {
 
 /**
  * Factory for creating entropy encoder instances.
@@ -44,9 +42,7 @@ class EncoderFactory {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace factory
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::factory
 
 // -----------------------------------------------------------------------------
 

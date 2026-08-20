@@ -5,15 +5,6 @@
  */
 
 #include "genie/core/access_unit/annotation/block_payload_stream.h"
-#include <algorithm>
-#include <sstream>
-#include <string>
-#include <utility>
-#include "genie/core/access_unit/annotation/block_payload.h"
-#include "genie/util/bit_reader.h"
-#include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

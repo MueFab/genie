@@ -69,7 +69,7 @@ void DescriptorConfiguration::write(util::BitWriter& writer) const {
         writer.FlushBits();
         contact_matrix_parameters.Write(writer);
         writer.WriteBits(subcontract_matrix_parameters.size(), 16);
-        for (auto& scm_params : subcontract_matrix_parameters)
+        for (const auto& scm_params : subcontract_matrix_parameters)
             scm_params.Write(writer);
     } else {
         writer.WriteBits(static_cast<uint8_t>(encoding_mode_ID), 8);

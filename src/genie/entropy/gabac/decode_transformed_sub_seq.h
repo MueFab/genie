@@ -36,7 +36,7 @@
 namespace genie::util {
 class DataBlock;  //!< Forward declaration of the DataBlock class for handling
                   //!< data operations.
-}
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 

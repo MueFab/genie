@@ -6,7 +6,6 @@
 
 #include <gtest/gtest.h>
 
-#include <filesystem>
 #include <string>
 
 #include "genie/annotation/annotation.h"
@@ -98,40 +97,56 @@ INSTANTIATE_TEST_SUITE_P(
         ContactTestDetails(
             "CASE01",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
-            false, false, true, true, true, false, 1000),
+            false, false, true, true, false, false, 1000),
         ContactTestDetails(
             "CASE02",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
-            false, false, true, true, true, false, 150),
+            false, false, true, true, false, false, 150),
         ContactTestDetails(
             "CASE03",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_22.cont",
-            false, false, true, true, true, false, 1000),
+            false, false, true, true, false, false, 1000),
         ContactTestDetails(
             "CASE04",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_22.cont",
-            false, false, true, true, true, false, 150),
+            false, false, true, true, false, false, 150),
+        // ContactTestDetails(
+        //     "CASE05",
+        //     "",
+        //     false, false, true, true, false, false, 0),
+        // ContactTestDetails(
+        //     "CASE06",
+        //     "",
+        //     false, false, true, true, false, false, 0),
         ContactTestDetails(
             "CASE07",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-50000-21_21.cont",
-            false, false, true, true, true, false, 1000, 5u),
+            false, false, true, true, false, false, 1000, 5u),
         ContactTestDetails(
             "CASE08",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-50000-21_21.cont",
-            false, false, true, true, true, false, 150, 5u),//, {1,5}),
+            false, false, true, true, false, false, 150, 5u),
         ContactTestDetails(
             "CASE09",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
-            true, false, true, true, true, false, 1000),
+            true, false, true, true, false, false, 1000),
+        // ContactTestDetails(
+        //     "CASE10",
+        //     "",
+        //     true, false, true, true, false, false, 0),
+        // ContactTestDetails(
+        //     "CASE11",
+        //     "",
+        //     true, false, true, true, false, false, 0),
         ContactTestDetails(
             "CASE12",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
-            true, false, false, true, true, false, 1000),
+            true, false, false, true, false, false, 1000),
         ContactTestDetails(
             "CASE13",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
-            true, false, true, true, true, false, 1000),
+            true, false, true, false, false, false, 1000),
         ContactTestDetails(
             "CASE14",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
-            true, false, true, true, true, false, 1000)));
+            true, false, true, true, false, false, 1000)));

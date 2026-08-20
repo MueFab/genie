@@ -28,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/access_unit.h"
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/core/read_encoder.h"
 #include "genie/util/dynamic_scheduler.h"

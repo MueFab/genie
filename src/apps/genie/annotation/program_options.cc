@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "apps/genie/annotation/program-options.h"
+#include "apps/genie/annotation/program_options.h"
 #include <iostream>
 #include <set>
 #include <string>

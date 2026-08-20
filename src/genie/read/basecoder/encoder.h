@@ -26,7 +26,7 @@
 #include <string>
 #include <utility>
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/access_unit.h"
 #include "genie/core/record/alignment_split/same_rec.h"
 #include "genie/core/record/record.h"
 

@@ -59,12 +59,12 @@ set(source_files
         parameter/annotation/annotation_encoding_parameters.cc
         parameter/annotation/attribute_data.cc
 
+        access_unit/access_unit.cc
+
         array_type.cc
-        # writer.cc
 
         stats/perf_stats.cc
 
-        access_unit.cc
         classifier_bypass.cc
         classifier_regroup.cc
         constants.cc

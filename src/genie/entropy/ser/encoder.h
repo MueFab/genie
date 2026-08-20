@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "genie/core/parameter/annotation/algorithm_parameters.h"
-#include "genie/core/record/annotation_access_unit/TypedData.h"
+#include "genie/core/access_unit/annotation/typed_data.h"
 #include "genie/core/constants.h"
 #include "genie/entropy/base/encoder.h"
 

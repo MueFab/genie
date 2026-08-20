@@ -15,7 +15,7 @@
 #include "cli11/CLI11.hpp"
 #include "genie/util/runtime_exception.h"
 #include "genie/util/string_helpers.h"
-#include "util/log.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
 

@@ -118,7 +118,7 @@ void encodeVariantSite(const std::string& _inputFileName,
   auto info = parser.getAttributes().getInfo();
 
   std::vector<genie::core::AnnotDesc> descrList;
-  for (auto& tile : tile_descriptorStream) descrList.push_back(tile.first);
+  for (const auto& tile : tile_descriptorStream) descrList.push_back(tile.first);
 
   genie::variant_site::ParameterSetComposer encodeParameters;
   genie::core::parameter::annotation::Record annotationParameterSet =

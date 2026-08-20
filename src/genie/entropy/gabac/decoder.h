@@ -29,7 +29,7 @@
 #include <tuple>   // For std::tuple return type in process function.
 #include <vector>  // For using std::vector container type.
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/access_unit.h"
 #include "genie/core/entropy_decoder.h"
 #include "genie/entropy/gabac/gabac_seq_conf_set.h"
 

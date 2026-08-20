@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/access_unit.h"
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/core/stats/perf_stats.h"
 #include "genie/read/spring/util.h"

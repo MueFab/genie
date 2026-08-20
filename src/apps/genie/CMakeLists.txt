@@ -14,7 +14,7 @@ set(source_files
         capsulator/program_options.cc
         capsulator/main.cc
         annotation/main.cc
-        annotation/program-options.cc
+        annotation/program_options.cc
         annotation/code.cc
 )
 

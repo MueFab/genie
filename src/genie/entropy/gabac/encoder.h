@@ -25,7 +25,7 @@
 
 // -----------------------------------------------------------------------------
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/access_unit.h"
 #include "genie/core/entropy_encoder.h"
 #include "genie/entropy/gabac/gabac.h"
 #include "genie/entropy/gabac/gabac_seq_conf_set.h"

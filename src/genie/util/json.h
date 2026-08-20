@@ -54,7 +54,7 @@ namespace {
             }
         return output;
     }
-}
+}  // namespace
 
 class JSON
 {
@@ -660,6 +660,6 @@ JSON JSON::Load( const string &str ) {
     return parse_next( str, offset );
 }
 
-} // End Namespace json
+}  // namespace json
 
 #endif // SRC_GENIE_UTIL_JSON_H_

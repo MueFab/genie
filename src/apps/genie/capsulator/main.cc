@@ -17,14 +17,14 @@
 #include <vector>
 
 #include "apps/genie/capsulator/program_options.h"
-#include "format/mgb/mgb_file.h"
-#include "format/mgg/encapsulator/decapsulated_file.h"
-#include "format/mgg/encapsulator/encapsulated_file.h"
+#include "genie/format/mgb/mgb_file.h"
+#include "genie/format/mgg/encapsulator/decapsulated_file.h"
+#include "genie/format/mgg/encapsulator/encapsulated_file.h"
 #include "genie/format/mgb/raw_reference.h"
 #include "genie/format/mgg/mgg_file.h"
 #include "genie/util/runtime_exception.h"
-#include "util/log.h"
-#include "util/string_helpers.h"
+#include "genie/util/log.h"
+#include "genie/util/string_helpers.h"
 
 // -----------------------------------------------------------------------------
 
