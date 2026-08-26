@@ -36,7 +36,23 @@ AnnotationAccessUnitHeader::AnnotationAccessUnitHeader()
       tile_index_2_exists(false),
       tile_index_2(0) {}
 
-AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(util::BitReader& reader) { read(reader); }
+AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(util::BitReader& reader)
+    : attribute_contiguity(false),
+      two_dimensional(false),
+      variable_size_tiles(false),
+      column_major_tile_order(false),
+      AT_coord_size(0),
+      is_attribute(false),
+      attribute_ID(0),
+      descriptor_ID(AnnotDesc::ATTRIBUTE),
+      n_tiles_per_col(0),
+      n_tiles_per_row(0),
+      n_blocks(0),
+      tile_index_1(0),
+      tile_index_2_exists(false),
+      tile_index_2(0) {
+  read(reader);
+}
 AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(util::BitReader& reader, bool attributeContiguity,
                                                        bool twoDimensional, bool columnMajorTileOrder,
                                                        bool variable_size_tiles, uint8_t ATCoordSize) {
