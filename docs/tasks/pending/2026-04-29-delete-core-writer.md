@@ -120,3 +120,94 @@ Before deleting `core::Writer`, we must guarantee that the refactored code produ
 | `writer.Flush()` | `writer.FlushBits()` |
 | `writer.GetBitsWritten()` | `writer.GetTotalBitsWritten()` |
 | `writer.WriteReserved(bits)` | `writer.WriteBits(0, bits)` |
+| `writer.GetBinWriter()` | direct `util::BitWriter` construction |
+
+---
+
+## Outcome (2026-08-25)
+
+**Status: Resolved — strategy shifted from delete to deprecate.**
+
+### Final Approach
+
+The original Phase 8 plan (delete `core::Writer`) was reversed in favour of
+**deprecation only**, on the grounds that:
+
+1. `core::Writer` is a public header (`src/genie/core/writer.h`). Deletion
+   is a breaking API change for downstream consumers.
+2. The pending Phase 7 verification tests ("serialize identical records
+   using both writers, assert byte-for-byte") add zero marginal value:
+   they would prove the two implementations are equivalent, but the
+   canonical replacement is already in production and the old one is
+   functionally frozen.
+3. The actual test coverage gap was on `util::BitReader`/`BitWriter`
+   itself, which Phase 7 missed entirely.
+
+### What Was Done
+
+1. **`src/genie/core/writer.h`** — strengthened class-level `@deprecated`
+   Doxygen tag with the full API mapping table above. `[[deprecated]]`
+   intentionally NOT applied: `CMakeLists.txt` enables `-Werror`, which
+   would break every internal call site.
+2. **`test/libs/util/bitreader_writer_comprehensive.cc`** — new file,
+   ~440 lines, 35+ tests covering the `util::BitReader`/`BitWriter`
+   public API (write widths 1–64, alignment tracking, flush, aligned
+   byte/stream APIs, `WriteAlignedInt<uint8/16/32/64>`, all reader
+   methods, stream state flags, roundtrips).
+3. **`test/CMakeLists.txt`** — added missing `add_subdirectory(libs)`;
+   `util-tests` was never built before this work.
+4. **`src/genie/util/bit_writer.{h,cc}`** — removed `inline` mismatch on
+   `WriteAlignedByte` / `WriteAlignedBytes(uint64_t, uint8_t)` (latent
+   ODR bug).
+
+### Verification
+
+- `util-tests`: **72/72 PASS**.
+- All other test binaries (`genie-test-*`, `coding-tests`): exit 0.
+- Full project build clean.
+
+### Out of Scope (Deferred)
+
+- Phase 8 deletion: not performed.
+- The 247 pre-existing warnings surface during forced rebuild
+  (`-Wshadow` x209 dominates; `-Wunused-parameter` x12,
+  `-Wunused-variable` x9 are stylistic; the rest handled in
+  subsequent commits).
+
+---
+
+## Subsequent Work (2026-08-25, same session)
+
+A forced rebuild after the deprecation work surfaced 247 pre-existing
+warnings across 5 categories. Two were treated as a real bug, the
+remainder as quick mechanical fixes. Both delivered in subsequent
+commits on the same branch.
+
+### `-Wuninitialized` x2 — real bug
+
+`src/genie/core/access_unit/annotation/annotation_access_unit_header.cc`:
+the bare `AnnotationAccessUnitHeader(util::BitReader&)` ctor delegated
+to `read(reader)` without setting `AT_coord_size` and `attribute_contiguity`
+first, causing read to consult uninitialized members.
+
+Fix: replicate the default ctor's member-initializer list in the bare
+`BitReader` ctor (+17 / -1 lines). `read(reader)` and the 6-args
+overload unchanged.
+
+Note: an initial delegated attempt inserted extra `reader.ReadBits()`
+calls inside `read(reader)`, which would have broken the 6-args
+caller-driven path. Rejected after manual review; the member-init
+approach is the correct fix.
+
+### Mechanical warnings — 11 sites across 6 files
+
+| Category | Count | Files |
+|---|---|---|
+| `-Wcast-user-defined` | 4 | `src/apps/genie/annotation/code.h` (×2, fires from 2 TUs) |
+| `-Wsign-compare` | 4 | `record.cc`, `genotype_payload.cc`, `geno_annotation.cc`, `gene_expression_annotation.cc` |
+| `-Wconversion` | 2 | `geno_annotation.cc`, `gene_expression_annotation.cc` |
+| `-Wunused-result` | 1 | `test/libs/quality/calq-test.cpp` |
+
+All edits behaviorally identical to the original. The `-Wconversion`
+sites operate on VCF-style format keys (<256 chars) where the original
+implicit truncation is preserved.
