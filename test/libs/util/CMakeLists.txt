@@ -4,6 +4,7 @@ set(source_files
         watch.cc
         bitwriter.cc
         bitroundtrip.cc
+        bitreader_writer_comprehensive.cc
         helpers.cc
         string-helpers.cc
         thread-manager.cc

@@ -8,6 +8,7 @@ add_subdirectory(contact)
 add_subdirectory(entropy)
 add_subdirectory(conformance)
 add_subdirectory(annotation)
+add_subdirectory(libs)
 
 enable_testing()
 
