@@ -64,7 +64,7 @@ TEST(CalqTest, recordPileupBasic) {
   EXPECT_EQ(seq, "T");
   EXPECT_EQ(qual, "t");
 
-  EXPECT_ANY_THROW(pileup.GetPileup(16));
+  EXPECT_ANY_THROW((void)pileup.GetPileup(16));
 }
 //
 TEST(CalqTest, recordPileupInsertions) {

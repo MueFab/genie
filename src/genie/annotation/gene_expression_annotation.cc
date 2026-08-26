@@ -33,7 +33,7 @@ std::vector<GeneExpressionUnits> GeneExpressionAnnotation::parseGeneExpression(
     combined = blocksWPars.at(0);
     //--------------
 
-    for (auto i = 1; i < blocksWPars.size(); ++i) {
+    for (auto i = 1u; i < blocksWPars.size(); ++i) {
       combined.blocks.push_back(blocksWPars.at(i).blocks.at(0));
     }
     std::map<std::string, core::parameter::annotation::AttributeData> attributeInfo;
@@ -207,7 +207,8 @@ void GeneExpressionAnnotation::sort_format(
   for (const auto& format : recs.at(0).GetExpressionAttributes()) {
     const auto& formatName = format.GetAttrName();
     core::parameter::annotation::AttributeData attrData(
-        formatName.size(), formatName, format.GetAttrType(), format.GetAttrArrayLen(), AttributeID);
+        static_cast<uint8_t>(formatName.size()), formatName, format.GetAttrType(),
+        format.GetAttrArrayLen(), AttributeID);
     attrInfo[formatName] = attrData;
     AttributeID++;
   }

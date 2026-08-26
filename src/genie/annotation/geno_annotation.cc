@@ -51,7 +51,7 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(
   combined = std::move(blocksWPars.at(0));
   //--------------
 
-  for (auto idx_i = 1; idx_i < blocksWPars.size(); ++idx_i) {
+  for (auto idx_i = 1u; idx_i < blocksWPars.size(); ++idx_i) {
     combined.blocks.push_back(std::move(blocksWPars.at(idx_i).blocks.at(0)));
   }
   std::map<std::string, core::parameter::annotation::AttributeData>
@@ -273,7 +273,7 @@ void GenoAnnotation::sort_format(
   for (const auto& format : recs.at(0).GetFormat()) {
     const auto& formatName = format.GetFormat();
     core::parameter::annotation::AttributeData attrData(
-        formatName.size(), formatName, format.GetType(),
+        static_cast<uint8_t>(formatName.size()), formatName, format.GetType(),
         format.GetArrayLength(), AttributeID);
     attrInfo[formatName] = attrData;
     AttributeID++;

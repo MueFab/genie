@@ -160,7 +160,7 @@ GenotypePayload::GenotypePayload(
     num_variants_payloads = num_bit_planes_;
   }
 
-  for (auto idx_i=0u; idx_i< num_variants_payloads; idx_i++) {
+  for (auto idx_i=0u; idx_i < static_cast<unsigned>(num_variants_payloads); idx_i++) {
     variants_payloads_.emplace_back(
       reader,
       parameters.GetVariantsCodecID(),
