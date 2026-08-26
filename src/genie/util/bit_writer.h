@@ -154,7 +154,7 @@ class BitWriter {
    * @param num_bytes The number of bytes to take from `writeBits` and write
    * to the output stream.
    */
-  inline void WriteAlignedBytes(uint64_t write_bits, uint8_t num_bytes);
+  void WriteAlignedBytes(uint64_t write_bits, uint8_t num_bytes);
 
   /**
    * @brief Writes an aligned integral value to the associated output stream.

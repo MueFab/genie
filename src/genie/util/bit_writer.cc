@@ -46,7 +46,7 @@ BitWriter::~BitWriter() { FlushBits(); }
 
 // -----------------------------------------------------------------------------
 
-inline void BitWriter::WriteAlignedBytes(const uint64_t write_bits,
+void BitWriter::WriteAlignedBytes(const uint64_t write_bits,
                                          const uint8_t num_bytes) {
   if (num_bytes == 1) goto L1;
   if (num_bytes == 2) goto L2;
@@ -132,7 +132,7 @@ bool BitWriter::IsByteAligned() const { return num_held_bits_ == 0; }
 
 // -----------------------------------------------------------------------------
 
-inline void BitWriter::WriteAlignedByte(uint8_t byte) {
+void BitWriter::WriteAlignedByte(uint8_t byte) {
   stream_.write(reinterpret_cast<char*>(&byte), 1);
   total_bits_written_ += kBitsPerByte;
 }
