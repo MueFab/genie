@@ -43,10 +43,29 @@ class FilePos {
 };
 
 /**
- * @brief Deprecated wrapper class for logging and binary writes.
- * @deprecated This class was introduced as temporary code in develop-part6
- * and is planned for complete removal in the future. New code should use
- * genie::util::BitWriter directly.
+ * @brief Deprecated wrapper for logging and binary writes.
+ *
+ * @deprecated This class is deprecated as of 2026-08-24.
+ *             All new code must use `genie::util::BitWriter` directly.
+ *
+ * Migration notes:
+ *   - `writer.Write(value, bits)`           -> `writer.WriteBits(value, bits)`
+ *   - `writer.Write(string)`                -> `writer.WriteBits(...)` or `WriteAlignedBytes(...)`
+ *   - `writer.Flush()`                      -> `writer.FlushBits()`
+ *   - `writer.GetBitsWritten()`             -> `writer.GetTotalBitsWritten()`
+ *   - `writer.WriteReserved(bits)`          -> `writer.WriteBits(0, bits)`
+ *   - `writer.GetBinWriter()`               -> construct `genie::util::BitWriter` directly
+ *
+ * This wrapper is retained (not deleted) for source compatibility with existing
+ * call sites during the migration window. The class will be removed once all
+ * production callers are migrated; see
+ * docs/tasks/done/2026-04-29-deprecate-core-writer.md for the migration plan.
+ *
+ * @note `[[deprecated]]` is intentionally NOT applied here because the
+ *       build enables `-Werror`. Adding the attribute would break the
+ *       build at every existing call site before callers have a chance
+ *       to migrate. The Doxygen `@deprecated` tag is the deprecation
+ *       contract for IDE/tooling consumers.
  */
 class Writer {
  private:
