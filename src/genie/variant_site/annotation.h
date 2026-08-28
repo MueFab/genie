@@ -1,0 +1,107 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+#ifndef SRC_GENIE_VARIANT_SITE_ANNOTATION_H_
+#define SRC_GENIE_VARIANT_SITE_ANNOTATION_H_
+
+#include <cstdint>
+#include <fstream>
+#include <list>
+#include <map>
+#include <sstream>
+#include <string>
+#include <tuple>
+#include <vector>
+
+#include "genie/variant_site/contact_annotation.h"
+#include "genie/variant_site/compressors.h"
+#include "genie/core/constants.h"
+#include "genie/core/record/data_unit/record.h"
+#include "genie/variant_site/geno_annotation.h"
+#include "genie/variant_site/site_annotation.h"
+#include "genie/variant_site/sample_annotation.h"
+#include "genie/variant_site/feature_annotation.h"
+#include "genie/variant_site/gene_expression_annotation.h"
+#include "genie/variant_site/functional_annotation.h"
+#include "genie/variant_site/track_data_annotation.h"
+#include "genie/variant_site/trackproperty_annotation.h"
+// -----------------------------------------------------------------------------
+
+namespace genie {
+namespace annotation {
+// ---------------------------------------------------------------------------------------------------------------------
+
+enum class RecType { SITE_FILE = 0, GENO_FILE, SAMPLE_FILE, FEATURE_FILE, GENE_EXPRESSION_FILE, CM_FILE, FUNCTIONAL_ANNOTATIONS_FILE, TRACK_FILE, TRACK_PROPERTY_FILE };
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+class Annotation {
+ public:
+  void setCompressorConfig(std::stringstream& config) {
+    compressors.parseConfig(config);
+  }
+  void setTileSize(uint32_t _defaultTileSizeHeight,
+                   uint32_t _defaultTileSizeWidth) {
+    defaultTileSizeHeight = _defaultTileSizeHeight;
+    defaultTileSizeWidth = _defaultTileSizeWidth;
+    genoAnnotation.setTileSize(_defaultTileSizeHeight, defaultTileSizeWidth);
+    siteAnnotation.setTileSize(_defaultTileSizeHeight);
+    sampleAnnotation.setTileSize(_defaultTileSizeWidth);
+    featureAnnotation.setTileSize(_defaultTileSizeHeight);
+    geneExpressionAnnotation.setTileSize(_defaultTileSizeHeight, _defaultTileSizeWidth);
+    functionalAnnotation.setTileSize(_defaultTileSizeHeight);
+    trackDataAnnotation.setTileSize(_defaultTileSizeHeight);
+    trackpropertyAnnotation.setTileSize(_defaultTileSizeHeight);
+  }
+
+  void startStream(RecType recType, std::string recordInputFileName,
+                   std::string outputFileName);
+
+  void writeToFile(std::string& outputFileName);
+
+  void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) {
+    genoAnnotation.setLikelihoodOptions(opt);
+  }
+  void setGenotypeOptions(genie::genotype::EncodingOptions opt) {
+    genoAnnotation.setGenotypeOptions(opt);
+  }
+
+  void setContactOptions(ContactMatrixParameters options) {
+    cmAnnotation.setContactOptions(options);
+  }
+
+ private:
+  std::ifstream recordInput;
+  genie::annotation::Compressor compressors;
+  std::map<std::string, InfoField> attributeInfo;
+
+  std::vector<genie::core::parameter::annotation::Record>
+      annotationParameterSet;
+  std::vector<genie::core::access_unit::annotation::Record>
+      annotationAccessUnit;
+
+  GenoAnnotation genoAnnotation;
+  SiteAnnotation siteAnnotation;
+  CMAnnotation cmAnnotation;
+  SampleAnnotation sampleAnnotation;
+  FeatureAnnotation featureAnnotation;
+  GeneExpressionAnnotation geneExpressionAnnotation;
+  FunctionalAnnotation functionalAnnotation;
+  TrackDataAnnotation trackDataAnnotation;
+  TrackPropertyAnnotation trackpropertyAnnotation;
+
+  uint32_t defaultTileSizeHeight{0};
+  uint32_t defaultTileSizeWidth{0};
+};
+
+}  // namespace annotation
+}  // namespace genie
+
+// -----------------------------------------------------------------------------
+
+#endif  // SRC_GENIE_VARIANT_SITE_ANNOTATION_H_

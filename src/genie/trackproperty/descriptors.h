@@ -15,7 +15,7 @@
 
 #include "genie/core/constants.h"
 #include "genie/core/track_property_record/record.h"
-#include "genie/annotation/tiles.h"
+#include "genie/variant_site/tiles.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

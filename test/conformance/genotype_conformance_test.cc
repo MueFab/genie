@@ -18,7 +18,7 @@
 
 #include "genie/core/parameter/annotation/algorithm_parameters.h"
 #include "genie/core/parameter/annotation/descriptor_configuration.h"
-#include "genie/annotation/parameterset_composer.h"
+#include "genie/variant_site/parameterset_composer.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/genotype/genotype_payload.h"
 
@@ -26,9 +26,9 @@
 #include "genie/core/access_unit/annotation/record.h"
 #include "genie/core/parameter/annotation/record.h"
 #include "genie/core/record/data_unit/record.h"
-#include "genie/annotation/accessunit_composer.h"
+#include "genie/variant_site/accessunit_composer.h"
 
-#include "genie/annotation/annotation.h"
+#include "genie/variant_site/annotation.h"
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_payload.h"
 

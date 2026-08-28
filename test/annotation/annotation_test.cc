@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/annotation/annotation.h"
+#include "genie/variant_site/annotation.h"
 
 #include <gtest/gtest.h>
 
