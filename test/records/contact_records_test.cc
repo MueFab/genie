@@ -408,3 +408,89 @@ TEST(ContactRecord, InterContactRecord_HR_Raw) {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ContactRecord, IntraContactRecord_MultiSamples) {
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21-mult_samples.cont";
+    std::string filepath = gitRootDir + "/data/records/contact/" + filename;
+
+    std::vector<genie::core::record::ContactRecord> recs;
+
+    {
+        std::ifstream reader(filepath, std::ios::binary);
+        ASSERT_EQ(reader.fail(), false);
+        genie::util::BitReader bitreader(reader);
+
+        while (bitreader.IsStreamGood()){
+            recs.emplace_back(bitreader);
+        }
+
+        recs.pop_back();
+    }
+
+    ASSERT_GE(recs.size(), 2u);
+
+    // Verify sample 0
+    auto& rec0 = recs[0];
+    ASSERT_EQ(rec0.GetSampleID(), 0u);
+    ASSERT_EQ(rec0.GetSampleName(), "Test01");
+
+    // Verify sample 1
+    auto& rec1 = recs[1];
+    ASSERT_EQ(rec1.GetSampleID(), 1u);
+    ASSERT_EQ(rec1.GetSampleName(), "Test02");
+
+    for (auto& rec : recs) {
+        std::stringstream ss;
+        genie::util::BitWriter writer(ss);
+        rec.Write(writer);
+
+        genie::util::BitReader bitreader(ss);
+        auto recon_rec = genie::core::record::ContactRecord(bitreader);
+        ASSERT_TRUE(rec == recon_rec);
+    }
+}
+
+TEST(ContactRecord, InterContactRecord_MultiSamples) {
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_22-mult_samples.cont";
+    std::string filepath = gitRootDir + "/data/records/contact/" + filename;
+
+    std::vector<genie::core::record::ContactRecord> recs;
+
+    {
+        std::ifstream reader(filepath, std::ios::binary);
+        ASSERT_EQ(reader.fail(), false);
+        genie::util::BitReader bitreader(reader);
+
+        while (bitreader.IsStreamGood()){
+            recs.emplace_back(bitreader);
+        }
+
+        recs.pop_back();
+    }
+
+    ASSERT_GE(recs.size(), 2u);
+
+    // Verify sample 0
+    auto& rec0 = recs[0];
+    ASSERT_EQ(rec0.GetSampleID(), 0u);
+    ASSERT_EQ(rec0.GetSampleName(), "Test01");
+
+    // Verify sample 1
+    auto& rec1 = recs[1];
+    ASSERT_EQ(rec1.GetSampleID(), 1u);
+    ASSERT_EQ(rec1.GetSampleName(), "Test02");
+
+    for (auto& rec : recs) {
+        std::stringstream ss;
+        genie::util::BitWriter writer(ss);
+        rec.Write(writer);
+
+        genie::util::BitReader bitreader(ss);
+        auto recon_rec = genie::core::record::ContactRecord(bitreader);
+        ASSERT_TRUE(rec == recon_rec);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
