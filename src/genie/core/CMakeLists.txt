@@ -64,7 +64,7 @@ set(source_files
 
         stats/perf_stats.cc
 
-        access_unit.cc
+        access_unit/sequencing/access_unit.cc
         classifier_bypass.cc
         classifier_regroup.cc
         constants.cc

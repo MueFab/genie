@@ -5,7 +5,7 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/sequencing/access_unit.h"
 
 #include <algorithm>
 #include <memory>

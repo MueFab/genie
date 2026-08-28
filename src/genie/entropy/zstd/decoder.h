@@ -22,7 +22,7 @@
 #include <vector>
 #include <cstdint>
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/sequencing/access_unit.h"
 #include "genie/core/entropy_decoder.h"
 
 // -----------------------------------------------------------------------------

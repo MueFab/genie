@@ -13,7 +13,7 @@
 #include <cstdint>
 #include <variant>
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/sequencing/access_unit.h"
 #include "genie/core/payload.h"
 #include "genie/util/bit_writer.h"
 

@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/sequencing/access_unit.h"
 #include "genie/name/tokenizer/token.h"
 
 // -----------------------------------------------------------------------------

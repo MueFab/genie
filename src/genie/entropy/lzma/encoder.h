@@ -16,7 +16,7 @@
 
 // -----------------------------------------------------------------------------
 
-#include "genie/core/access_unit.h"
+#include "genie/core/access_unit/sequencing/access_unit.h"
 #include "genie/core/entropy_encoder.h"
 #include "genie/core/parameter/annotation/algorithm_parameters.h"
 #include "genie/core/parameter/annotation/compressor_parameter_set.h"
