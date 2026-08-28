@@ -21,7 +21,6 @@
 #include "algorithm_parameters.h"
 #include "genie/contact/contact_matrix_parameters.h"
 #include "genie/contact/subcontact_matrix_parameters.h"
-#include "genie/core/writer.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/likelihood/likelihood_parameters.h"
 

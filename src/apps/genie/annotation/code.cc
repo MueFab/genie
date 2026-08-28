@@ -20,7 +20,6 @@
 #include "filesystem/filesystem.hpp"
 #include "genie/core/record/data_unit/record.h"
 #include "genie/core/record/genotype/record.h"
-#include "genie/core/writer.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/variant_site/accessunit_composer.h"

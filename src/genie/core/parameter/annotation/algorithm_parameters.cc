@@ -116,9 +116,9 @@ std::vector<std::vector<std::vector<std::vector<uint8_t>>>> AlgorithmParameters:
     uint8_t idx_j = 1;
     uint8_t idx_k = 1;
     uint8_t l = 1;
-    if (array_dims.size() != 0) idx_j = array_dims.at(0) + 1;
-    if (num_array_dims > 0) idx_k = array_dims.at(1) + 1;
-    if (num_array_dims == 2) l = array_dims.at(2) + 1;
+    if (array_dims.size() >= 1 && num_array_dims >= 1) idx_j = array_dims.at(0) + 1;
+    if (array_dims.size() >= 2 && num_array_dims >= 2) idx_k = array_dims.at(1) + 1;
+    if (array_dims.size() >= 3 && num_array_dims >= 3) l = array_dims.at(2) + 1;
 
     //      [idx_j]        [idx_k]         [l]      [type]
     std::vector<std::vector<std::vector<std::vector<uint8_t>>>> temp(

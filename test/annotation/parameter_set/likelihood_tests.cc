@@ -9,7 +9,6 @@
 #include <iostream>
 
 #include "random_record_fill_in.h"
-#include "genie/core/writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 #define GENERATE_TEST_FILES false
 

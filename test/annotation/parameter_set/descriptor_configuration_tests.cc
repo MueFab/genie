@@ -7,7 +7,6 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <iostream>
-#include "genie/core/writer.h"
 
 #include "random_record_fill_in.h"
 #include "genie/contact/contact_matrix_parameters.h"

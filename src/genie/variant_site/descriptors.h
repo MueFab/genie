@@ -19,7 +19,6 @@
 
 #include "genie/core/constants.h"
 #include "genie/core/record/site/record.h"
-#include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 #include "genie/variant_site/tiles.h"
 

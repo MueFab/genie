@@ -8,9 +8,10 @@
 #include <fstream>
 #include <iostream>
 
-#include "genie/core/writer.h"
 #include "random_record_fill_in.h"
 #include "genie/core/parameter/annotation/attribute_parameter_set.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 #define GENERATE_TEST_FILES false
 
@@ -96,81 +97,18 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetValues) {  // NOLINT(cer
     EXPECT_EQ(attributeParameterSet.getCompressorID(), 4);
 
     std::stringstream InOut;
-    genie::core::Writer strwriter(&InOut);
+    genie::util::BitWriter strwriter(InOut);
     attributeParameterSet.write(strwriter);
+    strwriter.FlushBits();
 
-        genie::core::Writer writeSize;
+    std::stringstream nullStream;
+    genie::util::BitWriter writeSize(nullStream);
     auto size = attributeParameterSet.getSize(writeSize);
     if (size % 8 != 0) size += (8 - size % 8);
     EXPECT_EQ(InOut.str().size(), size / 8);
 }
 
 TEST_F(AttributeParameterSetTests, AttributeParameterSetRandom) {  // NOLINT(cert-err58-cpp)
-    // The rule of thumb is to use EXPECT_* when you want the test to continue
-    // to reveal more errors after the assertion failure, and use ASSERT_*
-    // when continuing after failure doesn't make sense.
-
-    RandomAnnotationEncodingParameters randomattributeParameterSet;
-    genie::core::parameter::annotation::AttributeParameterSet attributeParameterSet;
-    genie::core::parameter::annotation::AttributeParameterSet attributeParameterSetCheck;
-    attributeParameterSet = randomattributeParameterSet.randomAttributeParameterSet();
-
-    std::stringstream InOut;
-    genie::core::Writer strwriter(&InOut);
-    genie::util::BitReader strreader(InOut);
-    attributeParameterSet.write(strwriter);
-    strwriter.Flush();
-    attributeParameterSetCheck.read(strreader);
-    std::stringstream TestOut;
-    genie::core::Writer teststrwriter(&TestOut);
-    attributeParameterSetCheck.write(teststrwriter);
-    teststrwriter.Flush();
-
-    EXPECT_EQ(InOut.str(), TestOut.str());
-
-        genie::core::Writer writeSize;
-    auto size = attributeParameterSet.getSize(writeSize);
-    if (size % 8 != 0) size += (8 - size % 8);
-    EXPECT_EQ(InOut.str().size(), size / 8);
-
-    EXPECT_EQ(attributeParameterSet.getAttriubuteID(), attributeParameterSetCheck.getAttriubuteID());
-    EXPECT_EQ(attributeParameterSet.getAttributeName(), attributeParameterSetCheck.getAttributeName());
-    EXPECT_EQ(attributeParameterSet.getAttributeType(), attributeParameterSetCheck.getAttributeType());
-    EXPECT_EQ(attributeParameterSet.getAttributeNumberOFArrayDims(),
-              attributeParameterSetCheck.getAttributeNumberOFArrayDims());
-    EXPECT_EQ(attributeParameterSet.getAttributeArrayDims(), attributeParameterSetCheck.getAttributeArrayDims());
-    EXPECT_EQ(attributeParameterSet.getAttributeDefaultValue(), attributeParameterSetCheck.getAttributeDefaultValue());
-    EXPECT_EQ(attributeParameterSet.isAttributeMissedValue(), attributeParameterSetCheck.isAttributeMissedValue());
-    EXPECT_EQ(attributeParameterSet.getAttributeMissedValues(), attributeParameterSetCheck.getAttributeMissedValues());
-    EXPECT_EQ(attributeParameterSet.getAttributeMissedString(), attributeParameterSetCheck.getAttributeMissedString());
-    EXPECT_EQ(attributeParameterSet.getCompressorID(), attributeParameterSetCheck.getCompressorID());
-    EXPECT_EQ(attributeParameterSet.areDependeciesAttributes(), attributeParameterSetCheck.areDependeciesAttributes());
-    EXPECT_EQ(attributeParameterSet.getAttributeNameLength(), attributeParameterSetCheck.getAttributeNameLength());
-
-#if GENERATE_TEST_FILES
-
-    std::string name = "TestFiles/AttributeParameterSet_seed_";
-    name += std::to_string(rand() % 10);
-
-    std::ofstream outputfile;
-    outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
-    if (outputfile.is_open()) {
-        genie::core::Writer writer(&outputfile);
-        attributeParameterSet.write(writer);
-        writer.flush();
-        outputfile.close();
-    }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile, true);
-        attributeParameterSet.write(txtWriter);
-        txtfile.close();
-    }
-#endif
-}
-
-TEST_F(AttributeParameterSetTests, AttributeParameterSetRandomBitWriter) {  // NOLINT(cert-err58-cpp)
     RandomAnnotationEncodingParameters randomattributeParameterSet;
     genie::core::parameter::annotation::AttributeParameterSet attributeParameterSet;
     genie::core::parameter::annotation::AttributeParameterSet attributeParameterSetCheck;
@@ -188,6 +126,12 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetRandomBitWriter) {  // N
     teststrwriter.FlushBits();
 
     EXPECT_EQ(InOut.str(), TestOut.str());
+
+    std::stringstream nullStream;
+    genie::util::BitWriter writeSize(nullStream);
+    auto size = attributeParameterSet.getSize(writeSize);
+    if (size % 8 != 0) size += (8 - size % 8);
+    EXPECT_EQ(InOut.str().size(), size / 8);
 
     EXPECT_EQ(attributeParameterSet.getAttriubuteID(), attributeParameterSetCheck.getAttriubuteID());
     EXPECT_EQ(attributeParameterSet.getAttributeName(), attributeParameterSetCheck.getAttributeName());

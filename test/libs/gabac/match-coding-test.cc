@@ -145,17 +145,15 @@ TEST_F(MatchCodingTest, inverseTransformMatchCoding) {
   transform_subset_ = {pointers_, lengths_, raw_values_};
 
   // void rawValues (is not allowed) and lengths is not
-  EXPECT_DEATH(
-      genie::entropy::gabac::InverseTransformMatchCoding(&transform_subset_),
-      "");
+  EXPECT_ANY_THROW(
+      genie::entropy::gabac::InverseTransformMatchCoding(&transform_subset_));
 
   pointers_ = {0, 0, 0, 0};
   lengths_ = {};
   raw_values_ = {};
   transform_subset_ = {pointers_, lengths_, raw_values_};
-  EXPECT_DEATH(
-      genie::entropy::gabac::InverseTransformMatchCoding(&transform_subset_),
-      "");
+  EXPECT_ANY_THROW(
+      genie::entropy::gabac::InverseTransformMatchCoding(&transform_subset_));
 
   // windowSize == 4
   expected_raw_values_ = {

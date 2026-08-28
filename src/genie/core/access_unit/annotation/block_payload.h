@@ -19,10 +19,8 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-// #include "genie/core/parameter/annotation/descriptor_configuration.h"
-#include "genie/core/writer.h"
-// #include "genie/genotype/genotype_parameters.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

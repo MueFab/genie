@@ -16,7 +16,6 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
 
 #include "genie/variant_site/compressors.h"
 #include "genie/core/parameter/annotation/annotation_encoding_parameters.h"

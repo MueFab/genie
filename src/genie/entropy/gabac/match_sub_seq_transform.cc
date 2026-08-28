@@ -96,7 +96,8 @@ void InverseTransformMatchCoding(
   const util::DataBlock* const raw_values = &(*transformed_sub_sequences)[2];
 
   util::DataBlock symbols(0, (raw_values->GetWordSize()));
-  assert(lengths->Size() == pointers->Size() + raw_values->Size());
+  UTILS_DIE_IF(lengths->Size() != pointers->Size() + raw_values->Size(),
+               "invalid sizes for match inverse transform");
 
   // Re-compute the symbols from the pointer, lengths and raw values
   size_t n = 0;

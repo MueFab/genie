@@ -48,6 +48,8 @@
 | 2026.08.28-main-library_rename_genie_variant_site | 2026.08.28 | Phase 1.5: rename library genie-annotation -> genie-variant-site | Done |
 | 2026.08.28-main-cli_orchestrator_migration | 2026.08.28 | Phase 2: modernize ParameterSetComposer and prune legacy PSC | Done |
 | 2026.08.28-main-build_consolidation_tmp_builds | 2026.08.28 | Consolidate all build directories into genie/tmp/builds/* | Done |
+| 2026.08.25-main-cli_dependency_audit | 2026.08.25 | Audit apps/genie/ CLI dependencies and external libraries | Done |
+| 2026-04-29-delete-core-writer | 2026-04-29 | Remove deprecated core::Writer and migrate remaining tests to util::BitWriter | Done |
 
 
 

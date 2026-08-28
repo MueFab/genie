@@ -23,7 +23,6 @@
 
 #include "genie/core/parameter/annotation/annotation_encoding_parameters.h"
 #include "genie/core/parameter/annotation/tile_configuration.h"
-#include "genie/core/writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

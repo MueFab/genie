@@ -25,7 +25,7 @@ namespace core {
 namespace parameter {
 namespace annotation {
 
-CompressorParameterSet::CompressorParameterSet() : compressor_ID(1), compressorSteps{} {}
+CompressorParameterSet::CompressorParameterSet() : compressor_ID(0), compressorSteps{} {}
 
 CompressorParameterSet::CompressorParameterSet(util::BitReader& reader) { read(reader); }
 
