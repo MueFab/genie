@@ -16,3 +16,4 @@ target_link_libraries(coding-tests PRIVATE genie-bsc)
 
 install(TARGETS coding-tests
         RUNTIME DESTINATION "usr/bin")
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

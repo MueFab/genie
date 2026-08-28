@@ -19,7 +19,6 @@
 #include "genie/util/runtime_exception.h"
 
 #include "genie/variant_site/annotation_encoder.h"
-#include "genie/variant_site/parameterset_composer.h"
 
 namespace genie {
 namespace annotation {

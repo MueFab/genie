@@ -1,3 +1,5 @@
+enable_testing()
+
 add_subdirectory(core)
 add_subdirectory(variant)
 add_subdirectory(example)
@@ -9,8 +11,6 @@ add_subdirectory(entropy)
 add_subdirectory(conformance)
 add_subdirectory(annotation)
 add_subdirectory(libs)
-
-enable_testing()
 
 file(GLOB TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*_test.cc")
 

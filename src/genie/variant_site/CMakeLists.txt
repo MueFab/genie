@@ -2,12 +2,11 @@ project("genie-variant-site")
 
 set(source_files
         annotation.cc
+        annotation_encoder.cc
 		geno_annotation.cc
 		site_annotation.cc
 		contact_annotation.cc
         compressors.cc
-		parameterset_composer.cc
-		annotation_encoder.cc
 		json_attribute_parser.cc
 		variantsite_parser.cc
 		vsite_parameterset_composer.cc

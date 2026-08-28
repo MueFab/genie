@@ -15,9 +15,9 @@
 #include "genie/variant_site/json_attribute_parser.h"
 #include "genie/core/constants.h"
 #include "genie/variant_site/accessunit_composer.h"
-#include "genie/variant_site/parameterset_composer.h"
 #include "genie/variant_site/variantsite_parser.h"
 
+#include "genie/variant_site/vsite_parameterset_composer.h"
 #include "genie/variant_site/compressors.h"
 #include "genie/core/record/data_unit/record.h"
 // -----------------------------------------------------------------------------

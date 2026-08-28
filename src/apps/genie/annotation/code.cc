@@ -29,7 +29,6 @@
 #include "genie/likelihood/likelihood_payload.h"
 #include "genie/util/runtime_exception.h"
 #include "genie/util/string_helpers.h"
-#include "genie/variant_site/parameterset_composer.h"
 #include "genie/variant_site/vsite_parameterset_composer.h"
 #include "genie/variant_site/variantsite_parser.h"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -236,19 +235,19 @@ void encodeVariantGenotype(const std::string& _input_fpath,
       likelihood_opt.block_size, likelihood_opt.transform_flag
   );
 
-  //--------------------------------------------------
   uint8_t AT_ID = 1;
   uint8_t AG_class = 0;
 
   std::map<std::string,
            genie::core::parameter::annotation::AttributeData>
       info;
-  genie::annotation::ParameterSetComposer genotypeParameterSet;
-  genotypeParameterSet.setGenotypeParameters(genotypeParameters);
-  genotypeParameterSet.setLikelihoodParameters(likelihoodParameters);
+  genie::variant_site::ParameterSetComposer genotypeParameterSet;
+  std::vector<genie::core::AnnotDesc> descrList = {
+      genie::core::AnnotDesc::GENOTYPE,
+      genie::core::AnnotDesc::LIKELIHOOD
+  };
   genie::core::parameter::annotation::Record annotationParameterSet =
-      genotypeParameterSet.Build(AT_ID, info,
-                                 {static_cast<uint32_t>(recs.size()), 3000});
+      genotypeParameterSet.setParameterSet(descrList, info, recs.size(), AT_ID);
 
   genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
 

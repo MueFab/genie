@@ -13,3 +13,4 @@ target_link_libraries(read-tests PRIVATE genie-localassembly)
 
 install(TARGETS read-tests
         RUNTIME DESTINATION "usr/bin")
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

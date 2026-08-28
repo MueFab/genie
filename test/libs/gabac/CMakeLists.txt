@@ -20,3 +20,4 @@ target_link_libraries(gabac-tests PRIVATE genie-gabac)
 
 install(TARGETS gabac-tests
         RUNTIME DESTINATION "usr/bin")
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

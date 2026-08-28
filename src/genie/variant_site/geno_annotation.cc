@@ -17,7 +17,6 @@
 #include <vector>
 
 #include "genie/variant_site/annotation_encoder.h"
-#include "genie/variant_site/parameterset_composer.h"
 #include "genie/core/array_type.h"
 #include "genie/core/constants.h"
 #include "genie/core/access_unit/annotation/typed_data.h"

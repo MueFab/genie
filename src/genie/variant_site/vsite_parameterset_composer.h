@@ -51,12 +51,21 @@ class ParameterSetComposer {
         genie::annotation::Compressor compressors,
         uint64_t defaultTileSize);
  
+    genie::core::parameter::annotation::Record Compose(
+        uint8_t AT_ID, uint8_t AG_class, std::pair<uint64_t, uint64_t> tile_Size,
+        core::parameter::annotation::AnnotationEncodingParameters& annotationEncodingpars);
+ 
  private:
 };
  
 // ---------------------------------------------------------------------------------------------------------------------
  
 }  // namespace variant_site
+
+namespace annotation {
+using ParameterSetComposer = genie::variant_site::ParameterSetComposer;
+}  // namespace annotation
+
 }  // namespace genie
  
 // ---------------------------------------------------------------------------------------------------------------------

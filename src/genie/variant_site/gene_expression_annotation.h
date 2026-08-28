@@ -11,6 +11,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include "genie/variant_site/vsite_parameterset_composer.h"
 #include "genie/variant_site/compressors.h"
 #include "genie/core/gene_expression_record/record.h"
 #include "genie/core/parameter/annotation/attribute_data.h"

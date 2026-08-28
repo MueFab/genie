@@ -12,3 +12,4 @@ target_link_libraries(quality-tests PRIVATE genie-calq)
 
 install(TARGETS quality-tests
         RUNTIME DESTINATION "usr/bin")
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

@@ -49,3 +49,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
 
 install(TARGETS ${PROJECT_NAME}
         RUNTIME DESTINATION "usr/bin")
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

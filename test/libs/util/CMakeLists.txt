@@ -23,3 +23,4 @@ target_link_libraries(util-tests PRIVATE genie-sam)
 
 install(TARGETS util-tests
         RUNTIME DESTINATION "usr/bin")
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

@@ -56,6 +56,7 @@ target_link_libraries(genie PRIVATE genie-genotype)
 target_link_libraries(genie PRIVATE genie-likelihood)
 target_link_libraries(genie PRIVATE genie-contact)
 target_include_directories(genie PRIVATE "${CMAKE_SOURCE_DIR}/src/genie")
+target_include_directories(genie PRIVATE "${CMAKE_SOURCE_DIR}/src/apps")
 
 if (${GENIE_USE_OPENMP})
     target_compile_definitions(genie PRIVATE GENIE_USE_OPENMP)

@@ -11,7 +11,6 @@
 #include <tuple>
 #include <vector>
 #include "genie/variant_site/annotation_encoder.h"
-#include "genie/variant_site/parameterset_composer.h"
 #include "genie/variant_site/accessunit_composer.h"
 
 // "genie/util/runtime_exception.h"

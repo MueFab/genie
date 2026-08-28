@@ -37,6 +37,17 @@
 | 2026-06-12-migrate-to-genie-entropy | 2026-06-12 | Migrate from thirdparty/codecs to native genie/entropy C++ wrappers | Done |
 | 2026-06-15-standardize-find-or-fetch-dependencies | 2026-06-15 | Standardize Find-or-Fetch dependency resolution scripts | Done |
 | 2026-04-27-parallelize-contact-tiles | 2026-04-27 | Parallelize contact tile encoding with OpenMP | Done |
+| 2026-08-11-cleanup-duplicate-hierarchies | 2026-08-11 | Grand plan: resolve temp_part6 dedup/divergence (variantsite, access_unit, variant rename) | Done |
+| 2026-08-11-track-a-dedup-variantsite | 2026-08-11 | Delete src/genie/variantsite (redundant w/ annotation) | Done |
+| 2026-08-11-track-b-dedup-access-unit-hierarchy | 2026-08-11 | Delete old core/record/annotation_access_unit (keep core/access_unit/annotation) | Done |
+| 2026-08-11-track-c-rename-variant-to-genotype | 2026-08-11 | Rename core/record/variant -> core/record/genotype | Done |
+| 2026-08-11-track-d-integrate-verify | 2026-08-11 | Prune core::Writer + merge A/B/C + full verify | Done |
+| 2026-04-29-deprecate-core-writer | 2026-04-29 | Deprecate core::Writer and add comprehensive bitstream tests | Done |
+| 2026.08.25-main-fix_warnings_wuninitialized | 2026.08.25 | Fix -Wuninitialized in AnnotationAccessUnitHeader::read | Done |
+| 2026.08.25-main-fix_warnings_mechanical | 2026.08.25 | Fix mechanical compiler warnings | Done |
+| 2026.08.28-main-library_rename_genie_variant_site | 2026.08.28 | Phase 1.5: rename library genie-annotation -> genie-variant-site | Done |
+| 2026.08.28-main-cli_orchestrator_migration | 2026.08.28 | Phase 2: modernize ParameterSetComposer and prune legacy PSC | Done |
+| 2026.08.28-main-build_consolidation_tmp_builds | 2026.08.28 | Consolidate all build directories into genie/tmp/builds/* | Done |
 
 
 

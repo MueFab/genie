@@ -266,6 +266,26 @@ genie::core::parameter::annotation::Record ParameterSetComposer::setParameterSet
     return annotationParameterSet;
 }
 
+genie::core::parameter::annotation::Record ParameterSetComposer::Compose(
+    uint8_t AT_ID, uint8_t AG_class, std::pair<uint64_t, uint64_t> tile_Size,
+    core::parameter::annotation::AnnotationEncodingParameters& annotationEncodingpars) {
+    const uint8_t ATCoordSize = 3;
+    const bool AT_pos_40_bits_flag = false;
+    const core::AlphabetId AT_alphabet_ID = core::AlphabetId::kAcgtn;
+    const uint8_t n_aux_attribute_groups = 0;
+    const uint8_t parameter_set_ID = 1;
+
+    std::vector<genie::core::parameter::annotation::TileConfiguration> tile_configurations;
+
+    tile_configurations.emplace_back(genie::core::parameter::annotation::TileConfiguration{
+        ATCoordSize, AG_class, {tile_Size.first, tile_Size.second}});
+
+    genie::core::parameter::annotation::Record annotationParameterSet(
+        parameter_set_ID, AT_ID, AT_alphabet_ID, ATCoordSize, AT_pos_40_bits_flag, n_aux_attribute_groups,
+        tile_configurations, annotationEncodingpars);
+    return annotationParameterSet;
+}
+
 }  // namespace variant_site
 }  // namespace genie
 

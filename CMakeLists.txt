@@ -3,6 +3,7 @@
 #==============================================================================
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
 project("genie")
 
@@ -210,6 +211,7 @@ add_subdirectory("thirdparty/codecs")
 add_subdirectory(src)
 
 if(${BUILD_TESTS})
+    enable_testing()
     add_subdirectory(test)
 endif()
 

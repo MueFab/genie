@@ -18,6 +18,7 @@
 #include "genie/core/parameter/annotation/record.h"
 #include "genie/core/access_unit/annotation/record.h"
 
+#include "genie/variant_site/vsite_parameterset_composer.h"
 #include "genie/variant_site/compressors.h"
 // -----------------------------------------------------------------------------
 
