@@ -25,7 +25,7 @@
 #include "genie/core/parameter/annotation/attribute_data.h"
 #include "genie/core/parameter/annotation/attribute_parameter_set.h"
 #include "genie/core/parameter/annotation/descriptor_configuration.h"
-#include "genie/core/record/site/record.h"
+#include "genie/core/record/annotation/site/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 

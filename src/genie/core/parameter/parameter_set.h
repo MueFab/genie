@@ -19,7 +19,7 @@
 #include "genie/core/parameter/data_unit.h"
 #include "genie/core/parameter/descriptor_sub_sequence_cfg.h"
 #include "genie/core/parameter/quality_values.h"
-#include "genie/core/record/class_type.h"
+#include "genie/core/record/sequencing/class_type.h"
 #include "genie/util/bit_reader.h"
 
 // -----------------------------------------------------------------------------

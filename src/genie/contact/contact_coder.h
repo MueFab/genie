@@ -14,7 +14,7 @@
 #include "consts.h"
 #include "contact_matrix_parameters.h"
 #include "genie/core/constants.h"
-#include "genie/core/record/contact/record.h"
+#include "genie/core/record/annotation/contact/record.h"
 #include "subcontact_matrix_parameters.h"
 #include "subcontact_matrix_payload.h"
 #include "contact_types.h"

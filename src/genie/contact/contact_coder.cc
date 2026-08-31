@@ -7,7 +7,7 @@
 #include "contact_coder.h"
 #include <genie/entropy/jbig/encoder.h>
 #include <genie/entropy/jbig/decoder.h>
-#include <genie/core/record/contact/record.h>
+#include <genie/core/record/annotation/contact/record.h>
 #include <genie/util/runtime_exception.h>
 #include <cstdint>
 #include <cstring>

@@ -17,7 +17,7 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/record/record.h"
+#include "genie/core/record/sequencing/record.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------

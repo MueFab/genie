@@ -17,7 +17,7 @@
 
 #include "genie/util/runtime_exception.h"
 
-#include "genie/core/record/class_type.h"
+#include "genie/core/record/sequencing/class_type.h"
 
 // -----------------------------------------------------------------------------
 

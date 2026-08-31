@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/record/alignment_split/other_rec.h"
+#include "genie/core/record/sequencing/alignment_split/other_rec.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------

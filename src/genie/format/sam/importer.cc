@@ -25,9 +25,9 @@
 #include <vector>
 
 #include "genie/core/cigar_tokenizer.h"
-#include "genie/core/record/alignment_split/other_rec.h"
-#include "genie/core/record/alignment_split/same_rec.h"
-#include "genie/core/record/class_type.h"
+#include "genie/core/record/sequencing/alignment_split/other_rec.h"
+#include "genie/core/record/sequencing/alignment_split/same_rec.h"
+#include "genie/core/record/sequencing/class_type.h"
 #include "genie/format/sam/pair_matcher.h"
 #include "genie/format/sam/sam_reader.h"
 #include "genie/format/sam/sam_sorter.h"

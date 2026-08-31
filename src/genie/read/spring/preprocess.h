@@ -25,7 +25,7 @@
 #include <optional>
 #include <string>
 
-#include "genie/core/record/chunk.h"
+#include "genie/core/record/sequencing/chunk.h"
 #include "genie/read/spring/util.h"
 #include "genie/util/drain.h"
 #include "genie/util/ordered_lock.h"

@@ -28,8 +28,8 @@
 
 #include "genie/core/access_unit/sequencing/access_unit.h"
 #include "genie/core/read_encoder.h"
-#include "genie/core/record/chunk.h"
-#include "genie/core/record/segment.h"
+#include "genie/core/record/sequencing/chunk.h"
+#include "genie/core/record/sequencing/segment.h"
 #include "genie/util/dynamic_scheduler.h"
 #include "genie/read/spring/util.h"
 #include "genie/util/log.h"

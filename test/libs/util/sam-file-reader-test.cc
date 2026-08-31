@@ -15,10 +15,10 @@
 
 #include <genie/core/classifier-bypass.h>
 
-#include <genie/core/record/alignment_split/same-rec.h>
-#include <genie/core/record/alignment_split/other-rec.h>
-#include <genie/core/record/alignment_split/unpaired.h>
-#include <genie/core/record/alignment_external/other-rec.h>
+#include <genie/core/record/sequencing/alignment_split/same_rec.h>
+#include <genie/core/record/sequencing/alignment_split/other_rec.h>
+#include <genie/core/record/sequencing/alignment_split/unpaired.h>
+#include <genie/core/record/sequencing/alignment_external/other_rec.h>
 
 TEST(SamRecord, ParseString) {  // NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");

@@ -23,7 +23,7 @@
 #include "genie/util/bit_writer.h"
 
 #include "genie/core/access_unit/annotation/attribute_field.h"
-#include "genie/core/record/site/record.h"
+#include "genie/core/record/annotation/site/record.h"
 
 #include "genie/core/access_unit/annotation/typed_data.h"
 // ---------------------------------------------------------------------------------------------------------------------

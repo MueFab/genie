@@ -24,8 +24,8 @@
 #include "genie/core/access_unit/annotation/typed_data.h"
 #include "genie/core/access_unit/annotation/record.h"
 #include "genie/core/parameter/annotation/record.h"
-#include "genie/core/record/data_unit/record.h"
-#include "genie/core/record/genotype/record.h"
+#include "genie/core/record/annotation/data_unit/record.h"
+#include "genie/core/record/annotation/genotype/record.h"
 #include "genie/variant_site/accessunit_composer.h"
 
 #include "genie/variant_site/annotation.h"

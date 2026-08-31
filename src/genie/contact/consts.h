@@ -12,7 +12,7 @@
 #include <tuple>
 #include "contact_types.h"
 #include "genie/core/constants.h"
-#include "genie/core/record/contact/record.h"
+#include "genie/core/record/annotation/contact/record.h"
 
 namespace genie::contact {
 

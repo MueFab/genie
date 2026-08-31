@@ -7,7 +7,7 @@
 
 #include "genie/format/mgrec/importer.h"
 
-#include <genie/core/record/alignment_split/same_rec.h>
+#include <genie/core/record/sequencing/alignment_split/same_rec.h>
 
 #include <iostream>
 #include <string>

@@ -15,7 +15,7 @@
 #include <vector>
 
 #include "genie/util/log.h"
-#include "record/alignment_split/same_rec.h"
+#include "genie/core/record/sequencing/alignment_split/same_rec.h"
 
 // -----------------------------------------------------------------------------
 

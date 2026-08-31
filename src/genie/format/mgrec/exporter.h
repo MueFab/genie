@@ -17,7 +17,7 @@
 // -----------------------------------------------------------------------------
 
 #include "genie/core/format_exporter.h"
-#include "genie/core/record/chunk.h"
+#include "genie/core/record/sequencing/chunk.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/drain.h"
 #include "genie/util/ordered_lock.h"

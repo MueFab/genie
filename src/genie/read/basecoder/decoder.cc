@@ -20,8 +20,8 @@
 
 #include "genie/read/basecoder/decoder.h"
 
-#include <genie/core/record/alignment_split/other_rec.h>
-#include <genie/core/record/alignment_split/unpaired.h>
+#include <genie/core/record/sequencing/alignment_split/other_rec.h>
+#include <genie/core/record/sequencing/alignment_split/unpaired.h>
 
 #include <memory>
 #include <string>
@@ -30,7 +30,7 @@
 #include <vector>
 
 #include "genie/core/qv_decoder.h"
-#include "genie/core/record/alignment_split/same_rec.h"
+#include "genie/core/record/sequencing/alignment_split/same_rec.h"
 
 // -----------------------------------------------------------------------------
 

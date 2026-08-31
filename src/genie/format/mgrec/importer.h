@@ -19,7 +19,7 @@
 
 #include "genie/core/classifier.h"
 #include "genie/core/format_importer.h"
-#include "genie/core/record/chunk.h"
+#include "genie/core/record/sequencing/chunk.h"
 #include "genie/util/bit_reader.h"
 
 // -----------------------------------------------------------------------------

@@ -30,7 +30,7 @@
 #include <vector>
 
 #include "genie/core/access_unit/sequencing/access_unit.h"
-#include "genie/core/record/record.h"
+#include "genie/core/record/sequencing/record.h"
 
 // -----------------------------------------------------------------------------
 

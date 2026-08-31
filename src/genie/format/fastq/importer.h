@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "genie/core/format_importer.h"
-#include "genie/core/record/record.h"
+#include "genie/core/record/sequencing/record.h"
 #include "genie/util/ordered_lock.h"
 
 // -----------------------------------------------------------------------------

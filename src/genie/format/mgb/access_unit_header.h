@@ -15,7 +15,7 @@
 #include <memory>
 
 #include "genie/core/parameter/data_unit.h"
-#include "genie/core/record/record.h"
+#include "genie/core/record/sequencing/record.h"
 #include "genie/format/mgb/au_type_cfg.h"
 #include "genie/format/mgb/block.h"
 #include "genie/format/mgb/mm_cfg.h"

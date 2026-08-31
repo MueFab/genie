@@ -12,9 +12,9 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/record/alignment_split/other_rec.h"
-#include "genie/core/record/alignment_split/same_rec.h"
-#include "genie/core/record/record.h"
+#include "genie/core/record/sequencing/alignment_split/other_rec.h"
+#include "genie/core/record/sequencing/alignment_split/same_rec.h"
+#include "genie/core/record/sequencing/record.h"
 #include "genie/format/sam/importer.h"
 #include "genie/util/ordered_section.h"
 #include "genie/util/stop_watch.h"

@@ -16,8 +16,8 @@
 #include "genie/util/runtime_exception.h"
 #include "genie/variant_site/variantsite_parser.h"
 
-#include "genie/core/record/genotype/record.h"
-#include "genie/core/record/site/record.h"
+#include "genie/core/record/annotation/genotype/record.h"
+#include "genie/core/record/annotation/site/record.h"
 
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"

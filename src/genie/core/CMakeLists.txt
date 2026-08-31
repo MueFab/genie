@@ -14,32 +14,32 @@ set(source_files
         parameter/parameter_set.cc
         parameter/quality_values.cc
 
-        record/alignment_external/none.cc
-        record/alignment_external/other_rec.cc
-        record/alignment_split/other_rec.cc
-        record/alignment_split/same_rec.cc
-        record/alignment_split/unpaired.cc
-        record/segment.cc
-        record/record.cc
-        record/chunk.cc
-        record/alignment_split.cc
-        record/alignment_shared_data.cc
-        record/alignment_external.cc
-        record/alignment_box.cc
-        record/alignment.cc
+        record/sequencing/alignment_external/none.cc
+        record/sequencing/alignment_external/other_rec.cc
+        record/sequencing/alignment_split/other_rec.cc
+        record/sequencing/alignment_split/same_rec.cc
+        record/sequencing/alignment_split/unpaired.cc
+        record/sequencing/segment.cc
+        record/sequencing/record.cc
+        record/sequencing/chunk.cc
+        record/sequencing/alignment_split.cc
+        record/sequencing/alignment_shared_data.cc
+        record/sequencing/alignment_external.cc
+        record/sequencing/alignment_box.cc
+        record/sequencing/alignment.cc
 
-        record/genotype/record.cc
-        record/genotype/format_field.cc
-        linked_record/linked_record.cc
-        record/site/record.cc
-        record/data_unit/record.cc
-        record/contact/record.cc
-        feature_record/record.cc
-        functional_annotation_record/record.cc
-        gene_expression_record/record.cc
-        sample_record/record.cc
-        track_property_record/record.cc
-        track_record/record.cc
+        record/annotation/genotype/record.cc
+        record/annotation/genotype/format_field.cc
+        record/annotation/linked/record.cc
+        record/annotation/site/record.cc
+        record/annotation/data_unit/record.cc
+        record/annotation/contact/record.cc
+        record/annotation/feature/record.cc
+        record/annotation/functional_annotation/record.cc
+        record/annotation/gene_expression/record.cc
+        record/annotation/sample/record.cc
+        record/annotation/track_property/record.cc
+        record/annotation/track/record.cc
 
         access_unit/annotation/record.cc
         access_unit/annotation/block.cc

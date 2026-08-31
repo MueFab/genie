@@ -21,7 +21,7 @@
 #include <utility>
 
 #include "genie/core/cigar_tokenizer.h"
-#include "genie/core/record/alignment_split/same_rec.h"
+#include "genie/core/record/sequencing/alignment_split/same_rec.h"
 #include "genie/util/stop_watch.h"
 
 // -----------------------------------------------------------------------------

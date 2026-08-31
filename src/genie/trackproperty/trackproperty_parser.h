@@ -15,7 +15,7 @@
 #include <vector>
 
 #include "genie/variant_site/json_attribute_parser.h"
-#include "genie/core/track_property_record/record.h"
+#include "genie/core/record/annotation/track_property/record.h"
 #include "genie/trackproperty/descriptors.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/runtime_exception.h"

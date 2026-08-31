@@ -19,7 +19,7 @@
 
 // Removed legacy codecs include
 #include "genie/core/constants.h"
-#include "genie/core/record/genotype/record.h"
+#include "genie/core/record/annotation/genotype/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/runtime_exception.h"

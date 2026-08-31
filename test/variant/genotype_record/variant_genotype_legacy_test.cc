@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <fstream>
-#include "genie/core/record/genotype/record.h"
+#include "genie/core/record/annotation/genotype/record.h"
 #include "genie/util/bit_reader.h"
 #include "helpers.h"
 #include <filesystem>

@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/record/genotype/record.h"
+#include "genie/core/record/annotation/genotype/record.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genotype_test_helpers.h"

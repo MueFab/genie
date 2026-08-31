@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/record/class_type.h"
+#include "genie/core/record/sequencing/class_type.h"
 #include "genie/util/log.h"
 #include "genie/util/stop_watch.h"
 

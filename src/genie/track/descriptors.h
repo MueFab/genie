@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/track_record/record.h"
+#include "genie/core/record/annotation/track/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/track/tiles.h"

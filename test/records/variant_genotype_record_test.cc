@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <vector>
-#include "genie/core/record/genotype/record.h"
+#include "genie/core/record/annotation/genotype/record.h"
 
 namespace genie::core::record {
 

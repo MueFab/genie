@@ -22,8 +22,8 @@
 #include "genie/variant_site/descriptors.h"
 
 #include "genie/variant_site/json_attribute_parser.h"
-#include "genie/core/sample_record/record.h"
-#include "genie/core/feature_record/record.h"
+#include "genie/core/record/annotation/sample/record.h"
+#include "genie/core/record/annotation/feature/record.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
 #include "genie/core/parameter/annotation/attribute_parameter_set.h"
 #include "genie/core/parameter/annotation/descriptor_configuration.h"

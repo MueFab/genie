@@ -34,7 +34,7 @@
 #include <string>
 #include <utility>
 
-#include "genie/core/record/record.h"
+#include "genie/core/record/sequencing/record.h"
 #include "genie/read/spring/params.h"
 #include "genie/read/spring/util.h"
 #include "genie/util/drain.h"

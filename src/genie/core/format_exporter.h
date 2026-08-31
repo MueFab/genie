@@ -11,7 +11,7 @@
 // -----------------------------------------------------------------------------
 
 #include "genie/core/access_unit/sequencing/access_unit.h"
-#include "genie/core/record/chunk.h"
+#include "genie/core/record/sequencing/chunk.h"
 #include "genie/util/drain.h"
 
 // -----------------------------------------------------------------------------

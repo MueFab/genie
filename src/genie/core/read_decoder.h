@@ -19,7 +19,7 @@
 #include "genie/core/module.h"
 #include "genie/core/name_decoder.h"
 #include "genie/core/qv_decoder.h"
-#include "genie/core/record/chunk.h"
+#include "genie/core/record/sequencing/chunk.h"
 #include "genie/util/side_selector.h"
 
 // -----------------------------------------------------------------------------

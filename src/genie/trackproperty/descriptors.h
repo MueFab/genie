@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/track_property_record/record.h"
+#include "genie/core/record/annotation/track_property/record.h"
 #include "genie/variant_site/tiles.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

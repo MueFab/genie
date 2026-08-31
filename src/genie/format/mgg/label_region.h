@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "genie/core/meta/region.h"
-#include "genie/core/record/class_type.h"
+#include "genie/core/record/sequencing/class_type.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 

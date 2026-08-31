@@ -19,7 +19,7 @@
 #include "genie/variant_site/contact_annotation.h"
 #include "genie/variant_site/compressors.h"
 #include "genie/core/constants.h"
-#include "genie/core/record/data_unit/record.h"
+#include "genie/core/record/annotation/data_unit/record.h"
 #include "genie/variant_site/geno_annotation.h"
 #include "genie/variant_site/site_annotation.h"
 #include "genie/variant_site/sample_annotation.h"

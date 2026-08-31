@@ -16,7 +16,7 @@
 #include <vector>
 
 #include "genie/core/classifier.h"
-#include "genie/core/record/record.h"
+#include "genie/core/record/sequencing/record.h"
 
 // -----------------------------------------------------------------------------
 
