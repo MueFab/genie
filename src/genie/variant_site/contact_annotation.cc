@@ -41,31 +41,45 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
     RECS.pop_back();
 
     auto cm_param = genie::contact::ContactMatrixParameters();
-    auto scm_param = genie::contact::SubcontactMatrixParameters();
-    auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
     cm_param.SetBinSize(RECS.front().GetBinSize());
     cm_param.SetTileSize(contactMatrixParameters.TILE_SIZE);
 
     for (auto& rec : RECS) {
-      cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
         cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
                                   rec.GetChr1Length());
         cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
                                   rec.GetChr2Length());
     }
-    cm_param.UpsertBinSizeMultiplier(contactMatrixParameters.MULT);
+    if (!contactMatrixParameters.bin_size_multipliers.empty()) {
+        for (auto mult : contactMatrixParameters.bin_size_multipliers) {
+            cm_param.UpsertBinSizeMultiplier(mult);
+        }
+    } else {
+        cm_param.UpsertBinSizeMultiplier(contactMatrixParameters.MULT);
+    }
 
-    auto& REC = RECS.front();
-    auto rec = genie::core::record::ContactRecord(REC);
-    genie::contact::encode_scm(cm_param, rec, scm_param, scm_payload, contactMatrixParameters.REMOVE_UNALIGNED_REGION,
-                               contactMatrixParameters.TRANSFORM_MASK, contactMatrixParameters.ENA_DIAG_TRANSFORM,
-                               contactMatrixParameters.ENA_BINARIZATION, contactMatrixParameters.NORM_AS_WEIGHT,
-                               contactMatrixParameters.MULTIPLICATIVE_NORM, contactMatrixParameters.CODEC_ID);
+    std::vector<genie::contact::SubcontactMatrixParameters> scm_params;
+    std::vector<genie::contact::SubcontactMatrixPayload> scm_payloads;
+    scm_params.reserve(RECS.size());
+    scm_payloads.reserve(RECS.size());
+
+    for (auto& REC : RECS) {
+        auto rec = genie::core::record::ContactRecord(REC);
+        genie::contact::SubcontactMatrixParameters scm_param;
+        genie::contact::SubcontactMatrixPayload scm_payload;
+        genie::contact::encode_scm(cm_param, rec, scm_param, scm_payload, contactMatrixParameters.REMOVE_UNALIGNED_REGION,
+                                   contactMatrixParameters.TRANSFORM_MASK, contactMatrixParameters.ENA_DIAG_TRANSFORM,
+                                   contactMatrixParameters.ENA_BINARIZATION, contactMatrixParameters.NORM_AS_WEIGHT,
+                                   contactMatrixParameters.MULTIPLICATIVE_NORM, contactMatrixParameters.CODEC_ID);
+        scm_params.push_back(std::move(scm_param));
+        scm_payloads.push_back(std::move(scm_payload));
+    }
 
     AnnotationEncoder encodingPars;
     encodingPars.setCompressors(compressors);
-    encodingPars.setContactParameters(cm_param, {scm_param});
+    encodingPars.setContactParameters(cm_param, scm_params);
 
     genie::entropy::bsc::BSCParameters bscParameters;
     auto BSCalgorithmParameters = bscParameters.convertToAlgorithmParameters();
@@ -87,7 +101,9 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
     std::map<std::string, core::parameter::annotation::AttributeData> attributeInfo;
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
     util::BitWriter writer(descriptorStream[genie::core::AnnotDesc::CONTACT]);
-    scm_payload.Write(writer);
+    for (auto& pay : scm_payloads) {
+        pay.Write(writer);
+    }
     core::access_unit::annotation::AccessUnit annotationAccessUnit;
     // add LINK_ID default values
     uint64_t linkIdRowCnt = 0;

@@ -39,6 +39,7 @@ struct ContactMatrixParameters {
     genie::core::AlgoID CODEC_ID{genie::core::AlgoID::JBIG};
     uint32_t TILE_SIZE{150u};
     uint32_t MULT{1u};
+    std::vector<uint32_t> bin_size_multipliers{};
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -19,7 +19,8 @@ struct ContactTestDetails {
                      bool REMOVE_UNALIGNED_REGION, bool TRANSFORM_MASK,
                      bool ENA_DIAG_TRANSFORM, bool ENA_BINARIZATION,
                      bool NORM_AS_WEIGHT, bool MULTIPLICATIVE_NORM,
-                     uint32_t TILE_SIZE, uint32_t MULT = 1u){//, std::vector<uint32_t> BINSIZEMULT ={}) {
+                     uint32_t TILE_SIZE, uint32_t MULT = 1u,
+                     std::vector<uint32_t> BINSIZEMULT = {}) {
     filename = contactin;
     cm_pars.REMOVE_UNALIGNED_REGION = REMOVE_UNALIGNED_REGION;
     cm_pars.TRANSFORM_MASK = TRANSFORM_MASK;
@@ -27,16 +28,16 @@ struct ContactTestDetails {
     cm_pars.ENA_BINARIZATION = ENA_BINARIZATION;
     cm_pars.NORM_AS_WEIGHT = NORM_AS_WEIGHT;
     cm_pars.MULTIPLICATIVE_NORM = MULTIPLICATIVE_NORM;
-    cm_pars.CODEC_ID = genie::core::AlgoID::JBIG, cm_pars.TILE_SIZE = TILE_SIZE;
+    cm_pars.CODEC_ID = genie::core::AlgoID::JBIG;
+    cm_pars.TILE_SIZE = TILE_SIZE;
     cm_pars.MULT = MULT;
+    cm_pars.bin_size_multipliers = BINSIZEMULT;
     outputfile = casename;
-    //binSizemultipliers = BINSIZEMULT;
   }
 
   std::string filename;
   std::string outputfile;
   genie::annotation::ContactMatrixParameters cm_pars;
- // std::vector<uint32_t> binSizemultipliers;
 };
 
 class AnnotationContactTests
@@ -114,13 +115,21 @@ INSTANTIATE_TEST_SUITE_P(
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_22.cont",
             false, false, true, true, true, false, 150),
         ContactTestDetails(
+            "CASE05",
+            "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21-mult_samples.cont",
+            false, false, true, true, true, false, 1000),
+        ContactTestDetails(
+            "CASE06",
+            "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_22-mult_samples.cont",
+            false, false, true, true, true, false, 1000),
+        ContactTestDetails(
             "CASE07",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-50000-21_21.cont",
             false, false, true, true, true, false, 1000, 5u),
         ContactTestDetails(
             "CASE08",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-50000-21_21.cont",
-            false, false, true, true, true, false, 150, 5u),//, {1,5}),
+            false, false, true, true, true, false, 150, 5u, {1, 5}),
         ContactTestDetails(
             "CASE09",
             "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont",
