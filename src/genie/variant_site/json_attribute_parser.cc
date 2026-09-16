@@ -57,9 +57,17 @@ genie::core::DataType JsonAttributeParser::InterpretType(std::string type) const
 }
 
 uint8_t JsonAttributeParser::InterpretSize(std::string size) const {
-    auto str = size.c_str();
-    if (std::isdigit(size[0])) return static_cast<uint8_t>(atoi(str));
-    // size == '.'
+    if (size.empty()) {
+        return 1;
+    }
+    if (std::isdigit(static_cast<unsigned char>(size[0]))) {
+        return static_cast<uint8_t>(std::atoi(size.c_str()));
+    }
+    // VCF variable size specifiers:
+    // '.' : unknown / variable length (defaults to 1 element per attribute slot)
+    // 'A' : 1 per alternate allele
+    // 'R' : 1 per allele (ref + alt)
+    // 'G' : 1 per possible genotype
     return 1;
 }
 

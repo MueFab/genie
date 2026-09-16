@@ -355,7 +355,7 @@ RandomAnnotationEncodingParameters::randomAnnotationEncodingParameters() {
         n_compressors, compressor_parameter_set, n_attributes, attribute_parameter_set);
 }
 
-genie::core::parameter::annotation::Record
+genie::core::parameter::annotation::ParameterSet
 RandomAnnotationEncodingParameters::randomAnnotationParameterSet() {
     uint8_t parameter_set_ID = randomU8();
     uint8_t AT_ID = randomU8();
@@ -369,7 +369,7 @@ RandomAnnotationEncodingParameters::randomAnnotationParameterSet() {
 
     genie::core::parameter::annotation::AnnotationEncodingParameters annotation_encoding_parameters;
 
-    return genie::core::parameter::annotation::Record(parameter_set_ID, AT_ID, AT_alphabet_ID, AT_coord_size,
+    return genie::core::parameter::annotation::ParameterSet(parameter_set_ID, AT_ID, AT_alphabet_ID, AT_coord_size,
                                                                  AT_pos_40_bits_flag, n_aux_attribute_groups,
                                                                  tile_configuration, annotation_encoding_parameters);
 }

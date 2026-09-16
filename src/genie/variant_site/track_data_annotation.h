@@ -26,8 +26,8 @@ namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 struct TrackUnits {
-    core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
+    core::parameter::annotation::ParameterSet annotationParameterSet;
+    std::vector<core::access_unit::annotation::AccessUnit> annotationAccessUnit;
 };
 
 class TrackDataAnnotation {
@@ -62,8 +62,8 @@ class TrackDataAnnotation {
         core::AnnotDesc::LINKID};
 
     variant_site::    AccessUnitComposer accessUnitcomposer;
-    core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
+    core::parameter::annotation::ParameterSet annotationParameterSet;
+    std::vector<core::access_unit::annotation::AccessUnit> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
     uint64_t numberOfRecords{0};

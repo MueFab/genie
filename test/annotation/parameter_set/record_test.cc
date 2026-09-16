@@ -7,7 +7,7 @@
 #include "random_record_fill_in.h"
 // #include "genie/contact/contact_matrix_parameters.h"
 #include "genie/core/array_type.h"
-#include "genie/core/parameter/annotation/record.h"
+#include "genie/core/parameter/annotation/parameter_set.h"
 #include "genie/likelihood/likelihood_parameters.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -34,8 +34,8 @@ class AnnotationParameterSetTests : public ::testing::Test {
 
 TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandomBitWriter) {  // NOLINT(cert-err58-cpp)
     RandomAnnotationEncodingParameters RandomContactMatrixParameters;
-    genie::core::parameter::annotation::Record annotationParameterSet;
-    genie::core::parameter::annotation::Record annotationParameterSetCheck;
+    genie::core::parameter::annotation::ParameterSet annotationParameterSet;
+    genie::core::parameter::annotation::ParameterSet annotationParameterSetCheck;
 
     annotationParameterSet = RandomContactMatrixParameters.randomAnnotationParameterSet();
 
@@ -209,7 +209,7 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
     genie::core::parameter::annotation::AnnotationEncodingParameters annotation_encoding_parameters(
         filters, features, ontologyTerms, descriptor_configuration, compressor_parameter_set, attribute_parameter_set);
 
-    genie::core::parameter::annotation::Record annotationParameterSet(
+    genie::core::parameter::annotation::ParameterSet annotationParameterSet(
         parameter_set_ID, AT_ID, AT_alphabet_ID, AT_coord_size, AT_pos_40_bits_flag, n_aux_attribute_groups,
         tileConfigurationArray, annotation_encoding_parameters);
 
@@ -232,7 +232,7 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
         txtfile.close();
     }
 
-    genie::core::parameter::annotation::Record annotationParameterSetCheck;
+    genie::core::parameter::annotation::ParameterSet annotationParameterSetCheck;
     std::ifstream inputfile;
     inputfile.open(name + ".bin", std::ios::binary);
     if (inputfile.is_open()) {

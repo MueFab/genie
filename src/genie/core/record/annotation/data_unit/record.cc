@@ -40,12 +40,12 @@ Record::Record(AccessUnit& _accessUnit)
 
 // -------------------------------------------------------------------------------------------------
 
-Record::Record(parameter::annotation::Record& _annotationParameterSet)
+Record::Record(parameter::annotation::ParameterSet& _annotationParameterSet)
     : data_unit_type_(3), data_unit_size_(0), annotation_parameter_set_(_annotationParameterSet) {}
 
 // -------------------------------------------------------------------------------------------------
 
-Record::Record(access_unit::annotation::Record& _annotationAccessUnit)
+Record::Record(access_unit::annotation::AccessUnit& _annotationAccessUnit)
     : data_unit_type_(4), data_unit_size_(0) {
   annotation_access_unit_ = _annotationAccessUnit;
 }

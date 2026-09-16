@@ -33,7 +33,6 @@ class ProgramOptions {
     std::string inputFile;  //!< @brief
     std::string outputFile;  //!< @brief
     std::string infoFields;  //!< @brief
-    std::string configFile;  //!< @brief
 
     bool forceOverwrite;  //!< @brief
     std::string task;     //!< @brief

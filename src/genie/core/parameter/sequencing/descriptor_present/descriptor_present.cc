@@ -5,14 +5,14 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/core/parameter/descriptor_present/descriptor_present.h"
+#include "genie/core/parameter/sequencing/descriptor_present/descriptor_present.h"
 
 #include <memory>
 #include <utility>
 
 #include "genie/core/global_cfg.h"
-#include "genie/core/parameter/descriptor_present/decoder_regular.h"
-#include "genie/core/parameter/descriptor_present/decoder_token_type.h"
+#include "genie/core/parameter/sequencing/descriptor_present/decoder_regular.h"
+#include "genie/core/parameter/sequencing/descriptor_present/decoder_token_type.h"
 
 // -----------------------------------------------------------------------------
 

@@ -340,4 +340,29 @@ TEST_F(JBIGTestCase, JBIGLargePayloadTest) { // NOLINT(cert-err58-cpp)
     EXPECT_EQ(original_data, decompressed);
 }
 
+TEST_F(JBIGTestCase, JBIGZeroLengthAndDimensionsTest) { // NOLINT(cert-err58-cpp)
+    genie::entropy::jbig::JBIGEncoder encoder;
+    std::vector<uint8_t> empty_input;
+    std::vector<uint8_t> compressed;
+    
+    // Empty buffer with nonzero dims
+    encoder.encode(empty_input, compressed, 100, 100);
+    EXPECT_TRUE(compressed.empty());
+
+    // Non-empty buffer with 0 ncols
+    std::vector<uint8_t> non_empty_input = {0x01, 0x02};
+    encoder.encode(non_empty_input, compressed, 0, 100);
+    EXPECT_TRUE(compressed.empty());
+
+    // Non-empty buffer with 0 nrows
+    encoder.encode(non_empty_input, compressed, 100, 0);
+    EXPECT_TRUE(compressed.empty());
+
+    // Stream encode with empty stream
+    std::stringstream empty_stream_in;
+    std::stringstream stream_out;
+    encoder.encode(empty_stream_in, stream_out, 100, 100);
+    EXPECT_EQ(stream_out.str().size(), 0);
+}
+
 

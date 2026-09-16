@@ -5,36 +5,49 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/core/parameter/descriptor_present/decoder.h"
+#include "genie/core/parameter/sequencing/data_unit.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::core::parameter::desc_pres {
+namespace genie::core::parameter {
 
 // -----------------------------------------------------------------------------
 
-void Decoder::Write(util::BitWriter& writer) const {
-  writer.WriteBits(encoding_mode_id_, 8);
+DataUnit::DataUnit(const DataUnitType& t) : data_unit_type_(t) {}
+
+// -----------------------------------------------------------------------------
+
+void DataUnit::Write(util::BitWriter& writer) const {
+  writer.WriteBits(static_cast<uint64_t>(data_unit_type_), 8);
 }
 
 // -----------------------------------------------------------------------------
 
-uint8_t Decoder::GetMode() const { return encoding_mode_id_; }
-
-// -----------------------------------------------------------------------------
-
-Decoder::Decoder(const uint8_t encoding_mode_id)
-    : encoding_mode_id_(encoding_mode_id) {}
-
-// -----------------------------------------------------------------------------
-
-bool Decoder::Equals(const Decoder* dec) const {
-  return encoding_mode_id_ == dec->encoding_mode_id_;
+DataUnit::DataUnitType DataUnit::GetDataUnitType() const {
+  return data_unit_type_;
 }
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::core::parameter::desc_pres
+void DataUnit::PrintDebug(std::ostream& output, uint8_t, uint8_t) const {
+  output << "* Data Unit: ";
+  switch (data_unit_type_) {
+    case DataUnitType::kRawReference:
+      output << "raw reference";
+      break;
+    case DataUnitType::kParameterSet:
+      output << "parameter set";
+      break;
+    case DataUnitType::kAccessUnit:
+      output << "access unit";
+      break;
+  }
+  output << std::endl;
+}
+
+// -----------------------------------------------------------------------------
+
+}  // namespace genie::core::parameter
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

@@ -5,6 +5,7 @@
  */
 
 #include "genie/variant_site/annotation.h"
+#include "genie/variant_site/json_attribute_parser.h"
 
 #include <gtest/gtest.h>
 
@@ -107,6 +108,26 @@ TEST_F(AnnotationTests, compressorConfigcompressors) {
   config << set1 << '\n' << set2 << '\n' << set3 << '\n';
   compressors.parseConfig(config);
   EXPECT_EQ(compressors.getNrOfCompressorIDs(), 2);
+}
+
+TEST_F(AnnotationTests, jsonAttributeParserVariableSizes) {
+  std::stringstream json_stream;
+  json_stream << "[{\"ID\":\"DP\",\"Type\":\"1\",\"Number\":\"1\"},"
+              << "{\"ID\":\"AF\",\"Type\":\"2\",\"Number\":\"A\"},"
+              << "{\"ID\":\"VAR\",\"Type\":\"1\",\"Number\":\".\"},"
+              << "{\"ID\":\"GEN\",\"Type\":\"1\",\"Number\":\"G\"}]";
+
+  genie::annotation::JsonAttributeParser parser(json_stream);
+  auto fields = parser.getInfoFields();
+  ASSERT_EQ(fields.size(), 4);
+  EXPECT_EQ(fields[0].ID, "DP");
+  EXPECT_EQ(fields[0].Number, 1);
+  EXPECT_EQ(fields[1].ID, "AF");
+  EXPECT_EQ(fields[1].Number, 1); // 'A' falls back to 1
+  EXPECT_EQ(fields[2].ID, "VAR");
+  EXPECT_EQ(fields[2].Number, 1); // '.' falls back to 1
+  EXPECT_EQ(fields[3].ID, "GEN");
+  EXPECT_EQ(fields[3].Number, 1); // 'G' falls back to 1
 }
 
 const bool RUNBIGFILES = true;

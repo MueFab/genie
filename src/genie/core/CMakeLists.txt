@@ -1,18 +1,18 @@
 project("genie-core")
 
 set(source_files
-        parameter/descriptor_present/decoder.cc
-        parameter/descriptor_present/decoder_regular.cc
-        parameter/descriptor_present/decoder_token_type.cc
-        parameter/descriptor_present/descriptor_present.cc
+        parameter/sequencing/descriptor_present/decoder.cc
+        parameter/sequencing/descriptor_present/decoder_regular.cc
+        parameter/sequencing/descriptor_present/decoder_token_type.cc
+        parameter/sequencing/descriptor_present/descriptor_present.cc
 
-        parameter/computed_ref.cc
-        parameter/computed_ref_extended.cc
-        parameter/data_unit.cc
-        parameter/descriptor.cc
-        parameter/descriptor_sub_sequence_cfg.cc
-        parameter/parameter_set.cc
-        parameter/quality_values.cc
+        parameter/sequencing/computed_ref.cc
+        parameter/sequencing/computed_ref_extended.cc
+        parameter/sequencing/data_unit.cc
+        parameter/sequencing/descriptor.cc
+        parameter/sequencing/descriptor_sub_sequence_cfg.cc
+        parameter/sequencing/parameter_set.cc
+        parameter/sequencing/quality_values.cc
 
         record/sequencing/alignment_external/none.cc
         record/sequencing/alignment_external/other_rec.cc
@@ -41,7 +41,7 @@ set(source_files
         record/annotation/track_property/record.cc
         record/annotation/track/record.cc
 
-        access_unit/annotation/record.cc
+        access_unit/annotation/access_unit.cc
         access_unit/annotation/block.cc
         access_unit/annotation/block_header.cc
         access_unit/annotation/block_payload.cc
@@ -49,7 +49,7 @@ set(source_files
         access_unit/annotation/annotation_access_unit_header.cc
         access_unit/annotation/typed_data.cc
 
-        parameter/annotation/record.cc
+        parameter/annotation/parameter_set.cc
         parameter/annotation/attribute_parameter_set.cc
         parameter/annotation/algorithm_parameters.cc
         parameter/annotation/tile_configuration.cc

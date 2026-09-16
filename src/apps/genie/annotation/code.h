@@ -16,9 +16,9 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/access_unit/annotation/record.h"
+#include "genie/core/access_unit/annotation/access_unit.h"
 #include "genie/core/parameter/annotation/descriptor_configuration.h"
-#include "genie/core/parameter/annotation/record.h"
+#include "genie/core/parameter/annotation/parameter_set.h"
 #include "genie/core/record/annotation/site/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -31,21 +31,20 @@ namespace annotation {
  */
 class Code {
  public:
-    /**
-     * @brief
-     */
+    Code() = default;
     Code(const std::string& _inputFileName, const std::string& _outputFileName);
-    Code(const std::string& _inputFileName, const std::string& _outputFileName, const std::string& _jsonInfoFileName);
+    Code(const std::string& _inputFileName, const std::string& _outputFileName,
+         const std::string& _infoFieldsFileName);
     Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput);
     Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,
-         const std::string& rec = std::string("all"));
-
-    Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,
-         const std::string& _infoFieldsFileName, const std::string& rec = std::string("all"));
+         const std::string& rec);
+    Code(const std::string& inputFileName, const std::string& outputFileName,
+         bool testOutput, const std::string& infoFieldsFileName,
+         const std::string& _rec = "");
 
  private:
-    using AnnotationParameterSet = genie::core::parameter::annotation::Record;
-    using AnnotationAccessUnit = genie::core::access_unit::annotation::Record;
+    using AnnotationParameterSet = genie::core::parameter::annotation::ParameterSet;
+    using AnnotationAccessUnit = genie::core::access_unit::annotation::AccessUnit;
     using DescriptorConfiguration = genie::core::parameter::annotation::DescriptorConfiguration;
     using AnnotationEncodingParameters = genie::core::parameter::annotation::AnnotationEncodingParameters;
 };

@@ -17,7 +17,7 @@
 #include <sstream>
 #include <vector>
 #include <cstdint>
-#include "genie/core/parameter/annotation/record.h"
+#include "genie/core/parameter/annotation/parameter_set.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

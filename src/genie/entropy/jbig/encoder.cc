@@ -33,6 +33,9 @@ void JBIGEncoder::encode(
     uint32_t nrows
 ) {
     const size_t srcLen = input.str().size();
+    if (srcLen == 0 || ncols == 0 || nrows == 0) {
+        return;
+    }
     unsigned char* compressedBuffer = nullptr;
     size_t compSize = 0;
 
@@ -70,8 +73,9 @@ void JBIGEncoder::encode(
     uint32_t ncols,
     uint32_t nrows
 ) {
+    output.clear();
     const size_t srcLen = input.size();
-    if (srcLen == 0) return;
+    if (srcLen == 0 || ncols == 0 || nrows == 0) return;
 
     unsigned char* compressedBuffer = nullptr;
     size_t dest_data_len = 0;

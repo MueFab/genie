@@ -5,7 +5,7 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/core/parameter/quality_values.h"
+#include "genie/core/parameter/sequencing/quality_values.h"
 
 // -----------------------------------------------------------------------------
 

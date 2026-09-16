@@ -31,7 +31,7 @@
 namespace genie {
 namespace variant_site {
 
-genie::core::parameter::annotation::Record ParameterSetComposer::setParameterSet(
+genie::core::parameter::annotation::ParameterSet ParameterSetComposer::setParameterSet(
     std::vector<genie::core::AnnotDesc> descrList,
     std::map<std::string, genie::core::parameter::annotation::AttributeData>& info,
     uint64_t defaultTileSize, uint8_t AT_ID) {
@@ -51,7 +51,7 @@ genie::core::parameter::annotation::Record ParameterSetComposer::setParameterSet
     return setParameterSet(descrList, info, compressor_parameter_set, defaultTileSize, AT_ID);
 }
 
-genie::core::parameter::annotation::Record ParameterSetComposer::setParameterSet(
+genie::core::parameter::annotation::ParameterSet ParameterSetComposer::setParameterSet(
     std::vector<genie::core::AnnotDesc> descrList,
     std::map<std::string, genie::core::parameter::annotation::AttributeData>& info,
     const std::vector<genie::core::parameter::annotation::CompressorParameterSet>& compressor_parameter_set,
@@ -152,14 +152,14 @@ genie::core::parameter::annotation::Record ParameterSetComposer::setParameterSet
         n_ontology_terms, ontology_term_name_len, ontology_term_name, n_descriptors, descriptor_configuration,
         n_compressors, compressor_parameter_set, n_attributes, attribute_parameter_set);
 
-    genie::core::parameter::annotation::Record annotationParameterSet(
+    genie::core::parameter::annotation::ParameterSet annotationParameterSet(
         defaultset.parameter_set_ID, defaultset.AT_ID, defaultset.AT_alphabet_ID, defaultset.ATCoordSize,
         defaultset.AT_pos_40_bits_flag, defaultset.n_aux_attribute_groups, tile_configurations,
         annotation_encoding_parameters);
     return annotationParameterSet;
 }
 
-genie::core::parameter::annotation::Record ParameterSetComposer::setParameterSet(
+genie::core::parameter::annotation::ParameterSet ParameterSetComposer::setParameterSet(
     std::vector<genie::core::AnnotDesc> descrList,
     std::map<std::string, genie::core::parameter::annotation::AttributeData>& info,
     genie::annotation::Compressor compressors, uint64_t defaultTileSize) {
@@ -259,14 +259,14 @@ genie::core::parameter::annotation::Record ParameterSetComposer::setParameterSet
         n_ontology_terms, ontology_term_name_len, ontology_term_name, n_descriptors, descriptor_configuration,
         n_compressors, compressors.getCompressorParameters(), n_attributes, attribute_parameter_set);
 
-    genie::core::parameter::annotation::Record annotationParameterSet(
+    genie::core::parameter::annotation::ParameterSet annotationParameterSet(
         defaultset.parameter_set_ID, defaultset.AT_ID, defaultset.AT_alphabet_ID, defaultset.ATCoordSize,
         defaultset.AT_pos_40_bits_flag, defaultset.n_aux_attribute_groups, tile_configurations,
         annotation_encoding_parameters);
     return annotationParameterSet;
 }
 
-genie::core::parameter::annotation::Record ParameterSetComposer::Compose(
+genie::core::parameter::annotation::ParameterSet ParameterSetComposer::Compose(
     uint8_t AT_ID, uint8_t AG_class, std::pair<uint64_t, uint64_t> tile_Size,
     core::parameter::annotation::AnnotationEncodingParameters& annotationEncodingpars) {
     const uint8_t ATCoordSize = 3;
@@ -280,7 +280,7 @@ genie::core::parameter::annotation::Record ParameterSetComposer::Compose(
     tile_configurations.emplace_back(genie::core::parameter::annotation::TileConfiguration{
         ATCoordSize, AG_class, {tile_Size.first, tile_Size.second}});
 
-    genie::core::parameter::annotation::Record annotationParameterSet(
+    genie::core::parameter::annotation::ParameterSet annotationParameterSet(
         parameter_set_ID, AT_ID, AT_alphabet_ID, ATCoordSize, AT_pos_40_bits_flag, n_aux_attribute_groups,
         tile_configurations, annotationEncodingpars);
     return annotationParameterSet;

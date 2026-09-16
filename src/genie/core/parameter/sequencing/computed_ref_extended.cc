@@ -5,7 +5,7 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/core/parameter/computed_ref_extended.h"
+#include "genie/core/parameter/sequencing/computed_ref_extended.h"
 
 // -----------------------------------------------------------------------------
 

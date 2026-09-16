@@ -26,8 +26,8 @@ namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 struct FunctionalAnnotationUnits {
-    core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
+    core::parameter::annotation::ParameterSet annotationParameterSet;
+    std::vector<core::access_unit::annotation::AccessUnit> annotationAccessUnit;
 };
 
 class FunctionalAnnotation {
@@ -62,8 +62,8 @@ class FunctionalAnnotation {
         core::AnnotDesc::ONTOLOGYNAME, core::AnnotDesc::ONTOLOGYID};
 
     variant_site::    AccessUnitComposer accessUnitcomposer;
-    core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
+    core::parameter::annotation::ParameterSet annotationParameterSet;
+    std::vector<core::access_unit::annotation::AccessUnit> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
     uint8_t annotationSubtype_{3};

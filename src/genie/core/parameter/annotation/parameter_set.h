@@ -1,0 +1,93 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+#ifndef SRC_GENIE_CORE_PARAMETER_ANNOTATION_PARAMETER_SET_H_
+#define SRC_GENIE_CORE_PARAMETER_ANNOTATION_PARAMETER_SET_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <cstdint>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "genie/core/constants.h"
+#include "genie/core/parameter/annotation/annotation_encoding_parameters.h"
+#include "genie/core/parameter/annotation/tile_configuration.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+namespace genie::core::parameter::annotation {
+
+/**
+ * @brief ISO/IEC 23092-6 Annotation Parameter Set
+ */
+class ParameterSet {
+ private:
+    uint8_t parameter_set_ID;
+    uint8_t AT_ID;
+    core::AlphabetId AT_alphabet_ID;
+    uint8_t AT_coord_size;
+    bool AT_pos_40_bits_flag;
+    uint8_t n_aux_attribute_groups;
+    std::vector<TileConfiguration> tile_configuration;
+    AnnotationEncodingParameters annotation_encoding_parameters;
+
+ public:
+    /**
+     * @brief Default constructor
+     */
+    ParameterSet();
+
+    ParameterSet(uint8_t parameter_set_ID, uint8_t AT_ID, core::AlphabetId AT_alphabet_ID, uint8_t AT_coord_size,
+                 bool AT_pos_40_bits_flag, uint8_t n_aux_attribute_groups, std::vector<TileConfiguration> tile_configuration,
+                 AnnotationEncodingParameters annotation_encoding_parameters);
+
+    void read(util::BitReader& reader);
+    void write(util::BitWriter& writer) const;
+
+    [[nodiscard]] size_t getSize() const;
+
+    [[nodiscard]] uint8_t getParameterSetID() const { return parameter_set_ID; }
+    [[nodiscard]] uint8_t getATID() const { return AT_ID; }
+    [[nodiscard]] core::AlphabetId getATAlphbetID() const { return AT_alphabet_ID; }
+    [[nodiscard]] uint8_t getATCoordSize() const { return AT_coord_size; }
+    [[nodiscard]] bool isATPos40Bits() const { return AT_pos_40_bits_flag; }
+    [[nodiscard]] uint8_t getNumberOfAuxAttributeGroups() const { return n_aux_attribute_groups; }
+    [[nodiscard]] const std::vector<TileConfiguration>& getTileConfigurations() const { return tile_configuration; }
+    [[nodiscard]] std::vector<TileConfiguration>& getTileConfigurations() { return tile_configuration; }
+    [[nodiscard]] const AnnotationEncodingParameters& getAnnotationEncodingParameters() const { return annotation_encoding_parameters; }
+    [[nodiscard]] AnnotationEncodingParameters& getAnnotationEncodingParameters() { return annotation_encoding_parameters; }
+};
+
+struct ParameterSettings {
+    uint8_t parameter_set_ID;
+    uint8_t AT_ID;
+    uint8_t AG_class;
+    core::AlphabetId AT_alphabet_ID;
+    uint8_t ATCoordSize;
+    bool AT_pos_40_bits_flag;
+    uint8_t n_aux_attribute_groups;
+    TileParameterSettings tileParameterSettings;
+
+    ParameterSettings()
+        : parameter_set_ID(1),
+          AT_ID(0),
+          AG_class(0),
+          AT_alphabet_ID(core::AlphabetId::kAcgtn),
+          ATCoordSize(3),
+          AT_pos_40_bits_flag(false),
+          n_aux_attribute_groups(0),
+          tileParameterSettings() {}
+};
+
+}  // namespace genie::core::parameter::annotation
+
+#endif  // SRC_GENIE_CORE_PARAMETER_ANNOTATION_PARAMETER_SET_H_

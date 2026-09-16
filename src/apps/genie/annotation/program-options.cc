@@ -44,7 +44,6 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     app.add_flag("-f,--force", forceOverwrite, "Overwrite existing output files\n");
     infoFields = "";
     app.add_option("-j, --info", infoFields, "json file with infoField information\n");
-    configFile = "";  //!< @brief
 
     try {
         app.parse(argc, argv);

@@ -88,7 +88,7 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
     util::BitWriter writer(descriptorStream[genie::core::AnnotDesc::CONTACT]);
     scm_payload.Write(writer);
-    core::access_unit::annotation::Record annotationAccessUnit;
+    core::access_unit::annotation::AccessUnit annotationAccessUnit;
     // add LINK_ID default values
     uint64_t linkIdRowCnt = 0;
     for (auto idx_j = 0u; idx_j < defaultTileSizeHeight && linkIdRowCnt < RECS.size(); ++idx_j, ++linkIdRowCnt) {

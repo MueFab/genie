@@ -119,11 +119,11 @@ void encodeVariantSite(const std::string& _inputFileName,
   for (auto& tile : tile_descriptorStream) descrList.push_back(tile.first);
 
   genie::variant_site::ParameterSetComposer encodeParameters;
-  genie::core::parameter::annotation::Record annotationParameterSet =
+  genie::core::parameter::annotation::ParameterSet annotationParameterSet =
       encodeParameters.setParameterSet(descrList, info,
                                        parser.getNumberOfRows(), AT_ID);
 
-  std::vector<genie::core::access_unit::annotation::Record>
+  std::vector<genie::core::access_unit::annotation::AccessUnit>
       annotationAccessUnit(parser.getNrOfTiles());
 
   genie::variant_site::AccessUnitComposer accessUnit;
@@ -245,7 +245,7 @@ void encodeVariantGenotype(const std::string& _input_fpath,
       genie::core::AnnotDesc::GENOTYPE,
       genie::core::AnnotDesc::LIKELIHOOD
   };
-  genie::core::parameter::annotation::Record annotationParameterSet =
+  genie::core::parameter::annotation::ParameterSet annotationParameterSet =
       genotypeParameterSet.setParameterSet(descrList, info, recs.size(), AT_ID);
 
   genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
@@ -289,7 +289,7 @@ void encodeVariantGenotype(const std::string& _input_fpath,
       descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
   }*/
   genie::variant_site::AccessUnitComposer accessUnitcomposer;
-  genie::core::access_unit::annotation::Record annotationAccessUnit;
+  genie::core::access_unit::annotation::AccessUnit annotationAccessUnit;
 
   accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream,
                                    attributesInfo, annotationParameterSet,

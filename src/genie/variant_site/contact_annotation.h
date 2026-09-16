@@ -15,8 +15,8 @@
 
 #include "genie/contact/contact_coder.h"
 #include "genie/core/record/annotation/genotype/record.h"
-#include "genie/core/parameter/annotation/record.h"
-#include "genie/core/access_unit/annotation/record.h"
+#include "genie/core/parameter/annotation/parameter_set.h"
+#include "genie/core/access_unit/annotation/access_unit.h"
 
 #include "genie/variant_site/vsite_parameterset_composer.h"
 #include "genie/variant_site/compressors.h"
@@ -26,8 +26,8 @@ namespace genie {
 namespace annotation {
 
 struct CMUnits {
-    core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
+    core::parameter::annotation::ParameterSet annotationParameterSet;
+    std::vector<core::access_unit::annotation::AccessUnit> annotationAccessUnit;
 };
 struct ContactMatrixParameters {
     bool REMOVE_UNALIGNED_REGION{false};

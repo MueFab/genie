@@ -32,8 +32,8 @@ void AccessUnitComposer::setAccessUnit(
     std::map<core::AnnotDesc, std::stringstream>& _descriptorStream,
     std::map<std::string, core::access_unit::annotation::TypedData>& _attributeTileStream,
     std::map<std::string, core::parameter::annotation::AttributeData> _attributeInfo,
-    const core::parameter::annotation::Record& _annotationParameterSet,
-    core::access_unit::annotation::Record& _annotationAccessUnit, uint8_t _AG_class, uint8_t _AT_ID,
+    const core::parameter::annotation::ParameterSet& _annotationParameterSet,
+    core::access_unit::annotation::AccessUnit& _annotationAccessUnit, uint8_t _AG_class, uint8_t _AT_ID,
     uint64_t _rowIndex) {
     setAccessUnit(_descriptorStream, _attributeTileStream, _attributeInfo, _annotationParameterSet,
                   _annotationAccessUnit, _AG_class, _AT_ID, _rowIndex, 0);
@@ -42,8 +42,8 @@ void AccessUnitComposer::setAccessUnit(
     std::map<core::AnnotDesc, std::stringstream>& _descriptorStream,
     std::map<std::string, core::access_unit::annotation::TypedData>& _attributeTileStream,
     std::map<std::string, core::parameter::annotation::AttributeData> _attributeInfo,
-    const core::parameter::annotation::Record& _annotationParameterSet,
-    core::access_unit::annotation::Record& _annotationAccessUnit, uint8_t _AG_class, uint8_t _AT_ID,
+    const core::parameter::annotation::ParameterSet& _annotationParameterSet,
+    core::access_unit::annotation::AccessUnit& _annotationAccessUnit, uint8_t _AG_class, uint8_t _AT_ID,
     uint64_t _rowIndex, uint64_t _colIndex) {
     tile_index_2 = _colIndex;
     tile_index_1 = _rowIndex;
@@ -58,7 +58,11 @@ void AccessUnitComposer::setAccessUnit(
     // -------- descriptors ---------- //
     auto descriptorConfigurations =
         _annotationParameterSet.getAnnotationEncodingParameters().getDescriptorConfigurations();
-    std::map<core::AnnotDesc, std::stringstream> encodedDescriptors;
+    auto numDescriptors = descriptorConfigurations.size();
+    auto numAttributes = _attributeTileStream.size();
+
+    // ---------------------- block payload ---------------------- //
+    std::map<genie::core::AnnotDesc, std::stringstream> encodedDescriptors;
     compress(descriptorConfigurations, _descriptorStream, encodedDescriptors);
 
     for (auto it = encodedDescriptors.begin(); it != encodedDescriptors.end(); ++it) {
@@ -112,7 +116,7 @@ void AccessUnitComposer::setAccessUnit(
         attributeContiguity, twoDimensional, columnMajorTileOrder, variable_size_tiles, ATCoordSize, is_attribute,
         attribute_ID, descriptor_ID, n_tiles_per_col, n_tiles_per_row, n_blocks, tile_index_1, tile_index_2_exists,
         tile_index_2);
-    genie::core::access_unit::annotation::Record annotationAccessUnit(
+    genie::core::access_unit::annotation::AccessUnit annotationAccessUnit(
         AT_ID, AT_type, AT_subtype, AG_class, annotationAccessUnitHeadertot, blocks, attributeContiguity,
         twoDimensional, columnMajorTileOrder, ATCoordSize, variable_size_tiles, n_blocks, numChrs);
     _annotationAccessUnit = annotationAccessUnit;

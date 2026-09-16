@@ -21,7 +21,7 @@
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
  
-#include "genie/core/parameter/annotation/record.h"
+#include "genie/core/parameter/annotation/parameter_set.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
 #include "genie/variant_site/compressors.h"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -33,24 +33,24 @@ class ParameterSetComposer {
  public:
     ParameterSetComposer() {}
  
-    genie::core::parameter::annotation::Record setParameterSet(
+    genie::core::parameter::annotation::ParameterSet setParameterSet(
         std::vector<genie::core::AnnotDesc> descrList,
         std::map<std::string, genie::core::parameter::annotation::AttributeData>& info,
         uint64_t defaultTileSize, uint8_t AT_ID);
  
-    genie::core::parameter::annotation::Record setParameterSet(
+    genie::core::parameter::annotation::ParameterSet setParameterSet(
         std::vector<genie::core::AnnotDesc> descrList,
         std::map<std::string, genie::core::parameter::annotation::AttributeData>& info,
         const std::vector<genie::core::parameter::annotation::CompressorParameterSet>& compressors,
         uint64_t defaultTileSize, uint8_t _AT_ID);
  
-    genie::core::parameter::annotation::Record setParameterSet(
+    genie::core::parameter::annotation::ParameterSet setParameterSet(
         std::vector<genie::core::AnnotDesc> descrList,
         std::map<std::string, genie::core::parameter::annotation::AttributeData>& info,
         genie::annotation::Compressor compressors,
         uint64_t defaultTileSize);
  
-    genie::core::parameter::annotation::Record Compose(
+    genie::core::parameter::annotation::ParameterSet Compose(
         uint8_t AT_ID, uint8_t AG_class, std::pair<uint64_t, uint64_t> tile_Size,
         core::parameter::annotation::AnnotationEncodingParameters& annotationEncodingpars);
  

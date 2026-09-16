@@ -26,8 +26,8 @@ namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 struct SiteUnits {
-    core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
+    core::parameter::annotation::ParameterSet annotationParameterSet;
+    std::vector<core::access_unit::annotation::AccessUnit> annotationAccessUnit;
 };
 
 class SiteAnnotation {
@@ -56,8 +56,8 @@ class SiteAnnotation {
 
 
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
-    genie::core::parameter::annotation::Record annotationParameterSet;
-    std::vector<genie::core::access_unit::annotation::Record> annotationAccessUnit;
+    genie::core::parameter::annotation::ParameterSet annotationParameterSet;
+    std::vector<genie::core::access_unit::annotation::AccessUnit> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
 };

@@ -21,7 +21,7 @@
 #include "genie/core/parameter/annotation/annotation_encoding_parameters.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
 #include "genie/core/parameter/annotation/descriptor_configuration.h"
-#include "genie/core/parameter/annotation/record.h"
+#include "genie/core/parameter/annotation/parameter_set.h"
 
 
 #include "genie/entropy/bsc/encoder.h"

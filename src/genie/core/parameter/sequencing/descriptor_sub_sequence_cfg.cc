@@ -5,12 +5,12 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/core/parameter/descriptor_sub_sequence_cfg.h"
+#include "genie/core/parameter/sequencing/descriptor_sub_sequence_cfg.h"
 
 #include <memory>
 #include <utility>
 
-#include "genie/core/parameter/descriptor_present/descriptor_present.h"
+#include "genie/core/parameter/sequencing/descriptor_present/descriptor_present.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------

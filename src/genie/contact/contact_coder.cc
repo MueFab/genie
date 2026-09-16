@@ -184,11 +184,14 @@ void decode_scm_mask_payload(
 
     size_t start_idx = 0;
     for (uint32_t rl_entry : rl_entries) {
-        size_t end_idx = start_idx + rl_entry;
-        for(size_t i = start_idx; i < std::min(end_idx, num_entries); ++i) {
+        if (start_idx >= num_entries) {
+            break;
+        }
+        size_t end_idx = std::min(start_idx + static_cast<size_t>(rl_entry), num_entries);
+        for (size_t i = start_idx; i < end_idx; ++i) {
             ::genie::backend::set_arr_element(mask, i, current_val);
         }
-        start_idx = end_idx;
+        start_idx = start_idx + static_cast<size_t>(rl_entry);
         current_val = !current_val;
     }
 }

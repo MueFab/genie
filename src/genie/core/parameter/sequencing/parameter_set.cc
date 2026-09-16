@@ -5,7 +5,7 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/core/parameter/parameter_set.h"
+#include "genie/core/parameter/sequencing/parameter_set.h"
 
 #include <memory>
 #include <sstream>

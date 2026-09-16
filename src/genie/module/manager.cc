@@ -18,8 +18,8 @@
 
 #include "genie/core/global_cfg.h"
 #include "genie/core/parameter/quality_values.h"
-//#include "genie/entropy/bsc/param_decoder.h"
-//#include "genie/entropy/lzma/param_decoder.h"
+#include "genie/entropy/bsc/param_decoder.h"
+#include "genie/entropy/lzma/param_decoder.h"
 #include "genie/entropy/paramcabac/decoder.h"
 #include "genie/entropy/zstd/param_decoder.h"
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
@@ -36,8 +36,14 @@ void detect() {
         entropy::paramcabac::kModeCabac, &entropy::paramcabac::DecoderRegular::create);
     indPark.RegisterConstructor<core::parameter::desc_pres::DecoderTokenType>(
         entropy::paramcabac::kModeCabac, &entropy::paramcabac::DecoderTokenType::create);
-//    indPark.RegisterConstructor<core::parameter::QualityValues>(quality::paramqv1::QualityValues1::MODE_QV1,
-//                                                                &quality::paramqv1::QualityValues1::create);
+    indPark.RegisterConstructor<core::parameter::desc_pres::DecoderRegular>(
+        entropy::lzma::kModeLzma, &entropy::lzma::DecoderRegular::create);
+    indPark.RegisterConstructor<core::parameter::desc_pres::DecoderRegular>(
+        entropy::zstd::kModeZstd, &entropy::zstd::DecoderRegular::create);
+    indPark.RegisterConstructor<core::parameter::desc_pres::DecoderRegular>(
+        entropy::bsc::DecoderRegular::mode_bsc_, &entropy::bsc::DecoderRegular::Create);
+    indPark.RegisterConstructor<core::parameter::QualityValues>(
+        quality::paramqv1::kModeQv1, &quality::paramqv1::QualityValues1::create);
 }
 
 // -----------------------------------------------------------------------------

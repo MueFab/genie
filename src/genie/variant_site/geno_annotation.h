@@ -26,8 +26,8 @@
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_payload.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
-#include "genie/core/parameter/annotation/record.h"
-#include "genie/core/access_unit/annotation/record.h"
+#include "genie/core/parameter/annotation/parameter_set.h"
+#include "genie/core/access_unit/annotation/access_unit.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
@@ -35,8 +35,8 @@ namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
 struct GenoUnits {
-  core::parameter::annotation::Record annotationParameterSet;
-  std::vector<core::access_unit::annotation::Record>
+  core::parameter::annotation::ParameterSet annotationParameterSet;
+  std::vector<core::access_unit::annotation::AccessUnit>
       annotationAccessUnit;
 };
 

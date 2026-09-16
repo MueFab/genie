@@ -5,7 +5,9 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/core/parameter/data_unit.h"
+#include "genie/core/parameter/sequencing/descriptor.h"
+#include "genie/core/parameter/sequencing/descriptor_present/descriptor_present.h"
+#include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
@@ -13,37 +15,30 @@ namespace genie::core::parameter {
 
 // -----------------------------------------------------------------------------
 
-DataUnit::DataUnit(const DataUnitType& t) : data_unit_type_(t) {}
-
-// -----------------------------------------------------------------------------
-
-void DataUnit::Write(util::BitWriter& writer) const {
-  writer.WriteBits(static_cast<uint64_t>(data_unit_type_), 8);
+bool Descriptor::Equals(const Descriptor* desc) const {
+  return dec_cfg_preset_ == desc->dec_cfg_preset_;
 }
 
 // -----------------------------------------------------------------------------
 
-DataUnit::DataUnitType DataUnit::GetDataUnitType() const {
-  return data_unit_type_;
+void Descriptor::Write(util::BitWriter& writer) const {
+  writer.WriteBits(dec_cfg_preset_, 8);
+}
+std::unique_ptr<Descriptor> Descriptor::Factory(GenDesc desc,
+                                                util::BitReader& reader) {
+  const auto preset = reader.Read<uint8_t>();
+  UTILS_DIE_IF(preset != 0, "Invalid DecCfgPreset");
+  return std::make_unique<desc_pres::DescriptorPresent>(desc, reader);
 }
 
 // -----------------------------------------------------------------------------
 
-void DataUnit::PrintDebug(std::ostream& output, uint8_t, uint8_t) const {
-  output << "* Data Unit: ";
-  switch (data_unit_type_) {
-    case DataUnitType::kRawReference:
-      output << "raw reference";
-      break;
-    case DataUnitType::kParameterSet:
-      output << "parameter set";
-      break;
-    case DataUnitType::kAccessUnit:
-      output << "access unit";
-      break;
-  }
-  output << std::endl;
-}
+uint8_t Descriptor::GetPreset() const { return dec_cfg_preset_; }
+
+// -----------------------------------------------------------------------------
+
+Descriptor::Descriptor(const uint8_t dec_cfg_preset)
+    : dec_cfg_preset_(dec_cfg_preset) {}
 
 // -----------------------------------------------------------------------------
 

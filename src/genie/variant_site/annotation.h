@@ -80,9 +80,9 @@ class Annotation {
   genie::annotation::Compressor compressors;
   std::map<std::string, InfoField> attributeInfo;
 
-  std::vector<genie::core::parameter::annotation::Record>
+  std::vector<genie::core::parameter::annotation::ParameterSet>
       annotationParameterSet;
-  std::vector<genie::core::access_unit::annotation::Record>
+  std::vector<genie::core::access_unit::annotation::AccessUnit>
       annotationAccessUnit;
 
   GenoAnnotation genoAnnotation;

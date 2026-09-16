@@ -14,7 +14,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/core/parameter/annotation/record.h"
+#include "genie/core/parameter/annotation/parameter_set.h"
 #include "genie/likelihood/likelihood_parameters.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ class RandomAnnotationEncodingParameters {
     genie::core::parameter::annotation::TileConfiguration randomTileConfiguration(uint8_t ATCoordSize);
     genie::core::parameter::annotation::CompressorParameterSet randomCompressorParameterSet();
     genie::core::parameter::annotation::AnnotationEncodingParameters randomAnnotationEncodingParameters();
-    genie::core::parameter::annotation::Record randomAnnotationParameterSet();
+    genie::core::parameter::annotation::ParameterSet randomAnnotationParameterSet();
 
  private:
     uint64_t randomU64() {

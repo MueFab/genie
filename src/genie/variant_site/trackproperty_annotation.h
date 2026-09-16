@@ -26,8 +26,8 @@ namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 struct TrackPropertyUnits {
-    core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
+    core::parameter::annotation::ParameterSet annotationParameterSet;
+    std::vector<core::access_unit::annotation::AccessUnit> annotationAccessUnit;
 };
 
 class TrackPropertyAnnotation {
@@ -53,8 +53,8 @@ class TrackPropertyAnnotation {
         core::AnnotDesc::LINKID};
 
     variant_site::AccessUnitComposer accessUnitcomposer;
-    core::parameter::annotation::Record annotationParameterSet;
-    std::vector<core::access_unit::annotation::Record> annotationAccessUnit;
+    core::parameter::annotation::ParameterSet annotationParameterSet;
+    std::vector<core::access_unit::annotation::AccessUnit> annotationAccessUnit;
 
     uint32_t defaultTileSizeHeight;
     uint8_t trackType_;  // Track type from first record (GTF, GFF, GENBANK, BED, BEDGRAPH, WIG, BIGWIG)
