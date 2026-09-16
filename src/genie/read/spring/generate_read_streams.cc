@@ -29,7 +29,7 @@
 #include <vector>
 
 #include "genie/core/access_unit/sequencing/access_unit.h"
-#include "genie/core/parameter/parameter_set.h"
+#include "genie/core/parameter/sequencing/parameter_set.h"
 #include "genie/core/read_encoder.h"
 #include "genie/util/dynamic_scheduler.h"
 #include "genie/read/spring/util.h"

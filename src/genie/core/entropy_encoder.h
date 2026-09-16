@@ -14,7 +14,7 @@
 
 #include "genie/core/access_unit/sequencing/access_unit.h"
 #include "genie/core/module.h"
-#include "genie/core/parameter/descriptor_present/decoder.h"
+#include "genie/core/parameter/sequencing/descriptor_present/decoder.h"
 
 // -----------------------------------------------------------------------------
 

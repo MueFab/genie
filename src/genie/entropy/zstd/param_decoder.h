@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/parameter/descriptor_present/decoder_regular.h"
+#include "genie/core/parameter/sequencing/descriptor_present/decoder_regular.h"
 #include "genie/entropy/zstd/subsequence.h"
 #include "genie/util/bit_reader.h"
 

@@ -12,7 +12,7 @@
 
 #include <map>
 
-#include "genie/core/parameter/parameter_set.h"
+#include "genie/core/parameter/sequencing/parameter_set.h"
 #include "genie/format/mgb/access_unit.h"
 #include "genie/format/mgb/raw_reference.h"
 

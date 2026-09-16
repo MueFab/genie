@@ -18,7 +18,7 @@
 #include <cstring>
 #include <iostream>
 
-#include "genie/core/parameter/descriptor_present/descriptor_present.h"
+#include "genie/core/parameter/sequencing/descriptor_present/descriptor_present.h"
 #include "genie/core/parameter/annotation/algorithm_parameters.h"
 #include "genie/core/parameter/annotation/compressor_parameter_set.h"
 #include "genie/entropy/bsc/param_decoder.h"

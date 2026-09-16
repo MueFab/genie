@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "genie/core/parameter/parameter_set.h"
+#include "genie/core/parameter/sequencing/parameter_set.h"
 #include "genie/format/mgg/access_unit_header.h"
 #include "genie/format/mgg/au_information.h"
 #include "genie/format/mgg/au_protection.h"

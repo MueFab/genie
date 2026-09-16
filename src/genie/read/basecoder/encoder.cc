@@ -27,7 +27,7 @@
 #include <string>
 #include <utility>
 
-#include "genie/core/parameter/parameter_set.h"
+#include "genie/core/parameter/sequencing/parameter_set.h"
 #include "genie/core/record/sequencing/alignment_box.h"
 #include "genie/core/record/sequencing/alignment_split/other_rec.h"
 #include "genie/core/record/sequencing/alignment_split/same_rec.h"

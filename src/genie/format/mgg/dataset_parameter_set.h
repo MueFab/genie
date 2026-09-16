@@ -22,7 +22,7 @@
 #include <string>
 
 #include "genie/core/constants.h"
-#include "genie/core/parameter/parameter_set.h"
+#include "genie/core/parameter/sequencing/parameter_set.h"
 #include "genie/format/mgg/dataset_parameter_set/update_info.h"
 #include "genie/format/mgg/gen_info.h"
 #include "genie/util/bit_reader.h"

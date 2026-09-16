@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/parameter/data_unit.h"
+#include "genie/core/parameter/sequencing/data_unit.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------

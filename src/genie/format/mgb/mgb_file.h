@@ -15,7 +15,7 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/parameter/data_unit.h"
+#include "genie/core/parameter/sequencing/data_unit.h"
 #include "genie/format/mgb/data_unit_factory.h"
 #include "genie/format/mgb/raw_reference.h"
 #include "genie/util/bit_reader.h"

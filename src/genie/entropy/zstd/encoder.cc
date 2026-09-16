@@ -24,7 +24,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "genie/core/parameter/descriptor_present/descriptor_present.h"
+#include "genie/core/parameter/sequencing/descriptor_present/descriptor_present.h"
 #include "genie/core/parameter/annotation/algorithm_parameters.h"
 #include "genie/core/parameter/annotation/compressor_parameter_set.h"
 #include "genie/entropy/zstd/param_decoder.h"

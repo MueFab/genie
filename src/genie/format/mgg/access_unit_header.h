@@ -21,7 +21,7 @@
 #include <map>
 #include <string>
 
-#include "genie/core/parameter/parameter_set.h"
+#include "genie/core/parameter/sequencing/parameter_set.h"
 #include "genie/format/mgb/access_unit.h"
 #include "genie/format/mgg/gen_info.h"
 #include "genie/util/bit_reader.h"

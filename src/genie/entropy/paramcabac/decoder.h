@@ -24,8 +24,8 @@
 #include <memory>
 #include <vector>
 
-#include "genie/core/parameter/descriptor_present/decoder_regular.h"
-#include "genie/core/parameter/descriptor_present/decoder_token_type.h"
+#include "genie/core/parameter/sequencing/descriptor_present/decoder_regular.h"
+#include "genie/core/parameter/sequencing/descriptor_present/decoder_token_type.h"
 #include "genie/entropy/paramcabac/subsequence.h"
 #include "genie/util/bit_writer.h"
 

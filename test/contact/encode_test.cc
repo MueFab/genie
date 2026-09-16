@@ -3930,3 +3930,57 @@ TEST(ContactCoderBenchmark, ParallelEncodingSpeedup) {
     }
 #endif
 }
+
+TEST(ContactCoderTest, DecodeScmMaskPayloadEdgeCases) {
+    // 1. Zero entries
+    {
+        genie::contact::SubcontactMatrixMaskPayload payload;
+        payload.SetRlEntries(genie::contact::TransformID::ID_1, true, std::vector<uint32_t>{5, 5});
+        genie::contact::BinVecDtype mask;
+        genie::contact::decode_scm_mask_payload(payload, 0, mask);
+        ASSERT_EQ(mask.size(), 0u);
+    }
+
+    // 2. TransformID::ID_0 (raw mask array passthrough)
+    {
+        std::vector<bool> raw_vals = {true, false, true, true};
+        auto raw_mask = genie::contact::create_vector<bool>(raw_vals);
+        genie::contact::SubcontactMatrixMaskPayload payload;
+        payload.SetMaskArray(raw_mask);
+        genie::contact::BinVecDtype decoded_mask;
+        genie::contact::decode_scm_mask_payload(payload, raw_vals.size(), decoded_mask);
+        ASSERT_TRUE(decoded_mask == raw_mask);
+    }
+
+    // 3. Overflow: rl_entries sum exceeds num_entries
+    {
+        genie::contact::SubcontactMatrixMaskPayload payload;
+        // First 4 true, next 10 false, total 14 > num_entries (7)
+        payload.SetRlEntries(genie::contact::TransformID::ID_1, true, std::vector<uint32_t>{4, 10});
+        genie::contact::BinVecDtype mask;
+        genie::contact::decode_scm_mask_payload(payload, 7, mask);
+        ASSERT_EQ(mask.size(), 7u);
+        for (size_t i = 0; i < 4; ++i) {
+            EXPECT_TRUE(genie::backend::get_arr_element(mask, i));
+        }
+        for (size_t i = 4; i < 7; ++i) {
+            EXPECT_FALSE(genie::backend::get_arr_element(mask, i));
+        }
+    }
+
+    // 4. Underflow: rl_entries sum is less than num_entries
+    {
+        genie::contact::SubcontactMatrixMaskPayload payload;
+        // First 3 true, remaining 5 unassigned remain false
+        payload.SetRlEntries(genie::contact::TransformID::ID_1, true, std::vector<uint32_t>{3});
+        genie::contact::BinVecDtype mask;
+        genie::contact::decode_scm_mask_payload(payload, 8, mask);
+        ASSERT_EQ(mask.size(), 8u);
+        for (size_t i = 0; i < 3; ++i) {
+            EXPECT_TRUE(genie::backend::get_arr_element(mask, i));
+        }
+        for (size_t i = 3; i < 8; ++i) {
+            EXPECT_FALSE(genie::backend::get_arr_element(mask, i));
+        }
+    }
+}

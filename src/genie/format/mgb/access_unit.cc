@@ -14,7 +14,7 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/parameter/parameter_set.h"
+#include "genie/core/parameter/sequencing/parameter_set.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/runtime_exception.h"
 

@@ -28,8 +28,8 @@
 #include <memory>
 #include <optional>
 
-#include "genie/core/parameter/parameter_set.h"
-#include "genie/core/parameter/quality_values.h"
+#include "genie/core/parameter/sequencing/parameter_set.h"
+#include "genie/core/parameter/sequencing/quality_values.h"
 #include "genie/quality/paramqv1/parameter_set.h"
 #include "genie/util/bit_writer.h"
 

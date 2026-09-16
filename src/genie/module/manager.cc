@@ -17,7 +17,7 @@
 #include "genie/module/manager.h"
 
 #include "genie/core/global_cfg.h"
-#include "genie/core/parameter/quality_values.h"
+#include "genie/core/parameter/sequencing/quality_values.h"
 #include "genie/entropy/bsc/param_decoder.h"
 #include "genie/entropy/lzma/param_decoder.h"
 #include "genie/entropy/paramcabac/decoder.h"

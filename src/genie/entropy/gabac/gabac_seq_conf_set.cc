@@ -10,7 +10,7 @@
 #include <memory>
 #include <utility>
 
-#include "genie/core/parameter/descriptor_present/descriptor_present.h"
+#include "genie/core/parameter/sequencing/descriptor_present/descriptor_present.h"
 
 // -----------------------------------------------------------------------------
 

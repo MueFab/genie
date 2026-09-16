@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/parameter/data_unit.h"
+#include "genie/core/parameter/sequencing/data_unit.h"
 #include "genie/format/mgb/extended_au.h"
 #include "genie/format/mgb/ref_cfg.h"
 #include "genie/util/bit_reader.h"
