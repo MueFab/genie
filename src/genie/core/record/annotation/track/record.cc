@@ -86,11 +86,7 @@ bool Record::Read(util::BitReader& reader) {
         }
         attr.attr_type = static_cast<uint8_t>(reader.ReadBits(8));
         DataType type = static_cast<DataType>(attr.attr_type);
-        auto array_len = static_cast<uint8_t>(reader.ReadBits(8));
-        attr.attr_values.reserve(array_len);
-        for (auto j = 0; j < array_len; ++j) {
-            attr.attr_values.push_back(readType.toArray(type, reader));
-        }
+        attr.attr_values.push_back(readType.toArray(type, reader));
         attributes_.push_back(attr);
     }
 
