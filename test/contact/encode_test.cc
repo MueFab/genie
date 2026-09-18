@@ -3984,3 +3984,142 @@ TEST(ContactCoderTest, DecodeScmMaskPayloadEdgeCases) {
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Norm-as-Weight encoder / decoder round-trip
+// ---------------------------------------------------------------------------------------------------------------------
+
+namespace {
+
+struct NormWeightCase {
+    std::vector<std::string> norm_names;
+    std::vector<std::vector<double>> norm_counts;
+    bool norm_as_weight;
+    bool multiplicative_norm;
+};
+
+// Helper: build a small ContactRecord with given norm metadata.
+// Uses inter-SCM (chr1_ID != chr2_ID) so the 4 entries survive round-trip
+// without intra-SCM symmetry folding.
+genie::core::record::ContactRecord makeIntraContact(
+    const NormWeightCase& c, uint32_t bin_size, uint64_t chr_len) {
+    const size_t n = c.norm_counts.empty() ? 4u : c.norm_counts.front().size();
+    std::vector<uint64_t> s1(n), s2(n), e1(n), e2(n);
+    std::vector<uint32_t> counts(n, 1u);
+    for (size_t i = 0; i < n; ++i) {
+        s1[i] = static_cast<uint64_t>(i) * bin_size;
+        s2[i] = static_cast<uint64_t>(i) * bin_size;
+        e1[i] = s1[i] + bin_size;
+        e2[i] = s2[i] + bin_size;
+    }
+    std::vector<std::vector<double>> norm = c.norm_counts;
+    if (norm.empty()) {
+        norm.emplace_back(std::vector<double>(n, 1.0));
+    }
+    auto rec = genie::core::record::ContactRecord(
+        0u, std::string("S"), bin_size,
+        1u, std::string("C1"), chr_len,
+        2u, std::string("C2"), chr_len,
+        std::vector<std::string>(c.norm_names),
+        std::move(s1), std::move(e1), std::move(s2), std::move(e2),
+        std::move(counts));
+    rec.SetNormCounts(std::move(norm));
+    return rec;
+}
+
+// Helper: round-trip a single SCM and return decoded tile values.
+std::vector<std::vector<uint32_t>> roundTripSCM(
+    const NormWeightCase& c, bool intra, uint32_t bin_size, uint64_t chr_len) {
+    auto rec = makeIntraContact(c, bin_size, chr_len);
+    genie::contact::ContactMatrixParameters cm_param;
+    cm_param.SetBinSize(bin_size);
+    cm_param.SetTileSize(8u);
+    cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+    cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(), rec.GetChr1Length());
+    cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(), rec.GetChr2Length());
+
+    genie::contact::SubcontactMatrixParameters scm_param;
+    genie::contact::SubcontactMatrixPayload scm_payload;
+
+    genie::contact::encode_scm(
+        cm_param, rec, scm_param, scm_payload,
+        /*remove_unaligned*/ false, /*transform_mask*/ false,
+        /*ena_diag_transform*/ false, /*ena_binarization*/ true,
+        c.norm_as_weight, c.multiplicative_norm,
+        genie::core::AlgoID::JBIG);
+
+    std::stringstream ss;
+    genie::util::BitWriter w(ss);
+    scm_payload.Write(w);
+
+    std::istringstream in(ss.str());
+    genie::util::BitReader r(in);
+    genie::contact::SubcontactMatrixPayload recon_payload(r, cm_param, scm_param);
+
+    genie::core::record::ContactRecord recon;
+    genie::contact::decode_scm(cm_param, scm_param, recon_payload, recon, 1u);
+
+    std::vector<std::vector<uint32_t>> grid;
+    grid.reserve(recon.GetNumEntries());
+    for (size_t i = 0; i < recon.GetNumEntries(); ++i) {
+        grid.push_back({recon.GetCounts()[i]});
+    }
+    return grid;
+}
+
+}  // namespace
+
+// Case 1: norm_as_weight=false → identity (raw counts preserved).
+TEST(ContactNormWeight, DisabledFlagIdentity) {
+    NormWeightCase c{{"ICE"}, {{2.0, 3.0, 4.0, 5.0}}, false, false};
+    auto grid = roundTripSCM(c, true, 1000u, 100000u);
+    ASSERT_EQ(grid.size(), 4u);
+    std::multiset<uint32_t> values;
+    for (auto& row : grid) values.insert(row[0]);
+    EXPECT_EQ(values, (std::multiset<uint32_t>{1u, 1u, 1u, 1u}));
+}
+
+// Case 2: single-method weight (non-multiplicative) → count * first_method.
+// All weights >= 1 to ensure the encoded binarization preserves the entry.
+TEST(ContactNormWeight, SingleMethod) {
+    NormWeightCase c{{"ICE"}, {{2.0, 3.0, 4.0, 5.0}}, true, false};
+    auto grid = roundTripSCM(c, true, 1000u, 100000u);
+    ASSERT_EQ(grid.size(), 4u);
+    std::multiset<uint32_t> values;
+    for (auto& row : grid) values.insert(row[0]);
+    EXPECT_EQ(values, (std::multiset<uint32_t>{2u, 3u, 4u, 5u}));
+}
+
+// Case 3: empty upstream norm_counts → fallback to identity even with flag set.
+TEST(ContactNormWeight, EmptyNormCountsFallback) {
+    NormWeightCase c{{}, {}, true, false};
+    auto grid = roundTripSCM(c, true, 1000u, 100000u);
+    ASSERT_EQ(grid.size(), 4u);
+    std::multiset<uint32_t> values;
+    for (auto& row : grid) values.insert(row[0]);
+    EXPECT_EQ(values, (std::multiset<uint32_t>{1u, 1u, 1u, 1u}));
+}
+
+// Case 4: multiplicative weight → product of all methods.
+// Uses values chosen so the product stays well within uint32_t.
+TEST(ContactNormWeight, MultiplicativeProduct) {
+    NormWeightCase c{{"VC", "KR"},
+                     {{2.0, 3.0, 2.0, 1.0}, {3.0, 2.0, 2.0, 1.0}},
+                     true, true};
+    auto grid = roundTripSCM(c, true, 1000u, 100000u);
+    ASSERT_EQ(grid.size(), 4u);
+    std::multiset<uint32_t> values;
+    for (auto& row : grid) values.insert(row[0]);
+    EXPECT_EQ(values, (std::multiset<uint32_t>{6u, 6u, 4u, 1u}));
+}
+
+// Case 5: out-of-range weights trigger safety guard → identity fallback.
+TEST(ContactNormWeight, OutOfRangeGuardFallsBack) {
+    // Product = 1e20 → far above the 1e6 guard → fold disabled.
+    NormWeightCase c{{"Huge"}, {{1e10, 1e10, 1e10, 1e10}}, true, false};
+    auto grid = roundTripSCM(c, true, 1000u, 100000u);
+    ASSERT_EQ(grid.size(), 4u);
+    std::multiset<uint32_t> values;
+    for (auto& row : grid) values.insert(row[0]);
+    EXPECT_EQ(values, (std::multiset<uint32_t>{1u, 1u, 1u, 1u}));
+}
