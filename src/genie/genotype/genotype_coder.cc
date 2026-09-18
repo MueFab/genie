@@ -1,4 +1,5 @@
 #include "genotype_coder.h"
+#include <genie/util/log.h>
 #include <genie/util/runtime_exception.h>
 #include <genie/backend/backend.h>
 #include <genie/entropy/jbig/encoder.h>
@@ -573,6 +574,12 @@ void encode_genotype(
     SortingAlgoID sort_col_method,
     genie::core::AlgoID codec_ID
 ) {
+    constexpr auto kLogModuleName = "Genotype";
+    const auto encode_start = std::chrono::steady_clock::now();
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "encode start: records=" + std::to_string(recs.size()) +
+              " block_size=" + std::to_string(block_size));
+
     params = GenotypeParameters(
         binarization_ID, concat_axis,
         sort_row_method != SortingAlgoID::NO_SORTING,
@@ -621,6 +628,14 @@ void encode_genotype(
     } else {
         payload.SetPhasesValue(true);
     }
+
+    const auto encode_elapsed_ms =
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now() - encode_start)
+            .count();
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "encode finish: records=" + std::to_string(recs.size()) +
+              " elapsed_ms=" + std::to_string(encode_elapsed_ms));
 }
 
 void decode_genotype(
@@ -629,6 +644,8 @@ void decode_genotype(
     Int8MatDtype& allele_mat,
     BinMatDtype& phasing_mat
 ) {
+    constexpr auto kLogModuleName = "Genotype";
+    const auto decode_start = std::chrono::steady_clock::now();
     std::vector<BinMatDtype> bin_mats;
     for (const auto& sbm : payload.GetVariantsPayloads()) {
         BinMatDtype bm;
@@ -652,6 +669,14 @@ void decode_genotype(
     }
 
     inverse_transform_max_val(allele_mat, payload.GetNoReferenceFlag(), payload.GetNotAvailableFlag());
+
+    const auto decode_elapsed_ms =
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now() - decode_start)
+            .count();
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "decode finish: entries=" + std::to_string(payload.GetVariantsPayloads().size()) +
+              " elapsed_ms=" + std::to_string(decode_elapsed_ms));
 }
 
 } // namespace genie::genotype

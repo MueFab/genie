@@ -25,6 +25,7 @@
 #include "genie/util/runtime_exception.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/log.h"
 #include "genie/backend/backend.h"
 
 namespace genie::likelihood {
@@ -201,8 +202,15 @@ void deserialize_block(const std::vector<uint8_t>& mat_payload, const std::vecto
 
 void encode_likelihood(std::vector<core::record::GenotypeRecord>& recs, LikelihoodParameters& params,
                        LikelihoodPayload& payload, size_t block_size, bool transform_flag) {
+    constexpr auto kLogModuleName = "Likelihood";
     EncodingOptions opt{static_cast<uint32_t>(block_size), transform_flag};
     LikelihoodEncodingBlock block;
+
+    const auto t_start = std::chrono::steady_clock::now();
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "encode start: records=" + std::to_string(recs.size()) +
+                  " num_samples=" + std::to_string(recs.front().GetSampleCount()) +
+                  " num_likelihoods=" + std::to_string(recs.front().GetNumberOfLikelihoods()));
 
     extract_likelihoods(opt, block, recs);
     transform_likelihood_mat(opt, block);
@@ -228,12 +236,21 @@ void encode_likelihood(std::vector<core::record::GenotypeRecord>& recs, Likeliho
         lut_data.assign(s_lut.begin(), s_lut.end());
         payload.setAdditionalPayload(std::move(lut_data));
     }
+
+    const auto t_end = std::chrono::steady_clock::now();
+    const auto elapsed_ms =
+        std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count();
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "encode done: records=" + std::to_string(block.nrows) +
+                  " elapsed_ms=" + std::to_string(elapsed_ms));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void decode_likelihood(const LikelihoodParameters& params, LikelihoodPayload& payload,
                        std::vector<core::record::GenotypeRecord>& recs) {
+    constexpr auto kLogModuleName = "Likelihood";
+    const auto t_start = std::chrono::steady_clock::now();
     LikelihoodEncodingBlock block;
     block.nrows = payload.getNRows();
     block.ncols = payload.getNCols();
@@ -278,6 +295,13 @@ void decode_likelihood(const LikelihoodParameters& params, LikelihoodPayload& pa
         }
         recs[i].SetLikelihoods(rec_likelihoods);
     }
+
+    const auto t_end = std::chrono::steady_clock::now();
+    const auto elapsed_ms =
+        std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count();
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "decode done: records=" + std::to_string(block.nrows) +
+                  " elapsed_ms=" + std::to_string(elapsed_ms));
 }
 
 } // namespace genie::likelihood
