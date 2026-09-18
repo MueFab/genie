@@ -316,6 +316,28 @@ void decode_scm(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+/**
+ * @brief Select a per-entry weight from pre-computed normalized counts.
+ *
+ * Operates on the upstream `ContactRecord::GetNormCounts()` payload (no
+ * ICE/VC/KR math). If `norm_as_weight` is false, all weights are 1.0.
+ * If `multiplicative_norm` is true, the product of all available
+ * per-entry values is used (falling back to the first method on zero).
+ * Missing or empty `norm_counts_` yields 1.0 (raw counts preserved).
+ *
+ * @param norm_counts            Per-method per-entry normalized values.
+ * @param norm_as_weight         Enable weight fold.
+ * @param multiplicative_norm    Combine methods multiplicatively.
+ * @return Vector of length num_entries with one weight per record entry.
+ */
+std::vector<double> selectNormWeights(
+    const std::vector<std::vector<double>>& norm_counts,
+    bool norm_as_weight,
+    bool multiplicative_norm
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void encode_scm(
     ContactMatrixParameters& cm_param,
     core::record::ContactRecord& rec,

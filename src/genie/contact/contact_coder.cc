@@ -15,6 +15,7 @@
 #include <numeric>
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <map>
 #include <set>
 #include <iostream>
@@ -24,6 +25,7 @@
 #include "subcontact_matrix_payload.h"
 #include "subcontact_matrix_mask_payload.h"
 #include "genie/backend/backend.h"
+#include "genie/util/log.h"
 #include <unordered_map>
 
 namespace genie::contact {
@@ -650,6 +652,72 @@ void conv_noop_on_sparse_mat(UInt64VecDtype& tile_row_ids, UInt64VecDtype& tile_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::vector<double> selectNormWeights(
+    const std::vector<std::vector<double>>& norm_counts,
+    bool norm_as_weight,
+    bool multiplicative_norm
+) {
+    if (!norm_as_weight || norm_counts.empty()) {
+        return {};
+    }
+    constexpr auto kLogModuleName = "Contact";
+
+    constexpr double MIN_USABLE = 1e-9;
+    constexpr double MAX_USABLE = 1e9;
+    constexpr double LOG_MIN = -20.7232658369464;
+    constexpr double LOG_MAX =  20.7232658369464;
+    constexpr double MAX_FINAL_WEIGHT = 1.0e6;
+
+    const size_t num_entries = norm_counts.front().size();
+    std::vector<double> weights(num_entries, 1.0);
+
+    if (multiplicative_norm) {
+        std::vector<double> log_acc(num_entries, 0.0);
+        for (size_t j = 0; j < norm_counts.size(); ++j) {
+            const auto& vec = norm_counts[j];
+            for (size_t i = 0; i < num_entries; ++i) {
+                double v = (i < vec.size()) ? vec[i] : 1.0;
+                if (v <= 0.0 || !std::isfinite(v)) continue;
+                if (v < MIN_USABLE) v = MIN_USABLE;
+                if (v > MAX_USABLE) v = MAX_USABLE;
+                log_acc[i] += std::log(v);
+                if (log_acc[i] < LOG_MIN) log_acc[i] = LOG_MIN;
+                if (log_acc[i] > LOG_MAX) log_acc[i] = LOG_MAX;
+            }
+        }
+        for (size_t i = 0; i < num_entries; ++i) {
+            weights[i] = std::exp(log_acc[i]);
+        }
+    } else {
+        const auto& vec = norm_counts.front();
+        for (size_t i = 0; i < num_entries; ++i) {
+            double v = (i < vec.size()) ? vec[i] : 1.0;
+            if (v <= 0.0 || !std::isfinite(v)) v = 1.0;
+            else if (v < MIN_USABLE) v = MIN_USABLE;
+            else if (v > MAX_USABLE) v = MAX_USABLE;
+            weights[i] = v;
+        }
+    }
+
+    double wmax = 0.0;
+    for (double w : weights) wmax = std::max(wmax, w);
+    if (wmax > MAX_FINAL_WEIGHT) {
+        UTILS_LOG(genie::util::Logger::Severity::WARNING,
+                  std::string("pre-computed norm_counts produce weights up to ")
+                  + std::to_string(wmax)
+                  + ", exceeding safe fold range ("
+                  + std::to_string(MAX_FINAL_WEIGHT)
+                  + "). Falling back to identity weights to preserve bitstream integrity. "
+                  + "Provide norm_counts suitable for direct multiplicative fold, or set "
+                  + "norm_as_weight=false.");
+        return {};
+    }
+
+    return weights;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& rec, SubcontactMatrixParameters& scm_param, SubcontactMatrixPayload& scm_payload, bool remove_unaligned_region, bool transform_mask, bool ena_diag_transform, bool ena_binarization, bool norm_as_weight, bool multiplicative_norm, core::AlgoID codec_ID) {
     UTILS_DIE_IF(!ena_binarization, "Binarization must be activated!");
 
@@ -685,18 +753,49 @@ void encode_scm(ContactMatrixParameters& cm_param, core::record::ContactRecord& 
     auto rec_row_ids = rec.GetStartPos1();
     auto rec_col_ids = rec.GetStartPos2();
     auto rec_counts = rec.GetCounts();
-    
+    auto norm_counts = rec.GetNormCounts();
+    auto norm_count_names = rec.GetNormCountNames();
+
     ::genie::backend::resize_arr(row_ids, rec_row_ids.size());
     ::genie::backend::resize_arr(col_ids, rec_col_ids.size());
     ::genie::backend::resize_arr(counts, rec_counts.size());
-    
+
+    auto weights = selectNormWeights(norm_counts, norm_as_weight, multiplicative_norm);
+    const bool apply_weight = !weights.empty();
+
     for(size_t k=0; k<rec_row_ids.size(); ++k) {
         uint64_t r = rec_row_ids[k] / interval;
         uint64_t c = rec_col_ids[k] / interval;
         if (is_intra_scm && r > c) std::swap(r, c);
         ::genie::backend::set_arr_element(row_ids, k, r);
         ::genie::backend::set_arr_element(col_ids, k, c);
-        ::genie::backend::set_arr_element(counts, k, rec_counts[k]);
+        uint32_t v = rec_counts[k];
+        if (apply_weight) {
+            double w = weights[k];
+            double scaled = static_cast<double>(v) * w;
+            if (scaled < 0.0) scaled = 0.0;
+            v = static_cast<uint32_t>(std::min<uint64_t>(static_cast<uint64_t>(scaled),
+                                                         std::numeric_limits<uint32_t>::max()));
+        }
+        ::genie::backend::set_arr_element(counts, k, v);
+    }
+
+    if (apply_weight) {
+        const size_t num_methods = norm_count_names.size();
+        const size_t recorded_methods = std::min<size_t>(num_methods, 255);
+        for (size_t j = 0; j < recorded_methods; ++j) {
+            NormalizationMethodInformation info{
+                static_cast<uint8_t>(j),
+                norm_count_names[j],
+                multiplicative_norm};
+            cm_param.AddNormMethod(static_cast<uint8_t>(j), std::move(info));
+        }
+        if (recorded_methods > 0) {
+            NormalizedMatrixInformations mat_info{
+                0,
+                multiplicative_norm ? "multiplicative" : norm_count_names[0]};
+            cm_param.AddNormMat(0, std::move(mat_info));
+        }
     }
 
     if (remove_unaligned_region) {

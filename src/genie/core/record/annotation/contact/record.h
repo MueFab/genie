@@ -308,6 +308,12 @@ class ContactRecord {
                    std::vector<uint32_t>&& counts);
 
   /**
+   * @brief Sets the normalized counts matrix (per-method, per-entry).
+   * @param _norm_counts Per-method per-entry normalized values.
+   */
+  void SetNormCounts(std::vector<std::vector<double_t>>&& _norm_counts);
+
+  /**
    * @brief Writes the contact record to a bit writer
    * @param writer The bit writer to write to
    */

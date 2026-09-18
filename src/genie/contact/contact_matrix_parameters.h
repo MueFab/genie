@@ -357,7 +357,7 @@ class ContactMatrixParameters {
      *  @param ID The ID of the normalization method.
      *  @param norm_method_info The information of the normalization method to add.
      */
-    [[maybe_unused]] void AddNormMethod(uint8_t ID, NormalizationMethodInformation&& norm_method_info);
+    void AddNormMethod(uint8_t ID, NormalizationMethodInformation&& norm_method_info);
 
     /**
      * @brief Gets the normalization methods.
@@ -366,7 +366,7 @@ class ContactMatrixParameters {
      *
      * @return A constant reference to the normalization methods.
      */
-    [[maybe_unused]] const std::unordered_map<uint8_t, NormalizationMethodInformation>& GetNormMethods() const;
+    const std::unordered_map<uint8_t, NormalizationMethodInformation>& GetNormMethods() const;
 
     /**
      * @brief Gets the number of normalized matrices.
@@ -385,7 +385,7 @@ class ContactMatrixParameters {
      *  @param ID The ID of the normalized matrix.
      *  @param norm_mat_info The information of the normalized matrix to add.
      */
-    [[maybe_unused]] void AddNormMat(uint8_t ID, NormalizedMatrixInformations&& norm_mat_info);
+    void AddNormMat(uint8_t ID, NormalizedMatrixInformations&& norm_mat_info);
 
     /**
      * @brief Gets the normalized matrices.
@@ -394,7 +394,7 @@ class ContactMatrixParameters {
      *
      *   @return A constant reference to the normalized matrices.
      */
-    [[maybe_unused]] const std::unordered_map<uint8_t, NormalizedMatrixInformations>& GetNormMats() const;
+    const std::unordered_map<uint8_t, NormalizedMatrixInformations>& GetNormMats() const;
 
     /**
      * @brief Gets the number of bin entries.

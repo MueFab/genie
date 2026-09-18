@@ -406,6 +406,12 @@ void ContactRecord::SetCMValues(std::vector<uint64_t>&& start_pos1,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void ContactRecord::SetNormCounts(std::vector<std::vector<double_t>>&& _norm_counts) {
+  norm_counts_ = std::move(_norm_counts);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 // TODO (Yeremia): Implement this
 void ContactRecord::Write(util::BitWriter& writer) const {
   // Sample

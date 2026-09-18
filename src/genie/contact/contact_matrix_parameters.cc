@@ -360,13 +360,13 @@ uint8_t ContactMatrixParameters::GetNumNormMethods() const { return static_cast<
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] void ContactMatrixParameters::AddNormMethod(uint8_t ID, NormalizationMethodInformation&& norm_method_info){
+void ContactMatrixParameters::AddNormMethod(uint8_t ID, NormalizationMethodInformation&& norm_method_info){
   norm_method_infos_.emplace(ID, std::move(norm_method_info));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] const std::unordered_map<uint8_t, NormalizationMethodInformation>& ContactMatrixParameters::GetNormMethods() const{
+const std::unordered_map<uint8_t, NormalizationMethodInformation>& ContactMatrixParameters::GetNormMethods() const{
     return norm_method_infos_;
 }
 
@@ -376,13 +376,13 @@ uint8_t ContactMatrixParameters::GetNumNormMats() const { return static_cast<uin
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] void ContactMatrixParameters::AddNormMat(uint8_t ID, NormalizedMatrixInformations&& norm_mat_info){
+void ContactMatrixParameters::AddNormMat(uint8_t ID, NormalizedMatrixInformations&& norm_mat_info){
   norm_mat_infos_.emplace(ID, norm_mat_info);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] const std::unordered_map<uint8_t, NormalizedMatrixInformations>& ContactMatrixParameters::GetNormMats() const {return norm_mat_infos_;}
+const std::unordered_map<uint8_t, NormalizedMatrixInformations>& ContactMatrixParameters::GetNormMats() const {return norm_mat_infos_;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
