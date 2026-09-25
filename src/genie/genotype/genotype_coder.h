@@ -12,7 +12,7 @@
 #include <tuple>
 
 #include "genie/core/constants.h"
-#include "genie/core/record/annotation/genotype/record.h"
+#include "genie/core/record/genotype/record.h"
 #include "genie/backend/backend.h"
 #include "genotype_parameters.h"
 #include "genotype_payload.h"

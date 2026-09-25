@@ -18,7 +18,7 @@
 #include <vector>
 #include "genie/core/array_type.h"
 #include "genie/core/constants.h"
-#include "genie/core/record/annotation/linked/record.h"
+#include "genie/core/record/linked/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 

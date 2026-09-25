@@ -13,7 +13,7 @@
 #include <utility>
 
 #include "genie/core/array_type.h"
-#include "genie/core/record/annotation/feature/record.h"
+#include "genie/core/record/sample/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"
@@ -21,7 +21,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-namespace genie::core::record::feature {
+namespace genie::core::record::sample {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -40,10 +40,10 @@ Record::Record(util::BitReader& reader) {
 
 bool Record::Read(util::BitReader& reader) {
   ClearData();
-  feature_index_ = reader.ReadBits(64);
+  sample_index_ = reader.ReadBits(32);
   if (!reader.IsStreamGood())
     return false;
-  feature_attributes_.Read(reader);
+  sample_attributes_.Read(reader);
   reader.ReadBits(7);
   linked_record_ = reader.ReadBits(1);
   if (linked_record_) {
@@ -61,12 +61,12 @@ bool Record::Read(util::BitReader& reader) {
 // -------------------------------------------------------------------------------------------------
 
 void Record::ClearData() {
-  feature_index_ = 0;
-  feature_attributes_.Clear();
+  sample_index_ = 0;
+  sample_attributes_.Clear();
   linked_record_ = 0;
   link_name_len_ = 0;
   link_name_ = "";
   reference_box_id_ = 0;
 }
 
-}  // namespace genie::core::record::feature
+}  // namespace genie::core::record::sample

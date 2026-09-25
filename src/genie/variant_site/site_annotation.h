@@ -19,7 +19,7 @@
 
 #include "genie/variant_site/vsite_parameterset_composer.h"
 #include "genie/variant_site/compressors.h"
-#include "genie/core/record/annotation/data_unit/record.h"
+#include "genie/core/record/data_unit/record.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {

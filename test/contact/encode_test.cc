@@ -9,7 +9,7 @@
 #include <vector>
 #include "genie/contact/contact_coder.h"
 #include "contact_test_helpers.h"
-#include "genie/core/record/annotation/contact/record.h"
+#include "genie/core/record/contact/record.h"
 #include "genie/util/bit_reader.h"
 #include "helpers.h"
 #include <iostream>

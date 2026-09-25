@@ -24,7 +24,7 @@
 #include "genie/core/access_unit/annotation/typed_data.h"
 #include "genie/core/access_unit/annotation/access_unit.h"
 #include "genie/core/parameter/annotation/parameter_set.h"
-#include "genie/core/record/annotation/data_unit/record.h"
+#include "genie/core/record/data_unit/record.h"
 #include "genie/variant_site/accessunit_composer.h"
 
 #include "genie/variant_site/annotation.h"

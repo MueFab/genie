@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/record/annotation/gene_expression/record.h"
+#include "genie/core/record/gene_expression/record.h"
 #include <string>
 #include <vector>
 #include "genie/core/array_type.h"

@@ -14,7 +14,7 @@
 #include "genie/core/constants.h"
 
 #include "genie/contact/contact_coder.h"
-#include "genie/core/record/annotation/genotype/record.h"
+#include "genie/core/record/genotype/record.h"
 #include "genie/core/parameter/annotation/parameter_set.h"
 #include "genie/core/access_unit/annotation/access_unit.h"
 

@@ -13,7 +13,7 @@
 #include <vector>
 #include "genie/variant_site/vsite_parameterset_composer.h"
 #include "genie/variant_site/compressors.h"
-#include "genie/core/record/annotation/gene_expression/record.h"
+#include "genie/core/record/gene_expression/record.h"
 #include "genie/core/parameter/annotation/attribute_data.h"
 #include "genie/core/parameter/annotation/parameter_set.h"
 #include "genie/core/access_unit/annotation/access_unit.h"

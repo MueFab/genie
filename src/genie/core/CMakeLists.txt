@@ -28,18 +28,18 @@ set(source_files
         record/sequencing/alignment_box.cc
         record/sequencing/alignment.cc
 
-        record/annotation/genotype/record.cc
-        record/annotation/genotype/format_field.cc
-        record/annotation/linked/record.cc
-        record/annotation/site/record.cc
-        record/annotation/data_unit/record.cc
-        record/annotation/contact/record.cc
-        record/annotation/feature/record.cc
-        record/annotation/functional_annotation/record.cc
-        record/annotation/gene_expression/record.cc
-        record/annotation/sample/record.cc
-        record/annotation/track_property/record.cc
-        record/annotation/track/record.cc
+        record/genotype/record.cc
+        record/genotype/format_field.cc
+        record/linked/record.cc
+        record/site/record.cc
+        record/data_unit/record.cc
+        record/contact/record.cc
+        record/feature/record.cc
+        record/functional_annotation/record.cc
+        record/gene_expression/record.cc
+        record/sample/record.cc
+        record/track_property/record.cc
+        record/track/record.cc
 
         access_unit/annotation/access_unit.cc
         access_unit/annotation/block.cc

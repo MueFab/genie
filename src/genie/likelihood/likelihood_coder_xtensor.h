@@ -11,7 +11,7 @@
 #include <sstream>
 #include <xtensor/xtensor.hpp>
 #include "likelihood_types.h"
-#include "genie/core/record/annotation/genotype/record.h"
+#include "genie/core/record/genotype/record.h"
 #include "likelihood_parameters.h"
 
 namespace genie::likelihood {

@@ -5,7 +5,7 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/core/record/annotation/functional_annotation/record.h"
+#include "genie/core/record/functional_annotation/record.h"
 
 #include <algorithm>
 #include <cstring>

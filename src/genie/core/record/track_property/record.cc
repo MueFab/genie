@@ -5,7 +5,7 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/core/record/annotation/track_property/record.h"
+#include "genie/core/record/track_property/record.h"
 
 #include <algorithm>
 #include <cstring>

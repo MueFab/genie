@@ -10,7 +10,7 @@
 #include <vector>
 #include <sstream>
 #include <memory>
-#include "genie/core/record/annotation/genotype/record.h"
+#include "genie/core/record/genotype/record.h"
 #include "likelihood_parameters.h"
 #include "likelihood_types.h"
 

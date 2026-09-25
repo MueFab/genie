@@ -17,7 +17,7 @@
 #include "genie/util/runtime_exception.h"
 
 #include "genie/contact/contact_coder.h"
-#include "genie/core/record/annotation/contact/record.h"
+#include "genie/core/record/contact/record.h"
 
 #include "genie/variant_site/annotation_encoder.h"
 

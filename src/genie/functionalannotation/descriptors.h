@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/record/annotation/functional_annotation/record.h"
+#include "genie/core/record/functional_annotation/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/functionalannotation/tiles.h"

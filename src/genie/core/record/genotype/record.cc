@@ -15,7 +15,7 @@
 #include "genie/util/runtime_exception.h"
 
 #include "genie/core/array_type.h"
-#include "genie/core/record/annotation/genotype/record.h"
+#include "genie/core/record/genotype/record.h"
 
 // -----------------------------------------------------------------------------
 
