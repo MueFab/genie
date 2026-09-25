@@ -7,7 +7,7 @@
 #ifndef GENIE_GENOTYPE_TEST_HELPERS_H
 #define GENIE_GENOTYPE_TEST_HELPERS_H
 
-#include "genotype_coder.h"
+#include "genie/genotype/genotype_coder.h"
 #include <algorithm>
 #include <vector>
 #include <random>

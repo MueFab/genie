@@ -9,9 +9,9 @@
 
 #include <vector>
 #include <sstream>
-#include "likelihood_types.h"
+#include "genie/likelihood/likelihood_types.h"
 #include "genie/core/record/genotype/record.h"
-#include "likelihood_parameters.h"
+#include "genie/likelihood/likelihood_parameters.h"
 
 namespace genie::likelihood {
     struct EncodingOptions;

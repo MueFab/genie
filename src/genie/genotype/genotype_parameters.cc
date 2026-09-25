@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genotype_parameters.h"
+#include "genie/genotype/genotype_parameters.h"
 
 #include "genie/util/runtime_exception.h"
 

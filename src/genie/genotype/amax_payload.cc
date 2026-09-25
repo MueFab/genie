@@ -6,7 +6,7 @@
 
 // -----------------------------------------------------------------------------
 
-#include "amax_payload.h"
+#include "genie/genotype/amax_payload.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------

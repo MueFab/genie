@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <list>
 #include <tuple>
-#include "contact_types.h"
+#include "genie/contact/contact_types.h"
 #include "genie/core/constants.h"
 #include "genie/core/record/contact/record.h"
 

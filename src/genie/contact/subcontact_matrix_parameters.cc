@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "subcontact_matrix_parameters.h"
+#include "genie/contact/subcontact_matrix_parameters.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------

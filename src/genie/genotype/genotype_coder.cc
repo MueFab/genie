@@ -1,4 +1,4 @@
-#include "genotype_coder.h"
+#include "genie/genotype/genotype_coder.h"
 #include <genie/util/log.h>
 #include <genie/util/runtime_exception.h>
 #include <genie/backend/backend.h>

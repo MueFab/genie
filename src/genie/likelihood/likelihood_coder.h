@@ -11,8 +11,8 @@
 #include <sstream>
 #include <memory>
 #include "genie/core/record/genotype/record.h"
-#include "likelihood_parameters.h"
-#include "likelihood_types.h"
+#include "genie/likelihood/likelihood_parameters.h"
+#include "genie/likelihood/likelihood_types.h"
 
 namespace genie::likelihood {
 

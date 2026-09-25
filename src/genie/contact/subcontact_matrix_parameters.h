@@ -14,7 +14,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "contact_matrix_parameters.h"
+#include "genie/contact/contact_matrix_parameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

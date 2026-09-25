@@ -14,9 +14,9 @@
 #include "genie/core/constants.h"
 #include "genie/core/record/genotype/record.h"
 #include "genie/backend/backend.h"
-#include "genotype_parameters.h"
-#include "genotype_payload.h"
-#include "genotype_types.h"
+#include "genie/genotype/genotype_parameters.h"
+#include "genie/genotype/genotype_payload.h"
+#include "genie/genotype/genotype_types.h"
 
 namespace genie::genotype {
 

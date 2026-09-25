@@ -7,7 +7,7 @@
 #ifndef GENIE_CONTACT_TEST_HELPERS_H
 #define GENIE_CONTACT_TEST_HELPERS_H
 
-#include "contact_types.h"
+#include "genie/contact/contact_types.h"
 #include <algorithm>
 #include <vector>
 #include <random>

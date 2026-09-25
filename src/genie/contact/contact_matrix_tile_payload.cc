@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "contact_matrix_tile_payload.h"
+#include "genie/contact/contact_matrix_tile_payload.h"
 #include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

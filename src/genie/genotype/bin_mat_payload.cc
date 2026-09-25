@@ -6,7 +6,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "bin_mat_payload.h"
+#include "genie/genotype/bin_mat_payload.h"
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/jbig/encoder.h"
 #include "genie/entropy/lzma/encoder.h"

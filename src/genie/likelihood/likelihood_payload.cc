@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "likelihood_payload.h"
+#include "genie/likelihood/likelihood_payload.h"
 
 #include <utility>
 

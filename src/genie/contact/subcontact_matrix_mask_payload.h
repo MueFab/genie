@@ -7,8 +7,8 @@
 #ifndef GENIE_CONTACT_SUBCONTACT_MATRIX_MASK_PAYLOAD_H
 #define GENIE_CONTACT_SUBCONTACT_MATRIX_MASK_PAYLOAD_H
 
-#include "consts.h"
-#include "contact_types.h"
+#include "genie/contact/consts.h"
+#include "genie/contact/contact_types.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 

@@ -4,7 +4,7 @@
 * https://github.com/mitogen/genie for more details.
 */
 
-#include "row_col_ids_payload.h"
+#include "genie/genotype/row_col_ids_payload.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------

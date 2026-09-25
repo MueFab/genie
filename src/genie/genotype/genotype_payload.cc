@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genotype_payload.h"
+#include "genie/genotype/genotype_payload.h"
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/jbig/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
 #include "genie/entropy/zstd/encoder.h"
 
-#include "genotype_coder.h"
+#include "genie/genotype/genotype_coder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "contact_coder.h"
+#include "genie/contact/contact_coder.h"
 #include <genie/entropy/jbig/encoder.h>
 #include <genie/entropy/jbig/decoder.h>
 #include <genie/core/record/contact/record.h>
@@ -19,11 +19,11 @@
 #include <map>
 #include <set>
 #include <iostream>
-#include "contact_matrix_parameters.h"
-#include "contact_matrix_tile_payload.h"
-#include "subcontact_matrix_parameters.h"
-#include "subcontact_matrix_payload.h"
-#include "subcontact_matrix_mask_payload.h"
+#include "genie/contact/contact_matrix_parameters.h"
+#include "genie/contact/contact_matrix_tile_payload.h"
+#include "genie/contact/subcontact_matrix_parameters.h"
+#include "genie/contact/subcontact_matrix_payload.h"
+#include "genie/contact/subcontact_matrix_mask_payload.h"
 #include "genie/backend/backend.h"
 #include "genie/util/log.h"
 #include <unordered_map>
